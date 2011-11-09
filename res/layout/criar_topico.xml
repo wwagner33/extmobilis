@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+			<TextView
+			    android:layout_width="wrap_content"
+			    android:layout_height="wrap_content"
+			    android:text="Nome do Topico"
+			    />
+    		<EditText
+    		    android:id="@+id/criar_topico_nome"
+    		    android:layout_width="wrap_content"
+    		    android:layout_height="wrap_content"
+    		    android:hint="Título do Tópico" 
+    		    />
+    			<TextView
+    			    android:layout_width="fill_parent"
+    			    android:layout_height="50dp"
+    			    android:text=""
+    			    />
+    		
+    			<TextView
+    			    android:layout_width="fill_parent"
+    			    android:layout_height="wrap_content"
+    			    android:text="Corpo da Mensagem"
+    			    />
+    		<EditText
+    		    android:id="@+id/criar_topico_conteudo"
+    		    android:layout_width="300dp"
+    		    android:layout_height="100dp"
+    		    android:hint="Corpo da Mensagem"
+    		    android:layout_gravity="center"
+    		    />
+    		<TextView
+    		    android:layout_width="fill_parent"
+    		    android:layout_height="40dp"
+    		    android:text=""
+    		    />
+    			<Button
+    			    android:id="@+id/criar_topico_submit"
+    			    android:layout_height="wrap_content"
+    			    android:layout_width="wrap_content"
+    			    android:layout_gravity="center"
+    			    android:text="Submit"
+    			    />
+    	
+
+</LinearLayout>
