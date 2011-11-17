@@ -4,10 +4,16 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 		<ListView
-		    	android:id="@+id/listposts"
+		    	android:id="@android:id/list"
 		    	android:layout_width="fill_parent"
 		    	android:layout_height="fill_parent"
 		    />	
-    
+    	<TextView
+    			android:id="@android:id/empty"
+    			android:layout_width="fill_parent"
+    			android:layout_height="fill_parent"
+    			android:gravity="center"
+    			android:text="não há mensagens nesse tópico / pressione Menu para adicionar uma nova mensagem"
+    	/>
 
 </LinearLayout>

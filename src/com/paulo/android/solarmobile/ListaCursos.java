@@ -43,7 +43,7 @@ public class ListaCursos extends Activity implements OnItemClickListener {
 				long arg3) {
 			// Toast.makeText(this, "teste", Toast.LENGTH_SHORT).show();
 			// intent = new Intent(ListaCursos.this,ListaPosts.class); // udar pra lista de Tópicos
-			intent = new Intent(ListaCursos.this,ListaTopicos.class);
+			intent = new Intent(ListaCursos.this,ListaPosts.class);
 			startActivity(intent);
 	
 			

@@ -1,52 +1,83 @@
 package com.paulo.android.solarmobile;
 
-import android.app.Activity;
-import android.content.ContentValues;
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import android.app.ListActivity;
+import android.content.Intent;
 import android.os.Bundle;
-import android.widget.ListView;
-import android.widget.TextView;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.widget.ListAdapter;
+import android.widget.SimpleAdapter;
 
 
-		/*
-		 * Lista os Tópicos do fórum. Se não houver post, deve existir um textview com a mensagem "Não há postagens
-		 * nesse fórum"	A lista de posts é uma lista customizada que, no momento , possui 3 elementos em cada list item
-		 * 1.A imagem da pessoa, Deve existir uma imagem vazia para os que não possuem imagem cadastrada.
-		 * 2.O nome do tópico. Por enquanto não há limite de caracteres.
-		 * 3. Uma prévia da mensagem do post em questão, também não há limite de caracteres.
-		 * 
-		 * Falta implementar um limite de posts por página e quando, chegar ao final, carragarem mais posts automaticamente
-		 * assim como a aplicação do gmail. Por enquanto não há limite de posts na página.
-		 * 
-		 * O layout final não deve conter a imagem do usuário, apenas na View da mensagem completa, juntamente com as
-		 * respostas da mensagem 
-		 * 
-		 * 
-		 * */
+		/*Método que pegue o resultado do HttpGet e jogue-o no ArrayList de HashMap*/
 
-public class ListaPosts extends Activity {
-	PostAdapter adapter;
-	ListView listaPosts;
-	ContentValues[] ForumContent;
+public class ListaPosts extends ListActivity {
+	
+	private ArrayList<HashMap<String,?>> valores;
+	String[] from = {"teste","teste2"};
+	int[] to = {R.id.ForumName,R.id.ForumText};
+	
+
+	private static final int REQ_CODE_1 = 1;	
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		ForumContent = new ContentValues[30];
-		for (int i=0;i<ForumContent.length;i++) {
-			ForumContent[i] = new ContentValues();
-			ForumContent[i].put("ForumName", "Forum"+i);
-			ForumContent[i].put("ForumContent", "Simulando o conteúdo de uma lista do tópico, estou escrevendo tanto porque o teclado daqui é bom de escrever" +
-					"			");
-			
-		}
-		
 		setContentView(R.layout.post);
-		listaPosts = (ListView) findViewById(R.id.listposts);
-		adapter = new PostAdapter(this,ForumContent);
-		listaPosts.setAdapter(adapter);
 		
 		
+		valores = new ArrayList<HashMap<String,?>>();
+		
+		
+		HashMap<String,String> valor1 = new HashMap<String,String>();
+		valor1.put("teste", "ForumName1");
+		valor1.put("teste2","ForumContent1");
+		
+		HashMap<String,String> valor2 = new HashMap<String,String>();
+		valor2 .put("teste", "ForumName2");
+		valor2.put("teste2","ForumContent2");
+		
+		valores.add(valor1);
+		valores.add(valor2);
+		
+		ListAdapter adapter = new SimpleAdapter(this, valores, R.layout.postitem, from, to);
+		setListAdapter(adapter);
+
+
 	}
 	
+	@Override
+			public boolean onCreateOptionsMenu(Menu menu) {
+				MenuInflater inflater = getMenuInflater();
+				inflater.inflate(R.menu.lista_posts_menu, menu);	
+				return true;
+				
+			}
+		@Override
+				public boolean onOptionsItemSelected(MenuItem item) {
+					if (item.getItemId()==R.id.lista_posts_responder) {
+						Intent intent = new Intent(ListaPosts.this,ResponderTopico.class);
+						startActivityForResult(intent,REQ_CODE_1);
+						return true;
+						
+					}
+					return super.onOptionsItemSelected(item);
+				}
+	
+		@Override
+				protected void onActivityResult(int requestCode, int resultCode,
+						Intent data) {
+					if (requestCode == REQ_CODE_1) {
+						if (resultCode == RESULT_OK) {
+						
+						}
+						
+					}
+					super.onActivityResult(requestCode, resultCode, data);
+				}
 
 }
