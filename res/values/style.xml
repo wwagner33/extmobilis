@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+		<style name="SolarTheme" parent="@android:style/Theme.Light.NoTitleBar">
+		
+		</style>
+		
+		<style name="SolarTheme.layout1">
+				<item name="android:background">#0033CC</item>
+		</style> 
+		
+		<style name="SolarTheme.layout2">
+				<item name="android:background">#6699CC</item>
+		</style>
+		
+		<style name="SolarTheme.layout3">
+				<item name="android:background">#FFFFFF</item>
+		</style>
+</resources>

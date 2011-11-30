@@ -3,6 +3,80 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
+    
+    	<LinearLayout
+    		android:id="@+id/layout1"
+    		android:layout_width="fill_parent"
+    		android:layout_height="40dp"
+    		android:orientation="horizontal"
+    		style="@style/SolarTheme.layout1"
+    		
+    		>
+    	    
+    	    <ImageView
+    	        	android:id="@+id/title_2"
+    	        	android:src="@drawable/solarlogo"
+    	       		android:layout_width="wrap_content"
+    	       		android:layout_height="30dp"
+    	       		android:layout_marginTop="5dp"
+    	       		android:layout_marginLeft="-50dp"
+    	       		
+    	        	
+    	        />
+    				
+    	</LinearLayout>
+    	
+    	<RelativeLayout
+    	    android:id="@+id/layout2"
+    	    android:layout_width="fill_parent"
+    	    android:layout_height="35dp"
+    	    style="@style/SolarTheme.layout2"
+    	    >
+    	    <ImageView
+    	        android:id="@+id/stock_person"
+    	        android:layout_width="wrap_content"
+    	        android:layout_height="30dp"
+    	        android:layout_alignParentLeft="true"
+    	        android:layout_marginTop="2dp"
+    	        android:src="@drawable/stock_person"
+    	        />
+    	    <TextView
+    	        android:id="@+id/aluno"
+    	        android:layout_toRightOf="@id/stock_person"
+    	        android:layout_height="wrap_content"
+    	        android:layout_width="wrap_content"
+    	        android:layout_alignParentTop="true"
+    	    	android:text="Aluno"    
+    	        />
+    	    <TextView
+    	        android:id="@+id/nome_aluno"
+    	        android:layout_below="@id/aluno"
+    	        android:layout_toRightOf="@id/stock_person"
+    	        android:layout_width="wrap_content"
+    	        android:layout_height="wrap_content"
+    	        android:layout_marginTop="-4dp"
+    	        android:text="Nome do aluno"
+    	        />
+    	    <ImageButton
+    	     
+    	        
+    	        />
+    	    
+    	    
+    	</RelativeLayout>
+    	
+    	    <RelativeLayout
+    	        android:id="@+id/layout3"
+    	        android:layout_height="40dp"
+    	        android:layout_width="fill_parent"
+    	       
+    	        >
+    	    </RelativeLayout>
+    	    <TextView
+    	        android:layout_width="wrap_content"
+    	        android:layout_height="wrap_content"
+    	        android:text="teste"
+    	        /> 
 		<ListView
 		    	android:id="@android:id/list"
 		    	android:layout_width="fill_parent"
@@ -13,7 +87,13 @@
     			android:layout_width="fill_parent"
     			android:layout_height="fill_parent"
     			android:gravity="center"
-    			android:text="não há mensagens nesse tópico / pressione Menu para adicionar uma nova mensagem"
+    			android:text="Forum Vazio"
     	/>
 
 </LinearLayout>
+
+
+    <!-- 
+    		android:layout_marginLeft="-50dp"
+     -->
+    
