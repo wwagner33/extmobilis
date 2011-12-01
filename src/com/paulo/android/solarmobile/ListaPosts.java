@@ -17,8 +17,31 @@ import android.widget.ListAdapter;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
-
 		/*Método que pegue o resultado do HttpGet e jogue-o no ArrayList de HashMap*/
+
+		/*	Menu OLD
+		 * 	
+		 * 		@Override
+			public boolean onCreateOptionsMenu(Menu menu) {
+				MenuInflater inflater = getMenuInflater();
+				inflater.inflate(R.menu.lista_posts_menu, menu);	
+				return true;
+				
+			}
+		@Override
+				public boolean onOptionsItemSelected(MenuItem item) {
+					if (item.getItemId()==R.id.lista_posts_responder) {
+						Intent intent = new Intent(ListaPosts.this,ResponderTopico.class);
+						startActivityForResult(intent,REQ_CODE_1);
+						return true;
+						
+					}
+					return super.onOptionsItemSelected(item);
+				}
+	sssss
+		 * 
+		 * 
+		 * */
 
 public class ListaPosts extends ListActivity implements OnClickListener {
 	
@@ -58,24 +81,7 @@ public class ListaPosts extends ListActivity implements OnClickListener {
 
 	}
 	
-	@Override
-			public boolean onCreateOptionsMenu(Menu menu) {
-				MenuInflater inflater = getMenuInflater();
-				inflater.inflate(R.menu.lista_posts_menu, menu);	
-				return true;
-				
-			}
-		@Override
-				public boolean onOptionsItemSelected(MenuItem item) {
-					if (item.getItemId()==R.id.lista_posts_responder) {
-						Intent intent = new Intent(ListaPosts.this,ResponderTopico.class);
-						startActivityForResult(intent,REQ_CODE_1);
-						return true;
-						
-					}
-					return super.onOptionsItemSelected(item);
-				}
-	
+
 		@Override
 				protected void onActivityResult(int requestCode, int resultCode,
 						Intent data) {
