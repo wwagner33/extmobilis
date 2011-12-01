@@ -9,18 +9,24 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ListAdapter;
 import android.widget.SimpleAdapter;
+import android.widget.Toast;
 
 
 		/*Método que pegue o resultado do HttpGet e jogue-o no ArrayList de HashMap*/
 
-public class ListaPosts extends ListActivity {
+public class ListaPosts extends ListActivity implements OnClickListener {
 	
 	private ArrayList<HashMap<String,?>> valores;
 	String[] from = {"teste","teste2"};
-	int[] to = {R.id.ForumName,R.id.ForumText};
-	
+	int[] to = {R.id.item_nome_pessoa,R.id.item_hora_envio};
+	Button teste;
+	ImageButton button;
 
 	private static final int REQ_CODE_1 = 1;	
 	
@@ -28,8 +34,10 @@ public class ListaPosts extends ListActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.post);
-		
-		
+		button = (ImageButton)findViewById(R.id.nova_mensagem);
+		button.setOnClickListener(this);
+		teste =(Button)findViewById(R.id.button_inicio);
+		teste.setOnClickListener(this);
 		valores = new ArrayList<HashMap<String,?>>();
 		
 		
@@ -46,7 +54,7 @@ public class ListaPosts extends ListActivity {
 		
 		ListAdapter adapter = new SimpleAdapter(this, valores, R.layout.postitem, from, to);
 		setListAdapter(adapter);
-
+		 
 
 	}
 	
@@ -79,5 +87,11 @@ public class ListaPosts extends ListActivity {
 					}
 					super.onActivityResult(requestCode, resultCode, data);
 				}
+
+		@Override
+		public void onClick(View v) {
+		Toast.makeText(this, "teste", Toast.LENGTH_SHORT).show();
+			
+		}
 
 }

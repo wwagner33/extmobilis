@@ -10,18 +10,15 @@
     		android:layout_height="40dp"
     		android:orientation="horizontal"
     		style="@style/SolarTheme.layout1"
-    		
-    		>
-    	    
-    	    <ImageView
+    	 >
+    	   		<ImageView          
     	        	android:id="@+id/title_2"
     	        	android:src="@drawable/solarlogo"
     	       		android:layout_width="wrap_content"
-    	       		android:layout_height="30dp"
+    	       		android:layout_height="wrap_content"
     	       		android:layout_marginTop="5dp"
-    	       		android:layout_marginLeft="-50dp"
-    	       		
-    	        	
+    	       		android:layout_marginLeft="5dp"
+    	       		android:scaleType="fitStart"
     	        />
     				
     	</LinearLayout>
@@ -35,7 +32,8 @@
     	    <ImageView
     	        android:id="@+id/stock_person"
     	        android:layout_width="wrap_content"
-    	        android:layout_height="30dp"
+    	        android:layout_height="wrap_content"
+    	        android:scaleType="fitStart"
     	        android:layout_alignParentLeft="true"
     	        android:layout_marginTop="2dp"
     	        android:src="@drawable/stock_person"
@@ -57,26 +55,74 @@
     	        android:layout_marginTop="-4dp"
     	        android:text="Nome do aluno"
     	        />
-    	    <ImageButton
-    	     
-    	        
-    	        />
+    	   <Button
+    	       	android:id="@+id/button_sair"
+    	       	android:layout_width="wrap_content"
+    	       	android:layout_height="wrap_content"
+    	 		android:background="@drawable/button_custom"
+    	 		
+    	 		android:padding="4dp"
+    	 		android:layout_marginTop="6dp"
+    	 		android:layout_marginRight="6dp"
+    	 		android:layout_marginBottom="6dp"
+    	  		android:text="sair"	
+    	  		android:textSize="10dp"
+    	       	android:layout_alignParentRight="true"
+    	       	
+    	       />
+    	   
+    	      <Button
+    	       	android:id="@+id/button_inicio"
+    	       	android:layout_width="wrap_content"
+    	     	android:layout_toLeftOf="@id/button_sair"
+    	       	android:layout_height="wrap_content"
+    	 		android:background="@drawable/button_custom"
+    	 		
+    	 		android:padding="4dp"
+    	 		android:layout_marginTop="6dp"
+    	 		android:layout_marginRight="6dp"
+    	 		android:layout_marginBottom="6dp"
+    	  		android:text="inicio"	
+    	  		android:textSize="10dp"
+    	   
+    	       	
+    	       />
     	    
     	    
+     	    
     	</RelativeLayout>
     	
     	    <RelativeLayout
     	        android:id="@+id/layout3"
     	        android:layout_height="40dp"
     	        android:layout_width="fill_parent"
-    	       
     	        >
+    	      <TextView 
+    	          android:id="@+id/nome_forum"
+    	          android:layout_width="wrap_content"
+    	          android:layout_height="wrap_content"
+    	          android:textSize="15dp"
+    	          android:layout_centerHorizontal="true"
+    	          android:layout_alignParentLeft="true"
+    	          android:layout_centerInParent="true"
+    	          android:layout_marginLeft="5dp"
+    	          android:text="Nome do Forum"
+    	          />
+    	      <ImageButton
+    	          android:id="@+id/nova_mensagem"
+    	          android:layout_width="wrap_content"
+    	          android:layout_height="wrap_content"
+    	          android:background="@drawable/respodner"
+    	          android:scaleType="matrix"
+    	          android:layout_alignParentRight="true"
+    	          android:layout_marginRight="5dp"
+    	          android:layout_centerInParent="true"
+    	          android:layout_centerHorizontal="true"
+    	     
+    	          />
+    	        
     	    </RelativeLayout>
-    	    <TextView
-    	        android:layout_width="wrap_content"
-    	        android:layout_height="wrap_content"
-    	        android:text="teste"
-    	        /> 
+    	
 		<ListView
 		    	android:id="@android:id/list"
 		    	android:layout_width="fill_parent"
@@ -95,5 +141,7 @@
 
     <!-- 
     		android:layout_marginLeft="-50dp"
+    		
+    		android:layout_height="30dp"
      -->
     
