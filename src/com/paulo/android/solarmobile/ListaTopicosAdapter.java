@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-public class ListaTopicosAdapter extends BaseAdapter {
+public class ListaTopicosAdapter extends BaseAdapter{
 	public Activity activity;
 	public ContentValues[] data;
 	public LayoutInflater inflater=null;
