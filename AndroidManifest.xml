@@ -32,12 +32,7 @@
             android:name=".ListaPosts"
             >
         </activity>
-        <activity
-            android:name=".ListaTopicos"
-            
-            >
-            
-        </activity>
+      
         <activity
             android:name=".ResponderTopico"
             />
