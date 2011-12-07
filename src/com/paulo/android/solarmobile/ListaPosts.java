@@ -30,17 +30,24 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class ListaPosts extends ListActivity implements OnClickListener,
-		OnChronometerTickListener, OnCompletionListener {
+		OnChronometerTickListener, OnCompletionListener  {
 
 	String[] from = { "teste", "teste2" };
 	int[] to = { R.id.item_nome_pessoa, R.id.item_hora_envio };
-	Button stop, start, pause, exitDialog, vf;
+	Button ouvir,stop,start,pause,exitDialog,vf;
 	TextView contador;
 	ImageButton button;
 	PostAdapter adapter;
 	private static final int REQ_CODE_1 = 1;
 	private static final int DIALOG_GRAVAR = 2;
 	Dialog myDialog;
+	public int tagHolder;
+	
+	File path = new File(Environment.getExternalStorageDirectory()
+			.getAbsolutePath() + "/Mobilis/Recordings/");
+	
+	// Valores da lista
+	ContentValues[] teste1;
 
 	// variáveis de gravar audio
 	long countUp;
@@ -59,12 +66,14 @@ public class ListaPosts extends ListActivity implements OnClickListener,
 		button = (ImageButton) findViewById(R.id.nova_mensagem);
 		button.setOnClickListener(this);
 
-		ContentValues[] teste1 = new ContentValues[2];
+		teste1 = new ContentValues[2];
 		teste1[0] = new ContentValues();
 		teste1[1] = new ContentValues();
 
 		teste1[0].put("teste", "teste");
+		teste1[0].put("hasVoice",false);
 		teste1[1].put("teste", "teste");
+		teste1[1].put("hasVoice",false);
 		adapter = new PostAdapter(this, teste1);
 
 		setListAdapter(adapter);
@@ -74,8 +83,15 @@ public class ListaPosts extends ListActivity implements OnClickListener,
 	@Override
 	public void onClick(View v) {
 		if (v.getId() == R.id.VoiceForum) {
+			Toast.makeText(this, "teste", Toast.LENGTH_SHORT).show();
+			
 			myDialog = onCreateDialog(DIALOG_GRAVAR);
+			tagHolder  = (Integer)v.getTag(R.id.change);
 			myDialog.show();
+			
+			String[] teste = path.list();
+			Toast.makeText(this, teste[0], Toast.LENGTH_SHORT).show();
+			
 		}
 		if (v.getId() == R.id.img_close) {
 			myDialog.dismiss();
@@ -84,22 +100,25 @@ public class ListaPosts extends ListActivity implements OnClickListener,
 			// gravar aqui
 			startTime = System.currentTimeMillis();
 			recorder = new MediaRecorder();
-
 			recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
 			recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
 			recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
 
-			File path = new File(Environment.getExternalStorageDirectory()
-					.getAbsolutePath() + "/Mobilis/Recordings/");
+		//	path = new File(Environment.getExternalStorageDirectory()
+		//			.getAbsolutePath() + "/Mobilis/Recordings/");
 			path.mkdirs();
 
-			try {
-				audioFile = File.createTempFile("recording", ".3gp", path);
-			} catch (IOException e) {
-				throw new RuntimeException(
-						"Couldn't create recording audio file", e);
+		//	try {
+				//audioFile = File.createTempFile("recording", ".3gp", path);
+				audioFile = new File(path, "recording.3gp");
+				
+			//	path.list()
+				
+	//		} catch (IOException e) {
+	//			throw new RuntimeException(
+	//					"Couldn't create recording audio file", e);
 
-			}
+			//}
 			recorder.setOutputFile(audioFile.getAbsolutePath());
 
 			try {
@@ -123,34 +142,52 @@ public class ListaPosts extends ListActivity implements OnClickListener,
 			recorder.stop();
 			recorder.release();
 			 task.cancel(true);// para a thread
-			stopWatch.stop();
+			 stopWatch.stop();
 			contador.setText("00:00");
-			player = new MediaPlayer();
-			player.setOnCompletionListener(this);
-			try {
-				player.setDataSource(audioFile.getAbsolutePath());
-			} catch (IllegalArgumentException e) {
-				throw new RuntimeException(
-						"Illegal Argument to MediaPlayer.setDataSource", e);
-			} catch (IllegalStateException e) {
-				throw new RuntimeException(
-						"Illegal State in MediaPlayer.setDataSource", e);
-			} catch (IOException e) {
-				throw new RuntimeException(
-						"IOException in MediaPalyer.setDataSource", e);
-			}
-			try {
-				player.prepare();
-			} catch (IllegalStateException e) {
-				throw new RuntimeException(
-						"IllegalStateException in MediaPlayer.prepare", e);
-			} catch (IOException e) {
-				throw new RuntimeException(
-						"IOException in MediaPlayer.prepare", e);
-			}
+			
+			// muda a view que possue voz
+			teste1[tagHolder].remove("hasVoice");
+			teste1[tagHolder].put("hasVoice", true);
+			
+			//salva o nome do arquivo de áudio na lista
+			teste1[tagHolder].put("voiceFileName", audioFile.getAbsolutePath());
+			
+			
+			setListAdapter(adapter);
+			
+			
+			
 		}
 		if (v.getId() == R.id.pause_recording) {
 			// ?????
+		}
+		
+		if (v.getId() == R.id.ouvir) {
+			//Toast.makeText(this,"Media Player",Toast.LENGTH_SHORT).show();
+			player = new MediaPlayer();
+			player.setOnCompletionListener(this);
+			
+			try {
+				player.setDataSource(audioFile.getAbsolutePath());
+				} catch (IllegalArgumentException e) {
+				throw new RuntimeException(
+				"Illegal Argument to MediaPlayer.setDataSource", e);
+				} catch (IllegalStateException e) {
+				throw new RuntimeException(
+				"Illegal State in MediaPlayer.setDataSource", e);
+				} catch (IOException e) {
+				throw new RuntimeException(
+				"IOException in MediaPalyer.setDataSource", e);
+				}
+				try {
+				player.prepare();
+				} catch (IllegalStateException e) {
+				throw new RuntimeException(
+				"IllegalStateException in MediaPlayer.prepare", e);
+				} catch (IOException e) {
+				throw new RuntimeException("IOException in MediaPlayer.prepare", e);
+				}
+			
 		}
 	}
 
@@ -251,17 +288,29 @@ public class ListaPosts extends ListActivity implements OnClickListener,
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
 
-			View v = convertView;
-			if (v == null) {
-
-				v = inflater.inflate(R.layout.postitem, parent, false);
-
-				vf = (Button) v.findViewById(R.id.VoiceForum);
-				vf.setOnClickListener(ListaPosts.this);
-
+		
+			if (convertView == null) {
+					if (data[position].getAsBoolean("hasVoice")==false) {				
+					convertView = inflater.inflate(R.layout.postitem, parent, false);
+					convertView.setId(1);
+					}
+					else  {
+					convertView = inflater.inflate(R.layout.postitemvoice,parent,false);
+					convertView.setId(2);
+					}
+						
 			}
+				if (convertView.getId()==2) {
+					ouvir = (Button)convertView.findViewById(R.id.ouvir);
+					ouvir.setOnClickListener(ListaPosts.this);
+				}
+		
+				vf = (Button) convertView.findViewById(R.id.VoiceForum);
+				vf.setTag(R.id.change,position);
+				vf.setOnClickListener(ListaPosts.this);
+			
 
-			return v;
+			return convertView;
 		}
 
 	}
@@ -277,8 +326,7 @@ public class ListaPosts extends ListActivity implements OnClickListener,
 
 	@Override
 	public void onCompletion(MediaPlayer mp) {
-		Toast.makeText(this, "Gravação bem sucedida", Toast.LENGTH_SHORT)
-				.show();
-
+		// TODO Auto-generated method stub
+		
 	}
-}
+ }
