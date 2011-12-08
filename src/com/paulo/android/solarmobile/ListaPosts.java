@@ -83,14 +83,14 @@ public class ListaPosts extends ListActivity implements OnClickListener,
 	@Override
 	public void onClick(View v) {
 		if (v.getId() == R.id.VoiceForum) {
-			Toast.makeText(this, "teste", Toast.LENGTH_SHORT).show();
-			
+		//	Toast.makeText(this, "teste", Toast.LENGTH_SHORT).show();
+			Toast.makeText(this, path.getAbsolutePath(),Toast.LENGTH_SHORT).show();
 			myDialog = onCreateDialog(DIALOG_GRAVAR);
 			tagHolder  = (Integer)v.getTag(R.id.change);
 			myDialog.show();
 			
-			String[] teste = path.list();
-			Toast.makeText(this, teste[0], Toast.LENGTH_SHORT).show();
+		//	String[] teste = path.list();
+		//	Toast.makeText(this, teste[0], Toast.LENGTH_SHORT).show();
 			
 		}
 		if (v.getId() == R.id.img_close) {
@@ -110,7 +110,7 @@ public class ListaPosts extends ListActivity implements OnClickListener,
 
 		//	try {
 				//audioFile = File.createTempFile("recording", ".3gp", path);
-				audioFile = new File(path, "recording.3gp");
+				audioFile = new File(path, "recording"+tagHolder+".3gp");
 				
 			//	path.list()
 				
@@ -163,12 +163,13 @@ public class ListaPosts extends ListActivity implements OnClickListener,
 		}
 		
 		if (v.getId() == R.id.ouvir) {
-			//Toast.makeText(this,"Media Player",Toast.LENGTH_SHORT).show();
+		//	Toast.makeText(this,"Media Player",Toast.LENGTH_SHORT).show();
 			player = new MediaPlayer();
 			player.setOnCompletionListener(this);
+			String position = String.valueOf(v.getTag(R.id.change));
 			
 			try {
-				player.setDataSource(audioFile.getAbsolutePath());
+				player.setDataSource(path.getAbsolutePath() + "/recording"+position+".3gp");
 				} catch (IllegalArgumentException e) {
 				throw new RuntimeException(
 				"Illegal Argument to MediaPlayer.setDataSource", e);
@@ -188,6 +189,7 @@ public class ListaPosts extends ListActivity implements OnClickListener,
 				throw new RuntimeException("IOException in MediaPlayer.prepare", e);
 				}
 			
+				player.start();
 		}
 	}
 
@@ -302,6 +304,7 @@ public class ListaPosts extends ListActivity implements OnClickListener,
 			}
 				if (convertView.getId()==2) {
 					ouvir = (Button)convertView.findViewById(R.id.ouvir);
+					ouvir.setTag(R.id.change,position);
 					ouvir.setOnClickListener(ListaPosts.this);
 				}
 		
