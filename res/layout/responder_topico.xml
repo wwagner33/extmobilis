@@ -3,25 +3,8 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical" >
-			<TextView
-			    android:layout_width="wrap_content"
-			    android:layout_height="wrap_content"
-			    android:text="Nome do Topico :"
-			    android:layout_margin="5dp"
-			    />
-    		<EditText
-    		    android:id="@+id/criar_topico_nome"
-    		    android:layout_width="wrap_content"
-    		    android:layout_height="wrap_content"
-    		    android:hint="Título do Tópico"
-    		    android:layout_marginLeft="5dp" 
-    		    />
-    			<TextView
-    			    android:layout_width="fill_parent"
-    			    android:layout_height="50dp"
-    			    android:text=""
-    			    />
-    		
+		
+    
     			<TextView
     			    android:layout_width="fill_parent"
     			    android:layout_height="wrap_content"
