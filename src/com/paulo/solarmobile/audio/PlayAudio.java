@@ -12,7 +12,7 @@ public abstract class PlayAudio {
 		public PlayAudio(String fileName) {
 			File path = new File(Environment.getExternalStorageDirectory()
 					.getAbsolutePath() + "/Mobilis/Recordings/");
-				player.setDataSource(path)
+			//	player.setDataSource(path)
 			
 		}
 		
