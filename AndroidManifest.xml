@@ -12,7 +12,7 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".Main"/>
+        <activity android:name=".Login"/>
         <activity android:name=".ListaCursos"/>
         <activity android:name=".ListaPosts"/>
         <activity android:name=".TopicListController"/>

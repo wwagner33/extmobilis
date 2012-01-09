@@ -26,7 +26,7 @@ public class InitialConfig extends Activity {
 				startActivity(intent);
 			}
 			else {
-				Intent intent = new Intent(this,Main.class);
+				Intent intent = new Intent(this,Login.class);
 				startActivity(intent);
 			}
 			
@@ -34,7 +34,7 @@ public class InitialConfig extends Activity {
 		
 		else {
 			helper.copyDatabaseFile();
-			intent = new Intent(this,Main.class);
+			intent = new Intent(this,Login.class);
 			startActivity(intent);
 		}
 	}
