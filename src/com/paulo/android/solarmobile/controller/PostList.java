@@ -1,7 +1,6 @@
 package com.paulo.android.solarmobile.controller;
 
 import java.io.File;
-import java.io.IOException;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -10,10 +9,7 @@ import android.app.ListActivity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
-import android.media.MediaRecorder;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.LayoutInflater;
@@ -28,8 +24,11 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class ListaPosts extends ListActivity implements OnClickListener,
-		OnChronometerTickListener, OnCompletionListener  {
+import com.paulo.solarmobile.audio.PlayAudio;
+import com.paulo.solarmobile.audio.RecordAudio;
+
+public class PostList extends ListActivity implements OnClickListener,
+		OnChronometerTickListener  {
 
 	String[] from = { "teste", "teste2" };
 	int[] to = { R.id.item_nome_pessoa, R.id.item_hora_envio };
@@ -55,15 +54,18 @@ public class ListaPosts extends ListActivity implements OnClickListener,
 	long startTime;
 	long time2 = 0;
 	Chronometer stopWatch;
-	MediaRecorder recorder;
-	MediaPlayer player;
 	File audioFile;
-	RecordOnBackground task = new RecordOnBackground();
+	
+	// recorder 
+	MediaRecorder record;
+	AudioPlayer player;
+	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.post);
+		
 		
 		
 		button = (ImageButton) findViewById(R.id.nova_mensagem);
@@ -77,8 +79,8 @@ public class ListaPosts extends ListActivity implements OnClickListener,
 		teste1[0].put("hasVoice",false);
 		teste1[1].put("teste", "teste");
 		teste1[1].put("hasVoice",false);
+		
 		adapter = new PostAdapter(this, teste1);
-
 		setListAdapter(adapter);
 
 	}
@@ -101,94 +103,38 @@ public class ListaPosts extends ListActivity implements OnClickListener,
 		}
 		if (v.getId() == R.id.start_recording) {
 			// gravar aqui
+			record = new MediaRecorder();
+			record.startRecording("teste");
 			startTime = System.currentTimeMillis();
-			recorder = new MediaRecorder();
-			recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-			recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-			recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-		
-			path.mkdirs();
-
-			audioFile = new File(path, "recording"+tagHolder+".3gp");
-			
-			recorder.setOutputFile(audioFile.getAbsolutePath());
-
-			try {
-				recorder.prepare();
-			} catch (IllegalStateException e) {
-				throw new RuntimeException(
-						"IllegalStateException on MediaRecorder.prepare", e);
-			} catch (IOException e) {
-				throw new RuntimeException(
-						"IOException on MediaRecorder.prepare", e);
-			}
-			// começa a gravar em background e começa o cronômetro na main
-			// thread
-
-			 task.doInBackground();
 			 stopWatch.start();
 
 		}
 		if (v.getId() == R.id.stop_recording) {
-			// parar a gravação
-			recorder.stop();
-			recorder.release();
-			 task.cancel(true);// para a thread
-			 stopWatch.stop();
-			contador.setText("00:00");
 			
+			record.stopRecording();
+			stopWatch.stop();
+			contador.setText("00:00");
+		
+			// update view 
 			// muda a view que possue voz
 			teste1[tagHolder].remove("hasVoice");
-			teste1[tagHolder].put("hasVoice", true);
-			
+			teste1[tagHolder].put("hasVoice", true);		
 			//salva o nome do arquivo de áudio na lista
-			teste1[tagHolder].put("voiceFileName", audioFile.getAbsolutePath());
-			
-			
+			teste1[tagHolder].put("voiceFileName", record.getAudioFilePath());	
 			setListAdapter(adapter);
 			
 			
-			
-		}
-		if (v.getId() == R.id.pause_recording) {
-			// ?????
 		}
 		
 		if (v.getId() == R.id.ouvir) {
-		//	Toast.makeText(this,"Media Player",Toast.LENGTH_SHORT).show();
-			player = new MediaPlayer();
-			player.setOnCompletionListener(this);
-			String position = String.valueOf(v.getTag(R.id.change));
-			
-			try {
-				player.setDataSource(path.getAbsolutePath() + "/recording"+position+".3gp");
-				} catch (IllegalArgumentException e) {
-				throw new RuntimeException(
-				"Illegal Argument to MediaPlayer.setDataSource", e);
-				} catch (IllegalStateException e) {
-				throw new RuntimeException(
-				"Illegal State in MediaPlayer.setDataSource", e);
-				} catch (IOException e) {
-				throw new RuntimeException(
-				"IOException in MediaPalyer.setDataSource", e);
-				}
-				try {
-				player.prepare();
-				} catch (IllegalStateException e) {
-				throw new RuntimeException(
-				"IllegalStateException in MediaPlayer.prepare", e);
-				} catch (IOException e) {
-				throw new RuntimeException("IOException in MediaPlayer.prepare", e);
-				}
-			
-				player.start();
+				
+		
 		}
 		if (v.getId()==R.id.Responder) {
 		 Intent	intent = new Intent(this,ResponseController.class);
 		 startActivity(intent);
 			
-		}
-		
+	  }	
 	}
 
 	@Override
@@ -218,7 +164,6 @@ public class ListaPosts extends ListActivity implements OnClickListener,
 		builder = new AlertDialog.Builder(this);
 		builder.setView(layout);
 		alertDialog = builder.create();
-
 		return alertDialog;
 	}
 
@@ -254,6 +199,45 @@ public class ListaPosts extends ListActivity implements OnClickListener,
 		contador.setText(asText);
 
 	}
+	
+
+	public class MediaRecorder extends RecordAudio {
+
+		@Override
+		public void updateRecordingDialog(int protocol) {
+				if (protocol ==1) {
+							// disable gravar
+							// enable stop
+							
+				}
+				
+				if (protocol ==2) {
+						// disable stop
+						// enable record	
+			}
+		}	
+	}
+	
+	public class AudioPlayer extends PlayAudio {
+
+		public AudioPlayer(String fileName) {
+			super(fileName);
+			
+		}
+
+		@Override
+		public void onCompletion(android.media.MediaPlayer mp) {
+				// faz nada por eunquanto
+			
+		}
+
+		@Override
+		public void updatePlayingDialog() {
+			// TODO Auto-generated method stub
+			
+		}
+	}
+	
 
 	public class PostAdapter extends BaseAdapter {
 
@@ -303,33 +287,17 @@ public class ListaPosts extends ListActivity implements OnClickListener,
 				if (convertView.getId()==2) {
 					ouvir = (Button)convertView.findViewById(R.id.ouvir);
 					ouvir.setTag(R.id.change,position);
-					ouvir.setOnClickListener(ListaPosts.this);
+					ouvir.setOnClickListener(PostList.this);
 				}
 		
 				vf = (Button) convertView.findViewById(R.id.VoiceForum);
 				response = (Button)convertView.findViewById(R.id.Responder);
-				response.setOnClickListener(ListaPosts.this);
+				response.setOnClickListener(PostList.this);
 				vf.setTag(R.id.change,position);
-				vf.setOnClickListener(ListaPosts.this);
+				vf.setOnClickListener(PostList.this);
 			
 
 			return convertView;
 		}
-
-	}
-
-	public class RecordOnBackground extends AsyncTask<Void, Void, Void> {
-
-		@Override
-		protected Void doInBackground(Void... params) {
-			recorder.start();
-			return null;
-		}
-	}
-
-	@Override
-	public void onCompletion(MediaPlayer mp) {
-		// TODO Auto-generated method stub
-		
 	}
  }

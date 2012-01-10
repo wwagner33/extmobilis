@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.paulo.android.solarmobile.model.DBAdapter;
 import com.paulo.android.solarmobile.model.DatabaseHelper;
@@ -21,6 +22,11 @@ public class InitialConfig extends Activity {
 		if (helper.checkDataBaseExistence()) {
 			adapter.open();
 			cursor = adapter.getOneRow("config", 1);
+			Log.w("Cursor size", String.valueOf(cursor.getColumnCount()));
+			Log.w("Cursor Count", String.valueOf(cursor.getCount()));
+		//	Log.w("Value",cursor.getString(1));
+			
+		
 			if (cursor.getString(cursor.getColumnIndex("valor"))!=null) {
 				intent = new Intent(this,ListaCursos.class);
 				startActivity(intent);

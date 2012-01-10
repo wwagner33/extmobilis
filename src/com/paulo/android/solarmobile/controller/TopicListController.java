@@ -29,7 +29,7 @@ public class TopicListController extends ListActivity {
 		protected void onListItemClick(ListView l, View v, int position, long id) {
 		// TODO Auto-generated method stub
 		super.onListItemClick(l, v, position, id);
-		Intent intent = new Intent(this,ListaPosts.class);
+		Intent intent = new Intent(this,PostList.class);
 		startActivity(intent);
 		}
 		

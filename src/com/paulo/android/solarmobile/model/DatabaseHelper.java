@@ -55,7 +55,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 	private static String DB_NAME = "MobilisDB.sqlite";
 
-	private final Context myContext;
+	private final Context context;
 
 	/**
 	 * Constructor Keeps a reference to the passed context in order to access
@@ -67,7 +67,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	public DatabaseHelper(Context context) {
 
 		super(context, DB_NAME, null, 1);
-		this.myContext = context;
+		this.context = context;
 	}
 
 	/**
@@ -128,50 +128,50 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	public void copyDatabaseFile() {
 
 		// variables
-		InputStream myInput = null;
-		OutputStream myOutput = null;
-		SQLiteDatabase database = null;
+				InputStream myInput = null;
+				OutputStream myOutput = null;
+				SQLiteDatabase database = null;
 
-		// only proceed in case the database does not exist
-		if (!checkDataBaseExistence()) {
-			// get the database
-			database = this.getReadableDatabase();
-			try {
-				// Open your local db as the input stream
-				myInput = myContext.getAssets().open(DB_NAME);
+				// only proceed in case the database does not exist
 
-				// Path to the just created empty db
-				String outFileName = DB_PATH + DB_NAME;
-
-				// Open the empty db as the output stream
-				myOutput = new FileOutputStream(outFileName);
-
-				// transfer bytes from the input file to the output file
-				byte[] buffer = new byte[1024];
-				int length;
-				while ((length = myInput.read(buffer)) > 0) {
-					myOutput.write(buffer, 0, length);
-				}
-			} catch (FileNotFoundException e) {
-				// handle your exception here
-			} catch (IOException e) {
-				// handle your exception here
-			} finally {
+				// get the database
+				database = this.getReadableDatabase();
 				try {
-					// Close the streams
-					myOutput.flush();
-					myOutput.close();
-					myInput.close();
-					// close the database in case it is opened
-					if (database != null && database.isOpen()) {
-						database.close();
-					}
+					// Open your local db as the input stream
+					myInput = context.getAssets().open(DB_NAME);
 
-				} catch (Exception e) {
+					// Path to the just created empty db
+					String outFileName = DB_PATH + DB_NAME;
+
+					// Open the empty db as the output stream
+					myOutput = new FileOutputStream(outFileName);
+
+					// transfer bytes from the input file to the output file
+					byte[] buffer = new byte[1024];
+					int length;
+					while ((length = myInput.read(buffer)) > 0) {
+						myOutput.write(buffer, 0, length);
+					}
+				} catch (FileNotFoundException e) {
 					// handle your exception here
+				} catch (IOException e) {
+					// handle your exception here
+				} finally {
+					try {
+						// Close the streams
+						myOutput.flush();
+						myOutput.close();
+						myInput.close();
+						// close the database in case it is opened
+						if (database != null && database.isOpen()) {
+						
+							database.close();
+						}
+					} catch (Exception e) {
+						// handle your exception here
+					}
 				}
-			}
-		}
+
 	}
 
 	/**
@@ -182,28 +182,26 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	 */
 	public boolean checkDataBaseExistence() {
 
-		// database to be verified
-		SQLiteDatabase dbToBeVerified = null;
-
+		SQLiteDatabase checkDB = null;
 		try {
-			// get database path
-			String dbPath = DB_PATH + DB_NAME;
-			// try to open the database
-			dbToBeVerified = SQLiteDatabase.openDatabase(dbPath, null,
-					SQLiteDatabase.OPEN_READONLY);
 
+			checkDB = SQLiteDatabase
+					.openDatabase(
+							"/data/data/com.paulo.android.solarmobile.controller/databases/MobilisDB.sqlite",
+							null, SQLiteDatabase.NO_LOCALIZED_COLLATORS);
+			checkDB.close();
 		} catch (SQLiteException e) {
-			// do nothing since the database does not exist
+			// Log.w("erro", "erro");
 		}
-
-		// in case it exists, close it
-		if (dbToBeVerified != null) {
-			// close DB
-			dbToBeVerified.close();
-
+		//return checkDB != null ? true : false;
+		if (checkDB!=null){
+			return true;
 		}
-
-		// in case there is a DB entity, the DB exists
-		return dbToBeVerified != null ? true : false;
+		else {
+			checkDB=this.getReadableDatabase();
+			checkDB.close();
+			return false;
+		}
+	
 	}
 }

@@ -19,6 +19,7 @@ public class DBAdapter {
 	public DBAdapter open() {
 		helper = new DatabaseHelper(context);
 		db = helper.getWritableDatabase();
+		
 		return this;
 	}
 	public void close() {
@@ -28,6 +29,7 @@ public class DBAdapter {
 	public Cursor getOneRow(String tableName,int id) {
 	//	Cursor cursor = db.query(tableName, null, "_id="+id, null, null, null, null);
 		Cursor cursor = db.rawQuery("SELECT * FROM config WHERE _id=1",null);
+		cursor.moveToFirst();
 		return cursor;
 	}
 	public Cursor getAllRows(String tableName) {
