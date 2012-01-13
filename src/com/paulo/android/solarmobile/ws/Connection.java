@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 public abstract class Connection {
 	Context context;
+	HttpResponse response;
 
 	public Connection(Context context) {
 		this.context = context;
@@ -85,7 +86,7 @@ public abstract class Connection {
 
 			Log.w("URL", String.valueOf(post.getURI()));
 
-			HttpResponse response = client.execute(post);
+			response = client.execute(post);
 			StatusLine statusLine = response.getStatusLine();
 			int statusCode = statusLine.getStatusCode();
 
@@ -97,9 +98,13 @@ public abstract class Connection {
 				BufferedReader reader = new BufferedReader(
 						new InputStreamReader(content));
 				String line;
-				while ((line = reader.readLine()) != null) {
+				while ((line = reader.readLine()) != null) { 
 					builder.append(line);
+					
+				
 				}
+				
+				
 			}
 
 			else {
@@ -111,7 +116,15 @@ public abstract class Connection {
 			Toast.makeText(context, "Erro de conexão", Toast.LENGTH_SHORT)
 					.show();
 		}
+		
+				
+			
+		
+		
+		
 		return builder.toString();
+		
 
 	}
+	
 }
