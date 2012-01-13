@@ -1,6 +1,7 @@
 package com.paulo.android.solarmobile.ws;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import org.apache.http.HttpEntity;
@@ -11,6 +12,10 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.ContentHandler;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
 import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
@@ -98,13 +103,11 @@ public abstract class Connection {
 				BufferedReader reader = new BufferedReader(
 						new InputStreamReader(content));
 				String line;
-				while ((line = reader.readLine()) != null) { 
+				while ((line = reader.readLine()) != null) {
 					builder.append(line);
-					
-				
+
 				}
-				
-				
+
 			}
 
 			else {
@@ -116,15 +119,107 @@ public abstract class Connection {
 			Toast.makeText(context, "Erro de conexão", Toast.LENGTH_SHORT)
 					.show();
 		}
-		
-				
-			
-		
-		
-		
-		return builder.toString();
-		
+
+		// return builder.toString();
+		return (parseToken(builder.toString()));
 
 	}
-	
+
+	public String parseToken(String jsonString) {
+
+		try {
+
+			JSONParser parser = new JSONParser();
+			KeyFinder finder = new KeyFinder();
+			finder.setMatchKey("auth_token");
+		
+				parser.parse(jsonString, finder, true);
+				if (finder.isFound()) {
+					 finder.setFound(false);
+					return (String) finder.getValue();
+				}
+				 else
+					return "keyNotFound";
+		}
+		catch (ParseException e) {
+			return "ParserException";
+			}	
+		}
+
+	class KeyFinder implements ContentHandler {
+		private Object value;
+		private boolean found = false;
+		private boolean end = false;
+		private String key;
+		private String matchKey;
+
+		public void setMatchKey(String matchKey) {
+			this.matchKey = matchKey;
+		}
+
+		public Object getValue() {
+			return value;
+		}
+
+		public boolean isEnd() {
+			return end;
+		}
+
+		public void setFound(boolean found) {
+			this.found = found;
+		}
+
+		public boolean isFound() {
+			return found;
+		}
+
+		public void startJSON() throws ParseException, IOException {
+			found = false;
+			end = false;
+		}
+
+		public void endJSON() throws ParseException, IOException {
+			end = true;
+		}
+
+		public boolean primitive(Object value) throws ParseException,
+				IOException {
+			if (key != null) {
+				if (key.equals(matchKey)) {
+					found = true;
+					this.value = value;
+					key = null;
+					return false;
+				}
+			}
+			return true;
+		}
+
+		public boolean startArray() throws ParseException, IOException {
+			return true;
+		}
+
+		public boolean startObject() throws ParseException, IOException {
+			return true;
+		}
+
+		public boolean startObjectEntry(String key) throws ParseException,
+				IOException {
+			this.key = key;
+			return true;
+		}
+
+		public boolean endArray() throws ParseException, IOException {
+			return false;
+		}
+
+		public boolean endObject() throws ParseException, IOException {
+			return true;
+		}
+
+		public boolean endObjectEntry() throws ParseException, IOException {
+			return true;
+		}
+	}
 }
+
