@@ -120,7 +120,6 @@ public abstract class Connection {
 					.show();
 		}
 
-		// return builder.toString();
 		return (parseToken(builder.toString()));
 
 	}
