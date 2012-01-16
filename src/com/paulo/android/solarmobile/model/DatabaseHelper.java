@@ -82,104 +82,67 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	 *            not already exist)
 	 */
 	public DatabaseHelper(Context context, boolean copyDatabase) {
-		// call overloaded constructor
+
 		this(context);
-		// copy database file in case desired
 		if (copyDatabase) {
 			copyDatabaseFile();
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * android.database.sqlite.SQLiteOpenHelper#onCreate(android.database.sqlite
-	 * .SQLiteDatabase)
-	 */
 	@Override
 	public void onCreate(SQLiteDatabase db) {
 		// Leave this method empty
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * android.database.sqlite.SQLiteOpenHelper#onUpgrade(android.database.sqlite
-	 * .SQLiteDatabase, int, int)
-	 */
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		// fill in your code here
 	}
 
-	/**
-	 * <p>
-	 * Copy the database file from the assets directory to the proper location
-	 * where the application can access it. The database location and name is
-	 * given by the constants {@link #DB_PATH} and {@link #DB_NAME}
-	 * respectively.
-	 * </p>
-	 * <p>
-	 * If the database file already exists, it will not be overwritten.
-	 * </p>
-	 */
 	public void copyDatabaseFile() {
 
-		// variables
-				InputStream myInput = null;
-				OutputStream myOutput = null;
-				SQLiteDatabase database = null;
+		InputStream myInput = null;
+		OutputStream myOutput = null;
+		SQLiteDatabase database = null;
 
-				// only proceed in case the database does not exist
+		// only proceed in case the database does not exist
 
-				// get the database
-				database = this.getReadableDatabase();
-				try {
-					// Open your local db as the input stream
-					myInput = context.getAssets().open(DB_NAME);
+		// get the database
+		database = this.getReadableDatabase();
+		try {
 
-					// Path to the just created empty db
-					String outFileName = DB_PATH + DB_NAME;
+			myInput = context.getAssets().open(DB_NAME);
 
-					// Open the empty db as the output stream
-					myOutput = new FileOutputStream(outFileName);
+			String outFileName = DB_PATH + DB_NAME;
 
-					// transfer bytes from the input file to the output file
-					byte[] buffer = new byte[1024];
-					int length;
-					while ((length = myInput.read(buffer)) > 0) {
-						myOutput.write(buffer, 0, length);
-					}
-				} catch (FileNotFoundException e) {
-					// handle your exception here
-				} catch (IOException e) {
-					// handle your exception here
-				} finally {
-					try {
-						// Close the streams
-						myOutput.flush();
-						myOutput.close();
-						myInput.close();
-						// close the database in case it is opened
-						if (database != null && database.isOpen()) {
-						
-							database.close();
-						}
-					} catch (Exception e) {
-						// handle your exception here
-					}
+			myOutput = new FileOutputStream(outFileName);
+
+			byte[] buffer = new byte[1024];
+			int length;
+			while ((length = myInput.read(buffer)) > 0) {
+				myOutput.write(buffer, 0, length);
+			}
+		} catch (FileNotFoundException e) {
+			// handle your exception here
+		} catch (IOException e) {
+			// handle your exception here
+		} finally {
+			try {
+
+				myOutput.flush();
+				myOutput.close();
+				myInput.close();
+				if (database != null && database.isOpen()) {
+
+					database.close();
 				}
+			} catch (Exception e) {
+				// handle your exception here
+			}
+		}
 
 	}
 
-	/**
-	 * Returns whether the database already exists.
-	 * 
-	 * @return <code>true</code> if the database exists, <code>false</code>
-	 *         otherwise.
-	 */
 	public boolean checkDataBaseExistence() {
 
 		SQLiteDatabase checkDB = null;
@@ -191,17 +154,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 							null, SQLiteDatabase.NO_LOCALIZED_COLLATORS);
 			checkDB.close();
 		} catch (SQLiteException e) {
-			// Log.w("erro", "erro");
+
 		}
-		//return checkDB != null ? true : false;
-		if (checkDB!=null){
+
+		if (checkDB != null) {
 			return true;
-		}
-		else {
-			checkDB=this.getReadableDatabase();
+		} else {
+			checkDB = this.getReadableDatabase();
 			checkDB.close();
 			return false;
 		}
-	
+
 	}
 }

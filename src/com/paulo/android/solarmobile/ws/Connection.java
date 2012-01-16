@@ -31,7 +31,8 @@ public abstract class Connection {
 
 	public abstract void parse(String result);
 
-	public String requestJSON(String URL, String authToken) throws ClientProtocolException, IOException
+	public String requestJSON(String URL, String authToken)
+			throws ClientProtocolException, IOException
 
 	// GET
 
@@ -42,31 +43,27 @@ public abstract class Connection {
 				+ "?auth_token=" + authToken);
 		Log.w("URL", String.valueOf(get.getURI()));
 
-	
+		HttpResponse response = client.execute(get);
+		StatusLine statusLine = response.getStatusLine();
+		int statusCode = statusLine.getStatusCode();
 
-			HttpResponse response = client.execute(get);
-			StatusLine statusLine = response.getStatusLine();
-			int statusCode = statusLine.getStatusCode();
-
-			Log.w("StatusCode", String.valueOf(statusCode));
-			if (statusCode == 200) {
-				HttpEntity entity = response.getEntity();
-				InputStream content = entity.getContent();
-				BufferedReader reader = new BufferedReader(
-						new InputStreamReader(content));
-				String line;
-				while ((line = reader.readLine()) != null) {
-					builder.append(line);
-				}
+		Log.w("StatusCode", String.valueOf(statusCode));
+		if (statusCode == 200) {
+			HttpEntity entity = response.getEntity();
+			InputStream content = entity.getContent();
+			BufferedReader reader = new BufferedReader(new InputStreamReader(
+					content));
+			String line;
+			while ((line = reader.readLine()) != null) {
+				builder.append(line);
 			}
+		}
 
-			else {
-				Toast.makeText(context, "Erro ao baixar o arquivo",
-						Toast.LENGTH_SHORT).show();
-			}
+		else {
+			Toast.makeText(context, "Erro ao baixar o arquivo",
+					Toast.LENGTH_SHORT).show();
+		}
 
-	
-		// return builder.toString();
 		Log.w("GET-RESULT", builder.toString());
 		return null;
 
@@ -114,9 +111,8 @@ public abstract class Connection {
 					.show();
 		}
 
-		// return builder.toString();
+		
 		Log.w("builder.toString()", builder.toString());
-		// return (parseToken(builder.toString()));
 
 		JSONParser parser = new JSONParser();
 		KeyFinder finder = new KeyFinder();
@@ -205,4 +201,3 @@ class KeyFinder implements ContentHandler {
 		return true;
 	}
 }
-

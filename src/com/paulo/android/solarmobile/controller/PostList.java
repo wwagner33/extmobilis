@@ -31,13 +31,11 @@ import com.paulo.solarmobile.audio.RecordAudio;
 public class PostList extends ListActivity implements OnClickListener,
 		OnChronometerTickListener {
 
-	String[] from = { "teste", "teste2" };
 	int[] to = { R.id.item_nome_pessoa, R.id.item_hora_envio };
 	Button ouvir, stop, start, pause, exitDialog, vf, response;
 	TextView contador;
 	ImageButton button;
 	PostAdapter adapter;
-	private static final int REQ_CODE_1 = 1;
 	private static final int DIALOG_GRAVAR = 2;
 	Dialog myDialog;
 	public int tagHolder;
@@ -84,22 +82,17 @@ public class PostList extends ListActivity implements OnClickListener,
 	@Override
 	public void onClick(View v) {
 		if (v.getId() == R.id.VoiceForum) {
-			// Toast.makeText(this, "teste", Toast.LENGTH_SHORT).show();
-			Toast.makeText(this, path.getAbsolutePath(), Toast.LENGTH_SHORT)
-					.show();
+
 			myDialog = onCreateDialog(DIALOG_GRAVAR);
 			tagHolder = (Integer) v.getTag(R.id.change);
 			myDialog.show();
-
-			// String[] teste = path.list();
-			// Toast.makeText(this, teste[0], Toast.LENGTH_SHORT).show();
 
 		}
 		if (v.getId() == R.id.img_close) {
 			myDialog.dismiss();
 		}
 		if (v.getId() == R.id.start_recording) {
-			// gravar aqui
+
 			record = new MediaRecorder();
 
 			try {
@@ -117,7 +110,6 @@ public class PostList extends ListActivity implements OnClickListener,
 			stopWatch.stop();
 			contador.setText("00:00");
 
-			// update view
 			// muda a view que possue voz
 			teste1[tagHolder].remove("hasVoice");
 			teste1[tagHolder].put("hasVoice", true);
@@ -173,13 +165,7 @@ public class PostList extends ListActivity implements OnClickListener,
 		String asText = "";
 		String Text1 = "";
 		String Text2 = "";
-		// countUp = (SystemClock.currentThreadTimeMillis() -
-		// chronometer.getBase()) / 1000;
-		// countUp = (SystemClock.elapsedRealtime() - chronometer.getBase()) /
-		// 1000;
-		// countUp = (endTime - startTime) /1000;
 		countUp = (endTime - startTime) / 1000;
-		// time2 = endTime;
 
 		if (countUp / 60 <= 9) {
 			Text1 = "0" + (countUp / 60);
@@ -195,7 +181,6 @@ public class PostList extends ListActivity implements OnClickListener,
 
 		asText = Text1 + ":" + Text2;
 
-		// asText = (countUp / 60) + ":" + (countUp % 60);
 		contador.setText(asText);
 
 	}
@@ -221,15 +206,11 @@ public class PostList extends ListActivity implements OnClickListener,
 
 		public AudioPlayer(String fileName) throws IllegalStateException,
 				IOException {
-
 			super(fileName);
-
 		}
 
 		@Override
 		public void onCompletion(android.media.MediaPlayer mp) {
-			// faz nada por enquanto
-
 		}
 
 		@Override
@@ -252,19 +233,16 @@ public class PostList extends ListActivity implements OnClickListener,
 
 		@Override
 		public int getCount() {
-			// TODO Auto-generated method stub
 			return data.length;
 		}
 
 		@Override
 		public Object getItem(int position) {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
 		public long getItemId(int position) {
-			// TODO Auto-generated method stub
 			return position;
 		}
 
