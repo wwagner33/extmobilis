@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -30,7 +31,7 @@ public abstract class Connection {
 
 	public abstract void parse(String result);
 
-	public String getJSON(String URL, String authToken)
+	public String requestJSON(String URL, String authToken) throws ClientProtocolException, IOException
 
 	// GET
 
@@ -41,7 +42,7 @@ public abstract class Connection {
 				+ "?auth_token=" + authToken);
 		Log.w("URL", String.valueOf(get.getURI()));
 
-		try {
+	
 
 			HttpResponse response = client.execute(get);
 			StatusLine statusLine = response.getStatusLine();
@@ -64,15 +65,15 @@ public abstract class Connection {
 						Toast.LENGTH_SHORT).show();
 			}
 
-		} catch (Exception e) {
-			Toast.makeText(context, "Erro de conexão", Toast.LENGTH_SHORT)
-					.show();
-		}
-		return builder.toString();
+	
+		// return builder.toString();
+		Log.w("GET-RESULT", builder.toString());
+		return null;
 
 	}
 
-	public String requestAuthenticityToken(JSONObject json) {
+	public String requestAuthenticityToken(JSONObject json)
+			throws ClientProtocolException, IOException, ParseException {
 
 		// POST
 
@@ -80,145 +81,128 @@ public abstract class Connection {
 		DefaultHttpClient client = new DefaultHttpClient();
 		HttpPost post = new HttpPost("http://10.0.2.2:3000/sessions");
 
-		try {
+		String teste = json.toJSONString();
+		StringEntity se = new StringEntity(teste);
 
-			String teste = json.toJSONString();
-			StringEntity se = new StringEntity(teste);
+		post.setEntity(se);
+		post.setHeader("Accept", "application/json");
+		post.setHeader("Content-type", "application/json");
 
-			post.setEntity(se);
-			post.setHeader("Accept", "application/json");
-			post.setHeader("Content-type", "application/json");
+		Log.w("URL", String.valueOf(post.getURI()));
 
-			Log.w("URL", String.valueOf(post.getURI()));
+		response = client.execute(post);
+		StatusLine statusLine = response.getStatusLine();
+		int statusCode = statusLine.getStatusCode();
 
-			response = client.execute(post);
-			StatusLine statusLine = response.getStatusLine();
-			int statusCode = statusLine.getStatusCode();
+		Log.w("StatusCode", String.valueOf(statusCode));
 
-			Log.w("StatusCode", String.valueOf(statusCode));
-
-			if (statusCode == 200) {
-				HttpEntity entity = response.getEntity();
-				InputStream content = entity.getContent();
-				BufferedReader reader = new BufferedReader(
-						new InputStreamReader(content));
-				String line;
-				while ((line = reader.readLine()) != null) {
-					builder.append(line);
-
-				}
+		if (statusCode == 200) {
+			HttpEntity entity = response.getEntity();
+			InputStream content = entity.getContent();
+			BufferedReader reader = new BufferedReader(new InputStreamReader(
+					content));
+			String line;
+			while ((line = reader.readLine()) != null) {
+				builder.append(line);
 
 			}
 
-			else {
-				Toast.makeText(context, "Erro de conexão", Toast.LENGTH_SHORT)
-						.show();
-			}
+		}
 
-		} catch (Exception e) {
+		else {
 			Toast.makeText(context, "Erro de conexão", Toast.LENGTH_SHORT)
 					.show();
 		}
 
-		return (parseToken(builder.toString()));
+		// return builder.toString();
+		Log.w("builder.toString()", builder.toString());
+		// return (parseToken(builder.toString()));
 
+		JSONParser parser = new JSONParser();
+		KeyFinder finder = new KeyFinder();
+		finder.setMatchKey("auth_token");
+
+		parser.parse(builder.toString(), finder, true);
+		if (finder.isFound()) {
+			finder.setFound(false);
+			return (String) finder.getValue();
+		} else
+			return "keyNotFound";
+	}
+}
+
+class KeyFinder implements ContentHandler {
+	private Object value;
+	private boolean found = false;
+	private boolean end = false;
+	private String key;
+	private String matchKey;
+
+	public void setMatchKey(String matchKey) {
+		this.matchKey = matchKey;
 	}
 
-	public String parseToken(String jsonString) {
+	public Object getValue() {
+		return value;
+	}
 
-		try {
+	public boolean isEnd() {
+		return end;
+	}
 
-			JSONParser parser = new JSONParser();
-			KeyFinder finder = new KeyFinder();
-			finder.setMatchKey("auth_token");
-		
-				parser.parse(jsonString, finder, true);
-				if (finder.isFound()) {
-					 finder.setFound(false);
-					return (String) finder.getValue();
-				}
-				 else
-					return "keyNotFound";
-		}
-		catch (ParseException e) {
-			return "ParserException";
-			}	
-		}
+	public void setFound(boolean found) {
+		this.found = found;
+	}
 
-	class KeyFinder implements ContentHandler {
-		private Object value;
-		private boolean found = false;
-		private boolean end = false;
-		private String key;
-		private String matchKey;
+	public boolean isFound() {
+		return found;
+	}
 
-		public void setMatchKey(String matchKey) {
-			this.matchKey = matchKey;
-		}
+	public void startJSON() throws ParseException, IOException {
+		found = false;
+		end = false;
+	}
 
-		public Object getValue() {
-			return value;
-		}
+	public void endJSON() throws ParseException, IOException {
+		end = true;
+	}
 
-		public boolean isEnd() {
-			return end;
-		}
-
-		public void setFound(boolean found) {
-			this.found = found;
-		}
-
-		public boolean isFound() {
-			return found;
-		}
-
-		public void startJSON() throws ParseException, IOException {
-			found = false;
-			end = false;
-		}
-
-		public void endJSON() throws ParseException, IOException {
-			end = true;
-		}
-
-		public boolean primitive(Object value) throws ParseException,
-				IOException {
-			if (key != null) {
-				if (key.equals(matchKey)) {
-					found = true;
-					this.value = value;
-					key = null;
-					return false;
-				}
+	public boolean primitive(Object value) throws ParseException, IOException {
+		if (key != null) {
+			if (key.equals(matchKey)) {
+				found = true;
+				this.value = value;
+				key = null;
+				return false;
 			}
-			return true;
 		}
+		return true;
+	}
 
-		public boolean startArray() throws ParseException, IOException {
-			return true;
-		}
+	public boolean startArray() throws ParseException, IOException {
+		return true;
+	}
 
-		public boolean startObject() throws ParseException, IOException {
-			return true;
-		}
+	public boolean startObject() throws ParseException, IOException {
+		return true;
+	}
 
-		public boolean startObjectEntry(String key) throws ParseException,
-				IOException {
-			this.key = key;
-			return true;
-		}
+	public boolean startObjectEntry(String key) throws ParseException,
+			IOException {
+		this.key = key;
+		return true;
+	}
 
-		public boolean endArray() throws ParseException, IOException {
-			return false;
-		}
+	public boolean endArray() throws ParseException, IOException {
+		return false;
+	}
 
-		public boolean endObject() throws ParseException, IOException {
-			return true;
-		}
+	public boolean endObject() throws ParseException, IOException {
+		return true;
+	}
 
-		public boolean endObjectEntry() throws ParseException, IOException {
-			return true;
-		}
+	public boolean endObjectEntry() throws ParseException, IOException {
+		return true;
 	}
 }
 
