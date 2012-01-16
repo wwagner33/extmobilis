@@ -1,97 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
- 		 >
- 			 
-    		<Button
-    		    android:id="@+id/img_close"
-    		    android:layout_alignParentTop="true"
-    		    android:layout_alignParentRight="true"
-    		    android:layout_width="wrap_content"
-    		    android:layout_height="wrap_content"
-    		    android:background="@drawable/window_close"
-    		        		    />
-    
-			<TextView
-			    android:id="@+id/status"
-			    android:layout_width="wrap_content"
-			    android:layout_height="wrap_content"
-			    android:text="Gravar"
-			    android:textSize="20dp"
-			
-			    android:layout_centerHorizontal="true"
-			  
-			    />
-			
-			<ImageView
-			    android:id="@+id/img_gravando"
-			    android:layout_below="@id/status"
-			    android:layout_width="75dp"
-			    android:layout_height="75dp"
-			    android:layout_centerHorizontal="true"
-			    android:src="@drawable/microphone"
-			  
-			    />
-			
-			
-			<TextView
-			    android:id="@+id/contador"
-			    android:layout_below="@id/img_gravando"
-			    android:layout_width="wrap_content"
-			    android:layout_height="wrap_content"
-			    android:text="00:00"
-			    android:layout_centerInParent="true"
-			 
-			    
-			    />
-			
-			    <ProgressBar
-			  	style="?android:attr/progressBarStyleHorizontal"			  	
-			    android:id="@+id/progresso_gravacao"
-			    android:layout_below="@id/contador"
-			    android:layout_width="120dp"
-			    android:layout_height="wrap_content"
-			    android:layout_centerHorizontal="true"
-			    />
-			
-   
-    	    
-    	   <Button
-    	          android:id="@+id/stop_recording"
-    	          android:layout_below="@id/progresso_gravacao"
-    	          android:layout_centerHorizontal="true"	
-    	          android:layout_width="wrap_content"
-    	          android:layout_height="wrap_content"
-    	          android:background="@drawable/stop"
-    	          /> 
-    	  <Button
-    	      android:layout_below="@id/progresso_gravacao"
-    	      android:id="@+id/start_recording"
-    	      android:layout_toLeftOf="@id/stop_recording"
-    	      android:layout_width="wrap_content"
-    	      android:layout_height="wrap_content"
-    		  android:background="@drawable/rec"	
-    	    
-    	      />     	         
-    	     <Button
-    	         android:layout_below="@id/progresso_gravacao"
-    	         android:id="@+id/pause_recording"
-    	         android:layout_toRightOf="@id/stop_recording"
-    	         android:layout_width="wrap_content"
-    	         android:layout_height="wrap_content"
-    	         android:background="@drawable/pause"   
-    	         />    
-    	         
-    	    <Chronometer
-    	        	android:layout_width="wrap_content"
-    	        	android:layout_height="wrap_content"
-    	        	android:id="@+id/chrono"
-    	        	android:visibility="gone"
-    	        /> 
-    	      
-    	    
-    	    <!--    android:layout_alignLeft="@id/progresso_gravacao" -->
-    	    
-	
+    android:layout_height="wrap_content" >
+
+    <Button
+        android:id="@+id/img_close"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:background="@drawable/window_close" />
+
+    <TextView
+        android:id="@+id/status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:text="Gravar"
+        android:textSize="20dp" />
+
+    <ImageView
+        android:id="@+id/img_gravando"
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:layout_below="@id/status"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/microphone" />
+
+    <TextView
+        android:id="@+id/contador"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/img_gravando"
+        android:layout_centerInParent="true"
+        android:text="00:00" />
+
+    <ProgressBar
+        android:id="@+id/progresso_gravacao"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="120dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/contador"
+        android:layout_centerHorizontal="true" />
+
+    <Button
+        android:id="@+id/stop_recording"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/progresso_gravacao"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/stop" />
+
+    <Button
+        android:id="@+id/start_recording"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/progresso_gravacao"
+        android:layout_toLeftOf="@id/stop_recording"
+        android:background="@drawable/rec" />
+
+    <Button
+        android:id="@+id/pause_recording"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/progresso_gravacao"
+        android:layout_toRightOf="@id/stop_recording"
+        android:background="@drawable/pause" />
+
+    <Chronometer
+        android:id="@+id/chrono"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
+
+    <!-- android:layout_alignLeft="@id/progresso_gravacao" -->
+
 </RelativeLayout>

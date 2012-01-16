@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.os.Bundle;
 import android.os.Environment;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -76,6 +77,8 @@ public class PostList extends ListActivity implements OnClickListener,
 
 		adapter = new PostAdapter(this, teste1);
 		setListAdapter(adapter);
+		
+		
 
 	}
 
@@ -153,7 +156,7 @@ public class PostList extends ListActivity implements OnClickListener,
 		stopWatch.setOnChronometerTickListener(this);
 		contador = (TextView) layout.findViewById(R.id.contador);
 
-		builder = new AlertDialog.Builder(this);
+		builder = new AlertDialog.Builder(new ContextThemeWrapper(this,R.style.CustomDialog));
 		builder.setView(layout);
 		alertDialog = builder.create();
 		return alertDialog;
