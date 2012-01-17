@@ -4,10 +4,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -18,12 +20,16 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
 
 public abstract class Connection {
 	Context context;
 	HttpResponse response;
+
+	private static final int HTTP_POST = 10;
+	private static final int HTTP_GET = 11;
 
 	public Connection(Context context) {
 		this.context = context;
@@ -65,7 +71,7 @@ public abstract class Connection {
 		}
 
 		Log.w("GET-RESULT", builder.toString());
-		return null;
+		return builder.toString();
 
 	}
 
@@ -111,7 +117,6 @@ public abstract class Connection {
 					.show();
 		}
 
-		
 		Log.w("builder.toString()", builder.toString());
 
 		JSONParser parser = new JSONParser();
@@ -200,4 +205,5 @@ class KeyFinder implements ContentHandler {
 	public boolean endObjectEntry() throws ParseException, IOException {
 		return true;
 	}
+
 }
