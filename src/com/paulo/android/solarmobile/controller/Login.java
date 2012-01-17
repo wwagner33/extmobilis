@@ -43,8 +43,8 @@ public class Login extends Activity implements OnClickListener {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.login);
-		
-		skipValidation = (Button)findViewById(R.id.login_skip);
+
+		skipValidation = (Button) findViewById(R.id.login_skip);
 		skipValidation.setOnClickListener(this);
 
 		login = (EditText) findViewById(R.id.campo1);
@@ -56,16 +56,15 @@ public class Login extends Activity implements OnClickListener {
 
 	@Override
 	public void onClick(View v) {
-		
-		if (v.getId()==R.id.login_skip) {
 
-			 intent = new Intent(Login.this, ListaCursos.class);
-			 startActivity(intent);
+		if (v.getId() == R.id.login_skip) {
+
+			intent = new Intent(Login.this, ListaCursos.class);
+			startActivity(intent);
 		}
-		
+
 		if (v.equals(submit)) {
 
-		
 			/*
 			 * Validação do Login
 			 * 
@@ -94,7 +93,10 @@ public class Login extends Activity implements OnClickListener {
 
 				Log.w("JsonObject", json.toString());
 
-				//adapter.open();
+				// adapter.open();
+				
+				dialog = createDialog();
+				dialog.show();
 				connection = new AndroidConnection(this);
 
 				// authToken = connection.requestAuthenticityToken(json);
@@ -135,9 +137,9 @@ public class Login extends Activity implements OnClickListener {
 
 	public ProgressDialog createDialog() {
 		ProgressDialog dialog;
-		dialog = new ProgressDialog(getApplicationContext());
+		dialog = new ProgressDialog(this);
 		dialog.setMessage("Carregando, Por favor aguarde...");
-		dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+		dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 		dialog.setCancelable(false);
 		return dialog;
 	}
@@ -156,7 +158,7 @@ public class Login extends Activity implements OnClickListener {
 	}
 
 	public void handleError(int errorCode) {
-		// dialog.dismiss();
+		 dialog.dismiss();
 		if (errorCode == CONNECTION_ERROR_CODE) {
 			Toast.makeText(this, "Erro de conexão,tente novamente ",
 					Toast.LENGTH_SHORT).show();
@@ -172,22 +174,21 @@ public class Login extends Activity implements OnClickListener {
 				authToken = connection.requestAuthenticityToken(json);
 				return authToken;
 			} catch (ClientProtocolException e) {
-				//handleError(CONNECTION_ERROR_CODE);
 				e.printStackTrace();
+				return null;
 			} catch (IOException e) {
-				//handleError(CONNECTION_ERROR_CODE);
 				e.printStackTrace();
+				return null;
 			} catch (ParseException e) {
-				//handleError(CONNECTION_ERROR_CODE);
 				e.printStackTrace();
+				return null;
 			}
-			return null;
 		}
 
 		@Override
 		protected void onPostExecute(String result) {
 			super.onPostExecute(result);
-			if (result==(null)) {
+			if (result == (null)) {
 				handleError(CONNECTION_ERROR_CODE);
 			} else {
 				getCourseList(result);
@@ -204,23 +205,28 @@ public class Login extends Activity implements OnClickListener {
 						params[0]);
 				return result;
 			} catch (ClientProtocolException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
+				return null;
+
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
+				return null;
 			}
-			return null;
+
+			catch (Exception e) {
+				e.printStackTrace();
+				return null;
+			}
 		}
 
 		@Override
 		protected void onPostExecute(String result) {
 			super.onPostExecute(result);
-			if (result.equals(null)) {
+			if (result == null) {
 				handleError(CONNECTION_ERROR_CODE);
 
 			} else {
-				intent = new Intent(getApplicationContext(),ListaCursos.class);
+				intent = new Intent(getApplicationContext(), ListaCursos.class);
 				intent.putExtra("CourseList", result);
 				startActivity(intent);
 			}

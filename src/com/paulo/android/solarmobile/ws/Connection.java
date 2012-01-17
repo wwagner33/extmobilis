@@ -113,8 +113,10 @@ public abstract class Connection {
 		}
 
 		else {
-			Toast.makeText(context, "Erro de conexão", Toast.LENGTH_SHORT)
-					.show();
+		//	Toast.makeText(context, "Erro de conexão", Toast.LENGTH_SHORT)
+			//
+			//.show();
+			return null;
 		}
 
 		Log.w("builder.toString()", builder.toString());
