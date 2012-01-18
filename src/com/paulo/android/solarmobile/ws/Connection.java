@@ -35,7 +35,7 @@ public abstract class Connection {
 		this.context = context;
 	}
 
-	public abstract void parse(String result);
+	public abstract Object parse(String result);
 
 	public String requestJSON(String URL, String authToken)
 			throws ClientProtocolException, IOException
@@ -113,9 +113,9 @@ public abstract class Connection {
 		}
 
 		else {
-		//	Toast.makeText(context, "Erro de conexão", Toast.LENGTH_SHORT)
+			// Toast.makeText(context, "Erro de conexão", Toast.LENGTH_SHORT)
 			//
-			//.show();
+			// .show();
 			return null;
 		}
 
@@ -132,9 +132,9 @@ public abstract class Connection {
 		} else
 			return "keyNotFound";
 	}
-}
+	
 
-class KeyFinder implements ContentHandler {
+	public class KeyFinder implements ContentHandler {
 	private Object value;
 	private boolean found = false;
 	private boolean end = false;
@@ -207,5 +207,7 @@ class KeyFinder implements ContentHandler {
 	public boolean endObjectEntry() throws ParseException, IOException {
 		return true;
 	}
-
+	}
 }
+
+

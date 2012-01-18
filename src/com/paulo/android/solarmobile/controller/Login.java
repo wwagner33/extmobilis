@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.LinkedHashMap;
 
 import org.apache.http.client.ClientProtocolException;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 
@@ -146,13 +147,18 @@ public class Login extends Activity implements OnClickListener {
 
 	public class AndroidConnection extends Connection {
 
+		KeyFinder kf;
+		
 		public AndroidConnection(Context context) {
 			super(context);
 		}
 
 		@Override
-		public void parse(String result) {
-
+		public String[] parse(String source) {
+			 kf = new KeyFinder();	
+			 JSONArray jsonArray= new JSONArray();
+			 
+				return null;
 		}
 
 	}
