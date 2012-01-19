@@ -24,27 +24,35 @@ public class ListaCursos extends Activity implements OnItemClickListener {
 			"Biologia", "História", "Engenharia", "Mecânica", "Engenharia",
 			"Química", "Computação", "Estatística" };
 	String courseList;
+	String[] teste;
 	private ListView lv;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.cursos);
-		
+
 		AndroidConnection connection = new AndroidConnection(this);
-		
+
 		Bundle extras = getIntent().getExtras();
-			if (extras!=null) {
-		courseList = extras.getString("CourseList");
-		connection.parse(courseList);
+		if (extras != null) {
+
+			Object jsons[] = (Object[])extras.get("CourseList");
+			Log.w("JSONS SIZE", String.valueOf(jsons.length));
+			ContentValues receivedValues[] = new ContentValues[jsons.length];
+			teste = new String[jsons.length];
+			
+			for (int i=0;i<jsons.length;i++) {
+				receivedValues[i] = (ContentValues)jsons[i];
+				teste[i] = receivedValues[i].getAsString("nomeCurso");
 			}
-		
-		// Log.w()		
-		
+		}
+
+	
 		
 		lv = (ListView) findViewById(R.id.list);
 		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-				R.layout.itemcurso, nomeCursos);
+				R.layout.itemcurso, teste);
 		lv.setOnItemClickListener(this);
 		lv.setAdapter(adapter);
 
@@ -55,31 +63,29 @@ public class ListaCursos extends Activity implements OnItemClickListener {
 		intent = new Intent(this, TopicListController.class);
 		startActivity(intent);
 	}
-	
+
 	public class AndroidConnection extends Connection {
-			KeyFinder finder;
-		
+		KeyFinder finder;
+
 		public AndroidConnection(Context context) {
 			super(context);
 		}
 
 		@Override
-		public String[] parse(String result) {
-			
-			ContentValues parseContainer[];
-			JSONObject jsonObjects[];
-			Log.w("Parse", "InsideParse");
-			finder = new KeyFinder();
-			Object object = JSONValue.parse(result);		
-			JSONArray jsonArray = (JSONArray)object;
-			Log.w("Tamanho Array", String.valueOf(jsonArray.size()));
-			jsonObjects = new JSONObject[jsonArray.size()];
-			parseContainer = new ContentValues[jsonArray.size()];
-			
-			for (int i =0;i<jsonArray.size();i++) {
-				
-			}
-			
+		public ContentValues[] parse(String source) {
+
+			/*
+			 * ContentValues parseContainer[]; JSONObject jsonObjects[];
+			 * Log.w("Parse", "InsideParse"); finder = new KeyFinder(); Object
+			 * object = JSONValue.parse(source); JSONArray jsonArray =
+			 * (JSONArray) object; Log.w("Tamanho Array",
+			 * String.valueOf(jsonArray.size())); jsonObjects = new
+			 * JSONObject[jsonArray.size()]; parseContainer = new
+			 * ContentValues[jsonArray.size()];
+			 * 
+			 * for (int i = 0; i < jsonArray.size(); i++) { jsonObjects[i] =
+			 * (JSONObject) jsonArray.get(i); }
+			 */
 			return null;
 		}
 	}

@@ -6,10 +6,13 @@ import java.util.LinkedHashMap;
 import org.apache.http.client.ClientProtocolException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -23,6 +26,7 @@ import android.widget.Toast;
 
 import com.paulo.android.solarmobile.model.DBAdapter;
 import com.paulo.android.solarmobile.ws.Connection;
+import com.paulo.android.solarmobile.ws.Connection.KeyFinder;
 
 public class Login extends Activity implements OnClickListener {
 	public EditText login, password;
@@ -106,7 +110,7 @@ public class Login extends Activity implements OnClickListener {
 			}
 
 		}
-		// }
+
 	}
 
 	public void requestToken() {
@@ -154,11 +158,36 @@ public class Login extends Activity implements OnClickListener {
 		}
 
 		@Override
-		public String[] parse(String source) {
-			kf = new KeyFinder();
-			JSONArray jsonArray = new JSONArray();
+		public ContentValues[] parse(String source) {
 
-			return null;
+			Object object = JSONValue.parse(source);
+			JSONArray jsonArray = (JSONArray) object;
+			JSONObject jsonObjects[] = new JSONObject[jsonArray.size()];
+
+			ContentValues parsedValues[] = new ContentValues[jsonArray.size()];
+
+			for (int i = 0; i < jsonArray.size(); i++) {
+				jsonObjects[i] = (JSONObject) jsonArray.get(i);
+				Log.w("Object", jsonObjects[i].toJSONString());
+				
+				parsedValues[i] = new ContentValues();
+
+				parsedValues[i].put("nomeCurso",
+						(String) jsonObjects[i].get("group_id"));
+				parsedValues[i].put("nomeCurso",
+						(String) jsonObjects[i].get("offer_id"));
+				parsedValues[i].put("nomeCurso",
+						(String) jsonObjects[i].get("curriculum_unit"));
+				parsedValues[i].put("nomeCurso",
+						(String) jsonObjects[i].get("semester"));
+				parsedValues[i].put("nomeCurso",
+						(String) jsonObjects[i].get("allocation_tag_id"));
+				parsedValues[i].put("nomeCurso",
+						(String) jsonObjects[i].get("name"));
+			}
+
+			// ContentValues[] parsedValues;
+			return parsedValues;
 		}
 
 	}
@@ -232,8 +261,11 @@ public class Login extends Activity implements OnClickListener {
 				handleError(CONNECTION_ERROR_CODE);
 
 			} else {
+
+				ContentValues[] parsedValues = connection.parse(result);
+
 				intent = new Intent(getApplicationContext(), ListaCursos.class);
-				intent.putExtra("CourseList", result);
+				intent.putExtra("CourseList", parsedValues);
 				startActivity(intent);
 			}
 		}
