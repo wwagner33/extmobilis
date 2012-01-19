@@ -41,6 +41,14 @@ public class DBAdapter {
 		Cursor cursor = db.rawQuery(SQLQuery, null);
 		return cursor;
 	}
+	
+	public void insertValue(String name,String value) {
+		ContentValues valores = new ContentValues();
+		valores.putNull("_id");
+		valores.put("nome", name);
+		valores.put("valor", value);
+		db.insert("config", null, valores);
+	}
 
 	public void updateTable(String tableName, int id, ContentValues valores) {
 		db.update(tableName, valores, "_id=" + id, null);

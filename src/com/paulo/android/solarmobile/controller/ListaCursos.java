@@ -1,8 +1,6 @@
 package com.paulo.android.solarmobile.controller;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
+
 
 import android.app.Activity;
 import android.content.ContentValues;
@@ -18,21 +16,27 @@ import android.widget.ListView;
 
 import com.paulo.android.solarmobile.ws.Connection;
 
+	// curriculum_units/:id/groups       
+	// lista todas as turmas do aluno dentro desta unidade curricular
+
+
 public class ListaCursos extends Activity implements OnItemClickListener {
 	public Intent intent;
 	private static final String[] nomeCursos = { "Química", "Matemática",
 			"Biologia", "História", "Engenharia", "Mecânica", "Engenharia",
 			"Química", "Computação", "Estatística" };
+	
 	String courseList;
 	String[] teste;
 	private ListView lv;
+	AndroidConnection connection;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.cursos);
 
-		AndroidConnection connection = new AndroidConnection(this);
+		 connection = new AndroidConnection(this);
 
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {
@@ -59,13 +63,19 @@ public class ListaCursos extends Activity implements OnItemClickListener {
 	}
 
 	@Override
-	public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-		intent = new Intent(this, TopicListController.class);
-		startActivity(intent);
+	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+		//intent = new Intent(this, TopicListController.class);
+		
+		Log.w("Item position", String.valueOf(position));
+		Log.w("item id", String.valueOf(id));
+		
+		//connection.requestJSON("curriculum_units/:+"+position+"/groups", authToken)
+		
+		//startActivity(intent);
 	}
 
 	public class AndroidConnection extends Connection {
-		KeyFinder finder;
+		
 
 		public AndroidConnection(Context context) {
 			super(context);
@@ -73,19 +83,7 @@ public class ListaCursos extends Activity implements OnItemClickListener {
 
 		@Override
 		public ContentValues[] parse(String source) {
-
-			/*
-			 * ContentValues parseContainer[]; JSONObject jsonObjects[];
-			 * Log.w("Parse", "InsideParse"); finder = new KeyFinder(); Object
-			 * object = JSONValue.parse(source); JSONArray jsonArray =
-			 * (JSONArray) object; Log.w("Tamanho Array",
-			 * String.valueOf(jsonArray.size())); jsonObjects = new
-			 * JSONObject[jsonArray.size()]; parseContainer = new
-			 * ContentValues[jsonArray.size()];
-			 * 
-			 * for (int i = 0; i < jsonArray.size(); i++) { jsonObjects[i] =
-			 * (JSONObject) jsonArray.get(i); }
-			 */
+				
 			return null;
 		}
 	}

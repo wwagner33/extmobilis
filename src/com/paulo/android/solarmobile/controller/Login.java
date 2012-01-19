@@ -207,6 +207,13 @@ public class Login extends Activity implements OnClickListener {
 		protected String doInBackground(Void... params) {
 			try {
 				authToken = connection.requestAuthenticityToken(json);
+				if (authToken!=null) {
+					adapter.open();
+					//guardando Token
+					adapter.insertValue("token", authToken);
+					adapter.close();
+					
+				}
 				return authToken;
 			} catch (ClientProtocolException e) {
 				e.printStackTrace();
