@@ -3,148 +3,65 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
-    
-    	<LinearLayout
-    		android:id="@+id/layout1"
-    		android:layout_width="fill_parent"
-    		android:layout_height="40dp"
-    		android:orientation="horizontal"
-    		style="@style/SolarTheme.layout1"
-    	 >
-    	   		<ImageView          
-    	        	android:id="@+id/title_2"
-    	        	android:src="@drawable/solarlogo"
-    	       		android:layout_width="wrap_content"
-    	       		android:layout_height="wrap_content"
-    	       		android:layout_marginTop="5dp"
-    	       		android:layout_marginLeft="5dp"
-    	       		android:scaleType="fitStart"
-    	        />
-    				
-    	</LinearLayout>
-    	
-    	<RelativeLayout
-    	    android:id="@+id/layout2"
-    	    android:layout_width="fill_parent"
-    	    android:layout_height="35dp"
-    	    style="@style/SolarTheme.layout2"
-    	    >
-    	    <ImageView
-    	        android:id="@+id/stock_person"
-    	        android:layout_width="wrap_content"
-    	        android:layout_height="wrap_content"
-    	        android:scaleType="fitStart"
-    	        android:layout_alignParentLeft="true"
-    	        android:layout_marginTop="2dp"
-    	        android:src="@drawable/stock_person"
-    	        />
-    	    <TextView
-    	        android:id="@+id/aluno"
-    	        android:layout_toRightOf="@id/stock_person"
-    	        android:layout_height="wrap_content"
-    	        android:layout_width="wrap_content"
-    	        android:layout_alignParentTop="true"
-    	    	android:text="Aluno"    
-    	        />
-    	    <TextView
-    	        android:id="@+id/nome_aluno"
-    	        android:layout_below="@id/aluno"
-    	        android:layout_toRightOf="@id/stock_person"
-    	        android:layout_width="wrap_content"
-    	        android:layout_height="wrap_content"
-    	        android:layout_marginTop="-4dp"
-    	        android:text="Nome do aluno"
-    	        />
-    	   <Button
-    	       	android:id="@+id/button_sair"
-    	       	android:layout_width="wrap_content"
-    	       	android:layout_height="wrap_content"
-    	 		android:background="@drawable/button_custom"
-    	 		
-    	 		android:padding="4dp"
-    	 		android:layout_marginTop="6dp"
-    	 		android:layout_marginRight="6dp"
-    	 		android:layout_marginBottom="6dp"
-    	  		android:text="sair"	
-    	  		android:textSize="10dp"
-    	       	android:layout_alignParentRight="true"
-    	       	
-    	       />
-    	   
-    	      <Button
-    	       	android:id="@+id/button_inicio"
-    	       	android:layout_width="wrap_content"
-    	     	android:layout_toLeftOf="@id/button_sair"
-    	       	android:layout_height="wrap_content"
-    	 		android:background="@drawable/button_custom"
-    	 		
-    	 		android:padding="4dp"
-    	 		android:layout_marginTop="6dp"
-    	 		android:layout_marginRight="6dp"
-    	 		android:layout_marginBottom="6dp"
-    	  		android:text="inicio"	
-    	  		android:textSize="10dp"
-    	   
-    	       	
-    	       />
-    	    
-    	    
-     	    
-    	</RelativeLayout>
-    	
-    	    <RelativeLayout
-    	        android:id="@+id/layout3"
-    	        android:layout_height="40dp"
-    	        android:layout_width="fill_parent"
-    	        >
-    	      <TextView 
-    	          android:id="@+id/nome_forum"
-    	          android:layout_width="wrap_content"
-    	          android:layout_height="wrap_content"
-    	          android:textSize="15dp"
-    	          android:layout_centerHorizontal="true"
-    	          android:layout_alignParentLeft="true"
-    	          android:layout_centerInParent="true"
-    	          android:layout_marginLeft="5dp"
-    	          android:text="Nome do Forum"
-    	          />
-    	      <ImageButton
-    	          android:id="@+id/nova_mensagem"
-    	          android:layout_width="wrap_content"
-    	          android:layout_height="wrap_content"
-    	          android:background="@drawable/respodner"
-    	          android:scaleType="matrix"
-    	          android:layout_alignParentRight="true"
-    	          android:layout_marginRight="5dp"
-    	          android:layout_centerInParent="true"
-    	          android:layout_centerHorizontal="true"
-    	     
-    	          />
-    	        
-    	    </RelativeLayout>
-    	
-		<ListView
-		    	android:id="@android:id/list"
-		    	android:layout_width="fill_parent"
-		    	android:layout_height="fill_parent"
-		    	android:footerDividersEnabled="false"
-		    	android:divider="@null"
-		    	
-		    />	
-    	<TextView
-    			android:id="@android:id/empty"
-    			android:layout_width="fill_parent"
-    			android:layout_height="fill_parent"
-    			android:gravity="center"
-    			android:text="Forum Vazio"
-    	/>
+
+    <RelativeLayout
+        android:id="@+id/layout1"
+        style="@style/SolarTheme.layout1"
+        android:layout_width="fill_parent"
+        android:layout_height="40dp" >
+
+        <ImageView
+            android:id="@+id/title_2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="5dp"
+            android:scaleType="fitStart"
+            android:src="@drawable/solar_logo_small" />
+
+        <TextView
+            android:id="@+id/header2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="5dp"
+            android:paddingRight="8dp"
+            android:layout_marginTop="5dp"
+            android:text="mobilis"
+            android:textStyle="italic"
+            android:textColor="#FFFF00" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/layout3"
+        android:layout_width="fill_parent"
+        android:layout_height="40dp" >
+
+        <TextView
+            android:id="@+id/nome_forum"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerHorizontal="true"
+            android:layout_centerInParent="true"
+            android:layout_marginLeft="5dp"
+            android:text="Nome do Forum"
+            android:textSize="15dp"
+            android:textColor="#0033CC" />
+    </RelativeLayout>
+
+    <ListView
+        android:id="@android:id/list"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" />
+
+    <TextView
+        android:id="@android:id/empty"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:gravity="center"
+        android:text="Forum Vazio" />
 
 </LinearLayout>
-
-
-    <!-- 
-    		android:layout_marginLeft="-50dp"
-    		
-    		android:layout_height="30dp"
-     -->
-    

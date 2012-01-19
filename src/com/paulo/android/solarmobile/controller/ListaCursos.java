@@ -1,16 +1,22 @@
 package com.paulo.android.solarmobile.controller;
 
-import com.paulo.android.solarmobile.ws.Connection;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+
+import com.paulo.android.solarmobile.ws.Connection;
 
 public class ListaCursos extends Activity implements OnItemClickListener {
 	public Intent intent;
@@ -29,9 +35,10 @@ public class ListaCursos extends Activity implements OnItemClickListener {
 		
 		Bundle extras = getIntent().getExtras();
 			if (extras!=null) {
-		String courseList = extras.getString("CourseList");
-			}
+		courseList = extras.getString("CourseList");
 		connection.parse(courseList);
+			}
+		
 		// Log.w()		
 		
 		
@@ -50,15 +57,30 @@ public class ListaCursos extends Activity implements OnItemClickListener {
 	}
 	
 	public class AndroidConnection extends Connection {
-
+			KeyFinder finder;
+		
 		public AndroidConnection(Context context) {
 			super(context);
-			// TODO Auto-generated constructor stub
 		}
 
 		@Override
 		public String[] parse(String result) {
-				return null;
+			
+			ContentValues parseContainer[];
+			JSONObject jsonObjects[];
+			Log.w("Parse", "InsideParse");
+			finder = new KeyFinder();
+			Object object = JSONValue.parse(result);		
+			JSONArray jsonArray = (JSONArray)object;
+			Log.w("Tamanho Array", String.valueOf(jsonArray.size()));
+			jsonObjects = new JSONObject[jsonArray.size()];
+			parseContainer = new ContentValues[jsonArray.size()];
+			
+			for (int i =0;i<jsonArray.size();i++) {
+				
+			}
+			
+			return null;
 		}
 	}
 }

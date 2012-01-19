@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
 <resources>
     <string name="hello">Hello World, Main!</string>
     <string name="app_name">SolarMobile</string>
-	<string name="teste">teste</string>
+    <string name="teste">teste</string>
 </resources>

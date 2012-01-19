@@ -32,7 +32,7 @@ import com.paulo.solarmobile.audio.RecordAudio;
 public class PostList extends ListActivity implements OnClickListener,
 		OnChronometerTickListener {
 
-	int[] to = { R.id.item_nome_pessoa, R.id.item_hora_envio };
+
 	Button ouvir, stop, start, pause, exitDialog, vf, response;
 	TextView contador;
 	ImageButton button;
@@ -63,34 +63,22 @@ public class PostList extends ListActivity implements OnClickListener,
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.post);
 
-		button = (ImageButton) findViewById(R.id.nova_mensagem);
-		button.setOnClickListener(this);
-
-		teste1 = new ContentValues[2];
-		teste1[0] = new ContentValues();
-		teste1[1] = new ContentValues();
-
-		teste1[0].put("teste", "teste");
-		teste1[0].put("hasVoice", false);
-		teste1[1].put("teste", "teste");
-		teste1[1].put("hasVoice", false);
-
-		adapter = new PostAdapter(this, teste1);
-		setListAdapter(adapter);
+				teste1 = new ContentValues[10];
+			
+				for (int i=1;i<teste1.length;i++) {
+					teste1[i] = new ContentValues();
+					teste1[i].put("nada", "nada");
+				}
 		
 		
+				adapter = new PostAdapter(this, teste1);
+				setListAdapter(adapter);
 
 	}
 
 	@Override
 	public void onClick(View v) {
-		if (v.getId() == R.id.VoiceForum) {
-
-			myDialog = onCreateDialog(DIALOG_GRAVAR);
-			tagHolder = (Integer) v.getTag(R.id.change);
-			myDialog.show();
-
-		}
+	
 		if (v.getId() == R.id.img_close) {
 			myDialog.dismiss();
 		}
@@ -122,14 +110,6 @@ public class PostList extends ListActivity implements OnClickListener,
 
 		}
 
-		if (v.getId() == R.id.ouvir) {
-
-		}
-		if (v.getId() == R.id.Responder) {
-			Intent intent = new Intent(this, ResponseController.class);
-			startActivity(intent);
-
-		}
 	}
 
 	@Override
@@ -156,7 +136,8 @@ public class PostList extends ListActivity implements OnClickListener,
 		stopWatch.setOnChronometerTickListener(this);
 		contador = (TextView) layout.findViewById(R.id.contador);
 
-		builder = new AlertDialog.Builder(new ContextThemeWrapper(this,R.style.CustomDialog));
+		builder = new AlertDialog.Builder(new ContextThemeWrapper(this,
+				R.style.CustomDialog));
 		builder.setView(layout);
 		alertDialog = builder.create();
 		return alertDialog;
@@ -241,7 +222,7 @@ public class PostList extends ListActivity implements OnClickListener,
 
 		@Override
 		public Object getItem(int position) {
-			return null;
+			return position;
 		}
 
 		@Override
@@ -251,32 +232,35 @@ public class PostList extends ListActivity implements OnClickListener,
 
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
-
-			if (convertView == null) {
-				if (data[position].getAsBoolean("hasVoice") == false) {
-					convertView = inflater.inflate(R.layout.postitem, parent,
-							false);
-					convertView.setId(1);
-				} else {
-					convertView = inflater.inflate(R.layout.postitemvoice,
-							parent, false);
-					convertView.setId(2);
-				}
-
+				
+			if (convertView==null) {
+				convertView = inflater.inflate(R.layout.postitem, parent,false);
 			}
-			if (convertView.getId() == 2) {
-				ouvir = (Button) convertView.findViewById(R.id.ouvir);
-				ouvir.setTag(R.id.change, position);
-				ouvir.setOnClickListener(PostList.this);
-			}
-
-			vf = (Button) convertView.findViewById(R.id.VoiceForum);
-			response = (Button) convertView.findViewById(R.id.Responder);
-			response.setOnClickListener(PostList.this);
-			vf.setTag(R.id.change, position);
-			vf.setOnClickListener(PostList.this);
-
+			
 			return convertView;
 		}
 	}
+	
+	/*	Backup
+	 * 		if (v.getId() == R.id.VoiceForum) {
+
+			myDialog = onCreateDialog(DIALOG_GRAVAR);
+			tagHolder = (Integer) v.getTag(R.id.change);
+			myDialog.show();
+
+		}
+	 *  
+	 *   
+		if (v.getId() == R.id.ouvir) {
+
+		}
+		if (v.getId() == R.id.Responder) {
+			Intent intent = new Intent(this, ResponseController.class);
+			startActivity(intent);
+		}
+	 * 
+	 * 
+	 * */
+	
+	
 }

@@ -95,7 +95,7 @@ public class Login extends Activity implements OnClickListener {
 				Log.w("JsonObject", json.toString());
 
 				// adapter.open();
-				
+
 				dialog = createDialog();
 				dialog.show();
 				connection = new AndroidConnection(this);
@@ -148,23 +148,23 @@ public class Login extends Activity implements OnClickListener {
 	public class AndroidConnection extends Connection {
 
 		KeyFinder kf;
-		
+
 		public AndroidConnection(Context context) {
 			super(context);
 		}
 
 		@Override
 		public String[] parse(String source) {
-			 kf = new KeyFinder();	
-			 JSONArray jsonArray= new JSONArray();
-			 
-				return null;
+			kf = new KeyFinder();
+			JSONArray jsonArray = new JSONArray();
+
+			return null;
 		}
 
 	}
 
 	public void handleError(int errorCode) {
-		 dialog.dismiss();
+		dialog.dismiss();
 		if (errorCode == CONNECTION_ERROR_CODE) {
 			Toast.makeText(this, "Erro de conexão,tente novamente ",
 					Toast.LENGTH_SHORT).show();

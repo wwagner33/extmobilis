@@ -1,69 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="wrap_content">
-	<ImageView
-	    android:id="@+id/avatar"
-	    android:layout_margin="5dp"
-	    android:padding="2dp"
-	    android:layout_alignParentLeft="true"
-	    android:src="@drawable/avatar1_32"
-	    android:layout_width="40dp"
-	    android:layout_height="40dp"
-	    />
+    android:layout_height="wrap_content" >
+
+    <ImageView
+        android:id="@+id/avatar"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentLeft="true"
+        android:layout_margin="5dp"
+        android:padding="2dp"
+        android:src="@drawable/avatar1_32" />
+
     <TextView
-        android:id="@+id/item_nome_pessoa"
- 		android:layout_margin="5dp"
+        android:id="@+id/post_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
-        android:layout_toRightOf="@id/avatar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text = "Nome da Pessoa"
-        
-        
-        />
-    <TextView
-        android:id="@+id/item_hora_envio"
-       	android:layout_margin="5dp"
-        android:layout_below="@id/item_nome_pessoa"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/avatar"
-        android:text="Enviado em : data"	
-        />
-    <TextView
-        android:id="@+id/item_mensagem"
         android:layout_margin="5dp"
         android:layout_toRightOf="@id/avatar"
-        android:layout_below="@id/item_hora_envio"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="corpo da mensagem"
-        />
-    <Button
-        android:id="@+id/VoiceForum"
-        android:background="@drawable/voiceforum"       
+        android:text="Nome"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/post_month"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-     	android:layout_marginBottom="10dp"
-     	android:layout_marginRight="5dp"
-     	android:layout_below="@id/item_mensagem"	
-        android:layout_alignParentBottom="true"
-      
-     
-        />
-    <Button
-        android:id="@+id/Responder"
-        android:background="@drawable/respodner"
+        android:layout_alignParentTop="true"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="5dp"
+        android:text="jan" />
+
+    <TextView
+        android:id="@+id/post_day"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-     	android:layout_marginBottom="10dp"
-     	android:layout_marginRight="10dp"
-        android:layout_toLeftOf="@id/VoiceForum"
-      	android:layout_below="@id/item_mensagem"
-        android:layout_alignParentBottom="true"
-        
-        />
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_toLeftOf="@id/post_month"
+        android:text="12" />
+
+    <TextView
+        android:id="@+id/placeholder"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_toLeftOf="@id/post_day"
+        android:text="V" />
+
+    <TextView
+        android:id="@+id/post_body"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/post_title"
+        android:layout_margin="4dp"
+        android:layout_toRightOf="@id/avatar"
+        android:text="corpo da mensagem" />
+
+
 </RelativeLayout>
