@@ -7,7 +7,6 @@ import org.apache.http.client.ClientProtocolException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import android.app.Activity;
@@ -35,7 +34,7 @@ public class Login extends Activity implements OnClickListener {
 	public Intent intent;
 	JSONObject json;
 	DBAdapter adapter;
-	AndroidConnection connection;
+	Connection connection;
 	ProgressDialog dialog;
 	String authToken;
 
@@ -43,6 +42,7 @@ public class Login extends Activity implements OnClickListener {
 	ObtainCourseListThread obtainCourseListThread;
 
 	private static final int CONNECTION_ERROR_CODE = 1;
+	private static final int PARSE_COURSES_ID = 222;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -56,6 +56,7 @@ public class Login extends Activity implements OnClickListener {
 		password = (EditText) findViewById(R.id.campo2);
 		submit = (Button) findViewById(R.id.submit);
 		submit.setOnClickListener(this);
+
 		adapter = new DBAdapter(this);
 	}
 
@@ -90,6 +91,8 @@ public class Login extends Activity implements OnClickListener {
 
 			boolean ok = true;
 			if (ok) {
+
+				// talvez realocar para dentro da thread
 				json = new JSONObject();
 				LinkedHashMap jsonMap = new LinkedHashMap<String, String>();
 				jsonMap.put("username", login.getText().toString());
@@ -98,19 +101,13 @@ public class Login extends Activity implements OnClickListener {
 
 				Log.w("JsonObject", json.toString());
 
-				// adapter.open();
-
 				dialog = createDialog();
 				dialog.show();
-				connection = new AndroidConnection(this);
+				connection = new Connection(this);
 
-				// authToken = connection.requestAuthenticityToken(json);
 				requestToken();
-
 			}
-
 		}
-
 	}
 
 	public void requestToken() {
@@ -149,49 +146,6 @@ public class Login extends Activity implements OnClickListener {
 		return dialog;
 	}
 
-	public class AndroidConnection extends Connection {
-
-		KeyFinder kf;
-
-		public AndroidConnection(Context context) {
-			super(context);
-		}
-
-		@Override
-		public ContentValues[] parse(String source) {
-
-			Object object = JSONValue.parse(source);
-			JSONArray jsonArray = (JSONArray) object;
-			JSONObject jsonObjects[] = new JSONObject[jsonArray.size()];
-
-			ContentValues parsedValues[] = new ContentValues[jsonArray.size()];
-
-			for (int i = 0; i < jsonArray.size(); i++) {
-				jsonObjects[i] = (JSONObject) jsonArray.get(i);
-				Log.w("Object", jsonObjects[i].toJSONString());
-				
-				parsedValues[i] = new ContentValues();
-
-				parsedValues[i].put("nomeCurso",
-						(String) jsonObjects[i].get("group_id"));
-				parsedValues[i].put("nomeCurso",
-						(String) jsonObjects[i].get("offer_id"));
-				parsedValues[i].put("nomeCurso",
-						(String) jsonObjects[i].get("curriculum_unit"));
-				parsedValues[i].put("nomeCurso",
-						(String) jsonObjects[i].get("semester"));
-				parsedValues[i].put("nomeCurso",
-						(String) jsonObjects[i].get("allocation_tag_id"));
-				parsedValues[i].put("nomeCurso",
-						(String) jsonObjects[i].get("name"));
-			}
-
-			// ContentValues[] parsedValues;
-			return parsedValues;
-		}
-
-	}
-
 	public void handleError(int errorCode) {
 		dialog.dismiss();
 		if (errorCode == CONNECTION_ERROR_CODE) {
@@ -207,13 +161,15 @@ public class Login extends Activity implements OnClickListener {
 		protected String doInBackground(Void... params) {
 			try {
 				authToken = connection.requestAuthenticityToken(json);
-				if (authToken!=null) {
+				if (authToken != null) {
 					adapter.open();
-					//guardando Token
-					adapter.insertValue("token", authToken);
-					adapter.close();
-					
+					Log.w("UpdateToken", "updateToken");
+					adapter.updateToken(authToken);
+				} else {
+					handleError(CONNECTION_ERROR_CODE);
 				}
+				adapter.close();
+
 				return authToken;
 			} catch (ClientProtocolException e) {
 				e.printStackTrace();
@@ -269,10 +225,15 @@ public class Login extends Activity implements OnClickListener {
 
 			} else {
 
-				ContentValues[] parsedValues = connection.parse(result);
+				adapter.open();
 
+				// adapter.insertCourses(result);
+
+				adapter.updateCourses(result);
+
+				// ContentValues[] parsedValues = connection.parse(result);
 				intent = new Intent(getApplicationContext(), ListaCursos.class);
-				intent.putExtra("CourseList", parsedValues);
+				intent.putExtra("CourseList", result);
 				startActivity(intent);
 			}
 		}

@@ -60,5 +60,4 @@
         android:layout_toRightOf="@id/avatar"
         android:text="corpo da mensagem" />
 
-
 </RelativeLayout>

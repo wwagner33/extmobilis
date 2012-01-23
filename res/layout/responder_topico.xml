@@ -3,57 +3,48 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical" >
-		
-    
-    			<TextView
-    			    android:layout_width="fill_parent"
-    			    android:layout_height="wrap_content"
-    			    android:text="Corpo da Mensagem"
-    			    android:layout_margin="5dp"
-    			    />
-    		<EditText
-    		    android:id="@+id/criar_topico_conteudo"
-    		    android:layout_width="300dp"
-    		    android:layout_height="100dp"
-    		    android:hint="Corpo da Mensagem :"
-    		    android:layout_gravity="center"
-    		   
-    		    />
-    		<TextView
-    		    android:layout_width="fill_parent"
-    		    android:layout_height="20dp"
-    		    android:text=""
-    		    />
-    			<Button
-    			    android:id="@+id/nova_mensagem_de_voz"
-    			    android:layout_width="fill_parent"
-    			    android:layout_height="wrap_content"
-    			    android:text="Gravar Nova Mensagem de Voz"
-    			    
-    			    />
-    				<Button
-    				    android:id="@+id/escolher_mensagem_de_voz"
-    				    android:layout_width="fill_parent"
-    				    android:layout_height="wrap_content"
-    				    android:text="escolher mesagem de voz"
-    	
-    				    />	
-    				    
-    			<TextView
-    			    android:id="@+id/num_gravacoes"
-    			    android:layout_width="fill_parent"
-    			    android:layout_height="wrap_content"
-    			    android:text="Número de Gravações : "
-    			    
-    			    />	
-    			
-    			<Button
-    			    android:id="@+id/criar_topico_submit"
-    			    android:layout_height="wrap_content"
-    			    android:layout_width="wrap_content"
-    			    android:layout_gravity="center"
-    			    android:text="Submit"
-    			    />
-    	
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:text="Corpo da Mensagem" />
+
+    <EditText
+        android:id="@+id/criar_topico_conteudo"
+        android:layout_width="300dp"
+        android:layout_height="100dp"
+        android:layout_gravity="center"
+        android:hint="Corpo da Mensagem :" />
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="20dp"
+        android:text="" />
+
+    <Button
+        android:id="@+id/nova_mensagem_de_voz"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Gravar Nova Mensagem de Voz" />
+
+    <Button
+        android:id="@+id/escolher_mensagem_de_voz"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="escolher mesagem de voz" />
+
+    <TextView
+        android:id="@+id/num_gravacoes"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Número de Gravações : " />
+
+    <Button
+        android:id="@+id/criar_topico_submit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="Submit" />
 
 </LinearLayout>

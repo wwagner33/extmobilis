@@ -22,11 +22,17 @@ public class InitialConfig extends Activity {
 
 		if (helper.checkDataBaseExistence()) {
 			adapter.open();
-			cursor = adapter.getOneRow("config", 1);
-			Log.w("Cursor size", String.valueOf(cursor.getColumnCount()));
-			Log.w("Cursor Count", String.valueOf(cursor.getCount()));
+			// cursor = adapter.getOneRow("config", 2);
+			// Log.w("Cursor size", String.valueOf(cursor.getColumnCount()));
+			// Log.w("Cursor Count", String.valueOf(cursor.getCount()));
 
-			if (cursor.getString(cursor.getColumnIndex("valor")) != null) {
+			//boolean teste = false;
+
+			 if (adapter.tokenExists()) {
+
+		//	if (teste) {
+				// checar também se existe valor na lista de cursor
+
 				intent = new Intent(this, ListaCursos.class);
 				startActivity(intent);
 			} else {

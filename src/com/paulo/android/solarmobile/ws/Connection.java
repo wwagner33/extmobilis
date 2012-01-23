@@ -24,7 +24,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
 
-public abstract class Connection {
+public class Connection {
 	Context context;
 	HttpResponse response;
 
@@ -35,7 +35,7 @@ public abstract class Connection {
 		this.context = context;
 	}
 
-	public abstract Object parse(String result);
+	//public abstract Object parse(String result);
 
 	public String requestJSON(String URL, String authToken)
 			throws ClientProtocolException, IOException
@@ -113,9 +113,10 @@ public abstract class Connection {
 		}
 
 		else {
-			// Toast.makeText(context, "Erro de conexão", Toast.LENGTH_SHORT)
-			//
-			// .show();
+		
+			//if (statusCode==401) {
+				//""
+			//}
 			return null;
 		}
 

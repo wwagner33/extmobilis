@@ -1,90 +1,193 @@
 package com.paulo.android.solarmobile.controller;
 
-
-
 import android.app.Activity;
+import android.app.ListActivity;
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
+import com.paulo.android.solarmobile.model.DBAdapter;
 import com.paulo.android.solarmobile.ws.Connection;
 
-	// curriculum_units/:id/groups       
-	// lista todas as turmas do aluno dentro desta unidade curricular
+// curriculum_units/:id/groups       
+// lista todas as turmas do aluno dentro desta unidade curricular
 
+public class ListaCursos extends ListActivity {
 
-public class ListaCursos extends Activity implements OnItemClickListener {
 	public Intent intent;
-	private static final String[] nomeCursos = { "Química", "Matemática",
-			"Biologia", "História", "Engenharia", "Mecânica", "Engenharia",
-			"Química", "Computação", "Estatística" };
-	
-	String courseList;
-	String[] teste;
+
+	private static final int PARSE_COURSES_ID = 222;
+
+	String[] courseListString;
+	String authToken;
 	private ListView lv;
-	AndroidConnection connection;
+	Connection connection;
+	DBAdapter adapter;
+	ParseJSON jsonParser;
+	ContentValues[] courseList;
+	String jsonString;
+	CourseListAdapter customAdapter;
+
+	// Threads
+	ObtainCurriculumUnitsThread curriculumThread;
+	ObtainCourseListThread courseListThread;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.cursos);
 
-		 connection = new AndroidConnection(this);
+		connection = new Connection(this);
+		adapter = new DBAdapter(this);
 
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {
 
-			Object jsons[] = (Object[])extras.get("CourseList");
-			Log.w("JSONS SIZE", String.valueOf(jsons.length));
-			ContentValues receivedValues[] = new ContentValues[jsons.length];
-			teste = new String[jsons.length];
-			
-			for (int i=0;i<jsons.length;i++) {
-				receivedValues[i] = (ContentValues)jsons[i];
-				teste[i] = receivedValues[i].getAsString("nomeCurso");
+			jsonString = extras.getString("CourseList");
+
+			jsonParser = new ParseJSON();
+			courseList = jsonParser.parseCourses(jsonString, PARSE_COURSES_ID);
+
+			// Log.w("JSONS SIZE", String.valueOf(jsons.length));
+
+			courseListString = new String[courseList.length];
+
+			for (int i = 0; i < courseList.length; i++) {
+				courseListString[i] = courseList[i].getAsString("name");
 			}
+			// lv = (ListView) findViewById(R.id.list);
+			ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+					R.layout.itemcurso, courseListString);
+			// lv.setOnItemClickListener(this);
+			setListAdapter(adapter);
+
 		}
 
-	
-		
-		lv = (ListView) findViewById(R.id.list);
-		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-				R.layout.itemcurso, teste);
-		lv.setOnItemClickListener(this);
-		lv.setAdapter(adapter);
+		else {
+			adapter.open();
+			jsonString = adapter.getCourseList();
+			adapter.close(); // fechar no onStop
+			updateList();
+
+		}
+	}
+
+	public String getBankCourseList() {
+		adapter.open();
+		String bankCourseList = adapter.getCourseList();
+		Log.w("Lista de Cursos", bankCourseList);
+		adapter.close();
+		return bankCourseList;
+	}
+
+	public void updateList() {
+		jsonParser = new ParseJSON();
+		courseList = jsonParser.parseCourses(getBankCourseList(),
+				PARSE_COURSES_ID);
+		customAdapter = new CourseListAdapter(this, courseList);
+		setListAdapter(customAdapter);
 
 	}
 
 	@Override
-	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-		//intent = new Intent(this, TopicListController.class);
-		
+	protected void onListItemClick(ListView l, View v, int position, long id) {
+		// TODO Auto-generated method stub
+		super.onListItemClick(l, v, position, id);
+		Intent intent = new Intent(this, TopicListController.class);
+
 		Log.w("Item position", String.valueOf(position));
 		Log.w("item id", String.valueOf(id));
-		
-		//connection.requestJSON("curriculum_units/:+"+position+"/groups", authToken)
-		
-		//startActivity(intent);
+
+		// connection.requestJSON("curriculum_units/:+"+position+"/groups",
+		// authToken)
+
+		startActivity(intent);
 	}
 
-	public class AndroidConnection extends Connection {
-		
+	public void getCourseList() {
+		// implementado quando houver refresh
+	}
 
-		public AndroidConnection(Context context) {
-			super(context);
+	public void obtainCurriculumUnits() {
+		curriculumThread = new ObtainCurriculumUnitsThread();
+		curriculumThread.execute();
+	}
+
+	public class ObtainCourseListThread extends AsyncTask<Void, Void, Void> {
+
+		// thread que será chamada quando houver um botão de refresh
+
+		@Override
+		protected Void doInBackground(Void... params) {
+			return null;
+		}
+	}
+
+	public class ObtainCurriculumUnitsThread extends
+			AsyncTask<Void, Void, Void> {
+
+		@Override
+		protected Void doInBackground(Void... params) {
+
+			return null;
+		}
+
+	}
+
+	public class CourseListAdapter extends BaseAdapter {
+
+		// Adapter geral enquanto não sabe-se quais elementos vão ficar
+		// realmente na lista
+		Activity activity;
+		ContentValues[] values;
+		LayoutInflater inflater = null;
+
+		public CourseListAdapter(Activity a, ContentValues[] v) {
+			activity = a;
+			values = v;
+			inflater = LayoutInflater.from(activity);
 		}
 
 		@Override
-		public ContentValues[] parse(String source) {
-				
-			return null;
+		public int getCount() {
+			// TODO Auto-generated method stub
+			return values.length;
 		}
+
+		@Override
+		public Object getItem(int position) {
+			// TODO Auto-generated method stub
+			return position;
+		}
+
+		@Override
+		public long getItemId(int position) {
+			// TODO Auto-generated method stub
+			return position;
+		}
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			if (convertView == null) {
+				convertView = inflater.inflate(R.layout.itemcurso, parent,
+						false);
+				TextView courseName = (TextView) convertView
+						.findViewById(R.id.item);
+				courseName.setText(values[position].getAsString("name"));
+			}
+			return convertView;
+		}
+
 	}
 }
