@@ -1,5 +1,9 @@
 package com.paulo.android.solarmobile.controller;
 
+import java.io.IOException;
+
+import org.apache.http.client.ClientProtocolException;
+
 import android.app.Activity;
 import android.app.ListActivity;
 import android.content.ContentValues;
@@ -10,12 +14,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.paulo.android.solarmobile.model.DBAdapter;
 import com.paulo.android.solarmobile.ws.Connection;
@@ -29,6 +33,8 @@ public class ListaCursos extends ListActivity {
 
 	private static final int PARSE_COURSES_ID = 222;
 
+	// public String URI = ""
+
 	String[] courseListString;
 	String authToken;
 	private ListView lv;
@@ -38,7 +44,12 @@ public class ListaCursos extends ListActivity {
 	ContentValues[] courseList;
 	String jsonString;
 	CourseListAdapter customAdapter;
+	String result;
 
+	String semesterString;
+	String groupsResult;
+
+	int itemPosition;
 	// Threads
 	ObtainCurriculumUnitsThread curriculumThread;
 	ObtainCourseListThread courseListThread;
@@ -50,6 +61,7 @@ public class ListaCursos extends ListActivity {
 
 		connection = new Connection(this);
 		adapter = new DBAdapter(this);
+		adapter.open();
 
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {
@@ -75,19 +87,27 @@ public class ListaCursos extends ListActivity {
 		}
 
 		else {
-			adapter.open();
+			// adapter.open();
 			jsonString = adapter.getCourseList();
-			adapter.close(); // fechar no onStop
+			//
+			// adapter.close(); // fechar no onStop
 			updateList();
 
 		}
 	}
 
+	@Override
+	protected void onStop() {
+		// TODO Auto-generated method stub
+		super.onStop();
+		adapter.close();
+	}
+
 	public String getBankCourseList() {
-		adapter.open();
+		// adapter.open();
 		String bankCourseList = adapter.getCourseList();
 		Log.w("Lista de Cursos", bankCourseList);
-		adapter.close();
+		// adapter.close();
 		return bankCourseList;
 	}
 
@@ -109,38 +129,116 @@ public class ListaCursos extends ListActivity {
 		Log.w("Item position", String.valueOf(position));
 		Log.w("item id", String.valueOf(id));
 
-		// connection.requestJSON("curriculum_units/:+"+position+"/groups",
+		Object semester = l.getAdapter().getItem(position);
+		semesterString = (String) semester;
+		Log.w("GroupID", semesterString);
+
+		// adapter.open();
+
+		authToken = adapter.getToken();
+		Log.w("TOKEN", authToken);
+
+		if (adapter.groupsExist()) {
+			startActivity(intent);
+		}
+
+		else {
+			// adapter.close();
+			obtainCurriculumUnits(adapter.getToken());
+
+		}
+
+		// Log.w("GROUP_ID", String.valueOf(l.getAdapter().getItem(position)));
+
+		// EditText teste = (EditText)v.findViewById(R.id.item);
+		// teste.setText("teste");
 		// authToken)
 
-		startActivity(intent);
+		// startActivity(intent);
 	}
 
 	public void getCourseList() {
 		// implementado quando houver refresh
 	}
 
-	public void obtainCurriculumUnits() {
+	public void obtainCurriculumUnits(String token) {
+		// adapter.open();
+		// authToken = adapter.getToken();
+		// adapter.close();
+
 		curriculumThread = new ObtainCurriculumUnitsThread();
-		curriculumThread.execute();
+		curriculumThread.execute(token);
 	}
 
-	public class ObtainCourseListThread extends AsyncTask<Void, Void, Void> {
+	public class ObtainCourseListThread extends AsyncTask<String, Void, String> {
+		//
 
 		// thread que será chamada quando houver um botão de refresh
 
 		@Override
-		protected Void doInBackground(Void... params) {
-			return null;
+		protected String doInBackground(String... params) {
+
+			try {
+				result = connection.requestJSON("curriculum_units/:"
+						+ semesterString + "/groups", params[0]);
+			} catch (ClientProtocolException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return result;
+
+		}
+
+		@Override
+		protected void onPostExecute(String result) {
+			// TODO Auto-generated method stub
+			super.onPostExecute(result);
+
 		}
 	}
 
 	public class ObtainCurriculumUnitsThread extends
-			AsyncTask<Void, Void, Void> {
+			AsyncTask<String, Void, String> {
 
 		@Override
-		protected Void doInBackground(Void... params) {
+		protected String doInBackground(String... params) {
+			try {
+				groupsResult = connection.requestJSON("curriculum_units/"
+						+ semesterString + "/groups.json", authToken);
+				return groupsResult;
+			} catch (ClientProtocolException e) {
+				e.printStackTrace();
+				return null;
 
-			return null;
+			} catch (IOException e) {
+				e.printStackTrace();
+				return null;
+			}
+
+			catch (Exception e) {
+				e.printStackTrace();
+				return null;
+			}
+		}
+
+		@Override
+		protected void onPostExecute(String result) {
+			// TODO Auto-generated method stub
+			super.onPostExecute(result);
+
+			if (result == null) {
+				Toast.makeText(getApplicationContext(), "erro",
+						Toast.LENGTH_SHORT).show();
+
+			} else {
+				adapter.updateGroups(result);
+				intent.putExtra("GroupList", result);
+				startActivity(intent);
+			}
+			// Log.w("Turmas", groupsResult);
 		}
 
 	}
@@ -167,14 +265,22 @@ public class ListaCursos extends ListActivity {
 
 		@Override
 		public Object getItem(int position) {
-			// TODO Auto-generated method stub
-			return position;
+
+			return values[position].getAsString("group_id");
+
 		}
 
 		@Override
 		public long getItemId(int position) {
-			// TODO Auto-generated method stub
+			// values[position].get(key)
+
+			// int teste =
+			// Integer.parseInt(values[position].getAsString("curriculum_units"));
 			return position;
+		}
+
+		public void teste() {
+
 		}
 
 		@Override

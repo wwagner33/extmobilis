@@ -98,4 +98,31 @@ public class DBAdapter {
 		cursor.close();
 		return result;
 	}
+
+	public boolean groupsExist() {
+
+		Cursor cursor = db.rawQuery("SELECT * FROM config WHERE _id=4", null);
+		cursor.moveToFirst();
+		String token = cursor.getString(cursor.getColumnIndex("valor"));
+		cursor.close();
+		if (token == null) {
+			return false;
+		} else
+			return true;
+	}
+
+	public void updateGroups(String newValues) {
+		ContentValues valores = new ContentValues();
+		valores.put("valor", newValues);
+		db.update("config", valores, "_id=4", null);
+	}
+
+	public String getGroups() {
+		Cursor cursor = db.rawQuery("SELECT * FROM config WHERE _id=4", null);
+		cursor.moveToFirst();
+		String result = cursor.getString(cursor.getColumnIndex("valor"));
+		cursor.close();
+		return result;
+	}
+
 }

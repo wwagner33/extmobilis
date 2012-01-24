@@ -33,18 +33,22 @@ public class ParseJSON {
 
 				parsedValues[i] = new ContentValues();
 
-				parsedValues[i].put("group_id",
-						(String) jsonObjects[i].get("group_id"));
-				parsedValues[i].put("offer_id",
-						(String) jsonObjects[i].get("offer_id"));
-				parsedValues[i].put("curriculum_unit",
-						(String) jsonObjects[i].get("curriculum_unit"));
-				parsedValues[i].put("semester",
-						(String) jsonObjects[i].get("semester"));
-				parsedValues[i].put("allocation_tag_id",
-						(String) jsonObjects[i].get("allocation_tag_id"));
-				parsedValues[i]
-						.put("name", (String) jsonObjects[i].get("name"));
+				parsedValues[i].put("group_id",(String) jsonObjects[i].get("group_id"));
+								
+				parsedValues[i].put("offer_id",(String) jsonObjects[i].get("offer_id"));
+				
+				
+				parsedValues[i].put("curriculum_unit_id",(String) jsonObjects[i].get("curriculum_unit_id"));
+				
+				
+				parsedValues[i].put("semester",(String) jsonObjects[i].get("semester"));
+				
+				
+				parsedValues[i].put("allocation_tag_id",(String) jsonObjects[i].get("allocation_tag_id"));
+				
+				
+				
+				parsedValues[i].put("name", (String) jsonObjects[i].get("name"));
 			}
 
 			return parsedValues;

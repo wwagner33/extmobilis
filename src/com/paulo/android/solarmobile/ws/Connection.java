@@ -35,7 +35,7 @@ public class Connection {
 		this.context = context;
 	}
 
-	//public abstract Object parse(String result);
+	// public abstract Object parse(String result);
 
 	public String requestJSON(String URL, String authToken)
 			throws ClientProtocolException, IOException
@@ -113,10 +113,10 @@ public class Connection {
 		}
 
 		else {
-		
-			//if (statusCode==401) {
-				//""
-			//}
+
+			// if (statusCode==401) {
+			// ""
+			// }
 			return null;
 		}
 
@@ -133,82 +133,80 @@ public class Connection {
 		} else
 			return "keyNotFound";
 	}
-	
 
 	public class KeyFinder implements ContentHandler {
-	private Object value;
-	private boolean found = false;
-	private boolean end = false;
-	private String key;
-	private String matchKey;
+		private Object value;
+		private boolean found = false;
+		private boolean end = false;
+		private String key;
+		private String matchKey;
 
-	public void setMatchKey(String matchKey) {
-		this.matchKey = matchKey;
-	}
-
-	public Object getValue() {
-		return value;
-	}
-
-	public boolean isEnd() {
-		return end;
-	}
-
-	public void setFound(boolean found) {
-		this.found = found;
-	}
-
-	public boolean isFound() {
-		return found;
-	}
-
-	public void startJSON() throws ParseException, IOException {
-		found = false;
-		end = false;
-	}
-
-	public void endJSON() throws ParseException, IOException {
-		end = true;
-	}
-
-	public boolean primitive(Object value) throws ParseException, IOException {
-		if (key != null) {
-			if (key.equals(matchKey)) {
-				found = true;
-				this.value = value;
-				key = null;
-				return false;
-			}
+		public void setMatchKey(String matchKey) {
+			this.matchKey = matchKey;
 		}
-		return true;
-	}
 
-	public boolean startArray() throws ParseException, IOException {
-		return true;
-	}
+		public Object getValue() {
+			return value;
+		}
 
-	public boolean startObject() throws ParseException, IOException {
-		return true;
-	}
+		public boolean isEnd() {
+			return end;
+		}
 
-	public boolean startObjectEntry(String key) throws ParseException,
-			IOException {
-		this.key = key;
-		return true;
-	}
+		public void setFound(boolean found) {
+			this.found = found;
+		}
 
-	public boolean endArray() throws ParseException, IOException {
-		return false;
-	}
+		public boolean isFound() {
+			return found;
+		}
 
-	public boolean endObject() throws ParseException, IOException {
-		return true;
-	}
+		public void startJSON() throws ParseException, IOException {
+			found = false;
+			end = false;
+		}
 
-	public boolean endObjectEntry() throws ParseException, IOException {
-		return true;
-	}
+		public void endJSON() throws ParseException, IOException {
+			end = true;
+		}
+
+		public boolean primitive(Object value) throws ParseException,
+				IOException {
+			if (key != null) {
+				if (key.equals(matchKey)) {
+					found = true;
+					this.value = value;
+					key = null;
+					return false;
+				}
+			}
+			return true;
+		}
+
+		public boolean startArray() throws ParseException, IOException {
+			return true;
+		}
+
+		public boolean startObject() throws ParseException, IOException {
+			return true;
+		}
+
+		public boolean startObjectEntry(String key) throws ParseException,
+				IOException {
+			this.key = key;
+			return true;
+		}
+
+		public boolean endArray() throws ParseException, IOException {
+			return false;
+		}
+
+		public boolean endObject() throws ParseException, IOException {
+			return true;
+		}
+
+		public boolean endObjectEntry() throws ParseException, IOException {
+			return true;
+		}
 	}
 }
-
-

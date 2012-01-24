@@ -166,7 +166,7 @@ public class Login extends Activity implements OnClickListener {
 					Log.w("UpdateToken", "updateToken");
 					adapter.updateToken(authToken);
 				} else {
-					handleError(CONNECTION_ERROR_CODE);
+						return null;
 				}
 				adapter.close();
 
