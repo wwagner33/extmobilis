@@ -11,15 +11,27 @@ public class TopicListController extends ListActivity {
 
 	public String[] topics = { "Assunto1", "Assunto2", "Assunto3", "Assunto4",
 			"Assunto5", "Assunto6" };;
+			
+			
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.topico);
+		
+		Bundle extras = getIntent().getExtras();
+		
+		//String 
+		
 		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
 				R.layout.topicoitem, topics);
 		setListAdapter(adapter);
+		
+		
+		
+		
+		
 	}
 
 	@Override

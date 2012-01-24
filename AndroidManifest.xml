@@ -16,6 +16,7 @@
         <activity android:name=".Login"/>
         <activity android:name=".ListaCursos"/>
         <activity android:name=".PostList"/>
+        <activity android:name = ".ClassListController"/>
         <activity android:name=".TopicListController"/>
         <activity android:name=".ResponseController"/>
     </application>

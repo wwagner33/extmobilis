@@ -19,6 +19,8 @@ public class InitialConfig extends Activity {
 		super.onCreate(savedInstanceState);
 		DatabaseHelper helper = new DatabaseHelper(this);
 		adapter = new DBAdapter(this);
+		
+		
 
 		if (helper.checkDataBaseExistence()) {
 			adapter.open();

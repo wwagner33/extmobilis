@@ -69,7 +69,7 @@ public class ListaCursos extends ListActivity {
 			jsonString = extras.getString("CourseList");
 
 			jsonParser = new ParseJSON();
-			courseList = jsonParser.parseCourses(jsonString, PARSE_COURSES_ID);
+			courseList = jsonParser.parseJSON(jsonString, PARSE_COURSES_ID);
 
 			// Log.w("JSONS SIZE", String.valueOf(jsons.length));
 
@@ -113,7 +113,7 @@ public class ListaCursos extends ListActivity {
 
 	public void updateList() {
 		jsonParser = new ParseJSON();
-		courseList = jsonParser.parseCourses(getBankCourseList(),
+		courseList = jsonParser.parseJSON(getBankCourseList(),
 				PARSE_COURSES_ID);
 		customAdapter = new CourseListAdapter(this, courseList);
 		setListAdapter(customAdapter);
@@ -124,7 +124,7 @@ public class ListaCursos extends ListActivity {
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		// TODO Auto-generated method stub
 		super.onListItemClick(l, v, position, id);
-		Intent intent = new Intent(this, TopicListController.class);
+		Intent intent = new Intent(this, ClassListController.class);
 
 		Log.w("Item position", String.valueOf(position));
 		Log.w("item id", String.valueOf(id));
@@ -234,6 +234,7 @@ public class ListaCursos extends ListActivity {
 						Toast.LENGTH_SHORT).show();
 
 			} else {
+				intent = new Intent(getApplicationContext(),ClassListController.class);
 				adapter.updateGroups(result);
 				intent.putExtra("GroupList", result);
 				startActivity(intent);
@@ -279,10 +280,7 @@ public class ListaCursos extends ListActivity {
 			return position;
 		}
 
-		public void teste() {
-
-		}
-
+	
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
 			if (convertView == null) {
