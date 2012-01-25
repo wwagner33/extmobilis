@@ -10,7 +10,7 @@
         android:layout_alignParentLeft="true"
         android:layout_margin="5dp"
         android:padding="2dp"
-        android:src="@drawable/avatar1_32" />
+        android:src="@drawable/stock_person"/>
 
     <TextView
         android:id="@+id/post_title"

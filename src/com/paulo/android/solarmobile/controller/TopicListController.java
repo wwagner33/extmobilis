@@ -39,6 +39,7 @@ public class TopicListController extends ListActivity {
 	TopicAdapter listAdapter;
 	Connection connection;
 	ObtainPostListThread thread;
+	String forumName;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -140,11 +141,10 @@ public class TopicListController extends ListActivity {
 						Toast.LENGTH_SHORT).show();
 
 			} else {
-				 intent = new Intent(getApplicationContext(),
-				 TopicListController.class);
-				 adapter.updateGroups(finalResult);
-				 intent.putExtra("TopicList", finalResult);
-				 startActivity(intent);
+				intent = new Intent(getApplicationContext(), PostList.class);
+				intent.putExtra("ForumName", forumName);	
+				intent.putExtra("PostList", finalResult);
+				startActivity(intent);
 			}
 			// Log.w("Turmas", groupsResult);
 		}
@@ -171,7 +171,9 @@ public class TopicListController extends ListActivity {
 
 		@Override
 		public Object getItem(int position) {
-			// TODO Auto-generated method stub
+
+			forumName = values[position].getAsString("name");
+
 			return values[position].getAsLong("id");
 		}
 

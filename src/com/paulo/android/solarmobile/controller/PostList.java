@@ -3,14 +3,14 @@ package com.paulo.android.solarmobile.controller;
 import java.io.File;
 import java.io.IOException;
 
+import org.json.simple.parser.JSONParser;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ListActivity;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.Intent;
-import android.media.MediaPlayer.OnCompletionListener;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.ContextThemeWrapper;
@@ -24,8 +24,9 @@ import android.widget.Chronometer;
 import android.widget.Chronometer.OnChronometerTickListener;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.paulo.android.solarmobile.model.DBAdapter;
+import com.paulo.android.solarmobile.ws.Connection;
 import com.paulo.solarmobile.audio.PlayAudio;
 import com.paulo.solarmobile.audio.RecordAudio;
 
@@ -35,10 +36,12 @@ public class PostList extends ListActivity implements OnClickListener,
 	Button ouvir, stop, start, pause, exitDialog, vf, response;
 	TextView contador;
 	ImageButton button;
-	PostAdapter adapter;
+	PostAdapter listAdapter;
 	private static final int DIALOG_GRAVAR = 2;
 	Dialog myDialog;
 	public int tagHolder;
+
+	ContentValues parsedValues[];
 
 	File path = new File(Environment.getExternalStorageDirectory()
 			.getAbsolutePath() + "/Mobilis/Recordings/");
@@ -57,18 +60,31 @@ public class PostList extends ListActivity implements OnClickListener,
 	MediaRecorder record;
 	AudioPlayer player;
 
-	private static final int PARSE_POSTS=225;
-	
+	private static final int PARSE_POSTS = 225;
+	DBAdapter adapter;
+	Connection connection;
+	ParseJSON jsonParser;
+
+	TextView textName;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.post);
 
+		textName = (TextView) findViewById(R.id.nome_forum);
 		Bundle extras = getIntent().getExtras();
 		String extrasString = extras.getString("PostList");
 
+		adapter = new DBAdapter(this);
+		connection = new Connection(this);
+
 		if (extrasString != null) {
-			// atualiza lista com os valores do servidor
+
+			String forumName = extras.getString("ForumName");
+			textName.setText(forumName);
+
+			updateList(extrasString);
 
 		}
 
@@ -80,9 +96,17 @@ public class PostList extends ListActivity implements OnClickListener,
 				teste1[i].put("nada", "nada");
 			}
 
-			adapter = new PostAdapter(this, teste1);
-			setListAdapter(adapter);
+			listAdapter = new PostAdapter(this, teste1);
+			setListAdapter(listAdapter);
 		}
+	}
+
+	public void updateList(String source) {
+		jsonParser = new ParseJSON();
+		parsedValues = jsonParser.parseJSON(source, PARSE_POSTS);
+		listAdapter = new PostAdapter(this, parsedValues);
+		setListAdapter(listAdapter);
+
 	}
 
 	@Override
@@ -115,7 +139,7 @@ public class PostList extends ListActivity implements OnClickListener,
 			teste1[tagHolder].put("hasVoice", true);
 			// salva o nome do arquivo de áudio na lista
 			teste1[tagHolder].put("voiceFileName", record.getAudioFilePath());
-			setListAdapter(adapter);
+			setListAdapter(listAdapter);
 
 		}
 
@@ -245,6 +269,11 @@ public class PostList extends ListActivity implements OnClickListener,
 			if (convertView == null) {
 				convertView = inflater
 						.inflate(R.layout.postitem, parent, false);
+				TextView postBody = (TextView)convertView.findViewById(R.id.post_body);
+				postBody.setText(data[position].getAsString("content"));
+
+				TextView userName = (TextView)convertView.findViewById(R.id.post_title);
+				userName.setText(String.valueOf(data[position].getAsLong("user_id")));
 			}
 
 			return convertView;
