@@ -32,7 +32,6 @@ import com.paulo.solarmobile.audio.RecordAudio;
 public class PostList extends ListActivity implements OnClickListener,
 		OnChronometerTickListener {
 
-
 	Button ouvir, stop, start, pause, exitDialog, vf, response;
 	TextView contador;
 	ImageButton button;
@@ -58,27 +57,37 @@ public class PostList extends ListActivity implements OnClickListener,
 	MediaRecorder record;
 	AudioPlayer player;
 
+	private static final int PARSE_POSTS=225;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.post);
 
-				teste1 = new ContentValues[10];
-			
-				for (int i=1;i<teste1.length;i++) {
-					teste1[i] = new ContentValues();
-					teste1[i].put("nada", "nada");
-				}
-		
-		
-				adapter = new PostAdapter(this, teste1);
-				setListAdapter(adapter);
+		Bundle extras = getIntent().getExtras();
+		String extrasString = extras.getString("PostList");
 
+		if (extrasString != null) {
+			// atualiza lista com os valores do servidor
+
+		}
+
+		else {
+			teste1 = new ContentValues[10];
+
+			for (int i = 1; i < teste1.length; i++) {
+				teste1[i] = new ContentValues();
+				teste1[i].put("nada", "nada");
+			}
+
+			adapter = new PostAdapter(this, teste1);
+			setListAdapter(adapter);
+		}
 	}
 
 	@Override
 	public void onClick(View v) {
-	
+
 		if (v.getId() == R.id.img_close) {
 			myDialog.dismiss();
 		}
@@ -232,35 +241,29 @@ public class PostList extends ListActivity implements OnClickListener,
 
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
-				
-			if (convertView==null) {
-				convertView = inflater.inflate(R.layout.postitem, parent,false);
+
+			if (convertView == null) {
+				convertView = inflater
+						.inflate(R.layout.postitem, parent, false);
 			}
-			
+
 			return convertView;
 		}
 	}
-	
-	/*	Backup
-	 * 		if (v.getId() == R.id.VoiceForum) {
 
-			myDialog = onCreateDialog(DIALOG_GRAVAR);
-			tagHolder = (Integer) v.getTag(R.id.change);
-			myDialog.show();
-
-		}
-	 *  
-	 *   
-		if (v.getId() == R.id.ouvir) {
-
-		}
-		if (v.getId() == R.id.Responder) {
-			Intent intent = new Intent(this, ResponseController.class);
-			startActivity(intent);
-		}
+	/*
+	 * Backup if (v.getId() == R.id.VoiceForum) {
+	 * 
+	 * myDialog = onCreateDialog(DIALOG_GRAVAR); tagHolder = (Integer)
+	 * v.getTag(R.id.change); myDialog.show();
+	 * 
+	 * }
 	 * 
 	 * 
-	 * */
-	
-	
+	 * if (v.getId() == R.id.ouvir) {
+	 * 
+	 * } if (v.getId() == R.id.Responder) { Intent intent = new Intent(this,
+	 * ResponseController.class); startActivity(intent); }
+	 */
+
 }

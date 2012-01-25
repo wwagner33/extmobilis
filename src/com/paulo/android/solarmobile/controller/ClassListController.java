@@ -1,9 +1,14 @@
 package com.paulo.android.solarmobile.controller;
 
+import java.io.IOException;
+
+import org.apache.http.client.ClientProtocolException;
+
 import android.app.Activity;
 import android.app.ListActivity;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,8 +17,10 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.paulo.android.solarmobile.model.DBAdapter;
+import com.paulo.android.solarmobile.ws.Connection;
 
 public class ClassListController extends ListActivity {
 
@@ -24,19 +31,34 @@ public class ClassListController extends ListActivity {
 	ContentValues[] parsedValues;
 	ClassAdapter listAdapter;
 
+	String result;
+	String connectionResult;
+	Connection connection;
+
+	Intent intent;
+	
+	ObtainTopicListThread thread;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.turmas);
 		adapter = new DBAdapter(this);
-
+		connection = new Connection(this);
 		adapter.open();
 
-		Log.w("teste", "lista de turmas");
+		// Log.w("teste", "lista de turmas");
 
-		updateList();
+		Bundle extras = getIntent().getExtras();
+		String extrasString = extras.getString("GroupList");
+		if (extrasString != null) {
+			updateList();
 
+		} else {
+
+			// nada mesmo
+		}
 	}
 
 	@Override
@@ -46,6 +68,11 @@ public class ClassListController extends ListActivity {
 		if (adapter != null) {
 			adapter.close();
 		}
+	}
+	
+	public void obtainTopics(String authToken) {
+		thread = new ObtainTopicListThread();
+		thread.execute(authToken);
 	}
 
 	public void updateList() {
@@ -58,12 +85,67 @@ public class ClassListController extends ListActivity {
 
 	}
 
+	public void updateList(String temp) {
+		// String classesFromDB = adapter.getGroups();
+		// Log.w("Turmas", classesFromDB);
+		jsonParser = new ParseJSON();
+		parsedValues = jsonParser.parseJSON(temp, PARSE_CLASSES);
+		listAdapter = new ClassAdapter(this, parsedValues);
+		setListAdapter(listAdapter);
+	}
+
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		// TODO Auto-generated method stub
 		super.onListItemClick(l, v, position, id);
-		Intent intent = new Intent(this, TopicListController.class);
-		startActivity(intent);
+
+		// pegar o id da classe
+		//Object classId = l.getAdapter().getItem(position);
+		//String classId = (String)classId;
+		
+		//obtainTopics(adapter.getToken());
+		
+		//Intent intent = new Intent(this, TopicListController.class);
+		//startActivity(intent);
+
+	}
+
+	public class ObtainTopicListThread extends AsyncTask<String, Void, String> {
+
+		@Override
+		protected String doInBackground(String... params) {
+			// try {
+			// result = connection.requestJSON("curriculum_units/"
+			// + semesterString + "/groups.json", authToken);
+			return result;
+			/*
+			 * } catch (ClientProtocolException e) { e.printStackTrace(); return
+			 * null;
+			 * 
+			 * } catch (IOException e) { e.printStackTrace(); return null; }
+			 * 
+			 * catch (Exception e) { e.printStackTrace(); return null; }
+			 */
+		}
+
+		@Override
+		protected void onPostExecute(String finalResult) {
+			// TODO Auto-generated method stub
+			super.onPostExecute(result);
+
+			if (finalResult == null) {
+				Toast.makeText(getApplicationContext(), "erro de conexão",
+						Toast.LENGTH_SHORT).show();
+
+			} else {
+				intent = new Intent(getApplicationContext(),
+						TopicListController.class);
+				// adapter.updateGroups(finalResult);
+				intent.putExtra("TopicList", result);
+				startActivity(intent);
+			}
+			// Log.w("Turmas", groupsResult);
+		}
 
 	}
 

@@ -124,7 +124,7 @@ public class ListaCursos extends ListActivity {
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		// TODO Auto-generated method stub
 		super.onListItemClick(l, v, position, id);
-		Intent intent = new Intent(this, ClassListController.class);
+		//Intent intent = new Intent(this, ClassListController.class);
 
 		Log.w("Item position", String.valueOf(position));
 		Log.w("item id", String.valueOf(id));
@@ -138,15 +138,15 @@ public class ListaCursos extends ListActivity {
 		authToken = adapter.getToken();
 		Log.w("TOKEN", authToken);
 
-		if (adapter.groupsExist()) {
-			startActivity(intent);
-		}
+	//	if (adapter.groupsExist()) {
+	//		startActivity(intent);
+	//	}
 
-		else {
+	//	else {
 			// adapter.close();
 			obtainCurriculumUnits(adapter.getToken());
 
-		}
+		//}
 
 		// Log.w("GROUP_ID", String.valueOf(l.getAdapter().getItem(position)));
 
@@ -230,7 +230,7 @@ public class ListaCursos extends ListActivity {
 			super.onPostExecute(result);
 
 			if (result == null) {
-				Toast.makeText(getApplicationContext(), "erro",
+				Toast.makeText(getApplicationContext(), "erro de conexão",
 						Toast.LENGTH_SHORT).show();
 
 			} else {

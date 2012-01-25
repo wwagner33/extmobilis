@@ -11,6 +11,8 @@ public class ParseJSON {
 
 	private static final int PARSE_COURSES_ID = 222;
 	private static final int PARSE_CLASSES_ID = 223;
+	private static final int PARSE_TOPICS_ID = 224;
+	private static final int PARSE_POSTS_ID = 225;
 
 	Object object;
 	ContentValues[] parsedValues;
@@ -78,6 +80,64 @@ public class ParseJSON {
 				parsedValues[i].put("semester",
 						(String) jsonObjects[i].get("semester"));
 
+			}
+
+			return parsedValues;
+
+		}
+
+		if (parseId == PARSE_TOPICS_ID) {
+			Log.w("InsideParser", "TRUE");
+
+			Object object = JSONValue.parse(source);
+			JSONArray jsonArray = (JSONArray) object;
+			JSONObject jsonObjects[] = new JSONObject[jsonArray.size()];
+			parsedValues = new ContentValues[jsonArray.size()];
+
+			for (int i = 0; i < jsonArray.size(); i++) {
+				/*
+				 * jsonObjects[i] = (JSONObject) jsonArray.get(i);
+				 * Log.w("Object", jsonObjects[i].toJSONString());
+				 * 
+				 * parsedValues[i] = new ContentValues();
+				 * 
+				 * parsedValues[i].put("id", (String) jsonObjects[i].get("id"));
+				 * 
+				 * parsedValues[i] .put("code", (String)
+				 * jsonObjects[i].get("code"));
+				 * 
+				 * parsedValues[i].put("semester", (String)
+				 * jsonObjects[i].get("semester"));
+				 */
+			}
+
+			return parsedValues;
+
+		}
+
+		if (parseId == PARSE_POSTS_ID) {
+			Log.w("InsideParser", "TRUE");
+
+			Object object = JSONValue.parse(source);
+			JSONArray jsonArray = (JSONArray) object;
+			JSONObject jsonObjects[] = new JSONObject[jsonArray.size()];
+			parsedValues = new ContentValues[jsonArray.size()];
+
+			for (int i = 0; i < jsonArray.size(); i++) {
+				/*
+				 * jsonObjects[i] = (JSONObject) jsonArray.get(i);
+				 * Log.w("Object", jsonObjects[i].toJSONString());
+				 * 
+				 * parsedValues[i] = new ContentValues();
+				 * 
+				 * parsedValues[i].put("id", (String) jsonObjects[i].get("id"));
+				 * 
+				 * parsedValues[i] .put("code", (String)
+				 * jsonObjects[i].get("code"));
+				 * 
+				 * parsedValues[i].put("semester", (String)
+				 * jsonObjects[i].get("semester"));
+				 */
 			}
 
 			return parsedValues;
