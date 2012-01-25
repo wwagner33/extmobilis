@@ -61,38 +61,50 @@ public class ListaCursos extends ListActivity {
 
 		connection = new Connection(this);
 		adapter = new DBAdapter(this);
-		adapter.open();
 
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {
 
 			jsonString = extras.getString("CourseList");
 
-			jsonParser = new ParseJSON();
-			courseList = jsonParser.parseJSON(jsonString, PARSE_COURSES_ID);
+			// jsonParser = new ParseJSON();
+			// courseList = jsonParser.parseJSON(jsonString, PARSE_COURSES_ID);
+
+			updateList(jsonString);
 
 			// Log.w("JSONS SIZE", String.valueOf(jsons.length));
 
-			courseListString = new String[courseList.length];
+			// courseListString = new String[courseList.length];
 
-			for (int i = 0; i < courseList.length; i++) {
-				courseListString[i] = courseList[i].getAsString("name");
-			}
-			// lv = (ListView) findViewById(R.id.list);
-			ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-					R.layout.itemcurso, courseListString);
-			// lv.setOnItemClickListener(this);
-			setListAdapter(adapter);
+			// for (int i = 0; i < courseList.length; i++) {
+			// courseListString[i] = courseList[i].getAsString("name");
+			// }
+			// // lv = (ListView) findViewById(R.id.list);
+			// / ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+			// R.layout.itemcurso, courseListString);
+			// // lv.setOnItemClickListener(this);
+			// setListAdapter(adapter);
 
 		}
 
 		else {
 			// adapter.open();
-			jsonString = adapter.getCourseList();
-			//
-			// adapter.close(); // fechar no onStop
+			// adapter.open();
+			// jsonString = adapter.getCourseList();
 			updateList();
+			// adapter.close(); // fechar no onStop
+			// updateList();
 
+		}
+
+	}
+
+	@Override
+	protected void onResume() {
+		// TODO Auto-generated method stub
+		super.onResume();
+		if (adapter == null) {
+			adapter.open();
 		}
 	}
 
@@ -100,21 +112,35 @@ public class ListaCursos extends ListActivity {
 	protected void onStop() {
 		// TODO Auto-generated method stub
 		super.onStop();
-		adapter.close();
+		if (adapter != null) {
+			adapter.close();
+		}
 	}
 
 	public String getBankCourseList() {
-		// adapter.open();
+
+		adapter.open();
 		String bankCourseList = adapter.getCourseList();
 		Log.w("Lista de Cursos", bankCourseList);
-		// adapter.close();
+		adapter.close();
 		return bankCourseList;
+
 	}
 
 	public void updateList() {
+
 		jsonParser = new ParseJSON();
-		courseList = jsonParser.parseJSON(getBankCourseList(),
-				PARSE_COURSES_ID);
+		courseList = jsonParser
+				.parseJSON(getBankCourseList(), PARSE_COURSES_ID);
+		customAdapter = new CourseListAdapter(this, courseList);
+		setListAdapter(customAdapter);
+
+	}
+
+	public void updateList(String list) {
+		jsonParser = new ParseJSON();
+		courseList = jsonParser
+				.parseJSON(getBankCourseList(), PARSE_COURSES_ID);
 		customAdapter = new CourseListAdapter(this, courseList);
 		setListAdapter(customAdapter);
 
@@ -124,7 +150,7 @@ public class ListaCursos extends ListActivity {
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		// TODO Auto-generated method stub
 		super.onListItemClick(l, v, position, id);
-		//Intent intent = new Intent(this, ClassListController.class);
+		// Intent intent = new Intent(this, ClassListController.class);
 
 		Log.w("Item position", String.valueOf(position));
 		Log.w("item id", String.valueOf(id));
@@ -135,18 +161,21 @@ public class ListaCursos extends ListActivity {
 
 		// adapter.open();
 
+		adapter.open();
 		authToken = adapter.getToken();
 		Log.w("TOKEN", authToken);
 
-	//	if (adapter.groupsExist()) {
-	//		startActivity(intent);
-	//	}
+		// if (adapter.groupsExist()) {
+		// startActivity(intent);
+		// }
 
-	//	else {
-			// adapter.close();
-			obtainCurriculumUnits(adapter.getToken());
+		// else {
+		// adapter.close();
 
-		//}
+		// obtainCurriculumUnits(adapter.getToken());
+		obtainCurriculumUnits(authToken);
+
+		// }
 
 		// Log.w("GROUP_ID", String.valueOf(l.getAdapter().getItem(position)));
 
@@ -234,9 +263,11 @@ public class ListaCursos extends ListActivity {
 						Toast.LENGTH_SHORT).show();
 
 			} else {
-				intent = new Intent(getApplicationContext(),ClassListController.class);
+				intent = new Intent(getApplicationContext(),
+						ClassListController.class);
 				adapter.updateGroups(result);
 				intent.putExtra("GroupList", result);
+				adapter.close();
 				startActivity(intent);
 			}
 			// Log.w("Turmas", groupsResult);
@@ -280,7 +311,6 @@ public class ListaCursos extends ListActivity {
 			return position;
 		}
 
-	
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
 			if (convertView == null) {

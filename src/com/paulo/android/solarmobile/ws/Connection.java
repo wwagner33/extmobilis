@@ -66,8 +66,8 @@ public class Connection {
 		}
 
 		else {
-			Toast.makeText(context, "Erro ao baixar o arquivo",
-					Toast.LENGTH_SHORT).show();
+			//Toast.makeText(context, "Erro ao baixar o arquivo",
+			//		Toast.LENGTH_SHORT).show();
 		}
 
 		Log.w("GET-RESULT", builder.toString());

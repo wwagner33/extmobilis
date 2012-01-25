@@ -35,8 +35,10 @@ public class ClassListController extends ListActivity {
 	String connectionResult;
 	Connection connection;
 
+	String classIdString;
+
 	Intent intent;
-	
+
 	ObtainTopicListThread thread;
 
 	@Override
@@ -46,7 +48,7 @@ public class ClassListController extends ListActivity {
 		setContentView(R.layout.turmas);
 		adapter = new DBAdapter(this);
 		connection = new Connection(this);
-		adapter.open();
+		// adapter.open();
 
 		// Log.w("teste", "lista de turmas");
 
@@ -69,19 +71,21 @@ public class ClassListController extends ListActivity {
 			adapter.close();
 		}
 	}
-	
+
 	public void obtainTopics(String authToken) {
 		thread = new ObtainTopicListThread();
 		thread.execute(authToken);
 	}
 
 	public void updateList() {
+		adapter.open();
 		String classesFromDB = adapter.getGroups();
 		Log.w("Turmas", classesFromDB);
 		jsonParser = new ParseJSON();
 		parsedValues = jsonParser.parseJSON(classesFromDB, PARSE_CLASSES);
 		listAdapter = new ClassAdapter(this, parsedValues);
 		setListAdapter(listAdapter);
+		adapter.close();
 
 	}
 
@@ -100,13 +104,16 @@ public class ClassListController extends ListActivity {
 		super.onListItemClick(l, v, position, id);
 
 		// pegar o id da classe
-		//Object classId = l.getAdapter().getItem(position);
-		//String classId = (String)classId;
-		
-		//obtainTopics(adapter.getToken());
-		
-		//Intent intent = new Intent(this, TopicListController.class);
-		//startActivity(intent);
+		// Object classId = l.getAdapter().getItem(position);
+		// String classId = (String)classId;
+
+		// obtainTopics(adapter.getToken());
+
+		// Intent intent = new Intent(this, TopicListController.class);
+		// startActivity(intent);
+		classIdString = (String) l.getAdapter().getItem(position);
+		adapter.open();
+		obtainTopics(adapter.getToken());
 
 	}
 
@@ -114,35 +121,46 @@ public class ClassListController extends ListActivity {
 
 		@Override
 		protected String doInBackground(String... params) {
-			// try {
-			// result = connection.requestJSON("curriculum_units/"
-			// + semesterString + "/groups.json", authToken);
-			return result;
-			/*
-			 * } catch (ClientProtocolException e) { e.printStackTrace(); return
-			 * null;
-			 * 
-			 * } catch (IOException e) { e.printStackTrace(); return null; }
-			 * 
-			 * catch (Exception e) { e.printStackTrace(); return null; }
-			 */
+			try {
+				// result = connection.requestJSON("curriculum_units/"
+				// + semesterString + "/groups.json", authToken);
+
+				result = connection.requestJSON("groups/" + classIdString
+						+ "/discussions.json", params[0]);
+				return result;
+
+			} catch (ClientProtocolException e) {
+				e.printStackTrace();
+				return null;
+
+			} catch (IOException e) {
+				e.printStackTrace();
+				return null;
+			}
+
+			catch (Exception e) {
+				e.printStackTrace();
+				return null;
+			}
+
 		}
 
 		@Override
 		protected void onPostExecute(String finalResult) {
 			// TODO Auto-generated method stub
-			super.onPostExecute(result);
+			super.onPostExecute(finalResult);
+			adapter.close();
 
 			if (finalResult == null) {
 				Toast.makeText(getApplicationContext(), "erro de conexão",
 						Toast.LENGTH_SHORT).show();
 
 			} else {
-				intent = new Intent(getApplicationContext(),
-						TopicListController.class);
+				 intent = new Intent(getApplicationContext(),
+				 TopicListController.class);
 				// adapter.updateGroups(finalResult);
-				intent.putExtra("TopicList", result);
-				startActivity(intent);
+				 intent.putExtra("TopicList", result);
+				 startActivity(intent);
 			}
 			// Log.w("Turmas", groupsResult);
 		}
@@ -172,7 +190,7 @@ public class ClassListController extends ListActivity {
 		@Override
 		public Object getItem(int position) {
 
-			return position;
+			return values[position].getAsString("id");
 
 		}
 
@@ -182,10 +200,7 @@ public class ClassListController extends ListActivity {
 			return position;
 		}
 
-		public void teste() {
-
-		}
-
+	
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
 			if (convertView == null) {

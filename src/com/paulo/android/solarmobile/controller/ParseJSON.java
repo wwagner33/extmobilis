@@ -39,6 +39,8 @@ public class ParseJSON {
 				parsedValues[i].put("group_id",
 						(String) jsonObjects[i].get("group_id"));
 
+				// Log.w("group_id",)
+
 				parsedValues[i].put("offer_id",
 						(String) jsonObjects[i].get("offer_id"));
 
@@ -92,25 +94,45 @@ public class ParseJSON {
 			Object object = JSONValue.parse(source);
 			JSONArray jsonArray = (JSONArray) object;
 			JSONObject jsonObjects[] = new JSONObject[jsonArray.size()];
+
+			// JSONObject teste = (JSONObject)jsonArray.get(0);
+
+			// JSONObject teste2 = (JSONObject)teste.get
+
+			// JSONArray teste2 = (JSONArray)teste3;
+			// Log.w("DISCUSSIONS LENGHT", teste.toJSONString());
+
 			parsedValues = new ContentValues[jsonArray.size()];
 
 			for (int i = 0; i < jsonArray.size(); i++) {
-				/*
-				 * jsonObjects[i] = (JSONObject) jsonArray.get(i);
-				 * Log.w("Object", jsonObjects[i].toJSONString());
-				 * 
-				 * parsedValues[i] = new ContentValues();
-				 * 
-				 * parsedValues[i].put("id", (String) jsonObjects[i].get("id"));
-				 * 
-				 * parsedValues[i] .put("code", (String)
-				 * jsonObjects[i].get("code"));
-				 * 
-				 * parsedValues[i].put("semester", (String)
-				 * jsonObjects[i].get("semester"));
-				 */
-			}
 
+				jsonObjects[i] = (JSONObject) jsonArray.get(i);
+
+				Log.w("Object", jsonObjects[i].toJSONString());
+
+				JSONObject teste2 = (JSONObject) jsonObjects[i]
+						.get("discussion");
+				// Log.w("OBJECT 1", teste2.toJSONString());
+
+				parsedValues[i] = new ContentValues();
+
+				parsedValues[i].put("allocation_tag_id",
+						(Long) teste2.get("allocation_tag_id"));
+
+				parsedValues[i].put("description",
+						(String) teste2.get("description"));
+
+				parsedValues[i].put("id", (Long) teste2.get("id"));
+					
+
+				parsedValues[i].put("name", (String) teste2.get("name"));
+
+				// Log.w("NAME", (String) jsonObjects[i].get("name"));
+
+				parsedValues[i].put("schedule_id",
+						(Long) teste2.get("schedule_id"));
+
+			}
 			return parsedValues;
 
 		}
@@ -120,7 +142,9 @@ public class ParseJSON {
 
 			Object object = JSONValue.parse(source);
 			JSONArray jsonArray = (JSONArray) object;
+
 			JSONObject jsonObjects[] = new JSONObject[jsonArray.size()];
+
 			parsedValues = new ContentValues[jsonArray.size()];
 
 			for (int i = 0; i < jsonArray.size(); i++) {
