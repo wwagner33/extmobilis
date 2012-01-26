@@ -6,6 +6,7 @@ import org.apache.http.client.ClientProtocolException;
 
 import android.app.Activity;
 import android.app.ListActivity;
+import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -34,6 +35,8 @@ public class ClassListController extends ListActivity {
 	String result;
 	String connectionResult;
 	Connection connection;
+
+	ProgressDialog dialog;
 
 	String classIdString;
 
@@ -70,6 +73,25 @@ public class ClassListController extends ListActivity {
 		if (adapter != null) {
 			adapter.close();
 		}
+		if (dialog!=null) {
+			if (dialog.isShowing()) {
+				dialog.dismiss();
+			}
+		}
+	}
+	
+
+	public void handleError(int errorCode) {
+		if (dialog!=null) {
+			if (dialog.isShowing()) {
+				dialog.dismiss();
+			}
+		}
+		
+		if (errorCode == Constants.CONNECTION_ERROR_ID) {
+			Toast.makeText(this, "Erro de conexão,tente novamente ",
+					Toast.LENGTH_SHORT).show();
+					}
 	}
 
 	public void obtainTopics(String authToken) {
@@ -113,6 +135,8 @@ public class ClassListController extends ListActivity {
 		// startActivity(intent);
 		classIdString = (String) l.getAdapter().getItem(position);
 		adapter.open();
+		dialog = Dialogs.getProgressDialog(this);
+		dialog.show();
 		obtainTopics(adapter.getToken());
 
 	}
@@ -152,15 +176,16 @@ public class ClassListController extends ListActivity {
 			adapter.close();
 
 			if (finalResult == null) {
-				Toast.makeText(getApplicationContext(), "erro de conexão",
-						Toast.LENGTH_SHORT).show();
+				//Toast.makeText(getApplicationContext(), "erro de conexão",
+						//Toast.LENGTH_SHORT).show();
+				handleError(Constants.CONNECTION_ERROR_ID);
 
 			} else {
-				 intent = new Intent(getApplicationContext(),
-				 TopicListController.class);
+				intent = new Intent(getApplicationContext(),
+						TopicListController.class);
 				// adapter.updateGroups(finalResult);
-				 intent.putExtra("TopicList", result);
-				 startActivity(intent);
+				intent.putExtra("TopicList", result);
+				startActivity(intent);
 			}
 			// Log.w("Turmas", groupsResult);
 		}
@@ -200,7 +225,6 @@ public class ClassListController extends ListActivity {
 			return position;
 		}
 
-	
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
 			if (convertView == null) {

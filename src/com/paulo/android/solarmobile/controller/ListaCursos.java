@@ -6,6 +6,7 @@ import org.apache.http.client.ClientProtocolException;
 
 import android.app.Activity;
 import android.app.ListActivity;
+import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -14,9 +15,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -45,6 +44,8 @@ public class ListaCursos extends ListActivity {
 	String jsonString;
 	CourseListAdapter customAdapter;
 	String result;
+
+	ProgressDialog dialog;
 
 	String semesterString;
 	String groupsResult;
@@ -99,7 +100,18 @@ public class ListaCursos extends ListActivity {
 
 	}
 	
-	
+	public void handleError(int errorCode) {
+		if (dialog!=null) {
+			if (dialog.isShowing()) {
+				dialog.dismiss();
+			}
+		}
+		if (errorCode == Constants.CONNECTION_ERROR_ID) {
+			Toast.makeText(this, "Erro de conexão,tente novamente ",
+					Toast.LENGTH_SHORT).show();
+					}
+	}
+
 	@Override
 	public void onBackPressed() {
 		// TODO Auto-generated method stub
@@ -123,6 +135,12 @@ public class ListaCursos extends ListActivity {
 		if (adapter != null) {
 			adapter.close();
 		}
+		if (dialog != null) {
+			if (dialog.isShowing()) {
+				dialog.dismiss();
+			}
+		}
+
 	}
 
 	public String getBankCourseList() {
@@ -181,6 +199,9 @@ public class ListaCursos extends ListActivity {
 		// adapter.close();
 
 		// obtainCurriculumUnits(adapter.getToken());
+		dialog = Dialogs.getProgressDialog(this);
+
+		dialog.show();
 		obtainCurriculumUnits(authToken);
 
 		// }
@@ -267,8 +288,9 @@ public class ListaCursos extends ListActivity {
 			super.onPostExecute(result);
 
 			if (result == null) {
-				Toast.makeText(getApplicationContext(), "erro de conexão",
-						Toast.LENGTH_SHORT).show();
+				//Toast.makeText(getApplicationContext(), "erro de conexão",
+						//Toast.LENGTH_SHORT).show();
+					handleError(Constants.CONNECTION_ERROR_ID);
 
 			} else {
 				intent = new Intent(getApplicationContext(),

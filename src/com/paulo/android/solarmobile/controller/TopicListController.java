@@ -6,6 +6,7 @@ import org.apache.http.client.ClientProtocolException;
 
 import android.app.Activity;
 import android.app.ListActivity;
+import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -40,6 +41,8 @@ public class TopicListController extends ListActivity {
 	Connection connection;
 	ObtainPostListThread thread;
 	String forumName;
+	ProgressDialog dialog;
+	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +70,35 @@ public class TopicListController extends ListActivity {
 		}
 	}
 
+	@Override
+	protected void onStop() {
+		// TODO Auto-generated method stub
+		super.onStop();
+		if (adapter != null) {
+			adapter.close();
+		}
+		if (dialog != null) {
+			if (dialog.isShowing()) {
+				dialog.dismiss();
+			}
+		}
+
+	}
+	
+
+	public void handleError(int errorCode) {
+		if (dialog!=null) {
+			if (dialog.isShowing()) {
+				dialog.dismiss();
+			}
+		}
+		if (errorCode == Constants.CONNECTION_ERROR_ID) {
+			Toast.makeText(this, "Erro de conexão,tente novamente ",
+					Toast.LENGTH_SHORT).show();
+					}
+	}
+	
+	
 	public void updateList(String topicJSON) {
 		Log.w("onUpdateList", "TRUE");
 
@@ -87,6 +119,9 @@ public class TopicListController extends ListActivity {
 		topicIdString = String.valueOf(TopicIdLong);
 		Log.w("TOPIC ID", topicIdString);
 
+		
+		dialog = Dialogs.getProgressDialog(this);
+		dialog.show();
 		obtainPosts();
 
 		// Intent intent = new Intent(this, PostList.class);
@@ -137,8 +172,9 @@ public class TopicListController extends ListActivity {
 			adapter.close();
 
 			if (finalResult == null) {
-				Toast.makeText(getApplicationContext(), "erro de conexão",
-						Toast.LENGTH_SHORT).show();
+				handleError(Constants.CONNECTION_ERROR_ID);
+				//Toast.makeText(getApplicationContext(), "erro de conexão",
+						//Toast.LENGTH_SHORT).show();
 
 			} else {
 				intent = new Intent(getApplicationContext(), PostList.class);

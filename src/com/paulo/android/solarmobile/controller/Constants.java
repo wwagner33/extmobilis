@@ -8,5 +8,8 @@ public class Constants {
 
 	// Dialogs
 	public static final String PROGRESS_DIALOG_TEXT = "Carregando, por favor aguarde";
+	
+	//Error ids
+	public static final int CONNECTION_ERROR_ID = 1;
 
 }
