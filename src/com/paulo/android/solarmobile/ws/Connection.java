@@ -19,6 +19,8 @@ import org.json.simple.parser.ContentHandler;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import com.paulo.android.solarmobile.controller.Constants;
+
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -45,8 +47,10 @@ public class Connection {
 	{
 		StringBuilder builder = new StringBuilder();
 		DefaultHttpClient client = new DefaultHttpClient();
-		HttpGet get = new HttpGet("http://10.0.2.2:3000/" + URL
-				+ "?auth_token=" + authToken);
+		//HttpGet get = new HttpGet("http://10.0.2.2:3000/" + URL
+				//+ "?auth_token=" + authToken);
+		HttpGet get = new HttpGet(Constants.URL_SERVER + URL
+		+ "?auth_token=" + authToken);
 		Log.w("URL", String.valueOf(get.getURI()));
 
 		HttpResponse response = client.execute(get);
@@ -82,7 +86,9 @@ public class Connection {
 
 		StringBuilder builder = new StringBuilder();
 		DefaultHttpClient client = new DefaultHttpClient();
-		HttpPost post = new HttpPost("http://10.0.2.2:3000/sessions");
+		//HttpPost post = new HttpPost("http://10.0.2.2:3000/sessions");
+		
+		HttpPost post = new HttpPost(Constants.URL_SERVER+"sessions");
 
 		String teste = json.toJSONString();
 		StringEntity se = new StringEntity(teste);

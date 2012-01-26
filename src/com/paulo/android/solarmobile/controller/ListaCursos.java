@@ -98,6 +98,14 @@ public class ListaCursos extends ListActivity {
 		}
 
 	}
+	
+	
+	@Override
+	public void onBackPressed() {
+		// TODO Auto-generated method stub
+		super.onBackPressed();
+		moveTaskToBack(true);
+	}
 
 	@Override
 	protected void onResume() {

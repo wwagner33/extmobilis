@@ -51,6 +51,8 @@ public class Login extends Activity implements OnClickListener {
 
 		skipValidation = (Button) findViewById(R.id.login_skip);
 		skipValidation.setOnClickListener(this);
+		skipValidation.setVisibility(View.GONE);
+		
 
 		login = (EditText) findViewById(R.id.campo1);
 		password = (EditText) findViewById(R.id.campo2);
@@ -101,7 +103,7 @@ public class Login extends Activity implements OnClickListener {
 
 				Log.w("JsonObject", json.toString());
 
-				dialog = createDialog();
+				dialog = Dialogs.getProgressDialog(this);
 				dialog.show();
 				connection = new Connection(this);
 
