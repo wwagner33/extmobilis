@@ -25,8 +25,6 @@ import com.paulo.android.solarmobile.ws.Connection;
 
 public class ClassListController extends ListActivity {
 
-	private static final int PARSE_CLASSES = 223;
-
 	DBAdapter adapter;
 	ParseJSON jsonParser;
 	ContentValues[] parsedValues;
@@ -46,14 +44,10 @@ public class ClassListController extends ListActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.turmas);
 		adapter = new DBAdapter(this);
 		connection = new Connection(this);
-		// adapter.open();
-
-		// Log.w("teste", "lista de turmas");
 
 		Bundle extras = getIntent().getExtras();
 		String extrasString = extras.getString("GroupList");
@@ -62,36 +56,35 @@ public class ClassListController extends ListActivity {
 
 		} else {
 
-			// nada mesmo
+			// futura atualização da lista com os valores banco
 		}
 	}
 
 	@Override
 	protected void onStop() {
-		// TODO Auto-generated method stub
+
 		super.onStop();
 		if (adapter != null) {
 			adapter.close();
 		}
-		if (dialog!=null) {
+		if (dialog != null) {
 			if (dialog.isShowing()) {
 				dialog.dismiss();
 			}
 		}
 	}
-	
 
 	public void handleError(int errorCode) {
-		if (dialog!=null) {
+		if (dialog != null) {
 			if (dialog.isShowing()) {
 				dialog.dismiss();
 			}
 		}
-		
+
 		if (errorCode == Constants.CONNECTION_ERROR_ID) {
 			Toast.makeText(this, "Erro de conexão,tente novamente ",
 					Toast.LENGTH_SHORT).show();
-					}
+		}
 	}
 
 	public void obtainTopics(String authToken) {
@@ -104,7 +97,8 @@ public class ClassListController extends ListActivity {
 		String classesFromDB = adapter.getGroups();
 		Log.w("Turmas", classesFromDB);
 		jsonParser = new ParseJSON();
-		parsedValues = jsonParser.parseJSON(classesFromDB, PARSE_CLASSES);
+		parsedValues = jsonParser.parseJSON(classesFromDB,
+				Constants.PARSE_CLASSES);
 		listAdapter = new ClassAdapter(this, parsedValues);
 		setListAdapter(listAdapter);
 		adapter.close();
@@ -112,27 +106,17 @@ public class ClassListController extends ListActivity {
 	}
 
 	public void updateList(String temp) {
-		// String classesFromDB = adapter.getGroups();
-		// Log.w("Turmas", classesFromDB);
 		jsonParser = new ParseJSON();
-		parsedValues = jsonParser.parseJSON(temp, PARSE_CLASSES);
+		parsedValues = jsonParser.parseJSON(temp, Constants.PARSE_CLASSES);
 		listAdapter = new ClassAdapter(this, parsedValues);
 		setListAdapter(listAdapter);
 	}
 
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
-		// TODO Auto-generated method stub
+
 		super.onListItemClick(l, v, position, id);
 
-		// pegar o id da classe
-		// Object classId = l.getAdapter().getItem(position);
-		// String classId = (String)classId;
-
-		// obtainTopics(adapter.getToken());
-
-		// Intent intent = new Intent(this, TopicListController.class);
-		// startActivity(intent);
 		classIdString = (String) l.getAdapter().getItem(position);
 		adapter.open();
 		dialog = Dialogs.getProgressDialog(this);
@@ -146,8 +130,6 @@ public class ClassListController extends ListActivity {
 		@Override
 		protected String doInBackground(String... params) {
 			try {
-				// result = connection.requestJSON("curriculum_units/"
-				// + semesterString + "/groups.json", authToken);
 
 				result = connection.requestJSON("groups/" + classIdString
 						+ "/discussions.json", params[0]);
@@ -176,26 +158,21 @@ public class ClassListController extends ListActivity {
 			adapter.close();
 
 			if (finalResult == null) {
-				//Toast.makeText(getApplicationContext(), "erro de conexão",
-						//Toast.LENGTH_SHORT).show();
+
 				handleError(Constants.CONNECTION_ERROR_ID);
 
 			} else {
 				intent = new Intent(getApplicationContext(),
 						TopicListController.class);
-				// adapter.updateGroups(finalResult);
+
 				intent.putExtra("TopicList", result);
 				startActivity(intent);
 			}
-			// Log.w("Turmas", groupsResult);
 		}
-
 	}
 
 	public class ClassAdapter extends BaseAdapter {
 
-		// Adapter geral enquanto não sabe-se quais elementos vão ficar
-		// realmente na lista
 		Activity activity;
 		ContentValues[] values;
 		LayoutInflater inflater = null;
@@ -208,7 +185,7 @@ public class ClassListController extends ListActivity {
 
 		@Override
 		public int getCount() {
-			// TODO Auto-generated method stub
+
 			return values.length;
 		}
 

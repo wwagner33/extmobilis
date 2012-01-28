@@ -23,20 +23,14 @@ import android.widget.Toast;
 import com.paulo.android.solarmobile.model.DBAdapter;
 import com.paulo.android.solarmobile.ws.Connection;
 
-// curriculum_units/:id/groups       
-// lista todas as turmas do aluno dentro desta unidade curricular
-
-public class ListaCursos extends ListActivity {
+public class CourseListController extends ListActivity {
 
 	public Intent intent;
 
 	private static final int PARSE_COURSES_ID = 222;
 
-	// public String URI = ""
-
 	String[] courseListString;
 	String authToken;
-	private ListView lv;
 	Connection connection;
 	DBAdapter adapter;
 	ParseJSON jsonParser;
@@ -51,6 +45,7 @@ public class ListaCursos extends ListActivity {
 	String groupsResult;
 
 	int itemPosition;
+
 	// Threads
 	ObtainCurriculumUnitsThread curriculumThread;
 	ObtainCourseListThread courseListThread;
@@ -67,41 +62,16 @@ public class ListaCursos extends ListActivity {
 		if (extras != null) {
 
 			jsonString = extras.getString("CourseList");
-
-			// jsonParser = new ParseJSON();
-			// courseList = jsonParser.parseJSON(jsonString, PARSE_COURSES_ID);
-
-			updateList(jsonString);
-
-			// Log.w("JSONS SIZE", String.valueOf(jsons.length));
-
-			// courseListString = new String[courseList.length];
-
-			// for (int i = 0; i < courseList.length; i++) {
-			// courseListString[i] = courseList[i].getAsString("name");
-			// }
-			// // lv = (ListView) findViewById(R.id.list);
-			// / ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-			// R.layout.itemcurso, courseListString);
-			// // lv.setOnItemClickListener(this);
-			// setListAdapter(adapter);
-
-		}
-
-		else {
-			// adapter.open();
-			// adapter.open();
-			// jsonString = adapter.getCourseList();
 			updateList();
-			// adapter.close(); // fechar no onStop
-			// updateList();
 
+		} else {
+
+			updateList();
 		}
-
 	}
-	
+
 	public void handleError(int errorCode) {
-		if (dialog!=null) {
+		if (dialog != null) {
 			if (dialog.isShowing()) {
 				dialog.dismiss();
 			}
@@ -109,19 +79,30 @@ public class ListaCursos extends ListActivity {
 		if (errorCode == Constants.CONNECTION_ERROR_ID) {
 			Toast.makeText(this, "Erro de conexão,tente novamente ",
 					Toast.LENGTH_SHORT).show();
-					}
+		}
 	}
 
 	@Override
 	public void onBackPressed() {
 		// TODO Auto-generated method stub
 		super.onBackPressed();
-		moveTaskToBack(true);
+		
+		if (dialog != null) {
+			if (dialog.isShowing()) {
+				dialog.dismiss();
+			}
+		}
+		
+		Intent intent = new Intent(this,InitialConfig.class);
+		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		intent.putExtra("FinishActivity", "YES");
+		startActivity(intent);
 	}
+
 
 	@Override
 	protected void onResume() {
-		// TODO Auto-generated method stub
+
 		super.onResume();
 		if (adapter == null) {
 			adapter.open();
@@ -130,7 +111,6 @@ public class ListaCursos extends ListActivity {
 
 	@Override
 	protected void onStop() {
-		// TODO Auto-generated method stub
 		super.onStop();
 		if (adapter != null) {
 			adapter.close();
@@ -155,18 +135,11 @@ public class ListaCursos extends ListActivity {
 
 	public void updateList() {
 
+		adapter.open();
 		jsonParser = new ParseJSON();
-		courseList = jsonParser
-				.parseJSON(getBankCourseList(), PARSE_COURSES_ID);
-		customAdapter = new CourseListAdapter(this, courseList);
-		setListAdapter(customAdapter);
-
-	}
-
-	public void updateList(String list) {
-		jsonParser = new ParseJSON();
-		courseList = jsonParser
-				.parseJSON(getBankCourseList(), PARSE_COURSES_ID);
+		courseList = jsonParser.parseJSON(adapter.getCourseList(),
+				PARSE_COURSES_ID);
+		adapter.close();
 		customAdapter = new CourseListAdapter(this, courseList);
 		setListAdapter(customAdapter);
 
@@ -288,9 +261,9 @@ public class ListaCursos extends ListActivity {
 			super.onPostExecute(result);
 
 			if (result == null) {
-				//Toast.makeText(getApplicationContext(), "erro de conexão",
-						//Toast.LENGTH_SHORT).show();
-					handleError(Constants.CONNECTION_ERROR_ID);
+				// Toast.makeText(getApplicationContext(), "erro de conexão",
+				// Toast.LENGTH_SHORT).show();
+				handleError(Constants.CONNECTION_ERROR_ID);
 
 			} else {
 				intent = new Intent(getApplicationContext(),

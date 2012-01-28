@@ -11,5 +11,14 @@ public class Constants {
 	
 	//Error ids
 	public static final int CONNECTION_ERROR_ID = 1;
+	
+	
+	// Database
+	public static final String DATABASE_PATH = "/data/data/com.paulo.android.solarmobile.controller/databases/";
+	public static final String DATABASE_NAME = "MobilisDB.sqlite";
+	
+	//Parse IDs
+	public static final int PARSE_COURSES_ID = 222;
+	public static final int PARSE_CLASSES = 223;
 
 }

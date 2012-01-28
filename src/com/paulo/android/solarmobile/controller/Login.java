@@ -52,7 +52,6 @@ public class Login extends Activity implements OnClickListener {
 		skipValidation = (Button) findViewById(R.id.login_skip);
 		skipValidation.setOnClickListener(this);
 		skipValidation.setVisibility(View.GONE);
-		
 
 		login = (EditText) findViewById(R.id.campo1);
 		password = (EditText) findViewById(R.id.campo2);
@@ -67,7 +66,7 @@ public class Login extends Activity implements OnClickListener {
 
 		if (v.getId() == R.id.login_skip) {
 
-			intent = new Intent(Login.this, ListaCursos.class);
+			intent = new Intent(Login.this, CourseListController.class);
 			startActivity(intent);
 		}
 
@@ -130,13 +129,17 @@ public class Login extends Activity implements OnClickListener {
 		if (adapter != null) {
 			adapter.close();
 		}
-	}
 
+	}
+	
 	@Override
 	public void onBackPressed() {
 		// TODO Auto-generated method stub
 		super.onBackPressed();
-		moveTaskToBack(true);
+		Intent intent = new Intent(this,InitialConfig.class);
+		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		intent.putExtra("FinishActivity", "YES");
+		startActivity(intent);
 	}
 
 	public ProgressDialog createDialog() {
@@ -168,7 +171,7 @@ public class Login extends Activity implements OnClickListener {
 					Log.w("UpdateToken", "updateToken");
 					adapter.updateToken(authToken);
 				} else {
-						return null;
+					return null;
 				}
 				adapter.close();
 
@@ -234,9 +237,12 @@ public class Login extends Activity implements OnClickListener {
 				adapter.updateCourses(result);
 
 				// ContentValues[] parsedValues = connection.parse(result);
-				intent = new Intent(getApplicationContext(), ListaCursos.class);
+				intent = new Intent(getApplicationContext(),
+						CourseListController.class);
 				intent.putExtra("CourseList", result);
-				startActivity(intent);
+				
+				dialog.dismiss();
+				startActivityForResult(intent, 10);
 			}
 		}
 	}

@@ -13,47 +13,57 @@ public class InitialConfig extends Activity {
 	Intent intent;
 	Cursor cursor;
 	DBAdapter adapter;
+	public static final int CALLED_FROM_ROOT = 10;
+	Bundle extras;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+	
+
 		DatabaseHelper helper = new DatabaseHelper(this);
 		adapter = new DBAdapter(this);
+		// Log.w("TOKEN TESTE", "TESTE2");
 		
 		
+		if 	(getIntent().getExtras()!=null) {
+			extras = getIntent().getExtras();
+			if (extras.getString("FinishActivity") != null) {
+				Log.w("onFinish", "YES");
+				onBackPressed();
+			}
+		}
+		
+		else {
 
 		if (helper.checkDataBaseExistence()) {
 			adapter.open();
-			// cursor = adapter.getOneRow("config", 2);
-			// Log.w("Cursor size", String.valueOf(cursor.getColumnCount()));
-			// Log.w("Cursor Count", String.valueOf(cursor.getCount()));
 
-			//boolean teste = false;
-
-			 if (adapter.tokenExists()) {
-
-		//	if (teste) {
-				// checar também se existe valor na lista de cursor
-
-				intent = new Intent(this, ListaCursos.class);
-				startActivity(intent);
+			if (adapter.tokenExists()) {
+				Log.w("TOKEN TESTE", "TOKEN OK");
+				intent = new Intent(this, CourseListController.class);
+				startActivityForResult(intent, CALLED_FROM_ROOT);
 			} else {
+				Log.w("TOKEN TESTE", "NO TOKEN");
 				Intent intent = new Intent(this, Login.class);
-				startActivity(intent);
+
+				startActivityForResult(intent, CALLED_FROM_ROOT);
 			}
 
 		}
 
 		else {
+			Log.w("teste", "db null");
 			helper.copyDatabaseFile();
 			intent = new Intent(this, Login.class);
-			startActivity(intent);
+			startActivityForResult(intent, CALLED_FROM_ROOT);
 		}
+	  }
 	}
 
 	@Override
 	protected void onStop() {
-		// TODO Auto-generated method stub
 		super.onStop();
 		if (cursor != null) {
 			cursor.close();
@@ -63,9 +73,9 @@ public class InitialConfig extends Activity {
 		}
 	}
 
-	@Override
-	public void onBackPressed() {
-		super.onBackPressed();
-		moveTaskToBack(true);
-	}
+	/*
+	 * @Override protected void onActivityResult(int requestCode, int
+	 * resultCode, Intent data) { // TODO Auto-generated method stub
+	 * super.onActivityResult(requestCode, resultCode, data); finish(); }
+	 */
 }
