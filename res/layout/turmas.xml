@@ -2,6 +2,36 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="fill_parent" android:layout_height="fill_parent"
 	android:orientation="vertical">
+	
+     <RelativeLayout
+        android:id="@+id/layout1"
+        style="@style/SolarTheme.layout1"
+        android:layout_width="fill_parent"
+        android:layout_height="40dp" >
+
+        <ImageView
+            android:id="@+id/title_2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="5dp"
+            android:scaleType="fitStart"
+            android:src="@drawable/solar_logo_small" />
+
+        <TextView
+            android:id="@+id/header2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="5dp"
+            android:paddingRight="8dp"
+            android:text="mobilis"
+            android:textColor="#FFFF00"
+            android:textStyle="italic" />
+    </RelativeLayout>
 
 	<TextView android:layout_width="fill_parent"
 		android:layout_height="50dp" android:text="Lista de Turmas" />

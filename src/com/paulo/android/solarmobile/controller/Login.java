@@ -40,6 +40,7 @@ public class Login extends Activity implements OnClickListener {
 
 	RequestTokenThread requestTokenThread;
 	ObtainCourseListThread obtainCourseListThread;
+	ConnectionLimit threadLimit;
 
 	private static final int CONNECTION_ERROR_CODE = 1;
 	private static final int PARSE_COURSES_ID = 222;
@@ -112,14 +113,17 @@ public class Login extends Activity implements OnClickListener {
 	}
 
 	public void requestToken() {
-
+		threadLimit = new ConnectionLimit();
 		requestTokenThread = new RequestTokenThread();
 		requestTokenThread.execute();
+		threadLimit.execute("token");
 	}
 
 	public void getCourseList(String token) {
+		threadLimit = new ConnectionLimit();
 		obtainCourseListThread = new ObtainCourseListThread();
 		obtainCourseListThread.execute(token);
+		threadLimit.execute("GET");
 	}
 
 	@Override
@@ -131,12 +135,12 @@ public class Login extends Activity implements OnClickListener {
 		}
 
 	}
-	
+
 	@Override
 	public void onBackPressed() {
 		// TODO Auto-generated method stub
 		super.onBackPressed();
-		Intent intent = new Intent(this,InitialConfig.class);
+		Intent intent = new Intent(this, InitialConfig.class);
 		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		intent.putExtra("FinishActivity", "YES");
 		startActivity(intent);
@@ -157,6 +161,11 @@ public class Login extends Activity implements OnClickListener {
 			Toast.makeText(this, "Erro de conexão,tente novamente ",
 					Toast.LENGTH_SHORT).show();
 			password.setText("");
+		}
+		if (errorCode == 2) {
+			dialog.dismiss();
+			Toast.makeText(this, "Tempo limite de resposta atingido",
+					Toast.LENGTH_SHORT).show();
 		}
 	}
 
@@ -240,10 +249,57 @@ public class Login extends Activity implements OnClickListener {
 				intent = new Intent(getApplicationContext(),
 						CourseListController.class);
 				intent.putExtra("CourseList", result);
-				
+
 				dialog.dismiss();
 				startActivityForResult(intent, 10);
 			}
 		}
 	}
+
+	public class ConnectionLimit extends AsyncTask<String, Void, Integer> {
+
+		@Override
+		protected Integer doInBackground(String... arg0) {
+			if (arg0[0].equals("token")) {
+				try {
+					Thread.sleep(5000);
+					if (requestTokenThread.getStatus() == AsyncTask.Status.RUNNING) {
+						connection.StopPost();
+						return 1;
+					}
+
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+			} else {
+				try {
+					Thread.sleep(5000);
+					if (obtainCourseListThread.getStatus() == AsyncTask.Status.RUNNING) {
+						connection.StopPost();
+						return 1;
+					}
+
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+
+			return 0;
+		}
+
+		@Override
+		protected void onPostExecute(Integer result) {
+			// TODO Auto-generated method stub
+			super.onPostExecute(result);
+			if (result == 1) {
+				handleError(2);
+			}
+
+		}
+
+	}
+
 }

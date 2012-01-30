@@ -19,5 +19,6 @@
         <activity android:name = ".ClassListController"/>
         <activity android:name=".TopicListController"/>
         <activity android:name=".ResponseController"/>
+        <activity android:name =".PostDetailController"/>
     </application>
 </manifest>

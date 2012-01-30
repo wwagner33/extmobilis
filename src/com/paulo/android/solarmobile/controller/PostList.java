@@ -3,16 +3,16 @@ package com.paulo.android.solarmobile.controller;
 import java.io.File;
 import java.io.IOException;
 
-import org.json.simple.parser.JSONParser;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ListActivity;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,6 +23,7 @@ import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.Chronometer.OnChronometerTickListener;
 import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.paulo.android.solarmobile.model.DBAdapter;
@@ -40,6 +41,9 @@ public class PostList extends ListActivity implements OnClickListener,
 	private static final int DIALOG_GRAVAR = 2;
 	Dialog myDialog;
 	public int tagHolder;
+	String forumName;
+	
+	public int previousSelected;
 
 	ContentValues parsedValues[];
 
@@ -81,7 +85,7 @@ public class PostList extends ListActivity implements OnClickListener,
 
 		if (extrasString != null) {
 
-			String forumName = extras.getString("ForumName");
+			forumName = extras.getString("ForumName");
 			textName.setText(forumName);
 
 			updateList(extrasString);
@@ -101,12 +105,35 @@ public class PostList extends ListActivity implements OnClickListener,
 		}
 	}
 
+	@Override
+	protected void onListItemClick(ListView l, View v, int position, long id) {
+		// TODO Auto-generated method stub
+		super.onListItemClick(l, v, position, id);
+		
+		ContentValues listValue = (ContentValues)l.getAdapter().getItem(position);
+		Intent intent = new Intent(this,PostDetailController.class);
+		intent.putExtra("username", listValue.getAsString("username"));
+		intent.putExtra("content", listValue.getAsString("content"));
+		intent.putExtra("forumName", forumName);
+		
+		startActivity(intent);
+	}
+
 	public void updateList(String source) {
 		jsonParser = new ParseJSON();
 		parsedValues = jsonParser.parseJSON(source, PARSE_POSTS);
 		listAdapter = new PostAdapter(this, parsedValues);
 		setListAdapter(listAdapter);
 
+	}
+	
+	public void updateList(ContentValues[] values) {
+		Log.w("teste", "teste");
+		PostAdapter newAdapter = new PostAdapter(this,parsedValues);
+		//getListView().setAdapter(newAdapter);
+		//getListView().
+		setListAdapter(newAdapter);
+	
 	}
 
 	@Override
@@ -255,7 +282,7 @@ public class PostList extends ListActivity implements OnClickListener,
 
 		@Override
 		public Object getItem(int position) {
-			return position;
+			return data[position];
 		}
 
 		@Override
@@ -267,13 +294,28 @@ public class PostList extends ListActivity implements OnClickListener,
 		public View getView(int position, View convertView, ViewGroup parent) {
 
 			if (convertView == null) {
+				
+		
 				convertView = inflater
 						.inflate(R.layout.postitem, parent, false);
-				TextView postBody = (TextView)convertView.findViewById(R.id.post_body);
+				TextView postBody = (TextView) convertView
+						.findViewById(R.id.post_body);
 				postBody.setText(data[position].getAsString("content"));
 
-				TextView userName = (TextView)convertView.findViewById(R.id.post_title);
-				userName.setText(String.valueOf(data[position].getAsLong("user_id")));
+				TextView userName = (TextView) convertView
+						.findViewById(R.id.post_title);
+				userName.setText(String.valueOf(data[position]
+						.getAsString("username")));
+				
+				/*
+				if (data[position].get("isSelected") == "true") {
+						
+					Log.w("ColorChanger", "true");
+					
+					RelativeLayout listBackground = (RelativeLayout)convertView.findViewById(R.id.post_id);
+					listBackground.setBackgroundColor(16737792);
+				}
+					*/
 			}
 
 			return convertView;

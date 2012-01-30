@@ -29,6 +29,8 @@ import android.widget.Toast;
 public class Connection {
 	Context context;
 	HttpResponse response;
+	HttpPost post;
+	HttpGet get;
 
 	private static final int HTTP_POST = 10;
 	private static final int HTTP_GET = 11;
@@ -49,7 +51,7 @@ public class Connection {
 		DefaultHttpClient client = new DefaultHttpClient();
 		//HttpGet get = new HttpGet("http://10.0.2.2:3000/" + URL
 				//+ "?auth_token=" + authToken);
-		HttpGet get = new HttpGet(Constants.URL_SERVER + URL
+		 get = new HttpGet(Constants.URL_SERVER + URL
 		+ "?auth_token=" + authToken);
 		Log.w("URL", String.valueOf(get.getURI()));
 
@@ -88,7 +90,7 @@ public class Connection {
 		DefaultHttpClient client = new DefaultHttpClient();
 		//HttpPost post = new HttpPost("http://10.0.2.2:3000/sessions");
 		
-		HttpPost post = new HttpPost(Constants.URL_SERVER+"sessions");
+		post = new HttpPost(Constants.URL_SERVER+"sessions");
 
 		String teste = json.toJSONString();
 		StringEntity se = new StringEntity(teste);
@@ -214,5 +216,11 @@ public class Connection {
 		public boolean endObjectEntry() throws ParseException, IOException {
 			return true;
 		}
+	}
+	public void StopPost() {
+		post.abort();
+	}
+	public void StopGet() {
+		get.abort();
 	}
 }

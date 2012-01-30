@@ -31,7 +31,7 @@ public class InitialConfig extends Activity {
 			extras = getIntent().getExtras();
 			if (extras.getString("FinishActivity") != null) {
 				Log.w("onFinish", "YES");
-				onBackPressed();
+				finish();
 			}
 		}
 		

@@ -37,6 +37,7 @@ public class ClassListController extends ListActivity {
 	ProgressDialog dialog;
 
 	String classIdString;
+	String extrasString;
 
 	Intent intent;
 
@@ -50,7 +51,7 @@ public class ClassListController extends ListActivity {
 		connection = new Connection(this);
 
 		Bundle extras = getIntent().getExtras();
-		String extrasString = extras.getString("GroupList");
+		extrasString = extras.getString("GroupList");
 		if (extrasString != null) {
 			updateList();
 
@@ -93,15 +94,15 @@ public class ClassListController extends ListActivity {
 	}
 
 	public void updateList() {
-		adapter.open();
-		String classesFromDB = adapter.getGroups();
-		Log.w("Turmas", classesFromDB);
+		//adapter.open();
+		//String classesFromDB = adapter.getGroups();
+		//Log.w("Turmas", classesFromDB);
 		jsonParser = new ParseJSON();
-		parsedValues = jsonParser.parseJSON(classesFromDB,
+		parsedValues = jsonParser.parseJSON(extrasString,
 				Constants.PARSE_CLASSES);
 		listAdapter = new ClassAdapter(this, parsedValues);
 		setListAdapter(listAdapter);
-		adapter.close();
+	//	adapter.close();
 
 	}
 

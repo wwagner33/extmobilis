@@ -55,6 +55,8 @@ public class ParseJSON {
 
 				parsedValues[i]
 						.put("name", (String) jsonObjects[i].get("name"));
+				
+			//	parsedValues[i].put("isSelect", false);
 			}
 
 			return parsedValues;
@@ -170,7 +172,7 @@ public class ParseJSON {
 
 				parsedValues[i].put("user_id", (Long) teste2.get("user_id"));
 
-				parsedValues[i].put("name", (String) teste2.get("name"));
+				parsedValues[i].put("username", (String) teste2.get("user_username"));
 
 			}
 
