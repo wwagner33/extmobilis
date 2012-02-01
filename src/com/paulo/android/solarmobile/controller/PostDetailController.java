@@ -16,6 +16,9 @@ public class PostDetailController extends Activity implements OnClickListener {
 	Button response;
 	public String topicId;
 	long parentId;
+	
+	String forumNameString;
+	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -31,9 +34,10 @@ public class PostDetailController extends Activity implements OnClickListener {
 		extras = getIntent().getExtras();
 		if (extras != null) {
 			body.setText(extras.getString("content"));
-			forumName.setText(extras.getString("forumName"));
+			forumName.setText(extras.getString("forumName")); // OK
+			forumNameString=extras.getString("forumName");
 			userName.setText(extras.getString("username"));
-			topicId = extras.getString("topicId");
+			topicId = extras.getString("topicId");  // OK
 			parentId = extras.getLong("parentId");
 			Log.w("ParentId on DETAILS", String.valueOf(parentId));
 		}
@@ -45,6 +49,7 @@ public class PostDetailController extends Activity implements OnClickListener {
 		Intent intent = new Intent(this, ResponseController.class);
 		intent.putExtra("topicId", topicId);
 		intent.putExtra("parentId",parentId);
+		intent.putExtra("ForumName",forumNameString);
 		startActivity(intent);
 	}
 

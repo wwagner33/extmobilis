@@ -42,6 +42,7 @@ public class PostList extends ListActivity implements OnClickListener,
 	Dialog myDialog;
 	public int tagHolder;
 	String forumName;
+	String extrasString;
 
 	public int parentId;
 
@@ -50,6 +51,8 @@ public class PostList extends ListActivity implements OnClickListener,
 	public int previousSelected;
 
 	ContentValues parsedValues[];
+
+	Bundle extras;
 
 	File path = new File(Environment.getExternalStorageDirectory()
 			.getAbsolutePath() + "/Mobilis/Recordings/");
@@ -81,8 +84,8 @@ public class PostList extends ListActivity implements OnClickListener,
 		setContentView(R.layout.post);
 
 		textName = (TextView) findViewById(R.id.nome_forum);
-		Bundle extras = getIntent().getExtras();
-		String extrasString = extras.getString("PostList");
+		extras = getIntent().getExtras();
+		extrasString = extras.getString("PostList");
 
 		adapter = new DBAdapter(this);
 		connection = new Connection(this);
@@ -93,7 +96,7 @@ public class PostList extends ListActivity implements OnClickListener,
 			textName.setText(forumName);
 			topicId = extras.getString("topicId");
 
-			updateList(extrasString);
+			// updateList(extrasString);
 
 		}
 
@@ -111,6 +114,15 @@ public class PostList extends ListActivity implements OnClickListener,
 	}
 
 	@Override
+	protected void onResume() {
+		// TODO Auto-generated method stub
+		super.onResume();
+		if (extrasString != null) {
+			updateList(extrasString);
+		}
+	}
+
+	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		// TODO Auto-generated method stub
 		super.onListItemClick(l, v, position, id);
@@ -120,9 +132,9 @@ public class PostList extends ListActivity implements OnClickListener,
 		Intent intent = new Intent(this, PostDetailController.class);
 		intent.putExtra("username", listValue.getAsString("username"));
 		intent.putExtra("content", listValue.getAsString("content"));
-		intent.putExtra("forumName", forumName);
-		intent.putExtra("topicId", topicId);
-		intent.putExtra("parentId",listValue.getAsLong("id"));
+		intent.putExtra("forumName", forumName); // OK
+		intent.putExtra("topicId", topicId); // OK
+		intent.putExtra("parentId", listValue.getAsLong("id"));
 		Log.w("ID ON POSTS", String.valueOf(listValue.getAsLong("id")));
 
 		startActivity(intent);
@@ -131,7 +143,12 @@ public class PostList extends ListActivity implements OnClickListener,
 	public void updateList(String source) {
 		jsonParser = new ParseJSON();
 		parsedValues = jsonParser.parseJSON(source, PARSE_POSTS);
+
+		// if (extras.getString("TESTE") == null) {
 		listAdapter = new PostAdapter(this, parsedValues);
+
+		// }
+
 		setListAdapter(listAdapter);
 
 	}
@@ -302,7 +319,7 @@ public class PostList extends ListActivity implements OnClickListener,
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
 
-			if (convertView == null) {
+		//	if (convertView == null) {
 
 				convertView = inflater
 						.inflate(R.layout.postitem, parent, false);
@@ -315,16 +332,7 @@ public class PostList extends ListActivity implements OnClickListener,
 				userName.setText(String.valueOf(data[position]
 						.getAsString("username")));
 
-				/*
-				 * if (data[position].get("isSelected") == "true") {
-				 * 
-				 * Log.w("ColorChanger", "true");
-				 * 
-				 * RelativeLayout listBackground =
-				 * (RelativeLayout)convertView.findViewById(R.id.post_id);
-				 * listBackground.setBackgroundColor(16737792); }
-				 */
-			}
+		//	}
 
 			return convertView;
 		}
