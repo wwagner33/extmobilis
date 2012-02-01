@@ -42,7 +42,11 @@ public class PostList extends ListActivity implements OnClickListener,
 	Dialog myDialog;
 	public int tagHolder;
 	String forumName;
-	
+
+	public int parentId;
+
+	public String topicId;
+
 	public int previousSelected;
 
 	ContentValues parsedValues[];
@@ -87,6 +91,7 @@ public class PostList extends ListActivity implements OnClickListener,
 
 			forumName = extras.getString("ForumName");
 			textName.setText(forumName);
+			topicId = extras.getString("topicId");
 
 			updateList(extrasString);
 
@@ -109,13 +114,17 @@ public class PostList extends ListActivity implements OnClickListener,
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		// TODO Auto-generated method stub
 		super.onListItemClick(l, v, position, id);
-		
-		ContentValues listValue = (ContentValues)l.getAdapter().getItem(position);
-		Intent intent = new Intent(this,PostDetailController.class);
+
+		ContentValues listValue = (ContentValues) l.getAdapter().getItem(
+				position);
+		Intent intent = new Intent(this, PostDetailController.class);
 		intent.putExtra("username", listValue.getAsString("username"));
 		intent.putExtra("content", listValue.getAsString("content"));
 		intent.putExtra("forumName", forumName);
-		
+		intent.putExtra("topicId", topicId);
+		intent.putExtra("parentId",listValue.getAsLong("id"));
+		Log.w("ID ON POSTS", String.valueOf(listValue.getAsLong("id")));
+
 		startActivity(intent);
 	}
 
@@ -126,14 +135,14 @@ public class PostList extends ListActivity implements OnClickListener,
 		setListAdapter(listAdapter);
 
 	}
-	
+
 	public void updateList(ContentValues[] values) {
 		Log.w("teste", "teste");
-		PostAdapter newAdapter = new PostAdapter(this,parsedValues);
-		//getListView().setAdapter(newAdapter);
-		//getListView().
+		PostAdapter newAdapter = new PostAdapter(this, parsedValues);
+		// getListView().setAdapter(newAdapter);
+		// getListView().
 		setListAdapter(newAdapter);
-	
+
 	}
 
 	@Override
@@ -294,8 +303,7 @@ public class PostList extends ListActivity implements OnClickListener,
 		public View getView(int position, View convertView, ViewGroup parent) {
 
 			if (convertView == null) {
-				
-		
+
 				convertView = inflater
 						.inflate(R.layout.postitem, parent, false);
 				TextView postBody = (TextView) convertView
@@ -306,16 +314,16 @@ public class PostList extends ListActivity implements OnClickListener,
 						.findViewById(R.id.post_title);
 				userName.setText(String.valueOf(data[position]
 						.getAsString("username")));
-				
+
 				/*
-				if (data[position].get("isSelected") == "true") {
-						
-					Log.w("ColorChanger", "true");
-					
-					RelativeLayout listBackground = (RelativeLayout)convertView.findViewById(R.id.post_id);
-					listBackground.setBackgroundColor(16737792);
-				}
-					*/
+				 * if (data[position].get("isSelected") == "true") {
+				 * 
+				 * Log.w("ColorChanger", "true");
+				 * 
+				 * RelativeLayout listBackground =
+				 * (RelativeLayout)convertView.findViewById(R.id.post_id);
+				 * listBackground.setBackgroundColor(16737792); }
+				 */
 			}
 
 			return convertView;

@@ -9,6 +9,7 @@ import android.util.Log;
 
 public class ParseJSON {
 
+	private static final int PARSE_TOKEN_ID = 221;
 	private static final int PARSE_COURSES_ID = 222;
 	private static final int PARSE_CLASSES_ID = 223;
 	private static final int PARSE_TOPICS_ID = 224;
@@ -16,10 +17,30 @@ public class ParseJSON {
 
 	Object object;
 	ContentValues[] parsedValues;
-	JSONArray jsonArray;
+	// JSONArray jsonArray;
 	JSONObject jsonObjects[];
 
 	public ContentValues[] parseJSON(String source, int parseId) {
+
+		if (parseId == PARSE_TOKEN_ID) {
+
+			Object object = JSONValue.parse(source);
+
+			JSONObject globalJSON = (JSONObject) object;
+
+			JSONObject sessionsJSON = (JSONObject) globalJSON.get("session");
+
+			String tokenString = (String) sessionsJSON.get("auth_token");
+
+			Log.w("TokenString", tokenString);
+
+			parsedValues = new ContentValues[1];
+			parsedValues[0] = new ContentValues();
+			parsedValues[0].put("token", tokenString);
+
+			return parsedValues;
+
+		}
 
 		if (parseId == PARSE_COURSES_ID) {
 
@@ -55,8 +76,8 @@ public class ParseJSON {
 
 				parsedValues[i]
 						.put("name", (String) jsonObjects[i].get("name"));
-				
-			//	parsedValues[i].put("isSelect", false);
+
+				// parsedValues[i].put("isSelect", false);
 			}
 
 			return parsedValues;
@@ -161,6 +182,7 @@ public class ParseJSON {
 						(Long) teste2.get("discussion_id"));
 
 				parsedValues[i].put("id", (Long) teste2.get("id"));
+				Log.w("POST ID", String.valueOf(teste2.get("id")));
 
 				parsedValues[i].putNull("parent_id");
 
@@ -172,7 +194,8 @@ public class ParseJSON {
 
 				parsedValues[i].put("user_id", (Long) teste2.get("user_id"));
 
-				parsedValues[i].put("username", (String) teste2.get("user_username"));
+				parsedValues[i].put("username",
+						(String) teste2.get("user_username"));
 
 			}
 

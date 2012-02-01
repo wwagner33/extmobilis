@@ -23,24 +23,6 @@
         android:text="" />
 
     <Button
-        android:id="@+id/nova_mensagem_de_voz"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="Gravar Nova Mensagem de Voz" />
-
-    <Button
-        android:id="@+id/escolher_mensagem_de_voz"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="escolher mesagem de voz" />
-
-    <TextView
-        android:id="@+id/num_gravacoes"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="Número de Gravações : " />
-
-    <Button
         android:id="@+id/criar_topico_submit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

@@ -25,7 +25,8 @@ import android.widget.Toast;
 
 import com.paulo.android.solarmobile.model.DBAdapter;
 import com.paulo.android.solarmobile.ws.Connection;
-import com.paulo.android.solarmobile.ws.Connection.KeyFinder;
+
+//import com.paulo.android.solarmobile.ws.Connection.KeyFinder;
 
 public class Login extends Activity implements OnClickListener {
 	public EditText login, password;
@@ -37,6 +38,7 @@ public class Login extends Activity implements OnClickListener {
 	Connection connection;
 	ProgressDialog dialog;
 	String authToken;
+	ParseJSON jsonParser;
 
 	RequestTokenThread requestTokenThread;
 	ObtainCourseListThread obtainCourseListThread;
@@ -103,8 +105,9 @@ public class Login extends Activity implements OnClickListener {
 
 				Log.w("JsonObject", json.toString());
 
-				dialog = Dialogs.getProgressDialog(this);
-				dialog.show();
+				 dialog = Dialogs.getProgressDialog(this);
+				 dialog.show();
+
 				connection = new Connection(this);
 
 				requestToken();
@@ -174,15 +177,13 @@ public class Login extends Activity implements OnClickListener {
 		@Override
 		protected String doInBackground(Void... params) {
 			try {
-				authToken = connection.requestAuthenticityToken(json);
-				if (authToken != null) {
-					adapter.open();
-					Log.w("UpdateToken", "updateToken");
-					adapter.updateToken(authToken);
-				} else {
+				authToken = connection.postToServer(json.toJSONString(),
+						Constants.URL_TOKEN);
+				if (authToken == null) {
 					return null;
 				}
-				adapter.close();
+
+				// adapter.close();
 
 				return authToken;
 			} catch (ClientProtocolException e) {
@@ -203,7 +204,20 @@ public class Login extends Activity implements OnClickListener {
 			if (result == (null)) {
 				handleError(CONNECTION_ERROR_CODE);
 			} else {
-				getCourseList(result);
+
+				Log.w("RESULT", result);
+
+				jsonParser = new ParseJSON();
+				ContentValues[] tokenParsed = jsonParser.parseJSON(result,
+						Constants.PARSE_TOKEN_ID);
+
+				Log.w("TOKENPARSED", tokenParsed[0].getAsString("token"));
+
+				adapter.open();
+				Log.w("UpdateToken", "updateToken");
+				adapter.updateToken(tokenParsed[0].getAsString("token"));
+				adapter.close();
+				getCourseList(tokenParsed[0].getAsString("token"));
 			}
 		}
 	}
@@ -213,8 +227,8 @@ public class Login extends Activity implements OnClickListener {
 		@Override
 		protected String doInBackground(String... params) {
 			try {
-				String result = connection.requestJSON("curriculum_units.json",
-						params[0]);
+				String result = connection.getFromServer(
+						"curriculum_units.json", params[0]);
 				return result;
 			} catch (ClientProtocolException e) {
 				e.printStackTrace();
@@ -239,6 +253,8 @@ public class Login extends Activity implements OnClickListener {
 
 			} else {
 
+				Log.w("TokenResult", result);
+
 				adapter.open();
 
 				// adapter.insertCourses(result);
@@ -252,6 +268,7 @@ public class Login extends Activity implements OnClickListener {
 
 				dialog.dismiss();
 				startActivityForResult(intent, 10);
+
 			}
 		}
 	}

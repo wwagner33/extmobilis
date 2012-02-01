@@ -210,7 +210,7 @@ public class CourseListController extends ListActivity {
 		protected String doInBackground(String... params) {
 
 			try {
-				result = connection.requestJSON("curriculum_units/:"
+				result = connection.getFromServer("curriculum_units/:"
 						+ semesterString + "/groups", params[0]);
 			} catch (ClientProtocolException e) {
 				// TODO Auto-generated catch block
@@ -237,7 +237,7 @@ public class CourseListController extends ListActivity {
 		@Override
 		protected String doInBackground(String... params) {
 			try {
-				groupsResult = connection.requestJSON("curriculum_units/"
+				groupsResult = connection.getFromServer("curriculum_units/"
 						+ semesterString + "/groups.json", authToken);
 				return groupsResult;
 			} catch (ClientProtocolException e) {

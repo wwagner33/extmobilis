@@ -32,16 +32,13 @@ public class Connection {
 	HttpPost post;
 	HttpGet get;
 
-	private static final int HTTP_POST = 10;
-	private static final int HTTP_GET = 11;
-
 	public Connection(Context context) {
 		this.context = context;
 	}
 
 	// public abstract Object parse(String result);
 
-	public String requestJSON(String URL, String authToken)
+	public String getFromServer(String URL, String authToken)
 			throws ClientProtocolException, IOException
 
 	// GET
@@ -49,10 +46,10 @@ public class Connection {
 	{
 		StringBuilder builder = new StringBuilder();
 		DefaultHttpClient client = new DefaultHttpClient();
-		//HttpGet get = new HttpGet("http://10.0.2.2:3000/" + URL
-				//+ "?auth_token=" + authToken);
-		 get = new HttpGet(Constants.URL_SERVER + URL
-		+ "?auth_token=" + authToken);
+		// HttpGet get = new HttpGet("http://10.0.2.2:3000/" + URL
+		// + "?auth_token=" + authToken);
+		get = new HttpGet(Constants.URL_SERVER + URL + "?auth_token="
+				+ authToken);
 		Log.w("URL", String.valueOf(get.getURI()));
 
 		HttpResponse response = client.execute(get);
@@ -72,8 +69,8 @@ public class Connection {
 		}
 
 		else {
-			//Toast.makeText(context, "Erro ao baixar o arquivo",
-			//		Toast.LENGTH_SHORT).show();
+			// Toast.makeText(context, "Erro ao baixar o arquivo",
+			// Toast.LENGTH_SHORT).show();
 		}
 
 		Log.w("GET-RESULT", builder.toString());
@@ -81,16 +78,17 @@ public class Connection {
 
 	}
 
-	public String requestAuthenticityToken(JSONObject json)
+	/*
+	public String postToServer(JSONObject json, String URL)
 			throws ClientProtocolException, IOException, ParseException {
 
 		// POST
 
 		StringBuilder builder = new StringBuilder();
 		DefaultHttpClient client = new DefaultHttpClient();
-		//HttpPost post = new HttpPost("http://10.0.2.2:3000/sessions");
-		
-		post = new HttpPost(Constants.URL_SERVER+"sessions");
+		// HttpPost post = new HttpPost("http://10.0.2.2:3000/sessions");
+
+		post = new HttpPost(Constants.URL_SERVER + URL);
 
 		String teste = json.toJSONString();
 		StringEntity se = new StringEntity(teste);
@@ -141,7 +139,61 @@ public class Connection {
 		} else
 			return "keyNotFound";
 	}
+		*/
+	public String postToServer(String jsonString, String URL)
+			throws ClientProtocolException, IOException, ParseException {
 
+		// POST
+
+		StringBuilder builder = new StringBuilder();
+		DefaultHttpClient client = new DefaultHttpClient();
+		// HttpPost post = new HttpPost("http://10.0.2.2:3000/sessions");
+
+		post = new HttpPost(Constants.URL_SERVER + URL);
+
+		// String teste = json.toJSONString();
+		StringEntity se = new StringEntity(jsonString);
+
+		post.setEntity(se);
+		post.setHeader("Accept", "application/json");
+		post.setHeader("Content-type", "application/json");
+
+		Log.w("URL", String.valueOf(post.getURI()));
+
+		response = client.execute(post);
+		StatusLine statusLine = response.getStatusLine();
+		int statusCode = statusLine.getStatusCode();
+
+		Log.w("StatusCode", String.valueOf(statusCode));
+
+		if (statusCode == 200) {
+			HttpEntity entity = response.getEntity();
+			InputStream content = entity.getContent();
+			BufferedReader reader = new BufferedReader(new InputStreamReader(
+					content));
+			String line;
+			while ((line = reader.readLine()) != null) {
+				builder.append(line);
+
+			}
+
+		}
+
+		else {
+
+			// if (statusCode==401) {
+			// ""
+			// }
+			return "Error";
+		}
+
+		//Log.w("builder.toString()", builder.toString());
+
+		return builder.toString();
+	}
+
+	
+	/*
 	public class KeyFinder implements ContentHandler {
 		private Object value;
 		private boolean found = false;
@@ -217,10 +269,14 @@ public class Connection {
 			return true;
 		}
 	}
+	*/
+
 	public void StopPost() {
 		post.abort();
 	}
+
 	public void StopGet() {
 		get.abort();
 	}
+	
 }

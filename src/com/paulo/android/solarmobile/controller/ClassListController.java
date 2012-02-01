@@ -132,7 +132,7 @@ public class ClassListController extends ListActivity {
 		protected String doInBackground(String... params) {
 			try {
 
-				result = connection.requestJSON("groups/" + classIdString
+				result = connection.getFromServer("groups/" + classIdString
 						+ "/discussions.json", params[0]);
 				return result;
 

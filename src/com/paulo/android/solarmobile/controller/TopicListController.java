@@ -42,7 +42,6 @@ public class TopicListController extends ListActivity {
 	ObtainPostListThread thread;
 	String forumName;
 	ProgressDialog dialog;
-	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -84,10 +83,9 @@ public class TopicListController extends ListActivity {
 		}
 
 	}
-	
 
 	public void handleError(int errorCode) {
-		if (dialog!=null) {
+		if (dialog != null) {
 			if (dialog.isShowing()) {
 				dialog.dismiss();
 			}
@@ -95,10 +93,9 @@ public class TopicListController extends ListActivity {
 		if (errorCode == Constants.CONNECTION_ERROR_ID) {
 			Toast.makeText(this, "Erro de conexão,tente novamente ",
 					Toast.LENGTH_SHORT).show();
-					}
+		}
 	}
-	
-	
+
 	public void updateList(String topicJSON) {
 		Log.w("onUpdateList", "TRUE");
 
@@ -119,7 +116,6 @@ public class TopicListController extends ListActivity {
 		topicIdString = String.valueOf(TopicIdLong);
 		Log.w("TOPIC ID", topicIdString);
 
-		
 		dialog = Dialogs.getProgressDialog(this);
 		dialog.show();
 		obtainPosts();
@@ -144,8 +140,8 @@ public class TopicListController extends ListActivity {
 		protected String doInBackground(String... params) {
 			try {
 
-				result = connection.requestJSON("discussions/" + topicIdString
-						+ "/posts.json", params[0]);
+				result = connection.getFromServer("discussions/"
+						+ topicIdString + "/posts.json", params[0]);
 
 				return result;
 
@@ -173,13 +169,14 @@ public class TopicListController extends ListActivity {
 
 			if (finalResult == null) {
 				handleError(Constants.CONNECTION_ERROR_ID);
-				//Toast.makeText(getApplicationContext(), "erro de conexão",
-						//Toast.LENGTH_SHORT).show();
+				// Toast.makeText(getApplicationContext(), "erro de conexão",
+				// Toast.LENGTH_SHORT).show();
 
 			} else {
 				intent = new Intent(getApplicationContext(), PostList.class);
-				intent.putExtra("ForumName", forumName);	
+				intent.putExtra("ForumName", forumName);
 				intent.putExtra("PostList", finalResult);
+				intent.putExtra("topicId", topicIdString);
 				startActivity(intent);
 			}
 			// Log.w("Turmas", groupsResult);
