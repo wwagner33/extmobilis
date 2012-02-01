@@ -166,7 +166,7 @@ public class Connection {
 
 		Log.w("StatusCode", String.valueOf(statusCode));
 
-		if (statusCode == 200) {
+		if (statusCode == 200 || statusCode ==201) {
 			HttpEntity entity = response.getEntity();
 			InputStream content = entity.getContent();
 			BufferedReader reader = new BufferedReader(new InputStreamReader(
@@ -179,16 +179,19 @@ public class Connection {
 
 		}
 
-		else {
+	//	else {
 
 			// if (statusCode==401) {
 			// ""
 			// }
-			return "Error";
-		}
+		//	return "Error";
+	//	}
 
 		//Log.w("builder.toString()", builder.toString());
 
+		
+		Log.w("RESULTADO DA POSTAGEM", builder.toString());
+		
 		return builder.toString();
 	}
 

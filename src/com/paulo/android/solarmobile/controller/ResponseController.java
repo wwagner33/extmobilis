@@ -33,6 +33,7 @@ public class ResponseController extends Activity implements OnClickListener {
 	// reponder um forum
 
 	// File recordingsFolder;
+
 	EditText message;
 	Button submit;
 	Connection connection;
@@ -78,13 +79,14 @@ public class ResponseController extends Activity implements OnClickListener {
 			if (extras.getLong("parentId") > 0) {
 				jsonMap.put("parent_id",
 						String.valueOf(extras.getLong("parentId")));
-			//	 URL = "discussions/" + topicId +"/posts?=" + token;
+				
 			} else {
 				jsonMap.put("parent_id", noParent);
 			}
 			responseJSON.put("discussion_post", jsonMap);
 			JSONObjectString = responseJSON.toJSONString();
 			Log.w("JSONString", JSONObjectString);
+			
 			sendPost();
 //		}
 	}
@@ -95,6 +97,9 @@ public class ResponseController extends Activity implements OnClickListener {
 		token = adapter.getToken();
 		adapter.close();
 		
+		 URL = "discussions/" + topicId +"/posts?auth_token=" + token;
+		 Log.w("URL", URL);
+		 
 		thread = new SendNewPostThread();
 		thread.execute();
 	}
@@ -104,7 +109,21 @@ public class ResponseController extends Activity implements OnClickListener {
 		@Override
 		protected Void doInBackground(Void... params) {
 
-			connection = new Connection(getApplicationContext());
+		
+			try {
+				connection = new Connection(getApplicationContext());
+				String result = connection.postToServer(JSONObjectString, URL);
+				Log.w("POSTResult",result);
+			} catch (ClientProtocolException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			return null;
 		}
 
