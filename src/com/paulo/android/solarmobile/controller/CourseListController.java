@@ -70,35 +70,30 @@ public class CourseListController extends ListActivity {
 		}
 	}
 
-	public void handleError(int errorCode) {
-		if (dialog != null) {
-			if (dialog.isShowing()) {
-				dialog.dismiss();
-			}
-		}
-		if (errorCode == Constants.ERROR_CONNECTION_FAILED) {
-			Toast.makeText(this, "Erro de conexão,tente novamente ",
-					Toast.LENGTH_SHORT).show();
-		}
+	public void closeDialogIfItsVisible() {
+		if (dialog != null && dialog.isShowing())
+			dialog.dismiss();
+
 	}
+
+	
 
 	@Override
 	public void onBackPressed() {
 		// TODO Auto-generated method stub
 		super.onBackPressed();
-		
+
 		if (dialog != null) {
 			if (dialog.isShowing()) {
 				dialog.dismiss();
 			}
 		}
-		
-		Intent intent = new Intent(this,InitialConfig.class);
+
+		Intent intent = new Intent(this, InitialConfig.class);
 		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		intent.putExtra("FinishActivity", "YES");
 		startActivity(intent);
 	}
-
 
 	@Override
 	protected void onResume() {
@@ -201,30 +196,33 @@ public class CourseListController extends ListActivity {
 		curriculumThread.execute(token);
 	}
 
-	public class ObtainCourseListThread extends AsyncTask<String, Void, String> {
+	public class ObtainCourseListThread extends
+			AsyncTask<String, Void, Object[]> {
 		//
 
 		// thread que será chamada quando houver um botão de refresh
 
 		@Override
-		protected String doInBackground(String... params) {
+		protected Object[] doInBackground(String... params) {
 
 			try {
-				result = connection.getFromServer("curriculum_units/:"
+				return connection.getFromServer("curriculum_units/:"
 						+ semesterString + "/groups", params[0]);
 			} catch (ClientProtocolException e) {
-				// TODO Auto-generated catch block
+
 				e.printStackTrace();
+				return null;
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				return null;
 			}
-			return result;
+			// return null;
 
 		}
 
 		@Override
-		protected void onPostExecute(String result) {
+		protected void onPostExecute(Object[] result) {
 			// TODO Auto-generated method stub
 			super.onPostExecute(result);
 
@@ -232,14 +230,14 @@ public class CourseListController extends ListActivity {
 	}
 
 	public class ObtainCurriculumUnitsThread extends
-			AsyncTask<String, Void, String> {
+			AsyncTask<String, Void, Object[]> {
 
 		@Override
-		protected String doInBackground(String... params) {
+		protected Object[] doInBackground(String... params) {
 			try {
-				groupsResult = connection.getFromServer("curriculum_units/"
+				return connection.getFromServer("curriculum_units/"
 						+ semesterString + "/groups.json", authToken);
-				return groupsResult;
+
 			} catch (ClientProtocolException e) {
 				e.printStackTrace();
 				return null;
@@ -256,22 +254,24 @@ public class CourseListController extends ListActivity {
 		}
 
 		@Override
-		protected void onPostExecute(String result) {
+		protected void onPostExecute(Object[] result) {
 			// TODO Auto-generated method stub
 			super.onPostExecute(result);
+			int statusCode = (Integer) result[1];
 
-			if (result == null) {
-				// Toast.makeText(getApplicationContext(), "erro de conexão",
-				// Toast.LENGTH_SHORT).show();
-				handleError(Constants.ERROR_CONNECTION_FAILED);
+			if (statusCode == 200) {
 
-			} else {
 				intent = new Intent(getApplicationContext(),
 						ClassListController.class);
-				adapter.updateGroups(result);
-				intent.putExtra("GroupList", result);
+				adapter.updateGroups((String) result[0]);
+				intent.putExtra("GroupList", (String)result[0]);
 				adapter.close();
 				startActivity(intent);
+			}
+			
+			else {
+				closeDialogIfItsVisible();
+				ErrorHandler.handleError(getApplicationContext(), statusCode);
 			}
 			// Log.w("Turmas", groupsResult);
 		}

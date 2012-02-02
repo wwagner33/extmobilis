@@ -178,18 +178,17 @@ public class ResponseController extends Activity implements OnClickListener {
 				Toast.LENGTH_LONG).show();
 	}
 
-	public class ObtainPostListThread extends AsyncTask<String, Void, String> {
+	public class ObtainPostListThread extends AsyncTask<String, Void, Object[]> {
 
 		Intent intent;
 
 		@Override
-		protected String doInBackground(String... params) {
+		protected Object[] doInBackground(String... params) {
+
 			try {
 
-				String result = connection.getFromServer("discussions/"
-						+ topicId + "/posts.json", params[0]);
-
-				return result;
+				return connection.getFromServer("discussions/" + topicId
+						+ "/posts.json", params[0]);
 
 			} catch (ClientProtocolException e) {
 				e.printStackTrace();
@@ -205,27 +204,30 @@ public class ResponseController extends Activity implements OnClickListener {
 				return null;
 			}
 
+			// return null;
+
 		}
 
 		@Override
-		protected void onPostExecute(String finalResult) {
+		protected void onPostExecute(Object[] result) {
 			// TODO Auto-generated method stub
-			super.onPostExecute(finalResult);
+			super.onPostExecute(result);
 			adapter.close();
+			int statusCode = (Integer) result[1];
 
-			if (finalResult == null) {
-				handleError(Constants.ERROR_CONNECTION_FAILED);
-				// Toast.makeText(getApplicationContext(), "erro de conexão",
-				// Toast.LENGTH_SHORT).show();
+			if (statusCode == 200) {
 
-			} else {
 				intent = new Intent(getApplicationContext(), PostList.class);
 				intent.putExtra("ForumName", forumName); // onDetails
-				intent.putExtra("PostList", finalResult); // OK
+				intent.putExtra("PostList", (String) result[0]); // OK
 				intent.putExtra("topicId", topicId); // OK
 				intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				intent.putExtra("TESTE", "TESTE");
 				startActivity(intent);
+			} else {
+				Toast.makeText(getApplicationContext(), "posts failed",
+						Toast.LENGTH_SHORT).show();
+				// intent = new Intent(getApl)
 			}
 			// Log.w("Turmas", groupsResult);
 		}

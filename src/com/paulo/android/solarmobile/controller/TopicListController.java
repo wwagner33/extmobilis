@@ -84,6 +84,12 @@ public class TopicListController extends ListActivity {
 
 	}
 
+	public void closeDialogIfItsVisible() {
+		if (dialog != null && dialog.isShowing())
+			dialog.dismiss();
+
+	}
+
 	public void handleError(int errorCode) {
 		if (dialog != null) {
 			if (dialog.isShowing()) {
@@ -134,16 +140,14 @@ public class TopicListController extends ListActivity {
 
 	}
 
-	public class ObtainPostListThread extends AsyncTask<String, Void, String> {
+	public class ObtainPostListThread extends AsyncTask<String, Void, Object[]> {
 
 		@Override
-		protected String doInBackground(String... params) {
+		protected Object[] doInBackground(String... params) {
 			try {
 
-				result = connection.getFromServer("discussions/"
-						+ topicIdString + "/posts.json", params[0]);
-
-				return result;
+				return connection.getFromServer("discussions/" + topicIdString
+						+ "/posts.json", params[0]);
 
 			} catch (ClientProtocolException e) {
 				e.printStackTrace();
@@ -162,26 +166,24 @@ public class TopicListController extends ListActivity {
 		}
 
 		@Override
-		protected void onPostExecute(String finalResult) {
+		protected void onPostExecute(Object[] result) {
 			// TODO Auto-generated method stub
-			super.onPostExecute(finalResult);
+			super.onPostExecute(result);
 			adapter.close();
+			int statusCode = (Integer) result[1];
 
-			if (finalResult == null) {
-				handleError(Constants.ERROR_CONNECTION_FAILED);
-				// Toast.makeText(getApplicationContext(), "erro de conexão",
-				// Toast.LENGTH_SHORT).show();
+			if (statusCode == 200) {
 
-			} else {
 				intent = new Intent(getApplicationContext(), PostList.class);
 				intent.putExtra("ForumName", forumName);
-				intent.putExtra("PostList", finalResult);
+				intent.putExtra("PostList", (String) result[0]);
 				intent.putExtra("topicId", topicIdString);
 				startActivity(intent);
+			} else {
+				closeDialogIfItsVisible();
+				handleError(statusCode);
 			}
-			// Log.w("Turmas", groupsResult);
 		}
-
 	}
 
 	public class TopicAdapter extends BaseAdapter {

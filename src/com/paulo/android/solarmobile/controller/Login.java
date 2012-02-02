@@ -220,14 +220,15 @@ public class Login extends Activity implements OnClickListener {
 
 	}
 
-	public class ObtainCourseListThread extends AsyncTask<String, Void, String> {
+	public class ObtainCourseListThread extends
+			AsyncTask<String, Void, Object[]> {
 
 		@Override
-		protected String doInBackground(String... params) {
+		protected Object[] doInBackground(String... params) {
 			try {
-				String result = connection.getFromServer(
-						"curriculum_units.json", params[0]);
-				return result;
+				return connection.getFromServer("curriculum_units.json",
+						params[0]);
+				// return result;
 
 			} catch (ClientProtocolException e) {
 				e.printStackTrace();
@@ -245,30 +246,30 @@ public class Login extends Activity implements OnClickListener {
 		}
 
 		@Override
-		protected void onPostExecute(String result) {
+		protected void onPostExecute(Object[] result) {
 			super.onPostExecute(result);
+			int statusCode = (Integer) result[1];
 
-			if (result == null) {
-				closeDialogIfItsVisible();
-
-			} else {
-
-				Log.w("TokenResult", result);
+			if (statusCode == 200) {
+				Log.w("TokenResult", (String) result[0]);
 
 				adapter.open();
 
 				// adapter.insertCourses(result);
 
-				adapter.updateCourses(result);
+				adapter.updateCourses((String) result[0]);
 
 				// ContentValues[] parsedValues = connection.parse(result);
 				intent = new Intent(getApplicationContext(),
 						CourseListController.class);
-				intent.putExtra("CourseList", result);
+				intent.putExtra("CourseList", (String)result[0]);
 
 				dialog.dismiss();
 				startActivityForResult(intent, 10);
 
+			} else {
+				closeDialogIfItsVisible();
+				ErrorHandler.handleError(getApplicationContext(), statusCode);
 			}
 		}
 	}

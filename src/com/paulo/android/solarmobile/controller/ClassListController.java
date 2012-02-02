@@ -74,6 +74,13 @@ public class ClassListController extends ListActivity {
 			}
 		}
 	}
+	
+	public void closeDialogIfItsVisible() {
+		if (dialog != null && dialog.isShowing())
+			dialog.dismiss();
+
+	}
+
 
 	public void obtainTopics(String authToken) {
 		thread = new ObtainTopicListThread();
@@ -113,15 +120,15 @@ public class ClassListController extends ListActivity {
 
 	}
 
-	public class ObtainTopicListThread extends AsyncTask<String, Void, String> {
+	public class ObtainTopicListThread extends
+			AsyncTask<String, Void, Object[]> {
 
 		@Override
-		protected String doInBackground(String... params) {
+		protected Object[] doInBackground(String... params) {
 			try {
 
-				result = connection.getFromServer("groups/" + classIdString
+				return connection.getFromServer("groups/" + classIdString
 						+ "/discussions.json", params[0]);
-				return result;
 
 			} catch (ClientProtocolException e) {
 				e.printStackTrace();
@@ -140,22 +147,23 @@ public class ClassListController extends ListActivity {
 		}
 
 		@Override
-		protected void onPostExecute(String finalResult) {
+		protected void onPostExecute(Object[] result) {
 			// TODO Auto-generated method stub
-			super.onPostExecute(finalResult);
+			super.onPostExecute(result);
 			adapter.close();
+			int statusCode = (Integer) result[1];
 
-			if (finalResult == null) {
+			if (statusCode == 200) {
 
-				ErrorHandler.handleError(getApplicationContext(),
-						Constants.ERROR_CONNECTION_FAILED);
-
-			} else {
 				intent = new Intent(getApplicationContext(),
 						TopicListController.class);
 
-				intent.putExtra("TopicList", result);
+				intent.putExtra("TopicList", (String)result[0]);
 				startActivity(intent);
+
+			} else {
+				closeDialogIfItsVisible();
+				ErrorHandler.handleError(getApplicationContext(), statusCode);
 			}
 		}
 	}
