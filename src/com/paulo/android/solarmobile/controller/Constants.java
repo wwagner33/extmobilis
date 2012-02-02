@@ -8,11 +8,15 @@ public class Constants {
 	public static final String URL_TOKEN = "sessions";
 
 	// Dialogs
-	public static final String PROGRESS_DIALOG_TEXT = "Carregando, por favor aguarde";
+	public static final String TEXT_PROGRESS_DIALOG = "Carregando, por favor aguarde";
 	
 	//Error ids
-	public static final int CONNECTION_ERROR_ID = 1;
-	public static final int BELOW_CHARACTER_LIMIT=2;
+	public static final int ERROR_CONNECTION_FAILED = 101;
+	public static final int ERROR_CONNECTION_TIMEOUT=102;
+	public static final int ERROR_SERVER_DOWN=103;
+	public static final int ERROR_TOKEN_EXPIRED=104;
+	public static final int ERROR_UNKNOWN=105;
+	//public static final int BELOW_CHARACTER_LIMIT=2;
 	
 	
 	// Database

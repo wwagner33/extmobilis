@@ -140,11 +140,13 @@ public class Connection {
 			return "keyNotFound";
 	}
 		*/
-	public String postToServer(String jsonString, String URL)
+	public Object[] postToServer(String jsonString, String URL)
 			throws ClientProtocolException, IOException, ParseException {
 
 		// POST
 
+		Object[] resultSet = new Object[2];
+		
 		StringBuilder builder = new StringBuilder();
 		DefaultHttpClient client = new DefaultHttpClient();
 		// HttpPost post = new HttpPost("http://10.0.2.2:3000/sessions");
@@ -176,23 +178,28 @@ public class Connection {
 				builder.append(line);
 
 			}
-
+			
+			
+			Log.w("resultFromServer", builder.toString());
+			
+			resultSet[0] = builder.toString();
+			resultSet[1] = statusCode;
+			return resultSet;
+			
+		}
+		
+		if (statusCode==500) {
+			resultSet[1] = Constants.ERROR_SERVER_DOWN;
+			return resultSet;
 		}
 
-	//	else {
-
-			// if (statusCode==401) {
-			// ""
-			// }
-		//	return "Error";
-	//	}
-
-		//Log.w("builder.toString()", builder.toString());
-
-		
-		Log.w("RESULTADO DA POSTAGEM", builder.toString());
-		
-		return builder.toString();
+		if (statusCode>=400 && statusCode <500) {
+			resultSet[1] = Constants.ERROR_TOKEN_EXPIRED;
+			return resultSet;
+		}
+			
+		resultSet[1] = Constants.ERROR_UNKNOWN;
+		return resultSet;
 	}
 
 	

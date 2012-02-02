@@ -38,7 +38,7 @@ public class PostList extends ListActivity implements OnClickListener,
 	TextView contador;
 	ImageButton button;
 	PostAdapter listAdapter;
-	private static final int DIALOG_GRAVAR = 2;
+
 	Dialog myDialog;
 	public int tagHolder;
 	String forumName;
@@ -96,8 +96,6 @@ public class PostList extends ListActivity implements OnClickListener,
 			textName.setText(forumName);
 			topicId = extras.getString("topicId");
 
-			// updateList(extrasString);
-
 		}
 
 		else {
@@ -143,23 +141,14 @@ public class PostList extends ListActivity implements OnClickListener,
 	public void updateList(String source) {
 		jsonParser = new ParseJSON();
 		parsedValues = jsonParser.parseJSON(source, PARSE_POSTS);
-
-		// if (extras.getString("TESTE") == null) {
 		listAdapter = new PostAdapter(this, parsedValues);
-
-		// }
-
 		setListAdapter(listAdapter);
-
 	}
 
 	public void updateList(ContentValues[] values) {
 		Log.w("teste", "teste");
 		PostAdapter newAdapter = new PostAdapter(this, parsedValues);
-		// getListView().setAdapter(newAdapter);
-		// getListView().
 		setListAdapter(newAdapter);
-
 	}
 
 	@Override
@@ -319,20 +308,19 @@ public class PostList extends ListActivity implements OnClickListener,
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
 
-		//	if (convertView == null) {
+			// if (convertView == null) {
 
-				convertView = inflater
-						.inflate(R.layout.postitem, parent, false);
-				TextView postBody = (TextView) convertView
-						.findViewById(R.id.post_body);
-				postBody.setText(data[position].getAsString("content"));
+			convertView = inflater.inflate(R.layout.postitem, parent, false);
+			TextView postBody = (TextView) convertView
+					.findViewById(R.id.post_body);
+			postBody.setText(data[position].getAsString("content"));
 
-				TextView userName = (TextView) convertView
-						.findViewById(R.id.post_title);
-				userName.setText(String.valueOf(data[position]
-						.getAsString("username")));
+			TextView userName = (TextView) convertView
+					.findViewById(R.id.post_title);
+			userName.setText(String.valueOf(data[position]
+					.getAsString("username")));
 
-		//	}
+			// }
 
 			return convertView;
 		}

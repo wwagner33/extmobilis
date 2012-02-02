@@ -2,17 +2,12 @@ package com.paulo.android.solarmobile.controller;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
-
 import org.apache.http.client.ClientProtocolException;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 import org.json.simple.parser.ParseException;
-
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -21,12 +16,9 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.paulo.android.solarmobile.model.DBAdapter;
 import com.paulo.android.solarmobile.ws.Connection;
-
-//import com.paulo.android.solarmobile.ws.Connection.KeyFinder;
 
 public class Login extends Activity implements OnClickListener {
 	public EditText login, password;
@@ -43,9 +35,6 @@ public class Login extends Activity implements OnClickListener {
 	RequestTokenThread requestTokenThread;
 	ObtainCourseListThread obtainCourseListThread;
 	ConnectionLimit threadLimit;
-
-	private static final int CONNECTION_ERROR_CODE = 1;
-	private static final int PARSE_COURSES_ID = 222;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -105,14 +94,20 @@ public class Login extends Activity implements OnClickListener {
 
 				Log.w("JsonObject", json.toString());
 
-				 dialog = Dialogs.getProgressDialog(this);
-				 dialog.show();
+				dialog = Dialogs.getProgressDialog(this);
+				dialog.show();
 
 				connection = new Connection(this);
 
 				requestToken();
 			}
 		}
+	}
+
+	public void closeDialogIfItsVisible() {
+		if (dialog != null && dialog.isShowing())
+			dialog.dismiss();
+
 	}
 
 	public void requestToken() {
@@ -158,34 +153,19 @@ public class Login extends Activity implements OnClickListener {
 		return dialog;
 	}
 
-	public void handleError(int errorCode) {
-		dialog.dismiss();
-		if (errorCode == CONNECTION_ERROR_CODE) {
-			Toast.makeText(this, "Erro de conexão,tente novamente ",
-					Toast.LENGTH_SHORT).show();
-			password.setText("");
-		}
-		if (errorCode == 2) {
-			dialog.dismiss();
-			Toast.makeText(this, "Tempo limite de resposta atingido",
-					Toast.LENGTH_SHORT).show();
-		}
-	}
-
-	public class RequestTokenThread extends AsyncTask<Void, Void, String> {
+	public class RequestTokenThread extends AsyncTask<Void, Void, Object[]> {
 
 		@Override
-		protected String doInBackground(Void... params) {
+		protected Object[] doInBackground(Void... params) {
 			try {
-				authToken = connection.postToServer(json.toJSONString(),
+
+				return connection.postToServer(json.toJSONString(),
 						Constants.URL_TOKEN);
-				if (authToken == null) {
-					return null;
-				}
+				// if (authToken == null) {
+				// return null;
+				// }
 
-				// adapter.close();
-
-				return authToken;
+				// return authToken;
 			} catch (ClientProtocolException e) {
 				e.printStackTrace();
 				return null;
@@ -199,17 +179,16 @@ public class Login extends Activity implements OnClickListener {
 		}
 
 		@Override
-		protected void onPostExecute(String result) {
+		protected void onPostExecute(Object[] result) {
 			super.onPostExecute(result);
-			if (result == (null)) {
-				handleError(CONNECTION_ERROR_CODE);
-			} else {
+			int statusReturned = (Integer) result[1];
 
-				Log.w("RESULT", result);
+			if (statusReturned == 200) {
+				Log.w("RESULT", (String) result[0]);
 
 				jsonParser = new ParseJSON();
-				ContentValues[] tokenParsed = jsonParser.parseJSON(result,
-						Constants.PARSE_TOKEN_ID);
+				ContentValues[] tokenParsed = jsonParser.parseJSON(
+						(String) result[0], Constants.PARSE_TOKEN_ID);
 
 				Log.w("TOKENPARSED", tokenParsed[0].getAsString("token"));
 
@@ -219,7 +198,26 @@ public class Login extends Activity implements OnClickListener {
 				adapter.close();
 				getCourseList(tokenParsed[0].getAsString("token"));
 			}
+
+			else {
+				closeDialogIfItsVisible();
+				ErrorHandler.handleError(getApplicationContext(),
+						(Integer) result[1]);
+			}
+
 		}
+
+		/*
+		 * if (result == "SERVER_DOWN" || result == null) {
+		 * 
+		 * if (dialog != null && dialog.isShowing()) { dialog.dismiss(); }
+		 * 
+		 * ErrorHandler.handleError(getApplicationContext(),
+		 * Constants.ERROR_CONNECTION_FAILED); }
+		 * 
+		 * else {
+		 */
+
 	}
 
 	public class ObtainCourseListThread extends AsyncTask<String, Void, String> {
@@ -230,6 +228,7 @@ public class Login extends Activity implements OnClickListener {
 				String result = connection.getFromServer(
 						"curriculum_units.json", params[0]);
 				return result;
+
 			} catch (ClientProtocolException e) {
 				e.printStackTrace();
 				return null;
@@ -248,8 +247,9 @@ public class Login extends Activity implements OnClickListener {
 		@Override
 		protected void onPostExecute(String result) {
 			super.onPostExecute(result);
+
 			if (result == null) {
-				handleError(CONNECTION_ERROR_CODE);
+				closeDialogIfItsVisible();
 
 			} else {
 
@@ -312,7 +312,8 @@ public class Login extends Activity implements OnClickListener {
 			// TODO Auto-generated method stub
 			super.onPostExecute(result);
 			if (result == 1) {
-				handleError(2);
+				ErrorHandler.handleError(getApplicationContext(),
+						Constants.ERROR_CONNECTION_TIMEOUT);
 			}
 
 		}

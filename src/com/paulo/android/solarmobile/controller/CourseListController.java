@@ -76,7 +76,7 @@ public class CourseListController extends ListActivity {
 				dialog.dismiss();
 			}
 		}
-		if (errorCode == Constants.CONNECTION_ERROR_ID) {
+		if (errorCode == Constants.ERROR_CONNECTION_FAILED) {
 			Toast.makeText(this, "Erro de conexão,tente novamente ",
 					Toast.LENGTH_SHORT).show();
 		}
@@ -263,7 +263,7 @@ public class CourseListController extends ListActivity {
 			if (result == null) {
 				// Toast.makeText(getApplicationContext(), "erro de conexão",
 				// Toast.LENGTH_SHORT).show();
-				handleError(Constants.CONNECTION_ERROR_ID);
+				handleError(Constants.ERROR_CONNECTION_FAILED);
 
 			} else {
 				intent = new Intent(getApplicationContext(),

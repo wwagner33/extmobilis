@@ -75,34 +75,21 @@ public class ClassListController extends ListActivity {
 		}
 	}
 
-	public void handleError(int errorCode) {
-		if (dialog != null) {
-			if (dialog.isShowing()) {
-				dialog.dismiss();
-			}
-		}
-
-		if (errorCode == Constants.CONNECTION_ERROR_ID) {
-			Toast.makeText(this, "Erro de conexão,tente novamente ",
-					Toast.LENGTH_SHORT).show();
-		}
-	}
-
 	public void obtainTopics(String authToken) {
 		thread = new ObtainTopicListThread();
 		thread.execute(authToken);
 	}
 
 	public void updateList() {
-		//adapter.open();
-		//String classesFromDB = adapter.getGroups();
-		//Log.w("Turmas", classesFromDB);
+		// adapter.open();
+		// String classesFromDB = adapter.getGroups();
+		// Log.w("Turmas", classesFromDB);
 		jsonParser = new ParseJSON();
 		parsedValues = jsonParser.parseJSON(extrasString,
 				Constants.PARSE_CLASSES);
 		listAdapter = new ClassAdapter(this, parsedValues);
 		setListAdapter(listAdapter);
-	//	adapter.close();
+		// adapter.close();
 
 	}
 
@@ -160,7 +147,8 @@ public class ClassListController extends ListActivity {
 
 			if (finalResult == null) {
 
-				handleError(Constants.CONNECTION_ERROR_ID);
+				ErrorHandler.handleError(getApplicationContext(),
+						Constants.ERROR_CONNECTION_FAILED);
 
 			} else {
 				intent = new Intent(getApplicationContext(),

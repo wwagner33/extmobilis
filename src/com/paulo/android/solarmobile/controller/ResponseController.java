@@ -50,7 +50,7 @@ public class ResponseController extends Activity implements OnClickListener {
 	String token;
 
 	ObtainPostListThread postThread;
-	
+
 	String forumName;
 
 	@Override
@@ -123,21 +123,21 @@ public class ResponseController extends Activity implements OnClickListener {
 		thread = new SendNewPostThread();
 		thread.execute();
 	}
-	
+
 	public void getPosts() {
 		postThread = new ObtainPostListThread();
 		postThread.execute(token);
 	}
 
-	public class SendNewPostThread extends AsyncTask<Void, Void, Void> {
+	public class SendNewPostThread extends AsyncTask<Void, Void, Object[]> {
 
 		@Override
-		protected Void doInBackground(Void... params) {
+		protected Object[] doInBackground(Void... params) {
 
 			try {
 				connection = new Connection(getApplicationContext());
-				String result = connection.postToServer(JSONObjectString, URL);
-				Log.w("POSTResult", result);
+				return connection.postToServer(JSONObjectString, URL);
+				// Log.w("POSTResult", result);
 			} catch (ClientProtocolException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -148,16 +148,23 @@ public class ResponseController extends Activity implements OnClickListener {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+
 			return null;
 		}
 
 		@Override
-		protected void onPostExecute(Void result) {
+		protected void onPostExecute(Object[] result) {
 			// TODO Auto-generated method stub
 			super.onPostExecute(result);
-				
+			int statusCode = (Integer) result[1];
+			if (statusCode == 201) {
 				getPosts();
-			
+			} else {
+				// closeDialogifItsRUNNING
+				ErrorHandler.handleError(getApplicationContext(), statusCode);
+
+			}
+
 			// Intent intent = new Intent(getApplicationContext(),
 			// PostList.class);
 			// startActivity(intent);
@@ -207,7 +214,7 @@ public class ResponseController extends Activity implements OnClickListener {
 			adapter.close();
 
 			if (finalResult == null) {
-				handleError(Constants.CONNECTION_ERROR_ID);
+				handleError(Constants.ERROR_CONNECTION_FAILED);
 				// Toast.makeText(getApplicationContext(), "erro de conexão",
 				// Toast.LENGTH_SHORT).show();
 
