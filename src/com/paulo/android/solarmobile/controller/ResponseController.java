@@ -63,6 +63,9 @@ public class ResponseController extends Activity implements OnClickListener {
 		submit = (Button) findViewById(R.id.criar_topico_submit);
 		submit.setOnClickListener(this);
 		message = (EditText) findViewById(R.id.criar_topico_conteudo);
+		
+		connection = new Connection(this);
+		
 		if (extras != null) {
 			topicId = extras.getString("topicId");
 			forumName = extras.getString("ForumName");
@@ -87,6 +90,12 @@ public class ResponseController extends Activity implements OnClickListener {
 
 	}
 
+	public void closeDialogIfItsVisible() {
+		if (dialog != null && dialog.isShowing())
+			dialog.dismiss();
+
+	}
+
 	@Override
 	public void onClick(View v) {
 
@@ -94,7 +103,7 @@ public class ResponseController extends Activity implements OnClickListener {
 		// handleError(Constants.BELOW_CHARACTER_LIMIT);
 		// } else {
 		responseJSON = new JSONObject();
-		LinkedHashMap<String, String> jsonMap = new LinkedHashMap<String, String>();
+		LinkedHashMap jsonMap = new LinkedHashMap<String, String>();
 		jsonMap.put("content", message.getText().toString());
 		if (extras.getLong("parentId") > 0) {
 			jsonMap.put("parent_id", String.valueOf(extras.getLong("parentId")));
@@ -117,7 +126,8 @@ public class ResponseController extends Activity implements OnClickListener {
 		token = adapter.getToken();
 		adapter.close();
 
-		URL = "discussions/" + topicId + "/posts?auth_token=" + token;
+		URL = "discussions/" + topicId + "/posts?auth_token=" + token; //CERTA
+	//	URL = "discussions/" + topicId + "/posts?auth_token="; // token;
 		Log.w("URL", URL);
 
 		thread = new SendNewPostThread();
@@ -135,7 +145,7 @@ public class ResponseController extends Activity implements OnClickListener {
 		protected Object[] doInBackground(Void... params) {
 
 			try {
-				connection = new Connection(getApplicationContext());
+				//connection = new Connection(getApplicationContext());
 				return connection.postToServer(JSONObjectString, URL);
 				// Log.w("POSTResult", result);
 			} catch (ClientProtocolException e) {
@@ -157,15 +167,15 @@ public class ResponseController extends Activity implements OnClickListener {
 			// TODO Auto-generated method stub
 			super.onPostExecute(result);
 			int statusCode = (Integer) result[1];
-			if (statusCode == 201) {
+			if (statusCode == 201 || statusCode == 200) {
 				getPosts();
 			} else {
-				// closeDialogifItsRUNNING
+				closeDialogIfItsVisible();
 				ErrorHandler.handleError(getApplicationContext(), statusCode);
 
 			}
 
-			// Intent intent = new Intent(getApplicationContext(),
+			// Intent intent = new Intent(getApplicationContext(),tete
 			// PostList.class);
 			// startActivity(intent);
 		}
@@ -221,12 +231,16 @@ public class ResponseController extends Activity implements OnClickListener {
 				intent.putExtra("ForumName", forumName); // onDetails
 				intent.putExtra("PostList", (String) result[0]); // OK
 				intent.putExtra("topicId", topicId); // OK
-				intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				intent.putExtra("TESTE", "TESTE");
 				startActivity(intent);
 			} else {
-				Toast.makeText(getApplicationContext(), "posts failed",
-						Toast.LENGTH_SHORT).show();
+
+				closeDialogIfItsVisible();
+				ErrorHandler.handleError(getApplicationContext(), statusCode);
+
+				// Toast.makeText(getApplicationContext(), "posts failed",
+				// Toast.LENGTH_SHORT).show();
 				// intent = new Intent(getApl)
 			}
 			// Log.w("Turmas", groupsResult);

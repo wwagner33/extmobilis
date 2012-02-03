@@ -101,11 +101,12 @@ public class Connection {
 		DefaultHttpClient client = new DefaultHttpClient();
 		// HttpPost post = new HttpPost("http://10.0.2.2:3000/sessions");
 
+		
 		post = new HttpPost(Constants.URL_SERVER + URL);
 
 		// String teste = json.toJSONString();
 		StringEntity se = new StringEntity(jsonString);
-
+		Log.w("ENTITY", jsonString);
 		post.setEntity(se);
 		post.setHeader("Accept", "application/json");
 		post.setHeader("Content-type", "application/json");
@@ -142,8 +143,13 @@ public class Connection {
 			return resultSet;
 		}
 
-		if (statusCode >= 400 && statusCode < 500) {
+		if (statusCode == 401) {
 			resultSet[1] = Constants.ERROR_TOKEN_EXPIRED;
+			return resultSet;
+		}
+		
+		if (statusCode == 404) {
+			resultSet[1] = Constants.ERROR_PAGE_NOT_FOUND;
 			return resultSet;
 		}
 

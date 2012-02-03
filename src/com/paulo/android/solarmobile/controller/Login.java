@@ -262,7 +262,7 @@ public class Login extends Activity implements OnClickListener {
 				// ContentValues[] parsedValues = connection.parse(result);
 				intent = new Intent(getApplicationContext(),
 						CourseListController.class);
-				intent.putExtra("CourseList", (String)result[0]);
+				intent.putExtra("CourseList", (String) result[0]);
 
 				dialog.dismiss();
 				startActivityForResult(intent, 10);

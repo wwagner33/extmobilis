@@ -30,13 +30,18 @@ public class ErrorHandler {
 			Toast.makeText(context, "Erro desconhecido", Toast.LENGTH_SHORT)
 					.show();
 		}
-		
+
+		if (errorId == Constants.ERROR_PAGE_NOT_FOUND) {
+				Toast.makeText(context, "Página não encontrada", Toast.LENGTH_SHORT).show();
+		}
+
 	}
 
-	/*	OLD IMPLEMENTATION
-	 * public void handleError(int errorCode) { dialog.dismiss(); if (errorCode
-	 * == Constants.ERROR_CONNECTION_FAILED) { Toast.makeText(this,
-	 * "Erro de conexão,tente novamente ", Toast.LENGTH_SHORT).show();
+	/*
+	 * OLD IMPLEMENTATION public void handleError(int errorCode) {
+	 * dialog.dismiss(); if (errorCode == Constants.ERROR_CONNECTION_FAILED) {
+	 * Toast.makeText(this, "Erro de conexão,tente novamente ",
+	 * Toast.LENGTH_SHORT).show();
 	 * 
 	 * } if (errorCode == 2) { dialog.dismiss(); Toast.makeText(this,
 	 * "Tempo limite de resposta atingido", Toast.LENGTH_SHORT).show(); }
