@@ -1,32 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:orientation="vertical" >
+    android:layout_height="fill_parent" >
 
-    <TextView
+    <RelativeLayout
+        android:id="@+id/layout_top_response"
+        style="@style/SolarTheme.layout1"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        android:text="Corpo da Mensagem" />
+        android:layout_height="40dp"
+        android:layout_alignParentTop="true" >
+
+        <ImageView
+            android:id="@+id/title_2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="5dp"
+            android:scaleType="fitStart"
+            android:src="@drawable/solar_logo_small" />
+
+        <TextView
+            android:id="@+id/header2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="5dp"
+            android:paddingRight="8dp"
+            android:text="mobilis"
+            android:textColor="#FFFF00"
+            android:textStyle="italic" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/top_bar"
+        android:layout_width="fill_parent"
+        android:layout_height="40dp"
+        android:layout_below="@id/layout_top_response"
+        android:background="#C0C0C0" >
+
+        <Button
+            android:id="@+id/teste1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="3dp"
+            android:text="cancelar" />
+
+        <Button
+            android:id="@+id/criar_topico_submit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="3dp"
+            android:text="Enviar" />
+    </RelativeLayout>
 
     <EditText
         android:id="@+id/criar_topico_conteudo"
-        android:layout_width="300dp"
-        android:layout_height="100dp"
-        android:layout_gravity="center"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/top_bar"
+        android:gravity="top|left"
         android:hint="Corpo da Mensagem :" />
 
-    <TextView
+    <RelativeLayout
         android:layout_width="fill_parent"
-        android:layout_height="20dp"
-        android:text="" />
+        android:layout_height="40dp"
+        android:layout_below="@id/criar_topico_conteudo"
+        android:background="#C0C0C0" >
+        <Button
+            
+            android:id="@+id/btn_gravar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="R"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            />
+        <TextView
+            android:layout_marginTop="11dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerHorizontal="true"
+            android:id="@+id/char_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="000"
+            />
+        
+        
+    </RelativeLayout>
 
-    <Button
-        android:id="@+id/criar_topico_submit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="Submit" />
-
-</LinearLayout>
+</RelativeLayout>

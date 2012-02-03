@@ -13,8 +13,10 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnKeyListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -22,7 +24,7 @@ import android.widget.Toast;
 import com.paulo.android.solarmobile.model.DBAdapter;
 import com.paulo.android.solarmobile.ws.Connection;
 
-public class ResponseController extends Activity implements OnClickListener {
+public class ResponseController extends Activity implements OnClickListener, OnKeyListener {
 
 	// Wedson: curl -v -H 'Content-Type: application/json' -H 'Accept:
 	// application/json' -X POST
@@ -63,6 +65,7 @@ public class ResponseController extends Activity implements OnClickListener {
 		submit = (Button) findViewById(R.id.criar_topico_submit);
 		submit.setOnClickListener(this);
 		message = (EditText) findViewById(R.id.criar_topico_conteudo);
+		message.setOnKeyListener(this);
 		
 		connection = new Connection(this);
 		
@@ -247,4 +250,39 @@ public class ResponseController extends Activity implements OnClickListener {
 		}
 
 	}
+
+	  @Override
+      public boolean onKey(View v, int keyCode, KeyEvent event) {
+
+		  int editTextRowCount;
+          // if enter is pressed start calculating
+          if (keyCode == KeyEvent.KEYCODE_ENTER
+                  && event.getAction() == KeyEvent.ACTION_UP) {
+
+              // get EditText text
+              String text = ((EditText) v).getText().toString();
+
+              // find how many rows it cointains
+              editTextRowCount = text.split("\\n").length;
+
+              // user has input more than limited - lets do something
+              // about that
+              if (editTextRowCount >= 3) {
+
+                  // find the last break
+                  int lastBreakIndex = text.lastIndexOf("\n");
+
+                  // compose new text
+                  String newText = text.substring(0, lastBreakIndex);
+
+                  // add new text - delete old one and append new one
+                  // (append because I want the cursor to be at the end)
+                  ((EditText) v).setText("");
+                  ((EditText) v).append(newText);
+
+              }
+          }
+
+          return false;
+	  }
 }
