@@ -2,6 +2,7 @@ package com.paulo.android.solarmobile.controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Calendar;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -135,6 +136,8 @@ public class PostList extends ListActivity implements OnClickListener,
 		intent.putExtra("parentId", listValue.getAsLong("id"));
 		Log.w("ID ON POSTS", String.valueOf(listValue.getAsLong("id")));
 
+		Log.w("Data", listValue.getAsString("postDate"));
+		
 		startActivity(intent);
 	}
 

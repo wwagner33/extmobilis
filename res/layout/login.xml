@@ -34,39 +34,64 @@
             android:textStyle="italic" />
     </RelativeLayout>
 
-    <TextView
+    <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Usuário :" />
+        android:layout_height="60dp" />
 
-    <EditText
-        android:id="@+id/campo1"
+    <RelativeLayout
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:inputType="" />
+        android:layout_height="wrap_content" >
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Senha :" />
+        <EditText
+            android:id="@+id/campo1"
+            android:layout_width="170dp"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="50dp"
+            android:layout_alignParentRight="true"
+            android:inputType="text" />
 
-    <EditText
-        android:id="@+id/campo2"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:inputType="textPassword" />
+        <TextView
+          	android:layout_alignParentLeft="true"
+            android:layout_marginLeft="50dp"
+            android:id="@+id/login_user_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@id/campo1"
+            android:layout_toLeftOf="@id/campo1"
+            android:text="Login" />
 
-    <Button
-        android:id="@+id/submit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="Submit" />
+        <EditText
+            android:id="@+id/campo2"
+            android:layout_marginTop="10dp"
+            android:layout_width="170dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="50dp"
+            android:layout_below="@id/campo1"
+            android:inputType="textPassword" />
 
-    <Button
-        android:id="@+id/login_skip"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="pular" />
+        <TextView
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="50dp"
+            android:id="@+id/login_password_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@id/campo2"
+            android:layout_below="@id/campo1"
+            android:layout_toLeftOf="@id/campo2"
+            android:text="Senha" />
+        <!-- android:layout_alignParentLeft="true" -->
+
+        <Button
+            android:layout_marginTop="10dp"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="50dp"
+            android:id="@+id/submit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/campo2"
+            android:layout_gravity="center"
+            android:text="entrar" />
+    </RelativeLayout>
 
 </LinearLayout>

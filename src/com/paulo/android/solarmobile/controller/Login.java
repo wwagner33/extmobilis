@@ -41,10 +41,6 @@ public class Login extends Activity implements OnClickListener {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.login);
 
-		skipValidation = (Button) findViewById(R.id.login_skip);
-		skipValidation.setOnClickListener(this);
-		skipValidation.setVisibility(View.GONE);
-
 		login = (EditText) findViewById(R.id.campo1);
 		password = (EditText) findViewById(R.id.campo2);
 		submit = (Button) findViewById(R.id.submit);
@@ -55,12 +51,6 @@ public class Login extends Activity implements OnClickListener {
 
 	@Override
 	public void onClick(View v) {
-
-		if (v.getId() == R.id.login_skip) {
-
-			intent = new Intent(Login.this, CourseListController.class);
-			startActivity(intent);
-		}
 
 		if (v.equals(submit)) {
 

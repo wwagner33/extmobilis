@@ -63,7 +63,7 @@
     <EditText
         android:id="@+id/criar_topico_conteudo"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="200dp"
         android:layout_below="@id/top_bar"
         android:gravity="top|left"
         android:hint="Corpo da Mensagem :" />

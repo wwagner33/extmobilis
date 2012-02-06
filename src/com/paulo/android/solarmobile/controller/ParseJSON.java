@@ -20,6 +20,22 @@ public class ParseJSON {
 	// JSONArray jsonArray;
 	JSONObject jsonObjects[];
 
+	public void parseData(ContentValues[] container, String data, int position) {
+		String year = data.substring(0, 4);
+		String month = data.substring(4, 6);
+		String day = data.substring(6, 8);
+		String hour = data.substring(8, 10);
+		String minute = data.substring(10, 12);
+		String second = data.substring(12, 14);
+		Log.w("ANO", year);
+		Log.w("Mês", month);
+		Log.w("dia", day);
+		Log.w("hora", hour);
+		Log.w("minuto", minute);
+		Log.w("segundo", second);
+
+	}
+
 	public ContentValues[] parseJSON(String source, int parseId) {
 
 		if (parseId == PARSE_TOKEN_ID) {
@@ -196,6 +212,11 @@ public class ParseJSON {
 
 				parsedValues[i].put("username",
 						(String) teste2.get("user_username"));
+
+				// parsedValues[i].put("postDate", (String)
+				// teste2.get("updated"));
+
+				parseData(parsedValues, (String) teste2.get("updated"), i);
 
 			}
 
