@@ -74,13 +74,12 @@ public class ClassListController extends ListActivity {
 			}
 		}
 	}
-	
+
 	public void closeDialogIfItsVisible() {
 		if (dialog != null && dialog.isShowing())
 			dialog.dismiss();
 
 	}
-
 
 	public void obtainTopics(String authToken) {
 		thread = new ObtainTopicListThread();
@@ -151,20 +150,28 @@ public class ClassListController extends ListActivity {
 			// TODO Auto-generated method stub
 			super.onPostExecute(result);
 			adapter.close();
-			int statusCode = (Integer) result[1];
+			
 
+			if (result == null) {
+				closeDialogIfItsVisible();
+				ErrorHandler.handleError(getApplicationContext(), Constants.ERROR_CONNECTION_REFUSED);			
+			}
+
+			else {
+				int statusCode = (Integer) result[1];
 			if (statusCode == 200) {
 
 				intent = new Intent(getApplicationContext(),
 						TopicListController.class);
 
-				intent.putExtra("TopicList", (String)result[0]);
+				intent.putExtra("TopicList", (String) result[0]);
 				startActivity(intent);
 
 			} else {
 				closeDialogIfItsVisible();
 				ErrorHandler.handleError(getApplicationContext(), statusCode);
 			}
+		}	
 		}
 	}
 
