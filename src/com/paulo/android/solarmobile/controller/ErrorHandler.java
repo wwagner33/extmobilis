@@ -32,7 +32,13 @@ public class ErrorHandler {
 		}
 
 		if (errorId == Constants.ERROR_PAGE_NOT_FOUND) {
-				Toast.makeText(context, "Página não encontrada", Toast.LENGTH_SHORT).show();
+			Toast.makeText(context, "Página não encontrada", Toast.LENGTH_SHORT)
+					.show();
+		}
+
+		if (errorId == Constants.ERROR_CONNECTION_REFUSED) {
+			Toast.makeText(context, "Conexão recusada", Toast.LENGTH_SHORT)
+					.show();
 		}
 
 	}

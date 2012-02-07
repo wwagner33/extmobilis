@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:layout_width="fill_parent" android:layout_height="fill_parent"
-	android:orientation="vertical">
-	
-     <RelativeLayout
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <RelativeLayout
         android:id="@+id/layout1"
         style="@style/SolarTheme.layout1"
         android:layout_width="fill_parent"
@@ -33,9 +34,34 @@
             android:textStyle="italic" />
     </RelativeLayout>
 
-	<TextView android:layout_width="fill_parent"
-		android:layout_height="50dp" android:text="Lista de Turmas" />
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="50dp" >
 
-	<ListView android:id="@android:id/list" android:layout_width="fill_parent"
-		android:layout_height="fill_parent" android:drawSelectorOnTop="false" />
-</LinearLayout>
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="15dp"
+            android:text="Turmas disponíveis"
+            android:textStyle="bold" />
+    </RelativeLayout>
+
+    <ListView
+        android:id="@android:id/list"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:divider="@null"
+        android:dividerHeight="4dp"
+        android:drawSelectorOnTop="false" />
+
+</LinearLayout><!--
+ListView OLD
+<ListView
+        android:id="@android:id/list"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:drawSelectorOnTop="false" />
+-->

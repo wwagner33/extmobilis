@@ -171,30 +171,39 @@ public class Login extends Activity implements OnClickListener {
 		@Override
 		protected void onPostExecute(Object[] result) {
 			super.onPostExecute(result);
-			int statusReturned = (Integer) result[1];
 
-			if (statusReturned == 200) {
-				Log.w("RESULT", (String) result[0]);
-
-				jsonParser = new ParseJSON();
-				ContentValues[] tokenParsed = jsonParser.parseJSON(
-						(String) result[0], Constants.PARSE_TOKEN_ID);
-
-				Log.w("TOKENPARSED", tokenParsed[0].getAsString("token"));
-
-				adapter.open();
-				Log.w("UpdateToken", "updateToken");
-				adapter.updateToken(tokenParsed[0].getAsString("token"));
-				adapter.close();
-				getCourseList(tokenParsed[0].getAsString("token"));
+			if (result == null) {
+				closeDialogIfItsVisible();
+				ErrorHandler.handleError(getApplicationContext(),
+						Constants.ERROR_CONNECTION_REFUSED);
 			}
 
 			else {
-				closeDialogIfItsVisible();
-				ErrorHandler.handleError(getApplicationContext(),
-						(Integer) result[1]);
-			}
 
+				int statusReturned = (Integer) result[1];
+				if (statusReturned == 200) {
+					Log.w("RESULT", (String) result[0]);
+
+					jsonParser = new ParseJSON();
+					ContentValues[] tokenParsed = jsonParser.parseJSON(
+							(String) result[0], Constants.PARSE_TOKEN_ID);
+
+					Log.w("TOKENPARSED", tokenParsed[0].getAsString("token"));
+
+					adapter.open();
+					Log.w("UpdateToken", "updateToken");
+					adapter.updateToken(tokenParsed[0].getAsString("token"));
+					adapter.close();
+					getCourseList(tokenParsed[0].getAsString("token"));
+				}
+
+				else {
+					closeDialogIfItsVisible();
+					ErrorHandler.handleError(getApplicationContext(),
+							(Integer) result[1]);
+				}
+
+			}
 		}
 
 		/*
@@ -238,28 +247,37 @@ public class Login extends Activity implements OnClickListener {
 		@Override
 		protected void onPostExecute(Object[] result) {
 			super.onPostExecute(result);
-			int statusCode = (Integer) result[1];
 
-			if (statusCode == 200) {
-				Log.w("TokenResult", (String) result[0]);
-
-				adapter.open();
-
-				// adapter.insertCourses(result);
-
-				adapter.updateCourses((String) result[0]);
-
-				// ContentValues[] parsedValues = connection.parse(result);
-				intent = new Intent(getApplicationContext(),
-						CourseListController.class);
-				intent.putExtra("CourseList", (String) result[0]);
-
-				dialog.dismiss();
-				startActivityForResult(intent, 10);
-
-			} else {
+			if (result == null) {
 				closeDialogIfItsVisible();
-				ErrorHandler.handleError(getApplicationContext(), statusCode);
+				ErrorHandler.handleError(getApplicationContext(),
+						Constants.ERROR_CONNECTION_REFUSED);
+			}
+
+			else {
+				int statusCode = (Integer) result[1];
+				if (statusCode == 200) {
+					Log.w("TokenResult", (String) result[0]);
+
+					adapter.open();
+
+					// adapter.insertCourses(result);
+
+					adapter.updateCourses((String) result[0]);
+
+					// ContentValues[] parsedValues = connection.parse(result);
+					intent = new Intent(getApplicationContext(),
+							CourseListController.class);
+					intent.putExtra("CourseList", (String) result[0]);
+
+					dialog.dismiss();
+					startActivityForResult(intent, 10);
+
+				} else {
+					closeDialogIfItsVisible();
+					ErrorHandler.handleError(getApplicationContext(),
+							statusCode);
+				}
 			}
 		}
 	}

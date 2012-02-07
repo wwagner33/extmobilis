@@ -90,18 +90,6 @@ public class TopicListController extends ListActivity {
 
 	}
 
-	public void handleError(int errorCode) {
-		if (dialog != null) {
-			if (dialog.isShowing()) {
-				dialog.dismiss();
-			}
-		}
-		if (errorCode == Constants.ERROR_CONNECTION_FAILED) {
-			Toast.makeText(this, "Erro de conexão,tente novamente ",
-					Toast.LENGTH_SHORT).show();
-		}
-	}
-
 	public void updateList(String topicJSON) {
 		Log.w("onUpdateList", "TRUE");
 
@@ -170,18 +158,30 @@ public class TopicListController extends ListActivity {
 			// TODO Auto-generated method stub
 			super.onPostExecute(result);
 			adapter.close();
-			int statusCode = (Integer) result[1];
 
-			if (statusCode == 200) {
-
-				intent = new Intent(getApplicationContext(), PostList.class);
-				intent.putExtra("ForumName", forumName);
-				intent.putExtra("PostList", (String) result[0]);
-				intent.putExtra("topicId", topicIdString);
-				startActivity(intent);
-			} else {
+			if (result == null) {
+				// CONNECTION REFUSED
 				closeDialogIfItsVisible();
-				handleError(statusCode);
+				ErrorHandler.handleError(getApplicationContext(),
+						Constants.ERROR_CONNECTION_REFUSED);
+			}
+
+			else {
+				int statusCode = (Integer) result[1];
+
+				if (statusCode == 200) {
+
+					intent = new Intent(getApplicationContext(), PostList.class);
+					intent.putExtra("ForumName", forumName);
+					intent.putExtra("PostList", (String) result[0]);
+					intent.putExtra("topicId", topicIdString);
+					startActivity(intent);
+				} else {
+
+					closeDialogIfItsVisible();
+					ErrorHandler.handleError(getApplicationContext(),
+							statusCode);
+				}
 			}
 		}
 	}

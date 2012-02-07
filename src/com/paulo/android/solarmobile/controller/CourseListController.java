@@ -76,8 +76,6 @@ public class CourseListController extends ListActivity {
 
 	}
 
-	
-
 	@Override
 	public void onBackPressed() {
 		// TODO Auto-generated method stub
@@ -257,25 +255,37 @@ public class CourseListController extends ListActivity {
 		protected void onPostExecute(Object[] result) {
 			// TODO Auto-generated method stub
 			super.onPostExecute(result);
-			int statusCode = (Integer) result[1];
+			// int statusCode = (Integer) result[1];
 
-			if (statusCode == 200) {
+			if (result == null) {
 
-				intent = new Intent(getApplicationContext(),
-						ClassListController.class);
-				adapter.updateGroups((String) result[0]);
-				intent.putExtra("GroupList", (String)result[0]);
-				adapter.close();
-				startActivity(intent);
-			}
-			
-			else {
 				closeDialogIfItsVisible();
-				ErrorHandler.handleError(getApplicationContext(), statusCode);
+				ErrorHandler.handleError(getApplicationContext(),
+						Constants.ERROR_CONNECTION_REFUSED);
 			}
-			// Log.w("Turmas", groupsResult);
-		}
 
+			else {
+
+				int statusCode = (Integer) result[1];
+
+				if (statusCode == 200) {
+
+					intent = new Intent(getApplicationContext(),
+							ClassListController.class);
+					adapter.updateGroups((String) result[0]);
+					intent.putExtra("GroupList", (String) result[0]);
+					adapter.close();
+					startActivity(intent);
+				}
+
+				else {
+					closeDialogIfItsVisible();
+					ErrorHandler.handleError(getApplicationContext(),
+							statusCode);
+				}
+				// Log.w("Turmas", groupsResult);
+			}
+		}
 	}
 
 	public class CourseListAdapter extends BaseAdapter {

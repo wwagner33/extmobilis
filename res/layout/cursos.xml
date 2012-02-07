@@ -43,17 +43,19 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:text="Lista de cursos disponíveis" />
+            android:textStyle="bold"
+            android:text="Cursos disponíveis" />
     </RelativeLayout>
 
     <ListView
-        android:dividerHeight="5dp"
+        android:dividerHeight="4dp"
         android:divider="@null"
         android:layout_marginLeft="15dp"
         android:layout_marginRight="15dp"
         android:id="@android:id/list"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:drawSelectorOnTop="false" />
+        android:drawSelectorOnTop="false" 
+        />
 
 </LinearLayout>

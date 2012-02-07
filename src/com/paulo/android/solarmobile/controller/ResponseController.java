@@ -24,7 +24,8 @@ import android.widget.Toast;
 import com.paulo.android.solarmobile.model.DBAdapter;
 import com.paulo.android.solarmobile.ws.Connection;
 
-public class ResponseController extends Activity implements OnClickListener, OnKeyListener {
+public class ResponseController extends Activity implements OnClickListener,
+		OnKeyListener {
 
 	// Wedson: curl -v -H 'Content-Type: application/json' -H 'Accept:
 	// application/json' -X POST
@@ -66,9 +67,9 @@ public class ResponseController extends Activity implements OnClickListener, OnK
 		submit.setOnClickListener(this);
 		message = (EditText) findViewById(R.id.criar_topico_conteudo);
 		message.setOnKeyListener(this);
-		
+
 		connection = new Connection(this);
-		
+
 		if (extras != null) {
 			topicId = extras.getString("topicId");
 			forumName = extras.getString("ForumName");
@@ -129,8 +130,8 @@ public class ResponseController extends Activity implements OnClickListener, OnK
 		token = adapter.getToken();
 		adapter.close();
 
-		URL = "discussions/" + topicId + "/posts?auth_token=" + token; //CERTA
-	//	URL = "discussions/" + topicId + "/posts?auth_token="; // token;
+		URL = "discussions/" + topicId + "/posts?auth_token=" + token; // CERTA
+		// URL = "discussions/" + topicId + "/posts?auth_token="; // token;
 		Log.w("URL", URL);
 
 		thread = new SendNewPostThread();
@@ -148,7 +149,7 @@ public class ResponseController extends Activity implements OnClickListener, OnK
 		protected Object[] doInBackground(Void... params) {
 
 			try {
-				//connection = new Connection(getApplicationContext());
+				// connection = new Connection(getApplicationContext());
 				return connection.postToServer(JSONObjectString, URL);
 				// Log.w("POSTResult", result);
 			} catch (ClientProtocolException e) {
@@ -169,18 +170,28 @@ public class ResponseController extends Activity implements OnClickListener, OnK
 		protected void onPostExecute(Object[] result) {
 			// TODO Auto-generated method stub
 			super.onPostExecute(result);
-			int statusCode = (Integer) result[1];
-			if (statusCode == 201 || statusCode == 200) {
-				getPosts();
-			} else {
-				closeDialogIfItsVisible();
-				ErrorHandler.handleError(getApplicationContext(), statusCode);
 
+			if (result == null) {
+				closeDialogIfItsVisible();
+				ErrorHandler.handleError(getApplicationContext(),
+						Constants.ERROR_CONNECTION_REFUSED);
 			}
 
-			// Intent intent = new Intent(getApplicationContext(),tete
-			// PostList.class);
-			// startActivity(intent);
+			else {
+				int statusCode = (Integer) result[1];
+				if (statusCode == 201 || statusCode == 200) {
+					getPosts();
+				} else {
+					closeDialogIfItsVisible();
+					ErrorHandler.handleError(getApplicationContext(),
+							statusCode);
+
+				}
+
+				// Intent intent = new Intent(getApplicationContext(),tete
+				// PostList.class);
+				// startActivity(intent);
+			}
 		}
 
 	}
@@ -226,63 +237,74 @@ public class ResponseController extends Activity implements OnClickListener, OnK
 			// TODO Auto-generated method stub
 			super.onPostExecute(result);
 			adapter.close();
-			int statusCode = (Integer) result[1];
 
-			if (statusCode == 200) {
+			if (result == null) {
 
-				intent = new Intent(getApplicationContext(), PostList.class);
-				intent.putExtra("ForumName", forumName); // onDetails
-				intent.putExtra("PostList", (String) result[0]); // OK
-				intent.putExtra("topicId", topicId); // OK
-				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				intent.putExtra("TESTE", "TESTE");
-				startActivity(intent);
-			} else {
-
-				closeDialogIfItsVisible();
-				ErrorHandler.handleError(getApplicationContext(), statusCode);
-
-				// Toast.makeText(getApplicationContext(), "posts failed",
-				// Toast.LENGTH_SHORT).show();
-				// intent = new Intent(getApl)
+				ErrorHandler.handleError(getApplicationContext(),
+						Constants.ERROR_CONNECTION_REFUSED);
 			}
-			// Log.w("Turmas", groupsResult);
+
+			else {
+
+				int statusCode = (Integer) result[1];
+
+				if (statusCode == 200) {
+
+					intent = new Intent(getApplicationContext(), PostList.class);
+					intent.putExtra("ForumName", forumName); // onDetails
+					intent.putExtra("PostList", (String) result[0]); // OK
+					intent.putExtra("topicId", topicId); // OK
+					intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+					intent.putExtra("TESTE", "TESTE");
+					startActivity(intent);
+				} else {
+
+					closeDialogIfItsVisible();
+					ErrorHandler.handleError(getApplicationContext(),
+							statusCode);
+
+					// Toast.makeText(getApplicationContext(), "posts failed",
+					// Toast.LENGTH_SHORT).show();
+					// intent = new Intent(getApl)
+				}
+				// Log.w("Turmas", groupsResult);
+			}
 		}
 
 	}
 
-	  @Override
-      public boolean onKey(View v, int keyCode, KeyEvent event) {
+	@Override
+	public boolean onKey(View v, int keyCode, KeyEvent event) {
 
-		  int editTextRowCount;
-          // if enter is pressed start calculating
-          if (keyCode == KeyEvent.KEYCODE_ENTER
-                  && event.getAction() == KeyEvent.ACTION_UP) {
+		int editTextRowCount;
+		// if enter is pressed start calculating
+		if (keyCode == KeyEvent.KEYCODE_ENTER
+				&& event.getAction() == KeyEvent.ACTION_UP) {
 
-              // get EditText text
-              String text = ((EditText) v).getText().toString();
+			// get EditText text
+			String text = ((EditText) v).getText().toString();
 
-              // find how many rows it cointains
-              editTextRowCount = text.split("\\n").length;
+			// find how many rows it cointains
+			editTextRowCount = text.split("\\n").length;
 
-              // user has input more than limited - lets do something
-              // about that
-              if (editTextRowCount >= 3) {
+			// user has input more than limited - lets do something
+			// about that
+			if (editTextRowCount >= 3) {
 
-                  // find the last break
-                  int lastBreakIndex = text.lastIndexOf("\n");
+				// find the last break
+				int lastBreakIndex = text.lastIndexOf("\n");
 
-                  // compose new text
-                  String newText = text.substring(0, lastBreakIndex);
+				// compose new text
+				String newText = text.substring(0, lastBreakIndex);
 
-                  // add new text - delete old one and append new one
-                  // (append because I want the cursor to be at the end)
-                  ((EditText) v).setText("");
-                  ((EditText) v).append(newText);
+				// add new text - delete old one and append new one
+				// (append because I want the cursor to be at the end)
+				((EditText) v).setText("");
+				((EditText) v).append(newText);
 
-              }
-          }
+			}
+		}
 
-          return false;
-	  }
+		return false;
+	}
 }

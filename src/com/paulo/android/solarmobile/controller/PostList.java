@@ -136,7 +136,7 @@ public class PostList extends ListActivity implements OnClickListener,
 		intent.putExtra("parentId", listValue.getAsLong("id"));
 		Log.w("ID ON POSTS", String.valueOf(listValue.getAsLong("id")));
 
-		Log.w("Data", listValue.getAsString("postDate"));
+		//Log.w("Data", listValue.getAsString("postDate"));
 		
 		startActivity(intent);
 	}

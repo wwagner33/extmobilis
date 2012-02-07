@@ -17,6 +17,7 @@ public class Constants {
 	public static final int ERROR_TOKEN_EXPIRED=104;
 	public static final int ERROR_UNKNOWN=105;
 	public static final int ERROR_PAGE_NOT_FOUND = 106;
+	public static final int ERROR_CONNECTION_REFUSED=107;
 	//public static final int BELOW_CHARACTER_LIMIT=2;
 	
 	

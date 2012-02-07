@@ -5,8 +5,10 @@
 		</style>
 		
 		<style name="SolarTheme.layout1">
-				<item name="android:background">#2A2B71</item>
+				<item name="android:background">@color/headerColor</item>
 		</style> 
+			<!--  <item name="android:background">#2A2B71</item> -->	
+			
 		
 		<style name="SolarTheme.layout2">
 				<item name="android:background">#6699CC</item>
