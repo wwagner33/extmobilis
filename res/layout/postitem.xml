@@ -25,6 +25,39 @@
         android:textStyle="bold" />
 
     <TextView
+        android:id="@+id/post_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="5dp"
+        android:text="12 jan" />
+
+   
+    <TextView
+        android:id="@+id/placeholder"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_toLeftOf="@id/post_date"
+        android:text="V" />
+
+    <TextView
+        android:id="@+id/post_body"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/post_title"
+        android:layout_margin="4dp"
+        android:layout_toRightOf="@id/avatar"
+        android:text="corpo da mensagem" />
+
+</RelativeLayout>
+
+<!-- 
+
+ <TextView
         android:id="@+id/post_month"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -43,22 +76,6 @@
         android:layout_toLeftOf="@id/post_month"
         android:text="12" />
 
-    <TextView
-        android:id="@+id/placeholder"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginRight="5dp"
-        android:layout_marginTop="5dp"
-        android:layout_toLeftOf="@id/post_day"
-        android:text="V" />
 
-    <TextView
-        android:id="@+id/post_body"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/post_title"
-        android:layout_margin="4dp"
-        android:layout_toRightOf="@id/avatar"
-        android:text="corpo da mensagem" />
 
-</RelativeLayout>
+ -->

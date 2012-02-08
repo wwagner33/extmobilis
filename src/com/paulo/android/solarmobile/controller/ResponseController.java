@@ -24,8 +24,7 @@ import android.widget.Toast;
 import com.paulo.android.solarmobile.model.DBAdapter;
 import com.paulo.android.solarmobile.ws.Connection;
 
-public class ResponseController extends Activity implements OnClickListener,
-		OnKeyListener {
+public class ResponseController extends Activity implements OnClickListener {
 
 	// Wedson: curl -v -H 'Content-Type: application/json' -H 'Accept:
 	// application/json' -X POST
@@ -66,7 +65,6 @@ public class ResponseController extends Activity implements OnClickListener,
 		submit = (Button) findViewById(R.id.criar_topico_submit);
 		submit.setOnClickListener(this);
 		message = (EditText) findViewById(R.id.criar_topico_conteudo);
-		message.setOnKeyListener(this);
 
 		connection = new Connection(this);
 
@@ -149,21 +147,19 @@ public class ResponseController extends Activity implements OnClickListener,
 		protected Object[] doInBackground(Void... params) {
 
 			try {
-				// connection = new Connection(getApplicationContext());
-				return connection.postToServer(JSONObjectString, URL);
-				// Log.w("POSTResult", result);
-			} catch (ClientProtocolException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ParseException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
 
-			return null;
+				return connection.postToServer(JSONObjectString, URL);
+
+			} catch (ClientProtocolException e) {
+				e.printStackTrace();
+				return null;
+			} catch (IOException e) {
+				e.printStackTrace();
+				return null;
+			} catch (ParseException e) {
+				e.printStackTrace();
+				return null;
+			}
 		}
 
 		@Override
@@ -188,9 +184,6 @@ public class ResponseController extends Activity implements OnClickListener,
 
 				}
 
-				// Intent intent = new Intent(getApplicationContext(),tete
-				// PostList.class);
-				// startActivity(intent);
 			}
 		}
 
@@ -228,13 +221,11 @@ public class ResponseController extends Activity implements OnClickListener,
 				return null;
 			}
 
-			// return null;
-
 		}
 
 		@Override
 		protected void onPostExecute(Object[] result) {
-			// TODO Auto-generated method stub
+
 			super.onPostExecute(result);
 			adapter.close();
 
@@ -263,48 +254,8 @@ public class ResponseController extends Activity implements OnClickListener,
 					ErrorHandler.handleError(getApplicationContext(),
 							statusCode);
 
-					// Toast.makeText(getApplicationContext(), "posts failed",
-					// Toast.LENGTH_SHORT).show();
-					// intent = new Intent(getApl)
 				}
-				// Log.w("Turmas", groupsResult);
 			}
 		}
-
-	}
-
-	@Override
-	public boolean onKey(View v, int keyCode, KeyEvent event) {
-
-		int editTextRowCount;
-		// if enter is pressed start calculating
-		if (keyCode == KeyEvent.KEYCODE_ENTER
-				&& event.getAction() == KeyEvent.ACTION_UP) {
-
-			// get EditText text
-			String text = ((EditText) v).getText().toString();
-
-			// find how many rows it cointains
-			editTextRowCount = text.split("\\n").length;
-
-			// user has input more than limited - lets do something
-			// about that
-			if (editTextRowCount >= 3) {
-
-				// find the last break
-				int lastBreakIndex = text.lastIndexOf("\n");
-
-				// compose new text
-				String newText = text.substring(0, lastBreakIndex);
-
-				// add new text - delete old one and append new one
-				// (append because I want the cursor to be at the end)
-				((EditText) v).setText("");
-				((EditText) v).append(newText);
-
-			}
-		}
-
-		return false;
 	}
 }

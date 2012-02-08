@@ -150,28 +150,29 @@ public class ClassListController extends ListActivity {
 			// TODO Auto-generated method stub
 			super.onPostExecute(result);
 			adapter.close();
-			
 
 			if (result == null) {
 				closeDialogIfItsVisible();
-				ErrorHandler.handleError(getApplicationContext(), Constants.ERROR_CONNECTION_REFUSED);			
+				ErrorHandler.handleError(getApplicationContext(),
+						Constants.ERROR_CONNECTION_REFUSED);
 			}
 
 			else {
 				int statusCode = (Integer) result[1];
-			if (statusCode == 200) {
+				if (statusCode == 200) {
 
-				intent = new Intent(getApplicationContext(),
-						TopicListController.class);
+					intent = new Intent(getApplicationContext(),
+							TopicListController.class);
 
-				intent.putExtra("TopicList", (String) result[0]);
-				startActivity(intent);
+					intent.putExtra("TopicList", (String) result[0]);
+					startActivity(intent);
 
-			} else {
-				closeDialogIfItsVisible();
-				ErrorHandler.handleError(getApplicationContext(), statusCode);
+				} else {
+					closeDialogIfItsVisible();
+					ErrorHandler.handleError(getApplicationContext(),
+							statusCode);
+				}
 			}
-		}	
 		}
 	}
 

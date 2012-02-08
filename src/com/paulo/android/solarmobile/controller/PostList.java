@@ -79,10 +79,23 @@ public class PostList extends ListActivity implements OnClickListener,
 
 	TextView textName;
 
+	int currentDay, currentMonth, currentYear;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.post);
+
+		Calendar calendar = Calendar.getInstance();
+
+		Log.w("ANO ATUAL", String.valueOf(calendar.get(Calendar.YEAR)));
+		currentYear = calendar.get(Calendar.YEAR);
+
+		Log.w("DIA ATUAL", String.valueOf(calendar.get(Calendar.DAY_OF_MONTH)));
+		currentDay = calendar.get(Calendar.DAY_OF_MONTH);
+
+		Log.w("MẼS Atual", String.valueOf(calendar.get(Calendar.MONTH)));
+		currentMonth = calendar.get(Calendar.MONTH) + 1;
 
 		textName = (TextView) findViewById(R.id.nome_forum);
 		extras = getIntent().getExtras();
@@ -136,8 +149,8 @@ public class PostList extends ListActivity implements OnClickListener,
 		intent.putExtra("parentId", listValue.getAsLong("id"));
 		Log.w("ID ON POSTS", String.valueOf(listValue.getAsLong("id")));
 
-		//Log.w("Data", listValue.getAsString("postDate"));
-		
+		// Log.w("Data", listValue.getAsString("postDate"));
+
 		startActivity(intent);
 	}
 
@@ -281,6 +294,57 @@ public class PostList extends ListActivity implements OnClickListener,
 		}
 	}
 
+	public boolean postedToday(int postDay, int postMonth, int postYear) {
+
+		if (postDay == currentDay && postMonth == currentMonth
+				&& postYear == currentYear)
+			return true;
+		else
+			return false;
+	}
+
+	public String getMonthAsText(int postMonth) {
+		if (postMonth == 1)
+
+			return "Jan";
+		if (postMonth == 2)
+
+			return "Fev";
+		if (postMonth == 3)
+
+			return "Mar";
+		if (postMonth == 4)
+
+			return "Abr";
+		if (postMonth == 5)
+
+			return "Mai";
+		if (postMonth == 6)
+
+			return "Jun";
+		if (postMonth == 7)
+
+			return "Jul";
+		if (postMonth == 8)
+
+			return "Ago";
+		if (postMonth == 9)
+
+			return "Set";
+		if (postMonth == 10)
+
+			return "Out";
+		if (postMonth == 11)
+
+			return "Nov";
+		if (postMonth == 12)
+
+			return "Dez";
+
+		return "?";
+
+	}
+
 	public class PostAdapter extends BaseAdapter {
 
 		Activity activity;
@@ -311,9 +375,31 @@ public class PostList extends ListActivity implements OnClickListener,
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
 
-			// if (convertView == null) {
-
 			convertView = inflater.inflate(R.layout.postitem, parent, false);
+			
+			
+			TextView postDate = (TextView) convertView
+					.findViewById(R.id.post_date);
+
+			if (postedToday(data[position].getAsInteger("postDay"),
+					data[position].getAsInteger("postMonth"),
+					data[position].getAsInteger("postYear")))
+
+			{
+				Log.w("POSTED TODAY", "TRUE");
+				postDate.setText(data[position].getAsString("postHour") + ":"
+						+ data[position].getAsString("postMinute"));
+
+			} else {
+
+				postDate.setText(data[position].getAsString("postDayString")
+						+ " "
+						+ getMonthAsText(data[position]
+								.getAsInteger("postMonth")));
+				Log.w("POSTED TODAY", "FALSE");
+			}
+
+		
 			TextView postBody = (TextView) convertView
 					.findViewById(R.id.post_body);
 			postBody.setText(data[position].getAsString("content"));
@@ -322,8 +408,6 @@ public class PostList extends ListActivity implements OnClickListener,
 					.findViewById(R.id.post_title);
 			userName.setText(String.valueOf(data[position]
 					.getAsString("username")));
-
-			// }
 
 			return convertView;
 		}

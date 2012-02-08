@@ -21,12 +21,22 @@ public class ParseJSON {
 	JSONObject jsonObjects[];
 
 	public void parseData(ContentValues[] container, String data, int position) {
+		
 		String year = data.substring(0, 4);
 		String month = data.substring(4, 6);
 		String day = data.substring(6, 8);
 		String hour = data.substring(8, 10);
 		String minute = data.substring(10, 12);
 		String second = data.substring(12, 14);
+
+		container[position].put("postYear", Integer.parseInt(year));
+		container[position].put("postMonth", Integer.parseInt(month));
+		container[position].put("postDay", Integer.parseInt(day));
+		container[position].put("postDayString", day);
+		container[position].put("postHour", hour);
+		container[position].put("postMinute", minute);
+		container[position].put("postSecond", second);
+		
 		Log.w("ANO", year);
 		Log.w("Mês", month);
 		Log.w("dia", day);
