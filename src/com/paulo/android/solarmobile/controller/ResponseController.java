@@ -1,5 +1,6 @@
 package com.paulo.android.solarmobile.controller;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 
@@ -8,23 +9,38 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
+import android.view.ContextThemeWrapper;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.view.View.OnKeyListener;
 import android.widget.Button;
+import android.widget.Chronometer;
+import android.widget.Chronometer.OnChronometerTickListener;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.paulo.android.solarmobile.model.DBAdapter;
 import com.paulo.android.solarmobile.ws.Connection;
+import com.paulo.solarmobile.audio.PlayAudio;
+import com.paulo.solarmobile.audio.RecordAudio;
 
-public class ResponseController extends Activity implements OnClickListener {
+public class ResponseController extends Activity implements OnClickListener,
+		OnChronometerTickListener {
 
 	// Wedson: curl -v -H 'Content-Type: application/json' -H 'Accept:
 	// application/json' -X POST
@@ -37,23 +53,42 @@ public class ResponseController extends Activity implements OnClickListener {
 	// File recordingsFolder;
 
 	EditText message;
-	Button submit;
+	Button submit, cancelar;
+	TextView timeUp, charCount;
+	ImageButton record;
 	Connection connection;
 	JSONObject responseJSON;
 	ProgressDialog dialog;
-	public String topicId;
 	Bundle extras;
 	long parentId;
 	String noParent = "";
-	String URL;
 	SendNewPostThread thread;
-	String JSONObjectString;
 	DBAdapter adapter;
-	String token;
+	String token, JSONObjectString, URL, topicId;
 
 	ObtainPostListThread postThread;
-
 	String forumName;
+
+	File path = new File(Environment.getExternalStorageDirectory()
+			.getAbsolutePath() + Constants.RECORDING_PATH);
+
+	File currentRecordingPath;
+
+	boolean imageChanger = true;
+
+	// variáveis do cronômetro
+	long countUp;
+	long startTime;
+	long time2 = 0;
+	Chronometer stopWatch;
+	File audioFile;
+
+	RecordAudio recorder;
+	AudioPlayer player;
+
+	// Dialog de gravação
+
+	Button start, stop, exitDialog;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +100,11 @@ public class ResponseController extends Activity implements OnClickListener {
 		submit = (Button) findViewById(R.id.criar_topico_submit);
 		submit.setOnClickListener(this);
 		message = (EditText) findViewById(R.id.criar_topico_conteudo);
+		record = (ImageButton) findViewById(R.id.btn_gravar);
+		record.setOnClickListener(this);
+		timeUp = (TextView) findViewById(R.id.recording_lenght);
+		stopWatch = (Chronometer) findViewById(R.id.recording_chronometer);
+		stopWatch.setOnChronometerTickListener(this);
 
 		connection = new Connection(this);
 
@@ -73,13 +113,19 @@ public class ResponseController extends Activity implements OnClickListener {
 			forumName = extras.getString("ForumName");
 
 		}
-		// submit.setOnClickListener(this);
 
 	}
 
 	@Override
-	protected void onStop() {
+	protected void onResume() {
 		// TODO Auto-generated method stub
+		super.onResume();
+		recorder = new RecordAudio();
+	}
+
+	@Override
+	protected void onStop() {
+
 		super.onStop();
 		if (adapter != null) {
 			adapter.close();
@@ -89,6 +135,8 @@ public class ResponseController extends Activity implements OnClickListener {
 				dialog.dismiss();
 			}
 		}
+		if (recorder != null)
+			recorder.releaseRecording();
 
 	}
 
@@ -101,24 +149,83 @@ public class ResponseController extends Activity implements OnClickListener {
 	@Override
 	public void onClick(View v) {
 
-		// if (message.getText().toString().length() < 9) {
-		// handleError(Constants.BELOW_CHARACTER_LIMIT);
-		// } else {
-		responseJSON = new JSONObject();
-		LinkedHashMap jsonMap = new LinkedHashMap<String, String>();
-		jsonMap.put("content", message.getText().toString());
-		if (extras.getLong("parentId") > 0) {
-			jsonMap.put("parent_id", String.valueOf(extras.getLong("parentId")));
+		if (v.getId() == R.id.criar_topico_submit) {
 
-		} else {
-			jsonMap.put("parent_id", noParent);
+			responseJSON = new JSONObject();
+			LinkedHashMap jsonMap = new LinkedHashMap<String, String>();
+			jsonMap.put("content", message.getText().toString());
+			if (extras.getLong("parentId") > 0) {
+				jsonMap.put("parent_id",
+						String.valueOf(extras.getLong("parentId")));
+
+			} else {
+				jsonMap.put("parent_id", noParent);
+			}
+			responseJSON.put("discussion_post", jsonMap);
+			JSONObjectString = responseJSON.toJSONString();
+			Log.w("JSONString", JSONObjectString);
+
+			sendPost();
+
 		}
-		responseJSON.put("discussion_post", jsonMap);
-		JSONObjectString = responseJSON.toJSONString();
-		Log.w("JSONString", JSONObjectString);
 
-		sendPost();
-		// }
+		if (v.getId() == R.id.btn_gravar) {
+
+			if (recorder.getRecordingState()) {
+				Toast.makeText(this, "gravação concluída", Toast.LENGTH_SHORT)
+						.show();
+				recorder.stopRecording();
+				stopWatch.stop();
+				timeUp.setText("00:00");
+				timeUp.setVisibility(View.GONE);
+				record.setImageResource(R.drawable.gravar_off);
+			} else {
+				try {
+					Toast.makeText(this, "Gravando", Toast.LENGTH_SHORT).show();
+					recorder.startRecording(Constants.RECORDING_FILENAME);
+					timeUp.setVisibility(View.VISIBLE);
+					startTime = System.currentTimeMillis();
+					stopWatch.start();
+					record.setImageResource(R.drawable.gravar_on);
+				} catch (IllegalStateException e) {
+					Log.w("EXCEPTION", "ILLEGAL STATE EXCEPTION");
+					record.setImageResource(R.drawable.gravar_off);
+					stopWatch.stop();
+					timeUp.setText("00:00");
+					e.printStackTrace();
+				} catch (IOException e) {
+					record.setImageResource(R.drawable.gravar_off);
+					// ErrorHandler.handleError(// audio error);
+					stopWatch.stop();
+					timeUp.setText("00:00");
+					e.printStackTrace();
+				}
+			}
+		}
+
+		/*
+		 * if (v.getId() == R.id.start_recording) {
+		 * 
+		 * recorder = new MediaRecorder();
+		 * 
+		 * try { recorder.startOrStopRecording("teste"); } catch (Exception e) {
+		 * // tratar erro }
+		 * 
+		 * startTime = System.currentTimeMillis(); stopWatch.start();
+		 * 
+		 * } if (v.getId() == R.id.stop_recording) {
+		 * 
+		 * recorder.stopRecording(); stopWatch.stop();
+		 * contador.setText("00:00");
+		 * 
+		 * /* // muda a view que possue voz
+		 * teste1[tagHolder].remove("hasVoice");
+		 * teste1[tagHolder].put("hasVoice", true); // salva o nome do arquivo
+		 * de áudio na lista teste1[tagHolder].put("voiceFileName",
+		 * record.getAudioFilePath()); setListAdapter(listAdapter);
+		 * 
+		 * }
+		 */
 	}
 
 	public void sendPost() {
@@ -128,8 +235,8 @@ public class ResponseController extends Activity implements OnClickListener {
 		token = adapter.getToken();
 		adapter.close();
 
-		URL = "discussions/" + topicId + "/posts?auth_token=" + token; // CERTA
-		// URL = "discussions/" + topicId + "/posts?auth_token="; // token;
+		URL = "discussions/" + topicId + "/posts?auth_token=" + token;
+
 		Log.w("URL", URL);
 
 		thread = new SendNewPostThread();
@@ -257,5 +364,54 @@ public class ResponseController extends Activity implements OnClickListener {
 				}
 			}
 		}
+	}
+
+	@Override
+	public void onChronometerTick(Chronometer chronometer) {
+
+		long endTime = System.currentTimeMillis();
+		String asText = "";
+		String Text1 = "";
+		String Text2 = "";
+		countUp = (endTime - startTime) / 1000;
+
+		if (countUp / 60 <= 9) {
+			Text1 = "0" + (countUp / 60);
+		} else {
+			Text1 += (countUp / 60);
+		}
+
+		if (countUp % 60 <= 9) {
+			Text2 = "0" + (countUp % 60);
+		} else {
+			Text2 += (countUp % 60);
+		}
+
+		asText = Text1 + ":" + Text2;
+
+		timeUp.setText(asText);
+
+	}
+
+	private class AudioPlayer extends PlayAudio {
+
+		public AudioPlayer(String fileName) throws IllegalStateException,
+				IOException {
+			super(fileName);
+			// TODO Auto-generated constructor stub
+		}
+
+		@Override
+		public void onCompletion(MediaPlayer mp) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void updatePlayingDialog() {
+			// TODO Auto-generated method stub
+
+		}
+
 	}
 }

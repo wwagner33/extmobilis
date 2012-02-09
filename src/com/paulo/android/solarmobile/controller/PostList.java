@@ -69,8 +69,8 @@ public class PostList extends ListActivity implements OnClickListener,
 	File audioFile;
 
 	// recorder
-	MediaRecorder record;
-	AudioPlayer player;
+	//private MediaRecorder record;
+	private AudioPlayer player;
 
 	private static final int PARSE_POSTS = 225;
 	DBAdapter adapter;
@@ -170,6 +170,7 @@ public class PostList extends ListActivity implements OnClickListener,
 	@Override
 	public void onClick(View v) {
 
+		/*
 		if (v.getId() == R.id.img_close) {
 			myDialog.dismiss();
 		}
@@ -178,7 +179,7 @@ public class PostList extends ListActivity implements OnClickListener,
 			record = new MediaRecorder();
 
 			try {
-				record.startRecording("teste");
+				record.startOrStopRecording("teste");
 			} catch (Exception e) {
 				// tratar erro
 			}
@@ -200,39 +201,10 @@ public class PostList extends ListActivity implements OnClickListener,
 			setListAdapter(listAdapter);
 
 		}
-
+				*/
 	}
 
-	@Override
-	protected Dialog onCreateDialog(int id) {
-		AlertDialog alertDialog;
-
-		AlertDialog.Builder builder;
-
-		Context mContext = getApplicationContext();
-		LayoutInflater inflater = (LayoutInflater) mContext
-				.getSystemService(LAYOUT_INFLATER_SERVICE);
-		View layout = inflater.inflate(R.layout.gravar,
-				(ViewGroup) findViewById(R.layout.post));
-
-		start = (Button) layout.findViewById(R.id.start_recording);
-		start.setOnClickListener(this);
-		stop = (Button) layout.findViewById(R.id.stop_recording);
-		stop.setOnClickListener(this);
-		pause = (Button) layout.findViewById(R.id.pause_recording);
-		pause.setOnClickListener(this);
-		exitDialog = (Button) layout.findViewById(R.id.img_close);
-		exitDialog.setOnClickListener(this);
-		stopWatch = (Chronometer) layout.findViewById(R.id.chrono);
-		stopWatch.setOnChronometerTickListener(this);
-		contador = (TextView) layout.findViewById(R.id.contador);
-
-		builder = new AlertDialog.Builder(new ContextThemeWrapper(this,
-				R.style.CustomDialog));
-		builder.setView(layout);
-		alertDialog = builder.create();
-		return alertDialog;
-	}
+	
 
 	@Override
 	public void onChronometerTick(Chronometer chronometer) {
@@ -260,24 +232,10 @@ public class PostList extends ListActivity implements OnClickListener,
 
 	}
 
-	public class MediaRecorder extends RecordAudio {
+	
+	
 
-		@Override
-		public void updateRecordingDialog(int protocol) {
-			if (protocol == 1) {
-				// disable gravar
-				// enable stop
-
-			}
-
-			if (protocol == 2) {
-				// disable stop
-				// enable record
-			}
-		}
-	}
-
-	public class AudioPlayer extends PlayAudio {
+	private class AudioPlayer extends PlayAudio {
 
 		public AudioPlayer(String fileName) throws IllegalStateException,
 				IOException {

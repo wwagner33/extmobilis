@@ -65,6 +65,7 @@
         android:layout_width="fill_parent"
         android:layout_height="200dp"
         android:layout_below="@id/top_bar"
+        android:background="#00000000"
         android:gravity="top|left"
         android:hint="Corpo da Mensagem :" />
 
@@ -73,25 +74,44 @@
         android:layout_height="40dp"
         android:layout_below="@id/criar_topico_conteudo"
         android:background="#C0C0C0" >
-        <Button
-            
+
+        <ImageButton
             android:id="@+id/btn_gravar"
-            android:layout_width="wrap_content"
+            android:layout_width="50dp"
             android:layout_height="wrap_content"
-            android:text="R"
+            android:layout_alignParentLeft="true"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
-            />
+            android:layout_marginLeft="10dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/gravar_off" />
+
         <TextView
-            android:layout_marginTop="11dp"
+            android:visibility="gone"
+            android:id="@+id/recording_lenght"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_centerHorizontal="true"
+            android:layout_marginTop="11dp"
+            android:layout_toRightOf="@id/btn_gravar"
+            android:text="00:00" />
+
+        <TextView
             android:id="@+id/char_number"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="000"
-            />
+            android:layout_alignParentRight="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="11dp"
+            android:text="000" />
         
+        <Chronometer
+            android:id="@+id/recording_chronometer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            />
         
     </RelativeLayout>
 

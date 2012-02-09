@@ -18,6 +18,7 @@ public class Constants {
 	public static final int ERROR_UNKNOWN=105;
 	public static final int ERROR_PAGE_NOT_FOUND = 106;
 	public static final int ERROR_CONNECTION_REFUSED=107;
+	public static final int ERROR_AUDIO_RECORDING_FAILED=108;
 	//public static final int BELOW_CHARACTER_LIMIT=2;
 	
 	
@@ -29,5 +30,11 @@ public class Constants {
 	public static final int PARSE_TOKEN_ID = 221;
 	public static final int PARSE_COURSES_ID = 222;
 	public static final int PARSE_CLASSES = 223;
+	
+	//Recording Path
+	public static final String RECORDING_PATH = "/Mobilis/Recordings/";
+	public static final String RECORDING_FILENAME = "recording";
+	
+	
 
 }
