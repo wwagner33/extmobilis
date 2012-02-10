@@ -101,7 +101,6 @@ public class Connection {
 		DefaultHttpClient client = new DefaultHttpClient();
 		// HttpPost post = new HttpPost("http://10.0.2.2:3000/sessions");
 
-		
 		post = new HttpPost(Constants.URL_SERVER + URL);
 
 		// String teste = json.toJSONString();
@@ -147,7 +146,7 @@ public class Connection {
 			resultSet[1] = Constants.ERROR_TOKEN_EXPIRED;
 			return resultSet;
 		}
-		
+
 		if (statusCode == 404) {
 			resultSet[1] = Constants.ERROR_PAGE_NOT_FOUND;
 			return resultSet;
@@ -157,49 +156,13 @@ public class Connection {
 		return resultSet;
 	}
 
-	/*
-	 * public class KeyFinder implements ContentHandler { private Object value;
-	 * private boolean found = false; private boolean end = false; private
-	 * String key; private String matchKey;
-	 * 
-	 * public void setMatchKey(String matchKey) { this.matchKey = matchKey; }
-	 * 
-	 * public Object getValue() { return value; }
-	 * 
-	 * public boolean isEnd() { return end; }
-	 * 
-	 * public void setFound(boolean found) { this.found = found; }
-	 * 
-	 * public boolean isFound() { return found; }
-	 * 
-	 * public void startJSON() throws ParseException, IOException { found =
-	 * false; end = false; }
-	 * 
-	 * public void endJSON() throws ParseException, IOException { end = true; }
-	 * 
-	 * public boolean primitive(Object value) throws ParseException, IOException
-	 * { if (key != null) { if (key.equals(matchKey)) { found = true; this.value
-	 * = value; key = null; return false; } } return true; }
-	 * 
-	 * public boolean startArray() throws ParseException, IOException { return
-	 * true; }
-	 * 
-	 * public boolean startObject() throws ParseException, IOException { return
-	 * true; }
-	 * 
-	 * public boolean startObjectEntry(String key) throws ParseException,
-	 * IOException { this.key = key; return true; }
-	 * 
-	 * public boolean endArray() throws ParseException, IOException { return
-	 * false; }
-	 * 
-	 * public boolean endObject() throws ParseException, IOException { return
-	 * true; }
-	 * 
-	 * public boolean endObjectEntry() throws ParseException, IOException {
-	 * return true; } }
-	 */
-
+	public Object[] postAudioToServer(String jsonString, String URL) {
+		
+		
+		return null;
+	}
+	
+	
 	public void StopPost() {
 		post.abort();
 	}
@@ -207,5 +170,6 @@ public class Connection {
 	public void StopGet() {
 		get.abort();
 	}
+	
 
 }

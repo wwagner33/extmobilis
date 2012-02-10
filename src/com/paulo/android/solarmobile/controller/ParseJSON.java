@@ -3,6 +3,7 @@ package com.paulo.android.solarmobile.controller;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.json.simple.parser.JSONParser;
 
 import android.content.ContentValues;
 import android.util.Log;
@@ -14,6 +15,7 @@ public class ParseJSON {
 	private static final int PARSE_CLASSES_ID = 223;
 	private static final int PARSE_TOPICS_ID = 224;
 	private static final int PARSE_POSTS_ID = 225;
+	public static final int PARSE_TEXT_RESPONSE = 226;
 
 	Object object;
 	ContentValues[] parsedValues;
@@ -21,7 +23,7 @@ public class ParseJSON {
 	JSONObject jsonObjects[];
 
 	public void parseData(ContentValues[] container, String data, int position) {
-		
+
 		String year = data.substring(0, 4);
 		String month = data.substring(4, 6);
 		String day = data.substring(6, 8);
@@ -36,7 +38,7 @@ public class ParseJSON {
 		container[position].put("postHour", hour);
 		container[position].put("postMinute", minute);
 		container[position].put("postSecond", second);
-		
+
 		Log.w("ANO", year);
 		Log.w("Mês", month);
 		Log.w("dia", day);
@@ -232,6 +234,22 @@ public class ParseJSON {
 
 			return parsedValues;
 
+		}
+
+		if (parseId == PARSE_TEXT_RESPONSE) {
+			Object object = JSONValue.parse(source);
+			JSONObject jsonObject = (JSONObject) object;
+			Log.w("OBJECT SIZE", String.valueOf(jsonObject.size()));
+			parsedValues = new ContentValues[1];
+			parsedValues[0] = new ContentValues();
+			parsedValues[0].put("result", (Long) jsonObject.get("result"));
+			//Log.w("RESULT",
+				//	String.valueOf(parsedValues[0].getAsInteger("result")));
+
+			parsedValues[0].put("post_id", (Long) jsonObject.get("post_id"));
+		//	Log.w("POSTID",
+					//String.valueOf(parsedValues[0].getAsInteger("post_id")));
+			return parsedValues;
 		}
 
 		return null;

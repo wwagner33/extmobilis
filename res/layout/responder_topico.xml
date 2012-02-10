@@ -42,7 +42,7 @@
         android:background="#C0C0C0" >
 
         <Button
-            android:id="@+id/teste1"
+            android:id="@+id/resposta_btn_cancel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
@@ -60,11 +60,40 @@
             android:text="Enviar" />
     </RelativeLayout>
 
+    <RelativeLayout
+        android:id="@+id/audio_preview_bar"
+        android:layout_width="fill_parent"
+        android:layout_height="60dp"
+        android:layout_below="@id/top_bar"
+        android:visibility="gone" >
+
+        <Button
+            android:id="@+id/preview_recording"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:text="Ouvir" />
+        
+        <!--  
+        <Seekbar
+            
+            />
+		-->
+		
+        <Button
+            android:id="@+id/delete_recording"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="X" />
+    </RelativeLayout>
+
     <EditText
+        android:layout_below="@id/audio_preview_bar"
         android:id="@+id/criar_topico_conteudo"
         android:layout_width="fill_parent"
         android:layout_height="200dp"
-        android:layout_below="@id/top_bar"
+      
         android:background="#00000000"
         android:gravity="top|left"
         android:hint="Corpo da Mensagem :" />
@@ -87,7 +116,6 @@
             android:src="@drawable/gravar_off" />
 
         <TextView
-            android:visibility="gone"
             android:id="@+id/recording_lenght"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -95,7 +123,8 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="11dp"
             android:layout_toRightOf="@id/btn_gravar"
-            android:text="00:00" />
+            android:text="00:00"
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/char_number"
@@ -105,14 +134,12 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="11dp"
             android:text="000" />
-        
+
         <Chronometer
             android:id="@+id/recording_chronometer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:visibility="gone"
-            />
-        
+            android:visibility="gone" />
     </RelativeLayout>
 
 </RelativeLayout>

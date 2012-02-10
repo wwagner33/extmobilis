@@ -69,9 +69,8 @@ public class PostList extends ListActivity implements OnClickListener,
 	File audioFile;
 
 	// recorder
-	//private MediaRecorder record;
-	private AudioPlayer player;
-
+	// private MediaRecorder record;
+	
 	private static final int PARSE_POSTS = 225;
 	DBAdapter adapter;
 	Connection connection;
@@ -171,40 +170,27 @@ public class PostList extends ListActivity implements OnClickListener,
 	public void onClick(View v) {
 
 		/*
-		if (v.getId() == R.id.img_close) {
-			myDialog.dismiss();
-		}
-		if (v.getId() == R.id.start_recording) {
-
-			record = new MediaRecorder();
-
-			try {
-				record.startOrStopRecording("teste");
-			} catch (Exception e) {
-				// tratar erro
-			}
-			startTime = System.currentTimeMillis();
-			stopWatch.start();
-
-		}
-		if (v.getId() == R.id.stop_recording) {
-
-			record.stopRecording();
-			stopWatch.stop();
-			contador.setText("00:00");
-
-			// muda a view que possue voz
-			teste1[tagHolder].remove("hasVoice");
-			teste1[tagHolder].put("hasVoice", true);
-			// salva o nome do arquivo de áudio na lista
-			teste1[tagHolder].put("voiceFileName", record.getAudioFilePath());
-			setListAdapter(listAdapter);
-
-		}
-				*/
+		 * if (v.getId() == R.id.img_close) { myDialog.dismiss(); } if
+		 * (v.getId() == R.id.start_recording) {
+		 * 
+		 * record = new MediaRecorder();
+		 * 
+		 * try { record.startOrStopRecording("teste"); } catch (Exception e) {
+		 * // tratar erro } startTime = System.currentTimeMillis();
+		 * stopWatch.start();
+		 * 
+		 * } if (v.getId() == R.id.stop_recording) {
+		 * 
+		 * record.stopRecording(); stopWatch.stop(); contador.setText("00:00");
+		 * 
+		 * // muda a view que possue voz teste1[tagHolder].remove("hasVoice");
+		 * teste1[tagHolder].put("hasVoice", true); // salva o nome do arquivo
+		 * de áudio na lista teste1[tagHolder].put("voiceFileName",
+		 * record.getAudioFilePath()); setListAdapter(listAdapter);
+		 * 
+		 * }
+		 */
 	}
-
-	
 
 	@Override
 	public void onChronometerTick(Chronometer chronometer) {
@@ -230,26 +216,6 @@ public class PostList extends ListActivity implements OnClickListener,
 
 		contador.setText(asText);
 
-	}
-
-	
-	
-
-	private class AudioPlayer extends PlayAudio {
-
-		public AudioPlayer(String fileName) throws IllegalStateException,
-				IOException {
-			super(fileName);
-		}
-
-		@Override
-		public void onCompletion(android.media.MediaPlayer mp) {
-		}
-
-		@Override
-		public void updatePlayingDialog() {
-
-		}
 	}
 
 	public boolean postedToday(int postDay, int postMonth, int postYear) {
@@ -334,8 +300,7 @@ public class PostList extends ListActivity implements OnClickListener,
 		public View getView(int position, View convertView, ViewGroup parent) {
 
 			convertView = inflater.inflate(R.layout.postitem, parent, false);
-			
-			
+
 			TextView postDate = (TextView) convertView
 					.findViewById(R.id.post_date);
 
@@ -357,7 +322,6 @@ public class PostList extends ListActivity implements OnClickListener,
 				Log.w("POSTED TODAY", "FALSE");
 			}
 
-		
 			TextView postBody = (TextView) convertView
 					.findViewById(R.id.post_body);
 			postBody.setText(data[position].getAsString("content"));

@@ -30,10 +30,13 @@ public class Constants {
 	public static final int PARSE_TOKEN_ID = 221;
 	public static final int PARSE_COURSES_ID = 222;
 	public static final int PARSE_CLASSES = 223;
+	public static final int PARSE_TEXT_RESPONSE=225;
 	
 	//Recording Path
 	public static final String RECORDING_PATH = "/Mobilis/Recordings/";
-	public static final String RECORDING_FILENAME = "recording";
+	public static final String RECORDING_FILENAME = "recording";  // PREFIX
+	public static final String RECORDING_EXTENSION = ".3gp";
+	public static final String RECORDING_FULLNAME = "recording.3gp";
 	
 	
 

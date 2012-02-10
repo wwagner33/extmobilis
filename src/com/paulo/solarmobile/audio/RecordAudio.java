@@ -93,4 +93,9 @@ public class RecordAudio {
 			return null;
 		}
 	}
+
+	public File getAudioFile() {
+		return audioFile;	
+	}
+
 }

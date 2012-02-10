@@ -9,28 +9,24 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.content.Context;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnCompletionListener;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
-import android.view.ContextThemeWrapper;
-import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
-import android.view.View.OnKeyListener;
 import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.Chronometer.OnChronometerTickListener;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.RelativeLayout;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -40,7 +36,7 @@ import com.paulo.solarmobile.audio.PlayAudio;
 import com.paulo.solarmobile.audio.RecordAudio;
 
 public class ResponseController extends Activity implements OnClickListener,
-		OnChronometerTickListener {
+		OnChronometerTickListener, OnCompletionListener {
 
 	// Wedson: curl -v -H 'Content-Type: application/json' -H 'Accept:
 	// application/json' -X POST
@@ -53,7 +49,8 @@ public class ResponseController extends Activity implements OnClickListener,
 	// File recordingsFolder;
 
 	EditText message;
-	Button submit, cancelar;
+	Button submit, cancelar, deleteRecording, previewAudio;
+	SeekBar audioProgress;
 	TextView timeUp, charCount;
 	ImageButton record;
 	Connection connection;
@@ -65,12 +62,21 @@ public class ResponseController extends Activity implements OnClickListener,
 	SendNewPostThread thread;
 	DBAdapter adapter;
 	String token, JSONObjectString, URL, topicId;
+	ParseJSON jsonParser;
+	ContentValues[] resultFromServer;
+
+	RelativeLayout audioPreviewBar;
 
 	ObtainPostListThread postThread;
 	String forumName;
 
+	public boolean existsRecording = false;
+
 	File path = new File(Environment.getExternalStorageDirectory()
 			.getAbsolutePath() + Constants.RECORDING_PATH);
+
+	File recordedFilePath = new File(path.getAbsolutePath()
+			+ Constants.RECORDING_FULLNAME);
 
 	File currentRecordingPath;
 
@@ -84,7 +90,7 @@ public class ResponseController extends Activity implements OnClickListener,
 	File audioFile;
 
 	RecordAudio recorder;
-	AudioPlayer player;
+	PlayAudio player;
 
 	// Dialog de gravação
 
@@ -106,7 +112,20 @@ public class ResponseController extends Activity implements OnClickListener,
 		stopWatch = (Chronometer) findViewById(R.id.recording_chronometer);
 		stopWatch.setOnChronometerTickListener(this);
 
+		deleteRecording = (Button) findViewById(R.id.delete_recording);
+		deleteRecording.setOnClickListener(this);
+
+		cancelar = (Button) findViewById(R.id.resposta_btn_cancel);
+		cancelar.setOnClickListener(this);
+
+		audioPreviewBar = (RelativeLayout) findViewById(R.id.audio_preview_bar);
+
+		previewAudio = (Button) findViewById(R.id.preview_recording);
+		previewAudio.setOnClickListener(this);
+
 		connection = new Connection(this);
+
+		jsonParser = new ParseJSON();
 
 		if (extras != null) {
 			topicId = extras.getString("topicId");
@@ -140,6 +159,14 @@ public class ResponseController extends Activity implements OnClickListener,
 
 	}
 
+	public void deleteRecording() {
+		recorder.getAudioFile().delete();
+		Toast.makeText(this, "Gravação deletada com sucesso",
+				Toast.LENGTH_SHORT).show();
+		audioPreviewBar.setVisibility(View.GONE);
+		existsRecording = false;
+	}
+
 	public void closeDialogIfItsVisible() {
 		if (dialog != null && dialog.isShowing())
 			dialog.dismiss();
@@ -148,6 +175,40 @@ public class ResponseController extends Activity implements OnClickListener,
 
 	@Override
 	public void onClick(View v) {
+
+		if (v.getId() == R.id.preview_recording) {
+			player = new PlayAudio();
+			try {
+				player.playOwnAudio();
+			} catch (IllegalArgumentException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalStateException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+		if (v.getId() == R.id.resposta_btn_cancel) {
+
+			/*
+			 * Log.w("OnClick", "YES"); if (previewFragment.isShown())
+			 * previewFragment.setVisibility(View.GONE); else
+			 * previewFragment.setVisibility(View.VISIBLE);
+			 */
+
+			// if existsRecording = true;
+			// Dialog == mensagem será descartada, continuar ?
+			// else finish ()
+
+		}
+
+		if (v.getId() == R.id.delete_recording) {
+			deleteRecording();
+		}
 
 		if (v.getId() == R.id.criar_topico_submit) {
 
@@ -179,6 +240,9 @@ public class ResponseController extends Activity implements OnClickListener,
 				timeUp.setText("00:00");
 				timeUp.setVisibility(View.GONE);
 				record.setImageResource(R.drawable.gravar_off);
+				if (!existsRecording) {
+					audioPreviewBar.setVisibility(View.VISIBLE);
+				}
 			} else {
 				try {
 					Toast.makeText(this, "Gravando", Toast.LENGTH_SHORT).show();
@@ -283,7 +347,28 @@ public class ResponseController extends Activity implements OnClickListener,
 			else {
 				int statusCode = (Integer) result[1];
 				if (statusCode == 201 || statusCode == 200) {
-					getPosts();
+
+					String resultString = (String) result[0];
+					Log.w("RESPONSE RESPONSE", resultString);
+
+					resultFromServer = jsonParser.parseJSON(resultString,
+							ParseJSON.PARSE_TEXT_RESPONSE);
+
+					Log.w("RESULT",
+							String.valueOf(resultFromServer[0].get("result")));
+					Log.w("POST_ID",
+							String.valueOf(resultFromServer[0].get("post_id")));
+
+					if (existsRecording) {
+
+						// sendRecording()
+
+					}
+
+					else {
+						getPosts();
+					}
+
 				} else {
 					closeDialogIfItsVisible();
 					ErrorHandler.handleError(getApplicationContext(),
@@ -292,6 +377,16 @@ public class ResponseController extends Activity implements OnClickListener,
 				}
 
 			}
+		}
+
+	}
+
+	public class SendAudioFile extends AsyncTask<Void, Void, Void> {
+
+		@Override
+		protected Void doInBackground(Void... params) {
+			// TODO Auto-generated method stub
+			return null;
 		}
 
 	}
@@ -393,25 +488,10 @@ public class ResponseController extends Activity implements OnClickListener,
 
 	}
 
-	private class AudioPlayer extends PlayAudio {
-
-		public AudioPlayer(String fileName) throws IllegalStateException,
-				IOException {
-			super(fileName);
-			// TODO Auto-generated constructor stub
-		}
-
-		@Override
-		public void onCompletion(MediaPlayer mp) {
-			// TODO Auto-generated method stub
-
-		}
-
-		@Override
-		public void updatePlayingDialog() {
-			// TODO Auto-generated method stub
-
-		}
+	@Override
+	public void onCompletion(MediaPlayer mp) {
+		// TODO Auto-generated method stub
 
 	}
+
 }
