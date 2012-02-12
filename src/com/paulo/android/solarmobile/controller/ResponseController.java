@@ -61,7 +61,7 @@ public class ResponseController extends Activity implements OnClickListener,
 	String noParent = "";
 	SendNewPostThread thread;
 	DBAdapter adapter;
-	String token, JSONObjectString, URL, topicId;
+	String token, JSONObjectString, URL, topicId,postId;
 	ParseJSON jsonParser;
 	ContentValues[] resultFromServer;
 
@@ -87,7 +87,7 @@ public class ResponseController extends Activity implements OnClickListener,
 	long startTime;
 	long time2 = 0;
 	Chronometer stopWatch;
-	File audioFile;
+	//File audioFile;
 
 	RecordAudio recorder;
 	PlayAudio player;
@@ -381,12 +381,26 @@ public class ResponseController extends Activity implements OnClickListener,
 
 	}
 
-	public class SendAudioFile extends AsyncTask<Void, Void, Void> {
+	public class SendAudioFile extends AsyncTask<String, Void, Object[]> {
 
 		@Override
-		protected Void doInBackground(Void... params) {
-			// TODO Auto-generated method stub
-			return null;
+		protected Object[] doInBackground(String... params) {
+			try {
+				return connection.postAudioToServer(URL, recorder.getAudioFile());
+			} catch (IllegalStateException e) {
+				e.printStackTrace();
+				return null;
+			} catch (IOException e) {
+				e.printStackTrace();
+				return null;
+			}
+
+		}
+
+		@Override
+		protected void onPostExecute(Object[] result) {
+
+			super.onPostExecute(result);
 		}
 
 	}
@@ -428,6 +442,8 @@ public class ResponseController extends Activity implements OnClickListener,
 		@Override
 		protected void onPostExecute(Object[] result) {
 
+			Log.w("PostExecute", "POST");
+			
 			super.onPostExecute(result);
 			adapter.close();
 
@@ -438,7 +454,7 @@ public class ResponseController extends Activity implements OnClickListener,
 			}
 
 			else {
-
+				Log.w("Teste", "TESTE3");
 				int statusCode = (Integer) result[1];
 
 				if (statusCode == 200) {

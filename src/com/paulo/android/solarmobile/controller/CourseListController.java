@@ -155,6 +155,7 @@ public class CourseListController extends ListActivity {
 
 		adapter.open();
 		authToken = adapter.getToken();
+		adapter.close();
 		Log.w("TOKEN", authToken);
 
 		// if (adapter.groupsExist()) {
@@ -272,6 +273,7 @@ public class CourseListController extends ListActivity {
 
 					intent = new Intent(getApplicationContext(),
 							ClassListController.class);
+					adapter.open();
 					adapter.updateGroups((String) result[0]);
 					intent.putExtra("GroupList", (String) result[0]);
 					adapter.close();

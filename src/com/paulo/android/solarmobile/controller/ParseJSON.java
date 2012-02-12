@@ -1,5 +1,7 @@
 package com.paulo.android.solarmobile.controller;
 
+import java.util.LinkedHashMap;
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -243,16 +245,30 @@ public class ParseJSON {
 			parsedValues = new ContentValues[1];
 			parsedValues[0] = new ContentValues();
 			parsedValues[0].put("result", (Long) jsonObject.get("result"));
-			//Log.w("RESULT",
-				//	String.valueOf(parsedValues[0].getAsInteger("result")));
+			// Log.w("RESULT",
+			// String.valueOf(parsedValues[0].getAsInteger("result")));
 
 			parsedValues[0].put("post_id", (Long) jsonObject.get("post_id"));
-		//	Log.w("POSTID",
-					//String.valueOf(parsedValues[0].getAsInteger("post_id")));
+			// Log.w("POSTID",
+			// String.valueOf(parsedValues[0].getAsInteger("post_id")));
 			return parsedValues;
 		}
 
 		return null;
+	}
+
+	public boolean isResponseSuccesful() {
+
+		return true;
+	}
+	
+	public JSONObject buildTokenObject(String username,String password) {
+		JSONObject jsonObject  = new JSONObject();
+		LinkedHashMap jsonMap = new LinkedHashMap<String, String>();
+		jsonMap.put("username", username);
+		jsonMap.put("password", password);
+		jsonObject.put("user", jsonMap);
+		return jsonObject;
 	}
 
 }
