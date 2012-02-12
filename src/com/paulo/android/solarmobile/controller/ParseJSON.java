@@ -245,12 +245,12 @@ public class ParseJSON {
 			parsedValues = new ContentValues[1];
 			parsedValues[0] = new ContentValues();
 			parsedValues[0].put("result", (Long) jsonObject.get("result"));
-			// Log.w("RESULT",
-			// String.valueOf(parsedValues[0].getAsInteger("result")));
+			 Log.w("RESULTONPARSER",
+			 String.valueOf(parsedValues[0].getAsInteger("result")));
 
 			parsedValues[0].put("post_id", (Long) jsonObject.get("post_id"));
-			// Log.w("POSTID",
-			// String.valueOf(parsedValues[0].getAsInteger("post_id")));
+			 Log.w("POSTIDONPARSER",
+			 String.valueOf(parsedValues[0].getAsInteger("post_id")));
 			return parsedValues;
 		}
 
@@ -261,14 +261,25 @@ public class ParseJSON {
 
 		return true;
 	}
-	
-	public JSONObject buildTokenObject(String username,String password) {
-		JSONObject jsonObject  = new JSONObject();
+
+	public JSONObject buildTokenObject(String username, String password) {
+		JSONObject jsonObject = new JSONObject();
 		LinkedHashMap jsonMap = new LinkedHashMap<String, String>();
 		jsonMap.put("username", username);
 		jsonMap.put("password", password);
 		jsonObject.put("user", jsonMap);
 		return jsonObject;
+	}
+
+	public JSONObject buildTextResponseWithParentObject(String content,
+			long parentId) {
+		JSONObject responseJSON = new JSONObject();
+		LinkedHashMap jsonMap = new LinkedHashMap<String, String>();
+		jsonMap.put("content", content);
+		jsonMap.put("parent_id", parentId);
+		responseJSON.put("discussion_post", jsonMap);
+		return responseJSON;
+
 	}
 
 }

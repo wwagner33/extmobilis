@@ -11,18 +11,16 @@ import android.widget.TextView;
 
 public class PostDetailController extends Activity implements OnClickListener {
 
-	TextView body, userName, forumName;
-	Bundle extras;
-	Button response;
+	public TextView body, userName, forumName;
+	public Bundle extras;
+	public Button response;
 	public String topicId;
 	long parentId;
-	
-	String forumNameString;
+	public String forumNameString;
 	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.post_detail);
 		body = (TextView) findViewById(R.id.post_body_detail);

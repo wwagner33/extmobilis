@@ -11,6 +11,7 @@ import org.json.simple.parser.ParseException;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
@@ -30,6 +31,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.paulo.android.solamobile.threads.SubmitTextResponseThread;
 import com.paulo.android.solarmobile.model.DBAdapter;
 import com.paulo.android.solarmobile.ws.Connection;
 import com.paulo.solarmobile.audio.PlayAudio;
@@ -59,11 +61,13 @@ public class ResponseController extends Activity implements OnClickListener,
 	Bundle extras;
 	long parentId;
 	String noParent = "";
-	SendNewPostThread thread;
+	SubmitTextResponse submitTextResponse;
 	DBAdapter adapter;
-	String token, JSONObjectString, URL, topicId,postId;
+	String token, JSONObjectString, URL, topicId, postId;
 	ParseJSON jsonParser;
-	ContentValues[] resultFromServer;
+	
+
+	JSONObject postObject;
 
 	RelativeLayout audioPreviewBar;
 
@@ -87,7 +91,7 @@ public class ResponseController extends Activity implements OnClickListener,
 	long startTime;
 	long time2 = 0;
 	Chronometer stopWatch;
-	//File audioFile;
+	// File audioFile;
 
 	RecordAudio recorder;
 	PlayAudio player;
@@ -212,21 +216,20 @@ public class ResponseController extends Activity implements OnClickListener,
 
 		if (v.getId() == R.id.criar_topico_submit) {
 
-			responseJSON = new JSONObject();
-			LinkedHashMap jsonMap = new LinkedHashMap<String, String>();
-			jsonMap.put("content", message.getText().toString());
 			if (extras.getLong("parentId") > 0) {
-				jsonMap.put("parent_id",
-						String.valueOf(extras.getLong("parentId")));
+
+				postObject = jsonParser.buildTextResponseWithParentObject(
+						message.getText().toString(),
+						extras.getLong("parentId"));
 
 			} else {
-				jsonMap.put("parent_id", noParent);
+				// jsonMap.put("parent_id", noParent);
 			}
-			responseJSON.put("discussion_post", jsonMap);
-			JSONObjectString = responseJSON.toJSONString();
-			Log.w("JSONString", JSONObjectString);
+			// responseJSON.put("discussion_post", jsonMap);
+			// JSONObjectString = responseJSON.toJSONString();
+			// Log.w("JSONString", JSONObjectString);
 
-			sendPost();
+			sendPost(postObject.toJSONString());
 
 		}
 
@@ -292,7 +295,7 @@ public class ResponseController extends Activity implements OnClickListener,
 		 */
 	}
 
-	public void sendPost() {
+	public void sendPost(String jsonString) {
 		dialog.show();
 		adapter = new DBAdapter(this);
 		adapter.open();
@@ -301,10 +304,12 @@ public class ResponseController extends Activity implements OnClickListener,
 
 		URL = "discussions/" + topicId + "/posts?auth_token=" + token;
 
-		Log.w("URL", URL);
+		submitTextResponse = new SubmitTextResponse(this);
+		submitTextResponse.setConnectionParameters(URL, jsonString);
+		submitTextResponse.execute();
 
-		thread = new SendNewPostThread();
-		thread.execute();
+		// thread = new SendNewPostThread();
+		// thread.execute();
 	}
 
 	public void getPosts() {
@@ -312,81 +317,95 @@ public class ResponseController extends Activity implements OnClickListener,
 		postThread.execute(token);
 	}
 
-	public class SendNewPostThread extends AsyncTask<Void, Void, Object[]> {
+	public class SubmitTextResponse extends SubmitTextResponseThread {
 
-		@Override
-		protected Object[] doInBackground(Void... params) {
+		public SubmitTextResponse(Context context) {
+			super(context);
 
-			try {
-
-				return connection.postToServer(JSONObjectString, URL);
-
-			} catch (ClientProtocolException e) {
-				e.printStackTrace();
-				return null;
-			} catch (IOException e) {
-				e.printStackTrace();
-				return null;
-			} catch (ParseException e) {
-				e.printStackTrace();
-				return null;
-			}
 		}
 
 		@Override
-		protected void onPostExecute(Object[] result) {
-			// TODO Auto-generated method stub
-			super.onPostExecute(result);
-
-			if (result == null) {
-				closeDialogIfItsVisible();
-				ErrorHandler.handleError(getApplicationContext(),
-						Constants.ERROR_CONNECTION_REFUSED);
-			}
-
-			else {
-				int statusCode = (Integer) result[1];
-				if (statusCode == 201 || statusCode == 200) {
-
-					String resultString = (String) result[0];
-					Log.w("RESPONSE RESPONSE", resultString);
-
-					resultFromServer = jsonParser.parseJSON(resultString,
-							ParseJSON.PARSE_TEXT_RESPONSE);
-
-					Log.w("RESULT",
-							String.valueOf(resultFromServer[0].get("result")));
-					Log.w("POST_ID",
-							String.valueOf(resultFromServer[0].get("post_id")));
-
-					if (existsRecording) {
-
-						// sendRecording()
-
-					}
-
-					else {
-						getPosts();
-					}
-
-				} else {
-					closeDialogIfItsVisible();
-					ErrorHandler.handleError(getApplicationContext(),
-							statusCode);
-
-				}
-
-			}
+		public void onTextResponseConnectionFailed() {
+			closeDialogIfItsVisible();
 		}
 
+		@Override
+		public void onTextResponseConnectionSucceded(String result) {
+			
+			Log.w("RESULT", result);
+			
+			ContentValues[] resultFromServer;
+			jsonParser = new ParseJSON();
+			resultFromServer = jsonParser.parseJSON(result, ParseJSON.PARSE_TEXT_RESPONSE);
+			Log.w("RESULTNEW", String.valueOf(resultFromServer[0].get("result")));
+			Log.w("POST_IDNEW", String.valueOf(resultFromServer[0].get("post_id")));
+
+			if (existsRecording) {
+				//
+			} else {
+				Log.w("getPosts","TRUE");
+				getPosts();
+			}
+		}
 	}
+
+	/*
+	 * public class SendNewPostThread extends AsyncTask<Void, Void, Object[]> {
+	 * 
+	 * @Override protected Object[] doInBackground(Void... params) {
+	 * 
+	 * try {
+	 * 
+	 * return connection.postToServer(JSONObjectString, URL);
+	 * 
+	 * } catch (ClientProtocolException e) { e.printStackTrace(); return null; }
+	 * catch (IOException e) { e.printStackTrace(); return null; } catch
+	 * (ParseException e) { e.printStackTrace(); return null; } }
+	 * 
+	 * @Override protected void onPostExecute(Object[] result) { // TODO
+	 * Auto-generated method stub super.onPostExecute(result);
+	 * 
+	 * if (result == null) { closeDialogIfItsVisible();
+	 * ErrorHandler.handleError(getApplicationContext(),
+	 * Constants.ERROR_CONNECTION_REFUSED); }
+	 * 
+	 * else { int statusCode = (Integer) result[1]; if (statusCode == 201 ||
+	 * statusCode == 200) {
+	 * 
+	 * String resultString = (String) result[0]; Log.w("RESPONSE RESPONSE",
+	 * resultString);
+	 * 
+	 * resultFromServer = jsonParser.parseJSON(resultString,
+	 * ParseJSON.PARSE_TEXT_RESPONSE);
+	 * 
+	 * Log.w("RESULT", String.valueOf(resultFromServer[0].get("result")));
+	 * Log.w("POST_ID", String.valueOf(resultFromServer[0].get("post_id")));
+	 * 
+	 * if (existsRecording) {
+	 * 
+	 * // sendRecording()
+	 * 
+	 * }
+	 * 
+	 * else { getPosts(); }
+	 * 
+	 * } else { closeDialogIfItsVisible();
+	 * ErrorHandler.handleError(getApplicationContext(), statusCode);
+	 * 
+	 * }
+	 * 
+	 * } }
+	 * 
+	 * }
+	 */
 
 	public class SendAudioFile extends AsyncTask<String, Void, Object[]> {
 
 		@Override
 		protected Object[] doInBackground(String... params) {
 			try {
-				return connection.postAudioToServer(URL, recorder.getAudioFile());
+				return connection.postAudioToServer(URL,
+						recorder.getAudioFile());
 			} catch (IllegalStateException e) {
 				e.printStackTrace();
 				return null;
@@ -443,7 +462,7 @@ public class ResponseController extends Activity implements OnClickListener,
 		protected void onPostExecute(Object[] result) {
 
 			Log.w("PostExecute", "POST");
-			
+
 			super.onPostExecute(result);
 			adapter.close();
 

@@ -32,45 +32,25 @@ import com.paulo.android.solarmobile.ws.Connection;
 import com.paulo.solarmobile.audio.PlayAudio;
 import com.paulo.solarmobile.audio.RecordAudio;
 
-public class PostList extends ListActivity implements OnClickListener,
-		OnChronometerTickListener {
+public class PostList extends ListActivity {
 
 	Button ouvir, stop, start, pause, exitDialog, vf, response;
 	TextView contador;
 	ImageButton button;
 	PostAdapter listAdapter;
-
 	Dialog myDialog;
-	public int tagHolder;
-	String forumName;
-	String extrasString;
-
-	public int parentId;
-
+	String extrasString, forumName;
+	public int parentId, tagHolder, previousSelected;
 	public String topicId;
-
-	public int previousSelected;
-
 	ContentValues parsedValues[];
-
 	Bundle extras;
 
 	File path = new File(Environment.getExternalStorageDirectory()
 			.getAbsolutePath() + "/Mobilis/Recordings/");
 
-	// Valores da lista
-	ContentValues[] teste1;
+	// quando a lista for vazia
+	ContentValues[] emptyListFiller;
 
-	// variáveis de gravar audio
-	long countUp;
-	long startTime;
-	long time2 = 0;
-	Chronometer stopWatch;
-	File audioFile;
-
-	// recorder
-	// private MediaRecorder record;
-	
 	private static final int PARSE_POSTS = 225;
 	DBAdapter adapter;
 	Connection connection;
@@ -112,14 +92,14 @@ public class PostList extends ListActivity implements OnClickListener,
 		}
 
 		else {
-			teste1 = new ContentValues[10];
+			emptyListFiller = new ContentValues[10];
 
-			for (int i = 1; i < teste1.length; i++) {
-				teste1[i] = new ContentValues();
-				teste1[i].put("nada", "nada");
+			for (int i = 1; i < emptyListFiller.length; i++) {
+				emptyListFiller[i] = new ContentValues();
+				emptyListFiller[i].put("nada", "nada");
 			}
 
-			listAdapter = new PostAdapter(this, teste1);
+			listAdapter = new PostAdapter(this, emptyListFiller);
 			setListAdapter(listAdapter);
 		}
 	}
@@ -164,58 +144,6 @@ public class PostList extends ListActivity implements OnClickListener,
 		Log.w("teste", "teste");
 		PostAdapter newAdapter = new PostAdapter(this, parsedValues);
 		setListAdapter(newAdapter);
-	}
-
-	@Override
-	public void onClick(View v) {
-
-		/*
-		 * if (v.getId() == R.id.img_close) { myDialog.dismiss(); } if
-		 * (v.getId() == R.id.start_recording) {
-		 * 
-		 * record = new MediaRecorder();
-		 * 
-		 * try { record.startOrStopRecording("teste"); } catch (Exception e) {
-		 * // tratar erro } startTime = System.currentTimeMillis();
-		 * stopWatch.start();
-		 * 
-		 * } if (v.getId() == R.id.stop_recording) {
-		 * 
-		 * record.stopRecording(); stopWatch.stop(); contador.setText("00:00");
-		 * 
-		 * // muda a view que possue voz teste1[tagHolder].remove("hasVoice");
-		 * teste1[tagHolder].put("hasVoice", true); // salva o nome do arquivo
-		 * de áudio na lista teste1[tagHolder].put("voiceFileName",
-		 * record.getAudioFilePath()); setListAdapter(listAdapter);
-		 * 
-		 * }
-		 */
-	}
-
-	@Override
-	public void onChronometerTick(Chronometer chronometer) {
-		long endTime = System.currentTimeMillis();
-		String asText = "";
-		String Text1 = "";
-		String Text2 = "";
-		countUp = (endTime - startTime) / 1000;
-
-		if (countUp / 60 <= 9) {
-			Text1 = "0" + (countUp / 60);
-		} else {
-			Text1 += (countUp / 60);
-		}
-
-		if (countUp % 60 <= 9) {
-			Text2 = "0" + (countUp % 60);
-		} else {
-			Text2 += (countUp % 60);
-		}
-
-		asText = Text1 + ":" + Text2;
-
-		contador.setText(asText);
-
 	}
 
 	public boolean postedToday(int postDay, int postMonth, int postYear) {
@@ -334,20 +262,4 @@ public class PostList extends ListActivity implements OnClickListener,
 			return convertView;
 		}
 	}
-
-	/*
-	 * Backup if (v.getId() == R.id.VoiceForum) {
-	 * 
-	 * myDialog = onCreateDialog(DIALOG_GRAVAR); tagHolder = (Integer)
-	 * v.getTag(R.id.change); myDialog.show();
-	 * 
-	 * }
-	 * 
-	 * 
-	 * if (v.getId() == R.id.ouvir) {
-	 * 
-	 * } if (v.getId() == R.id.Responder) { Intent intent = new Intent(this,
-	 * ResponseController.class); startActivity(intent); }
-	 */
-
 }

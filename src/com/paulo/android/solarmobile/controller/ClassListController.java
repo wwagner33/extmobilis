@@ -1,25 +1,20 @@
 package com.paulo.android.solarmobile.controller;
 
-import java.io.IOException;
-
-import org.apache.http.client.ClientProtocolException;
-
 import android.app.Activity;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.paulo.android.solamobile.threads.RequestTopicsThread;
 import com.paulo.android.solarmobile.model.DBAdapter;
 import com.paulo.android.solarmobile.ws.Connection;
 
@@ -29,19 +24,11 @@ public class ClassListController extends ListActivity {
 	ParseJSON jsonParser;
 	ContentValues[] parsedValues;
 	ClassAdapter listAdapter;
-
-	String result;
-	String connectionResult;
+	String connectionResult, result, classIdString, extrasString;
 	Connection connection;
-
 	ProgressDialog dialog;
-
-	String classIdString;
-	String extrasString;
-
 	Intent intent;
-
-	ObtainTopicListThread thread;
+	RequestTopics requestTopics;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +43,6 @@ public class ClassListController extends ListActivity {
 			updateList();
 
 		} else {
-
 			// futura atualização da lista com os valores banco
 		}
 	}
@@ -81,21 +67,21 @@ public class ClassListController extends ListActivity {
 
 	}
 
-	public void obtainTopics(String authToken) {
-		thread = new ObtainTopicListThread();
-		thread.execute(authToken);
+	public void obtainTopics(String URLString) {
+		requestTopics = new RequestTopics(this);
+		adapter.open();
+		requestTopics.setConnectionParameters(URLString, adapter.getToken());
+		adapter.close();
+		requestTopics.execute();
 	}
 
 	public void updateList() {
-		// adapter.open();
-		// String classesFromDB = adapter.getGroups();
-		// Log.w("Turmas", classesFromDB);
+
 		jsonParser = new ParseJSON();
 		parsedValues = jsonParser.parseJSON(extrasString,
 				Constants.PARSE_CLASSES);
 		listAdapter = new ClassAdapter(this, parsedValues);
 		setListAdapter(listAdapter);
-		// adapter.close();
 
 	}
 
@@ -112,68 +98,35 @@ public class ClassListController extends ListActivity {
 		super.onListItemClick(l, v, position, id);
 
 		classIdString = (String) l.getAdapter().getItem(position);
-		adapter.open();
+	//	adapter.open();
 		dialog = Dialogs.getProgressDialog(this);
 		dialog.show();
-		obtainTopics(adapter.getToken());
+		obtainTopics("groups/" + classIdString + "/discussions.json");
 
 	}
 
-	public class ObtainTopicListThread extends
-			AsyncTask<String, Void, Object[]> {
+	public class RequestTopics extends RequestTopicsThread {
 
-		@Override
-		protected Object[] doInBackground(String... params) {
-			try {
-
-				return connection.getFromServer("groups/" + classIdString
-						+ "/discussions.json", params[0]);
-
-			} catch (ClientProtocolException e) {
-				e.printStackTrace();
-				return null;
-
-			} catch (IOException e) {
-				e.printStackTrace();
-				return null;
-			}
-
-			catch (Exception e) {
-				e.printStackTrace();
-				return null;
-			}
+		public RequestTopics(Context context) {
+			super(context);
 
 		}
 
 		@Override
-		protected void onPostExecute(Object[] result) {
-			// TODO Auto-generated method stub
-			super.onPostExecute(result);
-			adapter.close();
+		public void onTopicsConnectionFailed() {
+			closeDialogIfItsVisible();
 
-			if (result == null) {
-				closeDialogIfItsVisible();
-				ErrorHandler.handleError(getApplicationContext(),
-						Constants.ERROR_CONNECTION_REFUSED);
-			}
-
-			else {
-				int statusCode = (Integer) result[1];
-				if (statusCode == 200) {
-
-					intent = new Intent(getApplicationContext(),
-							TopicListController.class);
-
-					intent.putExtra("TopicList", (String) result[0]);
-					startActivity(intent);
-
-				} else {
-					closeDialogIfItsVisible();
-					ErrorHandler.handleError(getApplicationContext(),
-							statusCode);
-				}
-			}
 		}
+
+		@Override
+		public void onTopicsConnectionSucceded(String result) {
+			intent = new Intent(getApplicationContext(),
+					TopicListController.class);
+			intent.putExtra("TopicList", result);
+			startActivity(intent);
+
+		}
+
 	}
 
 	public class ClassAdapter extends BaseAdapter {

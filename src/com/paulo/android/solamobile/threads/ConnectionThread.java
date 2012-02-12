@@ -71,7 +71,7 @@ public abstract class ConnectionThread extends AsyncTask<Void, Void, Object[]> {
 		else {
 			int statusReturned = (Integer) result[1];
 
-			if (statusReturned == 200) {
+			if (statusReturned == 200 || statusReturned == 201) {
 				Log.w("RESULT", (String) result[0]);
 
 				onConnectionSucceded((String) result[0]);
