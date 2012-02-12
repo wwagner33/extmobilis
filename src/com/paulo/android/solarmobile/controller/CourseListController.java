@@ -8,6 +8,7 @@ import android.app.Activity;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -20,6 +21,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.paulo.android.solamobile.threads.RequestCurriculumUnitsThread;
 import com.paulo.android.solarmobile.model.DBAdapter;
 import com.paulo.android.solarmobile.ws.Connection;
 
@@ -47,8 +49,7 @@ public class CourseListController extends ListActivity {
 	int itemPosition;
 
 	// Threads
-	ObtainCurriculumUnitsThread curriculumThread;
-	ObtainCourseListThread courseListThread;
+	RequestCurriculumUnits requestCurriculumUnits;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -78,7 +79,7 @@ public class CourseListController extends ListActivity {
 
 	@Override
 	public void onBackPressed() {
-		// TODO Auto-generated method stub
+
 		super.onBackPressed();
 
 		if (dialog != null) {
@@ -116,16 +117,6 @@ public class CourseListController extends ListActivity {
 
 	}
 
-	public String getBankCourseList() {
-
-		adapter.open();
-		String bankCourseList = adapter.getCourseList();
-		Log.w("Lista de Cursos", bankCourseList);
-		adapter.close();
-		return bankCourseList;
-
-	}
-
 	public void updateList() {
 
 		adapter.open();
@@ -140,9 +131,8 @@ public class CourseListController extends ListActivity {
 
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
-		// TODO Auto-generated method stub
+
 		super.onListItemClick(l, v, position, id);
-		// Intent intent = new Intent(this, ClassListController.class);
 
 		Log.w("Item position", String.valueOf(position));
 		Log.w("item id", String.valueOf(id));
@@ -151,149 +141,62 @@ public class CourseListController extends ListActivity {
 		semesterString = (String) semester;
 		Log.w("GroupID", semesterString);
 
-		// adapter.open();
-
 		adapter.open();
 		authToken = adapter.getToken();
 		adapter.close();
 		Log.w("TOKEN", authToken);
 
-		// if (adapter.groupsExist()) {
-		// startActivity(intent);
-		// }
-
-		// else {
-		// adapter.close();
-
-		// obtainCurriculumUnits(adapter.getToken());
 		dialog = Dialogs.getProgressDialog(this);
 
 		dialog.show();
-		obtainCurriculumUnits(authToken);
 
-		// }
+		obtainCurriculumUnits("curriculum_units/" + semesterString
+				+ "/groups.json");
 
-		// Log.w("GROUP_ID", String.valueOf(l.getAdapter().getItem(position)));
-
-		// EditText teste = (EditText)v.findViewById(R.id.item);
-		// teste.setText("teste");
-		// authToken)
-
-		// startActivity(intent);
 	}
 
 	public void getCourseList() {
 		// implementado quando houver refresh
 	}
 
-	public void obtainCurriculumUnits(String token) {
-		// adapter.open();
-		// authToken = adapter.getToken();
-		// adapter.close();
+	public void obtainCurriculumUnits(String URLString) {
 
-		curriculumThread = new ObtainCurriculumUnitsThread();
-		curriculumThread.execute(token);
+		requestCurriculumUnits = new RequestCurriculumUnits(this);
+		adapter.open();
+		requestCurriculumUnits.setConnectionParameters(URLString,
+				adapter.getToken());
+		adapter.close();
+		requestCurriculumUnits.execute();
+
+		// curriculumThread = new ObtainCurriculumUnitsThread();
+		// curriculumThread.execute(token);
 	}
 
-	public class ObtainCourseListThread extends
-			AsyncTask<String, Void, Object[]> {
-		//
+	public class RequestCurriculumUnits extends RequestCurriculumUnitsThread {
 
-		// thread que será chamada quando houver um botão de refresh
+		public RequestCurriculumUnits(Context context) {
+			super(context);
+			// TODO Auto-generated constructor stub
+		}
 
 		@Override
-		protected Object[] doInBackground(String... params) {
-
-			try {
-				return connection.getFromServer("curriculum_units/:"
-						+ semesterString + "/groups", params[0]);
-			} catch (ClientProtocolException e) {
-
-				e.printStackTrace();
-				return null;
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				return null;
-			}
-			// return null;
+		public void onCurriculumUnitsConnectionFailed() {
+			closeDialogIfItsVisible();
 
 		}
 
 		@Override
-		protected void onPostExecute(Object[] result) {
-			// TODO Auto-generated method stub
-			super.onPostExecute(result);
+		public void onCurriculumUnitsConnectionSuccedded(String result) {
+			intent = new Intent(getApplicationContext(),
+					ClassListController.class);
+			intent.putExtra("GroupList", result);
+			startActivity(intent);
 
-		}
-	}
-
-	public class ObtainCurriculumUnitsThread extends
-			AsyncTask<String, Void, Object[]> {
-
-		@Override
-		protected Object[] doInBackground(String... params) {
-			try {
-				return connection.getFromServer("curriculum_units/"
-						+ semesterString + "/groups.json", authToken);
-
-			} catch (ClientProtocolException e) {
-				e.printStackTrace();
-				return null;
-
-			} catch (IOException e) {
-				e.printStackTrace();
-				return null;
-			}
-
-			catch (Exception e) {
-				e.printStackTrace();
-				return null;
-			}
-		}
-
-		@Override
-		protected void onPostExecute(Object[] result) {
-			// TODO Auto-generated method stub
-			super.onPostExecute(result);
-			// int statusCode = (Integer) result[1];
-
-			if (result == null) {
-
-				closeDialogIfItsVisible();
-				ErrorHandler.handleError(getApplicationContext(),
-						Constants.ERROR_CONNECTION_REFUSED);
-			}
-
-			else {
-
-				int statusCode = (Integer) result[1];
-
-				if (statusCode == 200) {
-
-					intent = new Intent(getApplicationContext(),
-							ClassListController.class);
-					adapter.open();
-					adapter.updateGroups((String) result[0]);
-					intent.putExtra("GroupList", (String) result[0]);
-					adapter.close();
-					startActivity(intent);
-				}
-
-				else {
-					closeDialogIfItsVisible();
-					ErrorHandler.handleError(getApplicationContext(),
-							statusCode);
-				}
-				// Log.w("Turmas", groupsResult);
-			}
 		}
 	}
 
 	public class CourseListAdapter extends BaseAdapter {
 
-		// Adapter geral enquanto não sabe-se quais elementos vão ficar
-		// realmente na lista
 		Activity activity;
 		ContentValues[] values;
 		LayoutInflater inflater = null;
@@ -306,23 +209,17 @@ public class CourseListController extends ListActivity {
 
 		@Override
 		public int getCount() {
-			// TODO Auto-generated method stub
 			return values.length;
 		}
 
 		@Override
 		public Object getItem(int position) {
-
 			return values[position].getAsString("group_id");
 
 		}
 
 		@Override
 		public long getItemId(int position) {
-			// values[position].get(key)
-
-			// int teste =
-			// Integer.parseInt(values[position].getAsString("curriculum_units"));
 			return position;
 		}
 

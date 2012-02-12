@@ -3,19 +3,17 @@ package com.paulo.android.solamobile.threads;
 import java.io.IOException;
 
 import org.apache.http.client.ClientProtocolException;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.ParseException;
+
+import android.content.ContentValues;
+import android.content.Context;
+import android.os.AsyncTask;
+import android.util.Log;
 
 import com.paulo.android.solarmobile.controller.Constants;
 import com.paulo.android.solarmobile.controller.ErrorHandler;
 import com.paulo.android.solarmobile.controller.ParseJSON;
 import com.paulo.android.solarmobile.model.DBAdapter;
 import com.paulo.android.solarmobile.ws.Connection;
-
-import android.content.ContentValues;
-import android.content.Context;
-import android.os.AsyncTask;
-import android.util.Log;
 
 public abstract class ConnectionThread extends AsyncTask<Void, Void, Object[]> {
 
@@ -65,7 +63,7 @@ public abstract class ConnectionThread extends AsyncTask<Void, Void, Object[]> {
 		super.onPostExecute(result);
 
 		if (result == null) {
-			ConnectionFailed();
+			onConnectionFailed();
 			ErrorHandler.handleError(context,
 					Constants.ERROR_CONNECTION_REFUSED);
 		}
@@ -76,24 +74,13 @@ public abstract class ConnectionThread extends AsyncTask<Void, Void, Object[]> {
 			if (statusReturned == 200) {
 				Log.w("RESULT", (String) result[0]);
 
-				jsonParser = new ParseJSON();
-				ContentValues[] tokenParsed = jsonParser.parseJSON(
-						(String) result[0], Constants.PARSE_TOKEN_ID);
+				onConnectionSucceded((String) result[0]);
 
-				Log.w("TOKENPARSED", tokenParsed[0].getAsString("token"));
-
-				adapter.open();
-				Log.w("UpdateToken", "updateToken");
-				adapter.updateToken(tokenParsed[0].getAsString("token"));
-				adapter.close();
-
-				ConnectionSucceded();
-				// getCourseList(tokenParsed[0].getAsString("token"));
 			}
 
 			else {
 				ErrorHandler.handleError(context, (Integer) result[1]);
-				ConnectionFailed();
+				onConnectionFailed();
 			}
 
 		}
@@ -104,9 +91,9 @@ public abstract class ConnectionThread extends AsyncTask<Void, Void, Object[]> {
 		stop.execute(connectionType());
 	}
 
-	public abstract void ConnectionFailed();
+	public abstract void onConnectionFailed();
 
-	public abstract void ConnectionSucceded();
+	public abstract void onConnectionSucceded(String result);
 
 	public abstract Object[] connectionMethod();
 
@@ -126,25 +113,25 @@ public abstract class ConnectionThread extends AsyncTask<Void, Void, Object[]> {
 			}
 
 			if (params[0] == Constants.TYPE_CONNECTION_GET) {
-				if (isRunning())  {
-					
-				connection.StopGet();
-				stopConnectionThread();
-				return 1;
+				if (isRunning()) {
+
+					connection.StopGet();
+					stopConnectionThread();
+					return 1;
+				} else {
+					return 0;
 				}
-				else {
-					return 0;}
-				
+
 			}
 			if (params[0] == Constants.TYPE_CONNECTION_POST) {
-				if (isRunning())  {
-					
+				if (isRunning()) {
+
 					connection.StopPost();
 					stopConnectionThread();
 					return 1;
-					}
-					else {
-						return 0;}
+				} else {
+					return 0;
+				}
 			}
 
 			return 0;
@@ -155,6 +142,7 @@ public abstract class ConnectionThread extends AsyncTask<Void, Void, Object[]> {
 			if (result != 0) {
 				ErrorHandler.handleError(context,
 						Constants.ERROR_CONNECTION_TIMEOUT);
+				onConnectionFailed();
 			}
 
 			super.onPostExecute(result);

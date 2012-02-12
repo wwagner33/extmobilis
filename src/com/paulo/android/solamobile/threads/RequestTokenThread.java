@@ -27,13 +27,13 @@ public abstract class RequestTokenThread extends ConnectionThread {
 	}
 
 	@Override
-	public void ConnectionFailed() {
+	public void onConnectionFailed() {
 		onTokenConnectionFailed();
 	}
 
 	@Override
-	public void ConnectionSucceded() {
-		onTokenConnectionSucceded();
+	public void onConnectionSucceded(String result) {
+		onTokenConnectionSucceded(result);
 	}
 
 	@Override
@@ -58,6 +58,6 @@ public abstract class RequestTokenThread extends ConnectionThread {
 
 	public abstract void onTokenConnectionFailed();
 
-	public abstract void onTokenConnectionSucceded();
+	public abstract void onTokenConnectionSucceded(String result);
 
 }
