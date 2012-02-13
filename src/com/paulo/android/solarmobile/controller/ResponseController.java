@@ -31,6 +31,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.paulo.android.solamobile.threads.RequestPostsThread;
 import com.paulo.android.solamobile.threads.SubmitTextResponseThread;
 import com.paulo.android.solarmobile.model.DBAdapter;
 import com.paulo.android.solarmobile.ws.Connection;
@@ -65,13 +66,12 @@ public class ResponseController extends Activity implements OnClickListener,
 	DBAdapter adapter;
 	String token, JSONObjectString, URL, topicId, postId;
 	ParseJSON jsonParser;
-	
-
+	Intent intent;
 	JSONObject postObject;
 
 	RelativeLayout audioPreviewBar;
 
-	ObtainPostListThread postThread;
+	RequestPosts requestPosts;
 	String forumName;
 
 	public boolean existsRecording = false;
@@ -141,7 +141,7 @@ public class ResponseController extends Activity implements OnClickListener,
 
 	@Override
 	protected void onResume() {
-		// TODO Auto-generated method stub
+
 		super.onResume();
 		recorder = new RecordAudio();
 	}
@@ -225,9 +225,6 @@ public class ResponseController extends Activity implements OnClickListener,
 			} else {
 				// jsonMap.put("parent_id", noParent);
 			}
-			// responseJSON.put("discussion_post", jsonMap);
-			// JSONObjectString = responseJSON.toJSONString();
-			// Log.w("JSONString", JSONObjectString);
 
 			sendPost(postObject.toJSONString());
 
@@ -308,13 +305,16 @@ public class ResponseController extends Activity implements OnClickListener,
 		submitTextResponse.setConnectionParameters(URL, jsonString);
 		submitTextResponse.execute();
 
-		// thread = new SendNewPostThread();
-		// thread.execute();
 	}
 
-	public void getPosts() {
-		postThread = new ObtainPostListThread();
-		postThread.execute(token);
+	public void getPosts(String URLString) {
+
+		requestPosts = new RequestPosts(this);
+		adapter.open();
+		requestPosts.setConnectionParameters(URLString, adapter.getToken());
+		adapter.close();
+		requestPosts.execute();
+
 	}
 
 	public class SubmitTextResponse extends SubmitTextResponseThread {
@@ -331,73 +331,26 @@ public class ResponseController extends Activity implements OnClickListener,
 
 		@Override
 		public void onTextResponseConnectionSucceded(String result) {
-			
+
 			Log.w("RESULT", result);
-			
+
 			ContentValues[] resultFromServer;
 			jsonParser = new ParseJSON();
-			resultFromServer = jsonParser.parseJSON(result, ParseJSON.PARSE_TEXT_RESPONSE);
-			Log.w("RESULTNEW", String.valueOf(resultFromServer[0].get("result")));
-			Log.w("POST_IDNEW", String.valueOf(resultFromServer[0].get("post_id")));
+			resultFromServer = jsonParser.parseJSON(result,
+					ParseJSON.PARSE_TEXT_RESPONSE);
+			Log.w("RESULTNEW",
+					String.valueOf(resultFromServer[0].get("result")));
+			Log.w("POST_IDNEW",
+					String.valueOf(resultFromServer[0].get("post_id")));
 
 			if (existsRecording) {
 				//
 			} else {
-				Log.w("getPosts","TRUE");
-				getPosts();
+				Log.w("getPosts", "TRUE");
+				getPosts("discussions/" + topicId + "/posts.json");
 			}
 		}
 	}
-
-	/*
-	 * public class SendNewPostThread extends AsyncTask<Void, Void, Object[]> {
-	 * 
-	 * @Override protected Object[] doInBackground(Void... params) {
-	 * 
-	 * try {
-	 * 
-	 * return connection.postToServer(JSONObjectString, URL);
-	 * 
-	 * } catch (ClientProtocolException e) { e.printStackTrace(); return null; }
-	 * catch (IOException e) { e.printStackTrace(); return null; } catch
-	 * (ParseException e) { e.printStackTrace(); return null; } }
-	 * 
-	 * @Override protected void onPostExecute(Object[] result) { // TODO
-	 * Auto-generated method stub super.onPostExecute(result);
-	 * 
-	 * if (result == null) { closeDialogIfItsVisible();
-	 * ErrorHandler.handleError(getApplicationContext(),
-	 * Constants.ERROR_CONNECTION_REFUSED); }
-	 * 
-	 * else { int statusCode = (Integer) result[1]; if (statusCode == 201 ||
-	 * statusCode == 200) {
-	 * 
-	 * String resultString = (String) result[0]; Log.w("RESPONSE RESPONSE",
-	 * resultString);
-	 * 
-	 * resultFromServer = jsonParser.parseJSON(resultString,
-	 * ParseJSON.PARSE_TEXT_RESPONSE);
-	 * 
-	 * Log.w("RESULT", String.valueOf(resultFromServer[0].get("result")));
-	 * Log.w("POST_ID", String.valueOf(resultFromServer[0].get("post_id")));
-	 * 
-	 * if (existsRecording) {
-	 * 
-	 * // sendRecording()
-	 * 
-	 * }
-	 * 
-	 * else { getPosts(); }
-	 * 
-	 * } else { closeDialogIfItsVisible();
-	 * ErrorHandler.handleError(getApplicationContext(), statusCode);
-	 * 
-	 * }
-	 * 
-	 * } }
-	 * 
-	 * }
-	 */
 
 	public class SendAudioFile extends AsyncTask<String, Void, Object[]> {
 
@@ -430,69 +383,29 @@ public class ResponseController extends Activity implements OnClickListener,
 				Toast.LENGTH_LONG).show();
 	}
 
-	public class ObtainPostListThread extends AsyncTask<String, Void, Object[]> {
+	public class RequestPosts extends RequestPostsThread {
 
-		Intent intent;
-
-		@Override
-		protected Object[] doInBackground(String... params) {
-
-			try {
-
-				return connection.getFromServer("discussions/" + topicId
-						+ "/posts.json", params[0]);
-
-			} catch (ClientProtocolException e) {
-				e.printStackTrace();
-				return null;
-
-			} catch (IOException e) {
-				e.printStackTrace();
-				return null;
-			}
-
-			catch (Exception e) {
-				e.printStackTrace();
-				return null;
-			}
+		public RequestPosts(Context context) {
+			super(context);
 
 		}
 
 		@Override
-		protected void onPostExecute(Object[] result) {
+		public void onPostsConnectionFailed() {
+			closeDialogIfItsVisible();
 
-			Log.w("PostExecute", "POST");
+		}
 
-			super.onPostExecute(result);
-			adapter.close();
+		@Override
+		public void onPostsConnectionSucceded(String result) {
+			intent = new Intent(getApplicationContext(), PostList.class);
+			intent.putExtra("ForumName", forumName); // onDetails
+			intent.putExtra("PostList", (String) result); // OK
+			intent.putExtra("topicId", topicId); // OK
+			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			intent.putExtra("TESTE", "TESTE");
+			startActivity(intent);
 
-			if (result == null) {
-
-				ErrorHandler.handleError(getApplicationContext(),
-						Constants.ERROR_CONNECTION_REFUSED);
-			}
-
-			else {
-				Log.w("Teste", "TESTE3");
-				int statusCode = (Integer) result[1];
-
-				if (statusCode == 200) {
-
-					intent = new Intent(getApplicationContext(), PostList.class);
-					intent.putExtra("ForumName", forumName); // onDetails
-					intent.putExtra("PostList", (String) result[0]); // OK
-					intent.putExtra("topicId", topicId); // OK
-					intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-					intent.putExtra("TESTE", "TESTE");
-					startActivity(intent);
-				} else {
-
-					closeDialogIfItsVisible();
-					ErrorHandler.handleError(getApplicationContext(),
-							statusCode);
-
-				}
-			}
 		}
 	}
 
@@ -525,7 +438,6 @@ public class ResponseController extends Activity implements OnClickListener,
 
 	@Override
 	public void onCompletion(MediaPlayer mp) {
-		// TODO Auto-generated method stub
 
 	}
 
