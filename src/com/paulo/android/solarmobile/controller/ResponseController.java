@@ -32,6 +32,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.paulo.android.solamobile.threads.RequestPostsThread;
+import com.paulo.android.solamobile.threads.SubmitAudioResponseThread;
 import com.paulo.android.solamobile.threads.SubmitTextResponseThread;
 import com.paulo.android.solarmobile.model.DBAdapter;
 import com.paulo.android.solarmobile.ws.Connection;
@@ -316,6 +317,11 @@ public class ResponseController extends Activity implements OnClickListener,
 		requestPosts.execute();
 
 	}
+	
+	public void sendAudioPost(String URLString, File audioFIle) {
+		
+		
+	}
 
 	public class SubmitTextResponse extends SubmitTextResponseThread {
 
@@ -344,7 +350,8 @@ public class ResponseController extends Activity implements OnClickListener,
 					String.valueOf(resultFromServer[0].get("post_id")));
 
 			if (existsRecording) {
-				//
+				
+				
 			} else {
 				Log.w("getPosts", "TRUE");
 				getPosts("discussions/" + topicId + "/posts.json");
@@ -352,6 +359,30 @@ public class ResponseController extends Activity implements OnClickListener,
 		}
 	}
 
+	
+		public class SubmitAudio extends SubmitAudioResponseThread {
+
+			public SubmitAudio(Context context) {
+				super(context);
+				// TODO Auto-generated constructor stub
+			}
+
+			@Override
+			public void onAudioResponseConnectionFailed() {
+				closeDialogIfItsVisible();
+				
+			}
+
+			@Override
+			public void onAudioResponseConnectionSucceded(String result) {
+					
+				
+			}
+			
+		}
+	
+	
+				/*
 	public class SendAudioFile extends AsyncTask<String, Void, Object[]> {
 
 		@Override
@@ -376,6 +407,7 @@ public class ResponseController extends Activity implements OnClickListener,
 		}
 
 	}
+	*/
 
 	public void handleError(int errorId) {
 		Toast.makeText(getApplicationContext(),
