@@ -27,11 +27,11 @@ public abstract class SubmitAudioResponseThread extends ConnectionThread {
 		onAudioResponseConnectionSucceded(result);
 
 	}
-	
-	public void setConnectionParameters(String URLString,File audioFile) {
+
+	public void setConnectionParameters(String URLString, File audioFile) {
 		this.audioFile = audioFile;
 		this.URLString = URLString;
-		
+
 	}
 
 	@Override
@@ -40,7 +40,6 @@ public abstract class SubmitAudioResponseThread extends ConnectionThread {
 		try {
 			return super.connection.postAudioToServer(URLString, audioFile);
 		} catch (IllegalStateException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return null;
 		} catch (IOException e) {

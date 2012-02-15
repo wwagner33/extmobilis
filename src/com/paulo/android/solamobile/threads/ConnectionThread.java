@@ -105,7 +105,7 @@ public abstract class ConnectionThread extends AsyncTask<Void, Void, Object[]> {
 		protected Integer doInBackground(Integer... params) {
 
 			try {
-				Thread.sleep(5000);
+				Thread.sleep(10000);
 			} catch (InterruptedException e) {
 
 				e.printStackTrace();

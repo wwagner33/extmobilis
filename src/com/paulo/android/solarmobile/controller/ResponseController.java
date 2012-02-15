@@ -70,6 +70,8 @@ public class ResponseController extends Activity implements OnClickListener,
 	Intent intent;
 	JSONObject postObject;
 
+	SubmitAudio submitAudio;
+
 	RelativeLayout audioPreviewBar;
 
 	RequestPosts requestPosts;
@@ -243,7 +245,9 @@ public class ResponseController extends Activity implements OnClickListener,
 				record.setImageResource(R.drawable.gravar_off);
 				if (!existsRecording) {
 					audioPreviewBar.setVisibility(View.VISIBLE);
+					existsRecording = true;
 				}
+
 			} else {
 				try {
 					Toast.makeText(this, "Gravando", Toast.LENGTH_SHORT).show();
@@ -268,29 +272,6 @@ public class ResponseController extends Activity implements OnClickListener,
 			}
 		}
 
-		/*
-		 * if (v.getId() == R.id.start_recording) {
-		 * 
-		 * recorder = new MediaRecorder();
-		 * 
-		 * try { recorder.startOrStopRecording("teste"); } catch (Exception e) {
-		 * // tratar erro }
-		 * 
-		 * startTime = System.currentTimeMillis(); stopWatch.start();
-		 * 
-		 * } if (v.getId() == R.id.stop_recording) {
-		 * 
-		 * recorder.stopRecording(); stopWatch.stop();
-		 * contador.setText("00:00");
-		 * 
-		 * /* // muda a view que possue voz
-		 * teste1[tagHolder].remove("hasVoice");
-		 * teste1[tagHolder].put("hasVoice", true); // salva o nome do arquivo
-		 * de áudio na lista teste1[tagHolder].put("voiceFileName",
-		 * record.getAudioFilePath()); setListAdapter(listAdapter);
-		 * 
-		 * }
-		 */
 	}
 
 	public void sendPost(String jsonString) {
@@ -317,10 +298,13 @@ public class ResponseController extends Activity implements OnClickListener,
 		requestPosts.execute();
 
 	}
-	
-	public void sendAudioPost(String URLString, File audioFIle) {
-		
-		
+
+	public void sendAudioPost(String URLString, File audioFile) {
+		Log.w("ONSENDINGAUDIO", "TRUE");
+		submitAudio = new SubmitAudio(this);
+		submitAudio.setConnectionParameters(URLString, audioFile);
+		submitAudio.execute();
+
 	}
 
 	public class SubmitTextResponse extends SubmitTextResponseThread {
@@ -350,8 +334,15 @@ public class ResponseController extends Activity implements OnClickListener,
 					String.valueOf(resultFromServer[0].get("post_id")));
 
 			if (existsRecording) {
-				
-				
+
+				adapter.open();
+				String postURL = "posts/"
+						+ String.valueOf(resultFromServer[0].get("post_id"))
+						+ "/attach_file?auth_token=" + adapter.getToken();
+				adapter.close();
+				Log.w("PostURL", postURL);
+				sendAudioPost(postURL, recorder.getAudioFile());
+
 			} else {
 				Log.w("getPosts", "TRUE");
 				getPosts("discussions/" + topicId + "/posts.json");
@@ -359,55 +350,27 @@ public class ResponseController extends Activity implements OnClickListener,
 		}
 	}
 
-	
-		public class SubmitAudio extends SubmitAudioResponseThread {
+	public class SubmitAudio extends SubmitAudioResponseThread {
 
-			public SubmitAudio(Context context) {
-				super(context);
-				// TODO Auto-generated constructor stub
-			}
-
-			@Override
-			public void onAudioResponseConnectionFailed() {
-				closeDialogIfItsVisible();
-				
-			}
-
-			@Override
-			public void onAudioResponseConnectionSucceded(String result) {
-					
-				
-			}
-			
-		}
-	
-	
-				/*
-	public class SendAudioFile extends AsyncTask<String, Void, Object[]> {
-
-		@Override
-		protected Object[] doInBackground(String... params) {
-			try {
-				return connection.postAudioToServer(URL,
-						recorder.getAudioFile());
-			} catch (IllegalStateException e) {
-				e.printStackTrace();
-				return null;
-			} catch (IOException e) {
-				e.printStackTrace();
-				return null;
-			}
+		public SubmitAudio(Context context) {
+			super(context);
 
 		}
 
 		@Override
-		protected void onPostExecute(Object[] result) {
+		public void onAudioResponseConnectionFailed() {
+			closeDialogIfItsVisible();
 
-			super.onPostExecute(result);
+		}
+
+		@Override
+		public void onAudioResponseConnectionSucceded(String result) {
+			getPosts("discussions/" + topicId + "/posts.json");
+			closeDialogIfItsVisible();
+
 		}
 
 	}
-	*/
 
 	public void handleError(int errorId) {
 		Toast.makeText(getApplicationContext(),

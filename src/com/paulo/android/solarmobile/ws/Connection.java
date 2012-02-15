@@ -10,9 +10,9 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.client.ClientProtocolException;
-
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.FileEntity;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.FileBody;
@@ -24,6 +24,7 @@ import com.paulo.android.solarmobile.controller.Constants;
 
 import android.content.Context;
 
+import android.os.Environment;
 import android.util.Log;
 
 public class Connection {
@@ -36,19 +37,15 @@ public class Connection {
 		this.context = context;
 	}
 
-	// public abstract Object parse(String result);
-
 	public Object[] getFromServer(String URL, String authToken)
 			throws ClientProtocolException, IOException
-	// GET
 
 	{
 
 		Object[] resultSet = new Object[2];
 		StringBuilder builder = new StringBuilder();
 		DefaultHttpClient client = new DefaultHttpClient();
-		// HttpGet get = new HttpGet("http://10.0.2.2:3000/" + URL
-		// + "?auth_token=" + authToken);
+
 		get = new HttpGet(Constants.URL_SERVER + URL + "?auth_token="
 				+ authToken);
 
@@ -94,17 +91,13 @@ public class Connection {
 	public Object[] postToServer(String jsonString, String URL)
 			throws ClientProtocolException, IOException, ParseException {
 
-		// POST
-
 		Object[] resultSet = new Object[2];
 
 		StringBuilder builder = new StringBuilder();
 		DefaultHttpClient client = new DefaultHttpClient();
-		// HttpPost post = new HttpPost("http://10.0.2.2:3000/sessions");
 
 		post = new HttpPost(Constants.URL_SERVER + URL);
 
-		// String teste = json.toJSONString();
 		StringEntity se = new StringEntity(jsonString);
 		Log.w("ENTITY", jsonString);
 		post.setEntity(se);
@@ -160,28 +153,40 @@ public class Connection {
 	public Object[] postAudioToServer(String URL, File audioFile)
 			throws IllegalStateException, IOException {
 
+		if (audioFile == null) {
+
+			Log.w("AUDIONULL", "YES");
+		}
+
 		DefaultHttpClient client = new DefaultHttpClient();
+
 		Object[] resultSet = new Object[2];
 
 		StringBuilder builder = new StringBuilder();
 
-		HttpPost post = new HttpPost();
-		post.setHeader("Accept", "application/json");
-		post.setHeader("Content-type", "application/json");
+		HttpPost post = new HttpPost(Constants.URL_SERVER + URL);
 
 		MultipartEntity entity = new MultipartEntity();
-		entity.addPart("attachment", new FileBody(audioFile));
+
+		File teste2 = new File(Environment.getExternalStorageDirectory()
+				.getAbsolutePath() + "/Mobilis/Recordings/recording.3gp");
+
+		entity.addPart("attachment",
+				new FileBody(teste2, "audio/3gpp", "UTF-8"));
+
 		post.setEntity(entity);
 
-		response = client.execute(post);
+		Log.w("URL", String.valueOf(post.getURI()));
 
-		StatusLine statusLine = response.getStatusLine();
+		HttpResponse teste = client.execute(post);
+
+		StatusLine statusLine = teste.getStatusLine();
 		int statusCode = statusLine.getStatusCode();
 
 		Log.w("StatusCode", String.valueOf(statusCode));
 
 		if (statusCode == 200 || statusCode == 201) {
-			HttpEntity httpEntity = response.getEntity();
+			HttpEntity httpEntity = teste.getEntity();
 			InputStream content = httpEntity.getContent();
 			BufferedReader reader = new BufferedReader(new InputStreamReader(
 					content));
