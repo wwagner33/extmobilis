@@ -3,36 +3,9 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent" >
 
-    <RelativeLayout
+    <include
         android:id="@+id/layout_top_response"
-        style="@style/SolarTheme.layout1"
-        android:layout_width="fill_parent"
-        android:layout_height="40dp"
-        android:layout_alignParentTop="true" >
-
-        <ImageView
-            android:id="@+id/title_2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_marginLeft="5dp"
-            android:layout_marginTop="5dp"
-            android:scaleType="fitStart"
-            android:src="@drawable/solar_logo_small" />
-
-        <TextView
-            android:id="@+id/header2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="5dp"
-            android:layout_marginTop="5dp"
-            android:paddingRight="8dp"
-            android:text="mobilis"
-            android:textColor="#FFFF00"
-            android:textStyle="italic" />
-    </RelativeLayout>
+        layout="@layout/solar_logo_bar" />
 
     <RelativeLayout
         android:id="@+id/top_bar"
@@ -74,13 +47,13 @@
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
             android:text="Ouvir" />
-        
-        <!--  
+
+        <!--
         <Seekbar
             
             />
-		-->
-		
+        -->
+
         <Button
             android:id="@+id/delete_recording"
             android:layout_width="wrap_content"
@@ -89,11 +62,10 @@
     </RelativeLayout>
 
     <EditText
-        android:layout_below="@id/audio_preview_bar"
         android:id="@+id/criar_topico_conteudo"
         android:layout_width="fill_parent"
         android:layout_height="200dp"
-      
+        android:layout_below="@id/audio_preview_bar"
         android:background="#00000000"
         android:gravity="top|left"
         android:hint="Corpo da Mensagem :" />

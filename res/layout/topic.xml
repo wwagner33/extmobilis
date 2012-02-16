@@ -4,59 +4,29 @@
     android:layout_height="fill_parent"
     android:orientation="vertical" >
 
+    <include layout="@layout/solar_logo_bar" />
+
     <RelativeLayout
-        android:id="@+id/layout1"
-        style="@style/SolarTheme.layout1"
-        android:layout_width="fill_parent"
-        android:layout_height="40dp" >
-
-        <ImageView
-            android:id="@+id/title_2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_marginLeft="5dp"
-            android:layout_marginTop="5dp"
-            android:scaleType="fitStart"
-            android:src="@drawable/solar_logo_small" />
-
-        <TextView
-            android:id="@+id/header2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="5dp"
-            android:layout_marginTop="5dp"
-            android:paddingRight="8dp"
-            android:text="mobilis"
-            android:textColor="#FFFF00"
-            android:textStyle="italic" />
-    </RelativeLayout>
-
-     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="50dp" >
 
         <TextView
-            android:layout_marginLeft="15dp"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:textStyle="bold"
-            android:text="Forums disponíveis"/>
+            android:layout_marginLeft="15dp"
+            android:text="Forums disponíveis"
+            android:textStyle="bold" />
     </RelativeLayout>
 
     <ListView
-        android:dividerHeight="4dp"
-        android:divider="@null"
-        android:layout_marginLeft="15dp"
-        android:layout_marginRight="15dp"
         android:id="@android:id/list"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:drawSelectorOnTop="false" 
-        />
-
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:divider="@null"
+        android:dividerHeight="4dp"
+        android:drawSelectorOnTop="false" />
 
 </LinearLayout>
