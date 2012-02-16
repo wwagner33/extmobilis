@@ -12,30 +12,21 @@ import org.apache.http.StatusLine;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.FileEntity;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.impl.client.DefaultHttpClient;
-
 import org.json.simple.parser.ParseException;
-
-import com.paulo.android.solarmobile.controller.Constants;
-
-import android.content.Context;
 
 import android.os.Environment;
 import android.util.Log;
 
-public class Connection {
-	Context context;
-	HttpResponse response;
-	HttpPost post;
-	HttpGet get;
+import com.paulo.android.solarmobile.controller.Constants;
 
-	public Connection(Context context) {
-		this.context = context;
-	}
+public class Connection {
+	private HttpResponse response;
+	private HttpPost post;
+	private HttpGet get;
 
 	public Object[] getFromServer(String URL, String authToken)
 			throws ClientProtocolException, IOException

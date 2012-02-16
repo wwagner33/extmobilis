@@ -13,29 +13,25 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-
 import com.paulo.android.solamobile.threads.RequestTopicsThread;
 import com.paulo.android.solarmobile.model.DBAdapter;
-import com.paulo.android.solarmobile.ws.Connection;
 
 public class ClassListController extends ListActivity {
 
-	DBAdapter adapter;
-	ParseJSON jsonParser;
-	ContentValues[] parsedValues;
-	ClassAdapter listAdapter;
-	String connectionResult, result, classIdString, extrasString;
-	Connection connection;
-	ProgressDialog dialog;
-	Intent intent;
-	RequestTopics requestTopics;
+	private DBAdapter adapter;
+	private ParseJSON jsonParser;
+	private ContentValues[] parsedValues;
+	private ClassAdapter listAdapter;
+	private String classIdString, extrasString;;
+	private ProgressDialog dialog;
+	private Intent intent;
+	private RequestTopics requestTopics;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.turmas);
+		setContentView(R.layout.curriculum_units);
 		adapter = new DBAdapter(this);
-		connection = new Connection(this);
 
 		Bundle extras = getIntent().getExtras();
 		extrasString = extras.getString("GroupList");
@@ -79,7 +75,7 @@ public class ClassListController extends ListActivity {
 
 		jsonParser = new ParseJSON();
 		parsedValues = jsonParser.parseJSON(extrasString,
-				Constants.PARSE_CLASSES);
+				Constants.PARSE_CLASSES_ID);
 		listAdapter = new ClassAdapter(this, parsedValues);
 		setListAdapter(listAdapter);
 
@@ -87,7 +83,7 @@ public class ClassListController extends ListActivity {
 
 	public void updateList(String temp) {
 		jsonParser = new ParseJSON();
-		parsedValues = jsonParser.parseJSON(temp, Constants.PARSE_CLASSES);
+		parsedValues = jsonParser.parseJSON(temp, Constants.PARSE_CLASSES_ID);
 		listAdapter = new ClassAdapter(this, parsedValues);
 		setListAdapter(listAdapter);
 	}
@@ -98,10 +94,11 @@ public class ClassListController extends ListActivity {
 		super.onListItemClick(l, v, position, id);
 
 		classIdString = (String) l.getAdapter().getItem(position);
-	//	adapter.open();
 		dialog = Dialogs.getProgressDialog(this);
 		dialog.show();
-		obtainTopics("groups/" + classIdString + "/discussions.json");
+
+		obtainTopics(Constants.URL_GROUPS_PREFIX + classIdString
+				+ Constants.URL_DISCUSSION_SUFFIX);
 
 	}
 

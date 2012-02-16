@@ -15,39 +15,31 @@ import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+
 import com.paulo.android.solamobile.threads.RequestPostsThread;
 import com.paulo.android.solarmobile.model.DBAdapter;
-import com.paulo.android.solarmobile.ws.Connection;
 
 public class TopicListController extends ListActivity {
 
-	public String[] topics = { "Assunto1", "Assunto2", "Assunto3", "Assunto4",
+	private String[] topics = { "Assunto1", "Assunto2", "Assunto3", "Assunto4",
 			"Assunto5", "Assunto6" };
 
-	private static final int PARSE_TOPICS = 224;
-
-	String topicIdString;
-	String result;
-	DBAdapter adapter;
-	Intent intent;
-	ContentValues[] parsedValues;
-	ParseJSON jsonParser;
-	TopicAdapter listAdapter;
-	Connection connection;
-	RequestPosts requestPosts;
-	String forumName;
-	ProgressDialog dialog;
+	private String topicIdString;
+	private DBAdapter adapter;
+	private Intent intent;
+	private ContentValues[] parsedValues;
+	private ParseJSON jsonParser;
+	private TopicAdapter listAdapter;
+	private RequestPosts requestPosts;
+	private String forumName;
+	private ProgressDialog dialog;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.topico);
-
-		connection = new Connection(this);
 		adapter = new DBAdapter(this);
-
 		Bundle extras = getIntent().getExtras();
-
 		String extraString = extras.getString("TopicList");
 
 		if (extraString != null) {
@@ -86,7 +78,8 @@ public class TopicListController extends ListActivity {
 		Log.w("onUpdateList", "TRUE");
 
 		jsonParser = new ParseJSON();
-		parsedValues = jsonParser.parseJSON(topicJSON, PARSE_TOPICS);
+		parsedValues = jsonParser.parseJSON(topicJSON,
+				Constants.PARSE_TOPICS_ID);
 		Log.w("parsedLenght", String.valueOf(parsedValues.length));
 		listAdapter = new TopicAdapter(this, parsedValues);
 		setListAdapter(listAdapter);
@@ -94,7 +87,7 @@ public class TopicListController extends ListActivity {
 
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
-		
+
 		super.onListItemClick(l, v, position, id);
 		Object teste = l.getAdapter().getItem(position);
 		long TopicIdLong = (Long) teste;
@@ -103,7 +96,8 @@ public class TopicListController extends ListActivity {
 
 		dialog = Dialogs.getProgressDialog(this);
 		dialog.show();
-		obtainPosts("discussions/" + topicIdString + "/posts.json");
+		obtainPosts(Constants.URL_DISCUSSION_PREFIX + topicIdString
+				+ Constants.URL_POSTS_SUFFIX);
 
 	}
 
@@ -147,9 +141,9 @@ public class TopicListController extends ListActivity {
 		ContentValues[] values;
 		LayoutInflater inflater = null;
 
-		public TopicAdapter(Activity a, ContentValues[] v) {
-			activity = a;
-			values = v;
+		public TopicAdapter(Activity activity, ContentValues[] values) {
+			this.activity = activity;
+			this.values = values;
 			inflater = LayoutInflater.from(activity);
 		}
 

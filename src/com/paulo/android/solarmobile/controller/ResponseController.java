@@ -2,11 +2,8 @@ package com.paulo.android.solarmobile.controller;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.LinkedHashMap;
 
-import org.apache.http.client.ClientProtocolException;
 import org.json.simple.JSONObject;
-import org.json.simple.parser.ParseException;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -15,9 +12,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -27,7 +22,6 @@ import android.widget.Chronometer.OnChronometerTickListener;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
-import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,80 +29,41 @@ import com.paulo.android.solamobile.threads.RequestPostsThread;
 import com.paulo.android.solamobile.threads.SubmitAudioResponseThread;
 import com.paulo.android.solamobile.threads.SubmitTextResponseThread;
 import com.paulo.android.solarmobile.model.DBAdapter;
-import com.paulo.android.solarmobile.ws.Connection;
 import com.paulo.solarmobile.audio.PlayAudio;
 import com.paulo.solarmobile.audio.RecordAudio;
 
 public class ResponseController extends Activity implements OnClickListener,
 		OnChronometerTickListener, OnCompletionListener {
 
-	// Wedson: curl -v -H 'Content-Type: application/json' -H 'Accept:
-	// application/json' -X POST
-	// http://localhost:3000/discussions/1/posts?auth_token=B3BQ1twAooSXWY53hktp
-	// --data '{"discussion_post":{"content":"estou criando um novo post dentro
-	// de 1", "parent_id":""}}'
+	private EditText message;
+	private Button submit, cancelar, deleteRecording, previewAudio;
+	private TextView timeUp, charCount;
+	private ImageButton record;
+	private ProgressDialog dialog;
+	private Bundle extras;
+	private SubmitTextResponse submitTextResponse;
+	private DBAdapter adapter;
+	private String token, URL, topicId, forumName;
+	private ParseJSON jsonParser;
+	private Intent intent;
+	private JSONObject postObject;
+	private SubmitAudio submitAudio;
+	private RelativeLayout audioPreviewBar;
+	private RequestPosts requestPosts;
+	private boolean existsRecording = false;
 
-	// reponder um forum
+	private long countUp;
+	private long startTime;
+	private Chronometer stopWatch;
 
-	// File recordingsFolder;
-
-	EditText message;
-	Button submit, cancelar, deleteRecording, previewAudio;
-	SeekBar audioProgress;
-	TextView timeUp, charCount;
-	ImageButton record;
-	Connection connection;
-	JSONObject responseJSON;
-	ProgressDialog dialog;
-	Bundle extras;
-	long parentId;
-	String noParent = "";
-	SubmitTextResponse submitTextResponse;
-	DBAdapter adapter;
-	String token, JSONObjectString, URL, topicId, postId;
-	ParseJSON jsonParser;
-	Intent intent;
-	JSONObject postObject;
-
-	SubmitAudio submitAudio;
-
-	RelativeLayout audioPreviewBar;
-
-	RequestPosts requestPosts;
-	String forumName;
-
-	public boolean existsRecording = false;
-
-	File path = new File(Environment.getExternalStorageDirectory()
-			.getAbsolutePath() + Constants.RECORDING_PATH);
-
-	File recordedFilePath = new File(path.getAbsolutePath()
-			+ Constants.RECORDING_FULLNAME);
-
-	File currentRecordingPath;
-
-	boolean imageChanger = true;
-
-	// variáveis do cronômetro
-	long countUp;
-	long startTime;
-	long time2 = 0;
-	Chronometer stopWatch;
-	// File audioFile;
-
-	RecordAudio recorder;
-	PlayAudio player;
-
-	// Dialog de gravação
-
-	Button start, stop, exitDialog;
+	private RecordAudio recorder;
+	private PlayAudio player;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.responder_topico);
 		extras = getIntent().getExtras();
-		connection = new Connection(this);
 		dialog = Dialogs.getProgressDialog(this);
 		submit = (Button) findViewById(R.id.criar_topico_submit);
 		submit.setOnClickListener(this);
@@ -130,7 +85,8 @@ public class ResponseController extends Activity implements OnClickListener,
 		previewAudio = (Button) findViewById(R.id.preview_recording);
 		previewAudio.setOnClickListener(this);
 
-		connection = new Connection(this);
+		charCount = (TextView) findViewById(R.id.char_number);
+		//charCount.seTextW
 
 		jsonParser = new ParseJSON();
 
@@ -188,13 +144,10 @@ public class ResponseController extends Activity implements OnClickListener,
 			try {
 				player.playOwnAudio();
 			} catch (IllegalArgumentException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (IllegalStateException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -226,7 +179,7 @@ public class ResponseController extends Activity implements OnClickListener,
 						extras.getLong("parentId"));
 
 			} else {
-				// jsonMap.put("parent_id", noParent);
+
 			}
 
 			sendPost(postObject.toJSONString());
@@ -264,7 +217,6 @@ public class ResponseController extends Activity implements OnClickListener,
 					e.printStackTrace();
 				} catch (IOException e) {
 					record.setImageResource(R.drawable.gravar_off);
-					// ErrorHandler.handleError(// audio error);
 					stopWatch.stop();
 					timeUp.setText("00:00");
 					e.printStackTrace();
@@ -327,7 +279,7 @@ public class ResponseController extends Activity implements OnClickListener,
 			ContentValues[] resultFromServer;
 			jsonParser = new ParseJSON();
 			resultFromServer = jsonParser.parseJSON(result,
-					ParseJSON.PARSE_TEXT_RESPONSE);
+					Constants.PARSE_TEXT_RESPONSE_ID);
 			Log.w("RESULTNEW",
 					String.valueOf(resultFromServer[0].get("result")));
 			Log.w("POST_IDNEW",
@@ -345,7 +297,8 @@ public class ResponseController extends Activity implements OnClickListener,
 
 			} else {
 				Log.w("getPosts", "TRUE");
-				getPosts("discussions/" + topicId + "/posts.json");
+				getPosts(Constants.URL_DISCUSSION_PREFIX + topicId
+						+ Constants.URL_POSTS_SUFFIX);
 			}
 		}
 	}
@@ -365,17 +318,12 @@ public class ResponseController extends Activity implements OnClickListener,
 
 		@Override
 		public void onAudioResponseConnectionSucceded(String result) {
-			getPosts("discussions/" + topicId + "/posts.json");
+			getPosts(Constants.URL_DISCUSSION_PREFIX + topicId
+					+ Constants.URL_POSTS_SUFFIX);
 			closeDialogIfItsVisible();
 
 		}
 
-	}
-
-	public void handleError(int errorId) {
-		Toast.makeText(getApplicationContext(),
-				"Texto não pode ser enor do que 9 caracteres",
-				Toast.LENGTH_LONG).show();
 	}
 
 	public class RequestPosts extends RequestPostsThread {
@@ -394,9 +342,9 @@ public class ResponseController extends Activity implements OnClickListener,
 		@Override
 		public void onPostsConnectionSucceded(String result) {
 			intent = new Intent(getApplicationContext(), PostList.class);
-			intent.putExtra("ForumName", forumName); // onDetails
-			intent.putExtra("PostList", (String) result); // OK
-			intent.putExtra("topicId", topicId); // OK
+			intent.putExtra("ForumName", forumName);
+			intent.putExtra("PostList", (String) result);
+			intent.putExtra("topicId", topicId);
 			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			intent.putExtra("TESTE", "TESTE");
 			startActivity(intent);

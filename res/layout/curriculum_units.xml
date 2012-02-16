@@ -15,7 +15,7 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginLeft="15dp"
-            android:text="@string/courses_title"
+            android:text="@string/curriculum_units_title"
             android:textStyle="bold" />
     </RelativeLayout>
 

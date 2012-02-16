@@ -5,11 +5,9 @@ import java.io.IOException;
 import org.apache.http.client.ClientProtocolException;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
+import android.content.Context;
 
 import com.paulo.android.solarmobile.controller.Constants;
-import com.paulo.android.solarmobile.controller.ErrorHandler;
-
-import android.content.Context;
 
 public abstract class RequestTokenThread extends ConnectionThread {
 

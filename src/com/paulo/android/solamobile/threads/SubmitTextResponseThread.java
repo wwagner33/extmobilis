@@ -3,27 +3,23 @@ package com.paulo.android.solamobile.threads;
 import java.io.IOException;
 
 import org.apache.http.client.ClientProtocolException;
-import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
-
-import com.paulo.android.solarmobile.controller.Constants;
 
 import android.content.Context;
 
+import com.paulo.android.solarmobile.controller.Constants;
+
 public abstract class SubmitTextResponseThread extends ConnectionThread {
 
-	
-	String URLString,JSONString;
+	private String URLString, JSONString;
 
 	public SubmitTextResponseThread(Context context) {
 		super(context);
-		
 	}
 
 	@Override
 	public void onConnectionFailed() {
 		onTextResponseConnectionFailed();
-
 	}
 
 	@Override

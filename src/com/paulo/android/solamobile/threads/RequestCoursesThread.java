@@ -1,13 +1,9 @@
 package com.paulo.android.solamobile.threads;
 
 import java.io.IOException;
-
 import org.apache.http.client.ClientProtocolException;
-import org.json.simple.JSONObject;
-
-import com.paulo.android.solarmobile.controller.Constants;
-
 import android.content.Context;
+import com.paulo.android.solarmobile.controller.Constants;
 
 public abstract class RequestCoursesThread extends ConnectionThread {
 
@@ -20,7 +16,6 @@ public abstract class RequestCoursesThread extends ConnectionThread {
 
 	@Override
 	public int connectionType() {
-
 		return Constants.TYPE_CONNECTION_GET;
 	}
 

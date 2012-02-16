@@ -1,16 +1,11 @@
 package com.paulo.android.solarmobile.controller;
 
-import java.io.IOException;
-
-import org.apache.http.client.ClientProtocolException;
-
 import android.app.Activity;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,54 +14,33 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import com.paulo.android.solamobile.threads.RequestCurriculumUnitsThread;
 import com.paulo.android.solarmobile.model.DBAdapter;
-import com.paulo.android.solarmobile.ws.Connection;
 
 public class CourseListController extends ListActivity {
 
-	public Intent intent;
-
-	private static final int PARSE_COURSES_ID = 222;
-
-	String[] courseListString;
-	String authToken;
-	Connection connection;
-	DBAdapter adapter;
-	ParseJSON jsonParser;
-	ContentValues[] courseList;
-	String jsonString;
-	CourseListAdapter customAdapter;
-	String result;
-
-	ProgressDialog dialog;
-
-	String semesterString;
-	String groupsResult;
-
-	int itemPosition;
-
-	// Threads
-	RequestCurriculumUnits requestCurriculumUnits;
+	private Intent intent;
+	private DBAdapter adapter;
+	private ParseJSON jsonParser;
+	private ContentValues[] courseList;
+	private String semesterString, authToken;
+	private CourseListAdapter customAdapter;
+	private ProgressDialog dialog;
+	private RequestCurriculumUnits requestCurriculumUnits;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.cursos);
 
-		connection = new Connection(this);
 		adapter = new DBAdapter(this);
 
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {
 
-			jsonString = extras.getString("CourseList");
 			updateList();
 
 		} else {
-
 			updateList();
 		}
 	}
@@ -122,7 +96,7 @@ public class CourseListController extends ListActivity {
 		adapter.open();
 		jsonParser = new ParseJSON();
 		courseList = jsonParser.parseJSON(adapter.getCourseList(),
-				PARSE_COURSES_ID);
+				Constants.PARSE_COURSES_ID);
 		adapter.close();
 		customAdapter = new CourseListAdapter(this, courseList);
 		setListAdapter(customAdapter);
@@ -150,8 +124,8 @@ public class CourseListController extends ListActivity {
 
 		dialog.show();
 
-		obtainCurriculumUnits("curriculum_units/" + semesterString
-				+ "/groups.json");
+		obtainCurriculumUnits(Constants.URL_CURRICULUM_UNITS_PREFIX
+				+ semesterString + Constants.URL_GROUPS_SUFFIX);
 
 	}
 
@@ -168,15 +142,13 @@ public class CourseListController extends ListActivity {
 		adapter.close();
 		requestCurriculumUnits.execute();
 
-		// curriculumThread = new ObtainCurriculumUnitsThread();
-		// curriculumThread.execute(token);
 	}
 
 	public class RequestCurriculumUnits extends RequestCurriculumUnitsThread {
 
 		public RequestCurriculumUnits(Context context) {
 			super(context);
-			// TODO Auto-generated constructor stub
+
 		}
 
 		@Override
@@ -201,9 +173,9 @@ public class CourseListController extends ListActivity {
 		ContentValues[] values;
 		LayoutInflater inflater = null;
 
-		public CourseListAdapter(Activity a, ContentValues[] v) {
-			activity = a;
-			values = v;
+		public CourseListAdapter(Activity activity, ContentValues[] values) {
+			this.activity = activity;
+			this.values = values;
 			inflater = LayoutInflater.from(activity);
 		}
 
@@ -234,6 +206,5 @@ public class CourseListController extends ListActivity {
 			}
 			return convertView;
 		}
-
 	}
 }

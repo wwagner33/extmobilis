@@ -4,29 +4,16 @@ import java.io.File;
 import java.io.IOException;
 
 import android.media.MediaPlayer;
-import android.media.MediaPlayer.OnCompletionListener;
 import android.os.AsyncTask;
 import android.os.Environment;
 
 import com.paulo.android.solarmobile.controller.Constants;
 
 public class PlayAudio {
-	MediaPlayer player;
-	// File directoryPath;
-	boolean isPrepared = false;
-	playOnBackgroundThread playerThread;
-	volatile int progress = 0;
-
-	/*
-	 * public PlayAudio(String fileName) throws IllegalStateException,
-	 * IOException { File path = new
-	 * File(Environment.getExternalStorageDirectory() .getAbsolutePath() +
-	 * "/Mobilis/Recordings/");
-	 * 
-	 * player.setDataSource(path + "/recording" + fileName + ".3gp");
-	 * player.prepare(); isPrepared = true;
-	 * player.setOnCompletionListener(this); }
-	 */
+	private MediaPlayer player;
+	private boolean isPrepared = false;
+	public playOnBackgroundThread playerThread;
+	private volatile int progress = 0;
 
 	public void playOwnAudio() throws IllegalArgumentException,
 			IllegalStateException, IOException {
@@ -37,7 +24,6 @@ public class PlayAudio {
 		player.setDataSource(recordedAudioPath.getAbsolutePath());
 		player.prepare();
 		play();
-		// player.setOnCompletionListener(this);
 
 	}
 
@@ -65,9 +51,11 @@ public class PlayAudio {
 
 			return;
 
-		synchronized (this) {
-			playerThread = new playOnBackgroundThread();
-			player.start();
+		else {
+			synchronized (this) {
+				playerThread = new playOnBackgroundThread();
+				player.start();
+			}
 		}
 	}
 
@@ -82,7 +70,6 @@ public class PlayAudio {
 	public void stop() {
 		if (player.isPlaying()) {
 			player.stop();
-			// cancel thread
 			synchronized (this) {
 				isPrepared = false;
 			}
@@ -111,7 +98,6 @@ public class PlayAudio {
 
 		@Override
 		protected void onProgressUpdate(Integer... values) {
-			// TODO Auto-generated method stub
 			super.onProgressUpdate(values);
 			progress = values[0];
 		}

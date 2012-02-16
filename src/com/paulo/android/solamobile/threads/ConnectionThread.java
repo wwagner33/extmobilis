@@ -1,51 +1,35 @@
 package com.paulo.android.solamobile.threads;
 
-import java.io.IOException;
-
-import org.apache.http.client.ClientProtocolException;
-
-import android.content.ContentValues;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
 import com.paulo.android.solarmobile.controller.Constants;
 import com.paulo.android.solarmobile.controller.ErrorHandler;
-import com.paulo.android.solarmobile.controller.ParseJSON;
-import com.paulo.android.solarmobile.model.DBAdapter;
 import com.paulo.android.solarmobile.ws.Connection;
 
 public abstract class ConnectionThread extends AsyncTask<Void, Void, Object[]> {
 
-	Connection connection;
+	protected Connection connection;
 	private Context context;
-	// private int statusCode;
-
-	public ParseJSON jsonParser;
-	private DBAdapter adapter;
 
 	public ConnectionThread(Context context) {
 		this.context = context;
-		connection = new Connection(context);
-		adapter = new DBAdapter(context);
+		connection = new Connection();
+
 	}
 
 	@Override
 	protected Object[] doInBackground(Void... params) {
-
 		return connectionMethod();
-		// return connection.postToServer(jsonObject.toJSONString(), URL);
-
 	}
 
 	public void stopConnectionThread() {
-
 		super.cancel(true);
 	}
 
 	@Override
 	protected void onPreExecute() {
-		// TODO Auto-generated method stub
 		super.onPreExecute();
 		startConnectionLimit();
 	}
@@ -55,7 +39,6 @@ public abstract class ConnectionThread extends AsyncTask<Void, Void, Object[]> {
 			return true;
 		} else
 			return false;
-
 	}
 
 	@Override
@@ -147,7 +130,5 @@ public abstract class ConnectionThread extends AsyncTask<Void, Void, Object[]> {
 
 			super.onPostExecute(result);
 		}
-
 	}
-
 }

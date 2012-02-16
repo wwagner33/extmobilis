@@ -5,24 +5,13 @@ import java.util.LinkedHashMap;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-import org.json.simple.parser.JSONParser;
 
 import android.content.ContentValues;
 import android.util.Log;
 
 public class ParseJSON {
 
-	private static final int PARSE_TOKEN_ID = 221;
-	private static final int PARSE_COURSES_ID = 222;
-	private static final int PARSE_CLASSES_ID = 223;
-	private static final int PARSE_TOPICS_ID = 224;
-	private static final int PARSE_POSTS_ID = 225;
-	public static final int PARSE_TEXT_RESPONSE = 226;
-
-	Object object;
-	ContentValues[] parsedValues;
-	// JSONArray jsonArray;
-	JSONObject jsonObjects[];
+	private ContentValues[] parsedValues;
 
 	public void parseData(ContentValues[] container, String data, int position) {
 
@@ -52,7 +41,7 @@ public class ParseJSON {
 
 	public ContentValues[] parseJSON(String source, int parseId) {
 
-		if (parseId == PARSE_TOKEN_ID) {
+		if (parseId == Constants.PARSE_TOKEN_ID) {
 
 			Object object = JSONValue.parse(source);
 
@@ -72,7 +61,7 @@ public class ParseJSON {
 
 		}
 
-		if (parseId == PARSE_COURSES_ID) {
+		if (parseId == Constants.PARSE_COURSES_ID) {
 
 			Log.w("InsideParser", "TRUE");
 
@@ -113,7 +102,7 @@ public class ParseJSON {
 			return parsedValues;
 		}
 
-		if (parseId == PARSE_CLASSES_ID) {
+		if (parseId == Constants.PARSE_CLASSES_ID) {
 			Log.w("InsideParser", "TRUE");
 
 			Object object = JSONValue.parse(source);
@@ -141,7 +130,7 @@ public class ParseJSON {
 
 		}
 
-		if (parseId == PARSE_TOPICS_ID) {
+		if (parseId == Constants.PARSE_TOPICS_ID) {
 			Log.w("InsideParser", "TRUE");
 
 			Object object = JSONValue.parse(source);
@@ -182,7 +171,7 @@ public class ParseJSON {
 
 		}
 
-		if (parseId == PARSE_POSTS_ID) {
+		if (parseId == Constants.PARSE_POSTS_ID) {
 			Log.w("InsideParser", "TRUE");
 
 			Object object = JSONValue.parse(source);
@@ -227,9 +216,6 @@ public class ParseJSON {
 				parsedValues[i].put("username",
 						(String) teste2.get("user_username"));
 
-				// parsedValues[i].put("postDate", (String)
-				// teste2.get("updated"));
-
 				parseData(parsedValues, (String) teste2.get("updated"), i);
 
 			}
@@ -238,19 +224,19 @@ public class ParseJSON {
 
 		}
 
-		if (parseId == PARSE_TEXT_RESPONSE) {
+		if (parseId == Constants.PARSE_TEXT_RESPONSE_ID) {
 			Object object = JSONValue.parse(source);
 			JSONObject jsonObject = (JSONObject) object;
 			Log.w("OBJECT SIZE", String.valueOf(jsonObject.size()));
 			parsedValues = new ContentValues[1];
 			parsedValues[0] = new ContentValues();
 			parsedValues[0].put("result", (Long) jsonObject.get("result"));
-			 Log.w("RESULTONPARSER",
-			 String.valueOf(parsedValues[0].getAsInteger("result")));
+			Log.w("RESULTONPARSER",
+					String.valueOf(parsedValues[0].getAsInteger("result")));
 
 			parsedValues[0].put("post_id", (Long) jsonObject.get("post_id"));
-			 Log.w("POSTIDONPARSER",
-			 String.valueOf(parsedValues[0].getAsInteger("post_id")));
+			Log.w("POSTIDONPARSER",
+					String.valueOf(parsedValues[0].getAsInteger("post_id")));
 			return parsedValues;
 		}
 
@@ -258,10 +244,10 @@ public class ParseJSON {
 	}
 
 	public boolean isResponseSuccesful() {
-
 		return true;
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public JSONObject buildTokenObject(String username, String password) {
 		JSONObject jsonObject = new JSONObject();
 		LinkedHashMap jsonMap = new LinkedHashMap<String, String>();
@@ -271,6 +257,7 @@ public class ParseJSON {
 		return jsonObject;
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public JSONObject buildTextResponseWithParentObject(String content,
 			long parentId) {
 		JSONObject responseJSON = new JSONObject();

@@ -2,7 +2,6 @@ package com.paulo.solarmobile.audio;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Calendar;
 
 import android.media.MediaRecorder;
 import android.os.AsyncTask;
@@ -13,21 +12,15 @@ import com.paulo.android.solarmobile.controller.Constants;
 
 public class RecordAudio {
 
-	int teste = 0;
-
 	public static final int RECORDING_STARTED = 1;
 	public static final int RECORDING_STOPPED = 2;
-
-	File path = new File(Environment.getExternalStorageDirectory()
+	private File path = new File(Environment.getExternalStorageDirectory()
 			.getAbsolutePath() + Constants.RECORDING_PATH);
-	File audioFile;
-	MediaRecorder recorder;
-	RecordOnBackground recordOnBackgroundThread;
-
+	private File audioFile;
+	private MediaRecorder recorder;
+	private RecordOnBackground recordOnBackgroundThread;
 	public boolean isRecording = false;
-
 	public boolean isPrepared = false;
-
 	public boolean isReseted = false;
 
 	public RecordAudio() {
@@ -95,7 +88,7 @@ public class RecordAudio {
 	}
 
 	public File getAudioFile() {
-		return audioFile;	
+		return audioFile;
 	}
 
 }

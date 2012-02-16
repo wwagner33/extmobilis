@@ -10,56 +10,52 @@ import com.paulo.android.solarmobile.model.DBAdapter;
 import com.paulo.android.solarmobile.model.DatabaseHelper;
 
 public class InitialConfig extends Activity {
-	Intent intent;
-	Cursor cursor;
-	DBAdapter adapter;
-	public static final int CALLED_FROM_ROOT = 10;
-	Bundle extras;
+	private Intent intent;
+	private Cursor cursor;
+	private DBAdapter adapter;
+	private Bundle extras;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-	
-
 		DatabaseHelper helper = new DatabaseHelper(this);
 		adapter = new DBAdapter(this);
-		// Log.w("TOKEN TESTE", "TESTE2");
-		
-		
-		if 	(getIntent().getExtras()!=null) {
+
+		if (getIntent().getExtras() != null) {
 			extras = getIntent().getExtras();
-			if (extras.getString("FinishActivity") != null) {
+			if (extras
+					.getString(Constants.REQUEST_FINISH_ACTIVITY_ON_RETURN_TEXT) != null) {
 				Log.w("onFinish", "YES");
 				finish();
 			}
 		}
-		
+
 		else {
 
-		if (helper.checkDataBaseExistence()) {
-			adapter.open();
+			if (helper.checkDataBaseExistence()) {
+				adapter.open();
 
-			if (adapter.tokenExists()) {
-				Log.w("TOKEN TESTE", "TOKEN OK");
-				intent = new Intent(this, CourseListController.class);
-				startActivityForResult(intent, CALLED_FROM_ROOT);
-			} else {
-				Log.w("TOKEN TESTE", "NO TOKEN");
-				Intent intent = new Intent(this, Login.class);
+				if (adapter.tokenExists()) {
+					Log.w("TOKEN TESTE", "TOKEN OK");
+					intent = new Intent(this, CourseListController.class);
+					startActivity(intent);
+				} else {
+					Log.w("TOKEN TESTE", "NO TOKEN");
+					Intent intent = new Intent(this, Login.class);
 
-				startActivityForResult(intent, CALLED_FROM_ROOT);
+					startActivity(intent);
+				}
+
 			}
 
+			else {
+				Log.w("IsDBNULL", "YES");
+				helper.copyDatabaseFile();
+				intent = new Intent(this, Login.class);
+				startActivity(intent);
+			}
 		}
-
-		else {
-			Log.w("teste", "db null");
-			helper.copyDatabaseFile();
-			intent = new Intent(this, Login.class);
-			startActivityForResult(intent, CALLED_FROM_ROOT);
-		}
-	  }
 	}
 
 	@Override
@@ -72,10 +68,4 @@ public class InitialConfig extends Activity {
 			adapter.close();
 		}
 	}
-
-	/*
-	 * @Override protected void onActivityResult(int requestCode, int
-	 * resultCode, Intent data) { // TODO Auto-generated method stub
-	 * super.onActivityResult(requestCode, resultCode, data); finish(); }
-	 */
 }

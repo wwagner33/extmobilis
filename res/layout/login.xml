@@ -17,14 +17,9 @@
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="35dp"
+            android:contentDescription="@string/logo_description"
             android:scaleType="fitStart"
             android:src="@drawable/solar_logo_small" />
-
-        <!--
-        <include
-            android:id="@+id/title_2"
-            layout="@layout/solar_logo" />
-        -->
 
         <TextView
             android:layout_width="wrap_content"
@@ -32,11 +27,12 @@
             android:layout_below="@id/title_2"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="8dp"
-            android:text="Ambiente Virtual de Aprendizagem Mobilis"
-            android:textColor="#FFFFFF" />
+            android:text="@string/login_greeting_text"
+            android:textColor="@android:color/white" />
     </RelativeLayout>
 
     <LinearLayout
+        android:id="@+id/empty_space"
         android:layout_width="wrap_content"
         android:layout_height="10dp" />
 
@@ -60,7 +56,7 @@
             android:layout_alignParentLeft="true"
             android:layout_marginLeft="50dp"
             android:layout_toLeftOf="@id/campo1"
-            android:text="Login" />
+            android:text="@string/login_field_text" />
 
         <EditText
             android:id="@+id/campo2"
@@ -81,8 +77,7 @@
             android:layout_below="@id/campo1"
             android:layout_marginLeft="50dp"
             android:layout_toLeftOf="@id/campo2"
-            android:text="Senha" />
-        <!-- android:layout_alignParentLeft="true" -->
+            android:text="@string/password_field_text" />
 
         <Button
             android:id="@+id/submit"
@@ -93,20 +88,7 @@
             android:layout_gravity="center"
             android:layout_marginRight="50dp"
             android:layout_marginTop="10dp"
-            android:text="entrar" />
+            android:text="@string/login_submit_button_text" />
     </RelativeLayout>
 
-</LinearLayout><!--
-        <TextView
-            android:id="@+id/header2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="5dp"
-            android:layout_marginTop="5dp"
-            android:paddingRight="8dp"
-            android:text="mobilis"
-            android:textColor="#FFFF00"
-            android:textStyle="italic" /> 
--->
+</LinearLayout>

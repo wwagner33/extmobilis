@@ -11,13 +11,11 @@ import android.widget.TextView;
 
 public class PostDetailController extends Activity implements OnClickListener {
 
-	public TextView body, userName, forumName;
-	public Bundle extras;
-	public Button response;
-	public String topicId;
-	long parentId;
-	public String forumNameString;
-	
+	private TextView body, userName, forumName;
+	private Bundle extras;
+	private Button response;
+	private String topicId, forumNameString;
+	private long parentId;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -32,10 +30,10 @@ public class PostDetailController extends Activity implements OnClickListener {
 		extras = getIntent().getExtras();
 		if (extras != null) {
 			body.setText(extras.getString("content"));
-			forumName.setText(extras.getString("forumName")); // OK
-			forumNameString=extras.getString("forumName");
+			forumName.setText(extras.getString("forumName"));
+			forumNameString = extras.getString("forumName");
 			userName.setText(extras.getString("username"));
-			topicId = extras.getString("topicId");  // OK
+			topicId = extras.getString("topicId");
 			parentId = extras.getLong("parentId");
 			Log.w("ParentId on DETAILS", String.valueOf(parentId));
 		}
@@ -46,8 +44,8 @@ public class PostDetailController extends Activity implements OnClickListener {
 	public void onClick(View v) {
 		Intent intent = new Intent(this, ResponseController.class);
 		intent.putExtra("topicId", topicId);
-		intent.putExtra("parentId",parentId);
-		intent.putExtra("ForumName",forumNameString);
+		intent.putExtra("parentId", parentId);
+		intent.putExtra("ForumName", forumNameString);
 		startActivity(intent);
 	}
 

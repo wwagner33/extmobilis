@@ -1,16 +1,10 @@
 package com.paulo.android.solarmobile.controller;
 
-import java.io.IOException;
-import java.util.LinkedHashMap;
-import org.apache.http.client.ClientProtocolException;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.ParseException;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -21,22 +15,17 @@ import android.widget.EditText;
 import com.paulo.android.solamobile.threads.RequestCoursesThread;
 import com.paulo.android.solamobile.threads.RequestTokenThread;
 import com.paulo.android.solarmobile.model.DBAdapter;
-import com.paulo.android.solarmobile.ws.Connection;
 
 public class Login extends Activity implements OnClickListener {
-	public EditText login, password;
-	public Button submit;
-	public Button skipValidation;
-	public Intent intent;
-	JSONObject json;
-	DBAdapter adapter;
-	Connection connection;
-	ProgressDialog dialog;
-	String authToken;
-	ParseJSON jsonParser;
 
-	RequestToken requestToken;
-	RequestCourses requestCourses;
+	private EditText login, password;
+	private Button submit;
+	private Intent intent;
+	private DBAdapter adapter;
+	private ProgressDialog dialog;
+	private ParseJSON jsonParser;
+	private RequestToken requestToken;
+	private RequestCourses requestCourses;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -79,9 +68,6 @@ public class Login extends Activity implements OnClickListener {
 
 				dialog = Dialogs.getProgressDialog(this);
 				dialog.show();
-
-				connection = new Connection(this);
-
 				requestToken();
 			}
 		}
@@ -132,17 +118,9 @@ public class Login extends Activity implements OnClickListener {
 		super.onBackPressed();
 		Intent intent = new Intent(this, InitialConfig.class);
 		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-		intent.putExtra("FinishActivity", "YES");
+		intent.putExtra(Constants.REQUEST_FINISH_ACTIVITY_ON_RETURN_TEXT,
+				Constants.REQUEST_FINISH_ACTIVITY_ON_RETURN_VALUE);
 		startActivity(intent);
-	}
-
-	public ProgressDialog createDialog() {
-		ProgressDialog dialog;
-		dialog = new ProgressDialog(this);
-		dialog.setMessage("Carregando, Por favor aguarde...");
-		dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-		dialog.setCancelable(false);
-		return dialog;
 	}
 
 	public class RequestToken extends RequestTokenThread {
@@ -164,13 +142,10 @@ public class Login extends Activity implements OnClickListener {
 			jsonParser = new ParseJSON();
 			ContentValues[] tokenParsed = jsonParser.parseJSON(result,
 					Constants.PARSE_TOKEN_ID);
-
 			Log.w("TOKENPARSED", tokenParsed[0].getAsString("token"));
-
 			adapter.open();
 			Log.w("UpdateToken", "updateToken");
 			adapter.updateToken(tokenParsed[0].getAsString("token"));
-
 			String token = adapter.getToken();
 			adapter.close();
 			getCourseList(token);
@@ -201,5 +176,4 @@ public class Login extends Activity implements OnClickListener {
 			startActivity(intent);
 		}
 	}
-
 }
