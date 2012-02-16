@@ -160,7 +160,7 @@ public class ClassListController extends ListActivity {
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
 			if (convertView == null) {
-				convertView = inflater.inflate(R.layout.turmas_item, parent,
+				convertView = inflater.inflate(R.layout.curriculum_units_item, parent,
 						false);
 				TextView courseName = (TextView) convertView
 						.findViewById(R.id.turmas_item);

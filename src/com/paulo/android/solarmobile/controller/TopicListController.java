@@ -37,7 +37,7 @@ public class TopicListController extends ListActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.topico);
+		setContentView(R.layout.topic);
 		adapter = new DBAdapter(this);
 		Bundle extras = getIntent().getExtras();
 		String extraString = extras.getString("TopicList");
@@ -49,7 +49,7 @@ public class TopicListController extends ListActivity {
 		else {
 
 			ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-					R.layout.topicoitem, topics);
+					R.layout.topicitem, topics);
 			setListAdapter(adapter);
 		}
 	}
@@ -166,7 +166,7 @@ public class TopicListController extends ListActivity {
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
 			if (convertView == null) {
-				convertView = inflater.inflate(R.layout.topicoitem, parent,
+				convertView = inflater.inflate(R.layout.topicitem, parent,
 						false);
 
 				TextView topicTitle = (TextView) convertView

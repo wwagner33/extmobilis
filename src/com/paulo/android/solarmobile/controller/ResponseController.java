@@ -62,7 +62,7 @@ public class ResponseController extends Activity implements OnClickListener,
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.responder_topico);
+		setContentView(R.layout.answer_topic);
 		extras = getIntent().getExtras();
 		dialog = Dialogs.getProgressDialog(this);
 		submit = (Button) findViewById(R.id.criar_topico_submit);
@@ -86,7 +86,7 @@ public class ResponseController extends Activity implements OnClickListener,
 		previewAudio.setOnClickListener(this);
 
 		charCount = (TextView) findViewById(R.id.char_number);
-		//charCount.seTextW
+		// charCount.seTextW
 
 		jsonParser = new ParseJSON();
 

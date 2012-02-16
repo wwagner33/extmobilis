@@ -31,7 +31,7 @@ public class CourseListController extends ListActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.cursos);
+		setContentView(R.layout.course);
 
 		adapter = new DBAdapter(this);
 
@@ -198,7 +198,7 @@ public class CourseListController extends ListActivity {
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
 			if (convertView == null) {
-				convertView = inflater.inflate(R.layout.itemcurso, parent,
+				convertView = inflater.inflate(R.layout.course_item, parent,
 						false);
 				TextView courseName = (TextView) convertView
 						.findViewById(R.id.item);
