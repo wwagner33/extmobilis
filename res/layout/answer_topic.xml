@@ -21,7 +21,7 @@
             android:layout_alignParentLeft="true"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="3dp"
-            android:text="cancelar" />
+            android:text="@string/answer_topic_cancel_text" />
 
         <Button
             android:id="@+id/criar_topico_submit"
@@ -30,7 +30,7 @@
             android:layout_alignParentRight="true"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="3dp"
-            android:text="Enviar" />
+            android:text="@string/answer_topic_submit_text" />
     </RelativeLayout>
 
     <RelativeLayout
@@ -68,7 +68,7 @@
         android:layout_below="@id/audio_preview_bar"
         android:background="#00000000"
         android:gravity="top|left"
-        android:hint="Corpo da Mensagem :" />
+        android:hint="@string/answer_topic_edittext_hint" />
 
     <RelativeLayout
         android:layout_width="fill_parent"
@@ -84,6 +84,7 @@
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
             android:layout_marginLeft="10dp"
+            android:contentDescription="@string/recod_button_description"
             android:scaleType="fitCenter"
             android:src="@drawable/gravar_off" />
 
@@ -95,7 +96,7 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="11dp"
             android:layout_toRightOf="@id/btn_gravar"
-            android:text="00:00"
+            android:text="@string/counter_default_value"
             android:visibility="gone" />
 
         <TextView
@@ -105,7 +106,7 @@
             android:layout_alignParentRight="true"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="11dp"
-            android:text="000" />
+            android:text="@string/char_count_default_value" />
 
         <Chronometer
             android:id="@+id/recording_chronometer"

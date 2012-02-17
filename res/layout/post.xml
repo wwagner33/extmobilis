@@ -19,7 +19,6 @@
             android:layout_centerHorizontal="true"
             android:layout_centerInParent="true"
             android:layout_marginLeft="5dp"
-            android:text="Nome do Forum"
             android:textColor="#0033CC"
             android:textSize="15dp" />
     </RelativeLayout>
@@ -34,6 +33,6 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:gravity="center"
-        android:text="Forum Vazio" />
+        android:text="@string/empty_forum_message" />
 
 </LinearLayout>
