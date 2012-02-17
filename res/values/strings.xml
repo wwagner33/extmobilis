@@ -13,7 +13,7 @@
     <string name="curriculum_units_title">Turmas disponíveis</string>
     <string name="answer_topic_submit_text">Enviar</string>
     <string name="answer_topic_cancel_text">cancel</string>
-    <string name="answer_topic_edittext_hint"></string>
+    <string name="answer_topic_edittext_hint">Corpo da Mensagem</string>
     <string name="recod_button_description">Botão de gravação</string>
     <string name="counter_default_value">00:00</string>
     <string name="char_count_default_value">000</string>
@@ -22,5 +22,6 @@
     <string name="answer_topic_button_text">responder</string>
     <string name="empty_forum_message">Fórum Vazio</string>
     <string name="topics_title">Forums disponíveis</string>
+    <string name="new_topic_image_description">Imagem de Responder forum geral</string>
 
 </resources>

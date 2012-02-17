@@ -2,14 +2,16 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:orientation="vertical"
+    		>
 
     <include layout="@layout/solar_logo_bar" />
 
     <RelativeLayout
         android:id="@+id/layout3"
         android:layout_width="fill_parent"
-        android:layout_height="40dp" >
+        android:layout_height="40dp"
+        style="@style/SolarTheme" >
 
         <TextView
             android:id="@+id/nome_forum"
@@ -19,20 +21,37 @@
             android:layout_centerHorizontal="true"
             android:layout_centerInParent="true"
             android:layout_marginLeft="5dp"
-            android:textColor="#0033CC"
+            android:textColor="@color/TextColor"
             android:textSize="15dp" />
+
+        <ImageView
+            android:id="@+id/answer_topic_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerHorizontal="true"
+            android:layout_centerInParent="true"
+            android:layout_marginRight="5dp"
+            android:contentDescription="@string/new_topic_image_description"
+            android:src="@drawable/new_post_four" />
     </RelativeLayout>
 
-    <ListView
-        android:id="@android:id/list"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent" />
-
-    <TextView
-        android:id="@android:id/empty"
+    <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:gravity="center"
-        android:text="@string/empty_forum_message" />
+         style="@style/SolarTheme"  >
+
+        <ListView
+            android:id="@android:id/list"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent" />
+
+        <TextView
+            android:id="@android:id/empty"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:gravity="center"
+            android:text="@string/empty_forum_message" />
+    </RelativeLayout>
 
 </LinearLayout>

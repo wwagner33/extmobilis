@@ -3,8 +3,12 @@
 
     <color name="courseListIdle">#e7e7f1</color>
     <color name="courseListPressed">#fceaa0</color>
+    
 	<color name="blueText">#0033CC</color>
+	
 	<color name="headerColor">#2A2B71</color>
 	<color name="TextColor">#2A2B71</color>
+	
+	<color name="gray_background">#E0DEDE</color>
     
 </resources>

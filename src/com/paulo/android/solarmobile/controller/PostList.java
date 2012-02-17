@@ -9,12 +9,14 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-public class PostList extends ListActivity {
+public class PostList extends ListActivity implements OnClickListener {
 
 	private PostAdapter listAdapter;
 	private String extrasString, forumName, topicId;
@@ -24,11 +26,16 @@ public class PostList extends ListActivity {
 	private ParseJSON jsonParser;
 	private TextView textName;
 	private int currentDay, currentMonth, currentYear;
+	private Intent intent;
+	ImageView answerForum;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.post);
+
+		answerForum = (ImageView) findViewById(R.id.answer_topic_image);
+		answerForum.setOnClickListener(this);
 
 		Calendar calendar = Calendar.getInstance();
 
@@ -217,5 +224,16 @@ public class PostList extends ListActivity {
 
 			return convertView;
 		}
+	}
+
+	@Override
+	public void onClick(View v) {
+		if (v.getId() == R.id.answer_topic_image) {
+
+			intent = new Intent(this, ResponseController.class);
+			// intent.putExtras(extras)
+
+		}
+
 	}
 }

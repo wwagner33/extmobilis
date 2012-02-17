@@ -13,6 +13,8 @@ import android.content.Intent;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -21,6 +23,7 @@ import android.widget.Chronometer;
 import android.widget.Chronometer.OnChronometerTickListener;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,7 +36,7 @@ import com.paulo.solarmobile.audio.PlayAudio;
 import com.paulo.solarmobile.audio.RecordAudio;
 
 public class ResponseController extends Activity implements OnClickListener,
-		OnChronometerTickListener, OnCompletionListener {
+		OnChronometerTickListener, OnCompletionListener, TextWatcher {
 
 	private EditText message;
 	private Button submit, cancelar, deleteRecording, previewAudio;
@@ -51,6 +54,9 @@ public class ResponseController extends Activity implements OnClickListener,
 	private RelativeLayout audioPreviewBar;
 	private RequestPosts requestPosts;
 	private boolean existsRecording = false;
+	
+
+	// private int
 
 	private long countUp;
 	private long startTime;
@@ -68,6 +74,7 @@ public class ResponseController extends Activity implements OnClickListener,
 		submit = (Button) findViewById(R.id.criar_topico_submit);
 		submit.setOnClickListener(this);
 		message = (EditText) findViewById(R.id.criar_topico_conteudo);
+		message.addTextChangedListener(this);
 		record = (ImageButton) findViewById(R.id.btn_gravar);
 		record.setOnClickListener(this);
 		timeUp = (TextView) findViewById(R.id.recording_lenght);
@@ -86,8 +93,10 @@ public class ResponseController extends Activity implements OnClickListener,
 		previewAudio.setOnClickListener(this);
 
 		charCount = (TextView) findViewById(R.id.char_number);
-		// charCount.seTextW
+		// charCount.addTextChangedListener(this);
 
+	
+		
 		jsonParser = new ParseJSON();
 
 		if (extras != null) {
@@ -138,7 +147,9 @@ public class ResponseController extends Activity implements OnClickListener,
 
 	@Override
 	public void onClick(View v) {
-
+		
+		
+		
 		if (v.getId() == R.id.preview_recording) {
 			player = new PlayAudio();
 			try {
@@ -382,6 +393,36 @@ public class ResponseController extends Activity implements OnClickListener,
 	@Override
 	public void onCompletion(MediaPlayer mp) {
 
+	}
+
+	@Override
+	public void afterTextChanged(Editable editable) {
+
+		/*
+		 * if (sizeBefore>sizeAfter) { charCount++;
+		 * charCountText.setText(String.valueOf(charCount)); } else {
+		 * charcount-- charcountText.setText(String.valueOf(charCount)); }
+		 * 
+		 * // charCount.setText()
+		 */
+
+	}
+
+	@Override
+	public void beforeTextChanged(CharSequence s, int start, int count,
+			int after) {
+		Log.w("charSequenceOnBefore", s.toString());
+		Log.w("start", String.valueOf(start));
+		Log.w("count", String.valueOf(count));
+		Log.w("after", String.valueOf(after));
+	}
+
+	@Override
+	public void onTextChanged(CharSequence s, int start, int before, int count) {
+		Log.w("start", String.valueOf(start));
+		Log.w("before", String.valueOf(before));
+		Log.w("count", String.valueOf(count));
+		Log.w("charSequenceOnAfter", s.toString());
 	}
 
 }

@@ -28,5 +28,4 @@
         android:divider="@null"
         android:dividerHeight="4dp"
         android:drawSelectorOnTop="false" />
-
 </LinearLayout>
