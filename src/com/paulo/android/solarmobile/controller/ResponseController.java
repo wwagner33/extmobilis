@@ -54,9 +54,7 @@ public class ResponseController extends Activity implements OnClickListener,
 	private RelativeLayout audioPreviewBar;
 	private RequestPosts requestPosts;
 	private boolean existsRecording = false;
-	
 
-	// private int
 
 	private long countUp;
 	private long startTime;
@@ -95,12 +93,12 @@ public class ResponseController extends Activity implements OnClickListener,
 		charCount = (TextView) findViewById(R.id.char_number);
 		// charCount.addTextChangedListener(this);
 
-	
-		
 		jsonParser = new ParseJSON();
 
 		if (extras != null) {
+
 			topicId = extras.getString("topicId");
+
 			forumName = extras.getString("ForumName");
 
 		}
@@ -147,9 +145,7 @@ public class ResponseController extends Activity implements OnClickListener,
 
 	@Override
 	public void onClick(View v) {
-		
-		
-		
+
 		if (v.getId() == R.id.preview_recording) {
 			player = new PlayAudio();
 			try {
@@ -190,7 +186,8 @@ public class ResponseController extends Activity implements OnClickListener,
 						extras.getLong("parentId"));
 
 			} else {
-
+				postObject = jsonParser.buildTextResponseWithoutParent(message
+						.getText().toString());
 			}
 
 			sendPost(postObject.toJSONString());

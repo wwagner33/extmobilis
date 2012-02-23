@@ -13,6 +13,11 @@ public class Constants {
 	public static final String URL_DISCUSSION_PREFIX = "discussions/";
 	public static final String URL_CURRICULUM_UNITS_PREFIX = "curriculum_units/";
 	public static final String URL_POSTS_SUFFIX = "/posts.json";
+	
+	// Nova chamada
+	
+	
+	
 
 	// Dialogs
 	public static final String TEXT_PROGRESS_DIALOG = "Carregando, por favor aguarde";
@@ -39,6 +44,8 @@ public class Constants {
 	public static final int PARSE_TOPICS_ID = 224;
 	public static final int PARSE_POSTS_ID = 225;
 	public static final int PARSE_TEXT_RESPONSE_ID = 226;
+	public static final long noParentId = 0;
+	public static final String noParentString = "";
 
 	// Recording Path
 	public static final String RECORDING_PATH = "/Mobilis/Recordings/";

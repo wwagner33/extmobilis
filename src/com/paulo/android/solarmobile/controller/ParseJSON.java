@@ -269,4 +269,14 @@ public class ParseJSON {
 
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public JSONObject buildTextResponseWithoutParent(String content) {
+		JSONObject responseJSON = new JSONObject();
+		LinkedHashMap jsonMap = new LinkedHashMap<String, String>();
+		jsonMap.put("content", content);
+		jsonMap.put("parent_id", Constants.noParentString);
+		responseJSON.put("discussion_post", jsonMap);
+		return responseJSON;
+	}
+
 }

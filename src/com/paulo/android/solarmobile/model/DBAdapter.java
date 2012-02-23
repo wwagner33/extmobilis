@@ -27,6 +27,8 @@ public class DBAdapter {
 		helper.close();
 	}
 
+	// Queries genéricas
+
 	public Cursor getOneRow(String tableName, int id) {
 		Cursor cursor = db.rawQuery("SELECT * FROM config WHERE _id=1", null);
 		cursor.moveToFirst();
@@ -45,7 +47,12 @@ public class DBAdapter {
 
 	public void updateTable(String tableName, int id, ContentValues valores) {
 		db.update(tableName, valores, "_id=" + id, null);
+
 	}
+
+	// Queries Genéricas END
+
+	// Token Queries
 
 	public String getToken() {
 		Cursor teste = db.rawQuery("SELECT * FROM config WHERE _id=2", null);
@@ -73,6 +80,10 @@ public class DBAdapter {
 
 		db.update("config", valores, "_id=2", null);
 	}
+
+	// Token Queries END
+
+	// Cursos Queries
 
 	public boolean coursesExist() {
 		Cursor cursor = db.rawQuery("SELECT * FROM config WHERE _id=3", null);
@@ -124,5 +135,7 @@ public class DBAdapter {
 		cursor.close();
 		return result;
 	}
+
+	// Cursos Queries END
 
 }

@@ -15,9 +15,11 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class PostList extends ListActivity implements OnClickListener {
 
+	private static final long noParentId = 0;
 	private PostAdapter listAdapter;
 	private String extrasString, forumName, topicId;
 	private ContentValues parsedValues[];
@@ -36,6 +38,7 @@ public class PostList extends ListActivity implements OnClickListener {
 
 		answerForum = (ImageView) findViewById(R.id.answer_topic_image);
 		answerForum.setOnClickListener(this);
+		answerForum.setClickable(true);
 
 		Calendar calendar = Calendar.getInstance();
 
@@ -231,9 +234,12 @@ public class PostList extends ListActivity implements OnClickListener {
 		if (v.getId() == R.id.answer_topic_image) {
 
 			intent = new Intent(this, ResponseController.class);
-			// intent.putExtras(extras)
+			intent.putExtra("topicId", topicId);
+			intent.putExtra("parentId", noParentId);
+			intent.putExtra("ForumName", forumName);
+
+			startActivity(intent);
 
 		}
-
 	}
 }

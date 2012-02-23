@@ -2,16 +2,15 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    		>
+    android:orientation="vertical" >
 
     <include layout="@layout/solar_logo_bar" />
 
     <RelativeLayout
         android:id="@+id/layout3"
+        style="@style/SolarTheme"
         android:layout_width="fill_parent"
-        android:layout_height="40dp"
-        style="@style/SolarTheme" >
+        android:layout_height="40dp" >
 
         <TextView
             android:id="@+id/nome_forum"
@@ -32,14 +31,15 @@
             android:layout_centerHorizontal="true"
             android:layout_centerInParent="true"
             android:layout_marginRight="5dp"
-            android:contentDescription="@string/new_topic_image_description"
-            android:src="@drawable/new_post_four" />
+            android:clickable="true"
+            android:src="@drawable/new_post_selector"
+            android:contentDescription="@string/new_topic_image_description" />
     </RelativeLayout>
 
     <RelativeLayout
+        style="@style/SolarTheme"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-         style="@style/SolarTheme"  >
+        android:layout_height="fill_parent" >
 
         <ListView
             android:id="@android:id/list"
