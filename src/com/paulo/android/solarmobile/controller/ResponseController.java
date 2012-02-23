@@ -55,6 +55,7 @@ public class ResponseController extends Activity implements OnClickListener,
 	private RequestPosts requestPosts;
 	private boolean existsRecording = false;
 
+	private String charSequenceAfter, charSequenceBefore;
 
 	private long countUp;
 	private long startTime;
@@ -395,6 +396,7 @@ public class ResponseController extends Activity implements OnClickListener,
 	@Override
 	public void afterTextChanged(Editable editable) {
 
+		charCount.setText(String.valueOf(charSequenceAfter.length()));
 		/*
 		 * if (sizeBefore>sizeAfter) { charCount++;
 		 * charCountText.setText(String.valueOf(charCount)); } else {
@@ -412,6 +414,7 @@ public class ResponseController extends Activity implements OnClickListener,
 		Log.w("start", String.valueOf(start));
 		Log.w("count", String.valueOf(count));
 		Log.w("after", String.valueOf(after));
+		charSequenceBefore = s.toString();
 	}
 
 	@Override
@@ -420,6 +423,7 @@ public class ResponseController extends Activity implements OnClickListener,
 		Log.w("before", String.valueOf(before));
 		Log.w("count", String.valueOf(count));
 		Log.w("charSequenceOnAfter", s.toString());
+		charSequenceAfter = s.toString();
 	}
 
 }

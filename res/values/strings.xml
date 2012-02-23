@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <resources>
-
     <string name="hello">Hello World, Main!</string>
     <string name="app_name">SolarMobile</string>
     <string name="teste">teste</string>
@@ -16,12 +15,11 @@
     <string name="answer_topic_edittext_hint">Corpo da Mensagem</string>
     <string name="recod_button_description">Botão de gravação</string>
     <string name="counter_default_value">00:00</string>
-    <string name="char_count_default_value">000</string>
+    <string name="char_count_default_value">0</string>
     <string name="post_list_forum_name_placeholder">Nome do Forum</string>
     <string name="stock_person_description">Imagem default do usuário</string>
     <string name="answer_topic_button_text">responder</string>
     <string name="empty_forum_message">Fórum Vazio</string>
     <string name="topics_title">Forums disponíveis</string>
     <string name="new_topic_image_description">Imagem de Responder forum geral</string>
-
 </resources>

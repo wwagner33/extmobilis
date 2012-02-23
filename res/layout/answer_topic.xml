@@ -48,12 +48,6 @@
             android:layout_centerVertical="true"
             android:text="Ouvir" />
 
-        <!--
-        <Seekbar
-            
-            />
-        -->
-
         <Button
             android:id="@+id/delete_recording"
             android:layout_width="wrap_content"
@@ -100,6 +94,7 @@
             android:visibility="gone" />
 
         <TextView
+            android:layout_marginRight="10dp"
             android:id="@+id/char_number"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

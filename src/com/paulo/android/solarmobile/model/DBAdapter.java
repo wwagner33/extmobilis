@@ -129,12 +129,17 @@ public class DBAdapter {
 	}
 
 	public String getGroups() {
+
 		Cursor cursor = db.rawQuery("SELECT * FROM config WHERE _id=4", null);
 		cursor.moveToFirst();
 		String result = cursor.getString(cursor.getColumnIndex("valor"));
 		cursor.close();
 		return result;
 	}
+
+	// Cursos Queries END
+
+	// Cursos Queries START
 
 	// Cursos Queries END
 
