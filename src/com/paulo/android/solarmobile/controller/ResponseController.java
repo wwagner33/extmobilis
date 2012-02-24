@@ -12,6 +12,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
+import android.media.MediaRecorder;
+import android.media.MediaRecorder.OnInfoListener;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -36,7 +38,7 @@ import com.paulo.solarmobile.audio.PlayAudio;
 import com.paulo.solarmobile.audio.RecordAudio;
 
 public class ResponseController extends Activity implements OnClickListener,
-		OnChronometerTickListener, OnCompletionListener, TextWatcher {
+		OnChronometerTickListener, OnCompletionListener, TextWatcher, OnInfoListener {
 
 	private EditText message;
 	private Button submit, cancelar, deleteRecording, previewAudio;
@@ -424,6 +426,12 @@ public class ResponseController extends Activity implements OnClickListener,
 		Log.w("count", String.valueOf(count));
 		Log.w("charSequenceOnAfter", s.toString());
 		charSequenceAfter = s.toString();
+	}
+
+	@Override
+	public void onInfo(MediaRecorder mr, int what, int extra) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent" >
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
 
     <include
         android:id="@+id/layout_top_response"
@@ -32,7 +33,7 @@
             android:layout_marginTop="3dp"
             android:text="@string/answer_topic_submit_text" />
     </RelativeLayout>
-
+    
     <RelativeLayout
         android:id="@+id/audio_preview_bar"
         android:layout_width="fill_parent"
@@ -58,7 +59,8 @@
     <EditText
         android:id="@+id/criar_topico_conteudo"
         android:layout_width="fill_parent"
-        android:layout_height="200dp"
+        android:layout_height="0dip"
+        android:layout_weight="1"
         android:layout_below="@id/audio_preview_bar"
         android:background="#00000000"
         android:gravity="top|left"
@@ -69,6 +71,8 @@
         android:layout_height="40dp"
         android:layout_below="@id/criar_topico_conteudo"
         android:background="#C0C0C0" >
+
+        <!-- android:layout_height="40dp" -->
 
         <ImageButton
             android:id="@+id/btn_gravar"
@@ -94,12 +98,12 @@
             android:visibility="gone" />
 
         <TextView
-            android:layout_marginRight="10dp"
             android:id="@+id/char_number"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_centerHorizontal="true"
+            android:layout_marginRight="10dp"
             android:layout_marginTop="11dp"
             android:text="@string/char_count_default_value" />
 
@@ -110,4 +114,4 @@
             android:visibility="gone" />
     </RelativeLayout>
 
-</RelativeLayout>
+</LinearLayout>

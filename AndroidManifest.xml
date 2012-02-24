@@ -1,24 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<manifest android:versionCode="1" android:versionName="1.0"
-    package="com.paulo.android.solarmobile.controller" xmlns:android="http://schemas.android.com/apk/res/android">
-    <uses-sdk android:minSdkVersion="8"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <application android:icon="@drawable/launcher"
-        android:label="@string/app_name" android:theme="@android:style/Theme.Light.NoTitleBar">
-        <activity android:label="@string/app_name" android:name=".InitialConfig">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.paulo.android.solarmobile.controller"
+    android:versionCode="1"
+    android:versionName="1.0" >
+
+    <uses-sdk android:minSdkVersion="8" />
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:icon="@drawable/launcher"
+        android:label="@string/app_name"
+        android:theme="@android:style/Theme.Light.NoTitleBar"
+       
+            android:windowSoftInputMode="stateVisible|adjustPan" >
+        <activity
+            android:name=".InitialConfig"
+            android:label="@string/app_name" >
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Login"/>
-        <activity android:name=".CourseListController"/>
-        <activity android:name=".PostList"/>
-        <activity android:name = ".ClassListController"/>
-        <activity android:name=".TopicListController"/>
-        <activity android:name=".ResponseController"/>
-        <activity android:name =".PostDetailController"/>
+        <activity android:name=".Login" />
+        <activity android:name=".CourseListController" />
+        <activity android:name=".PostList" />
+        <activity android:name=".ClassListController" />
+        <activity android:name=".TopicListController" />
+        <activity
+            android:name=".ResponseController"
+            android:windowSoftInputMode="adjustResize"/>
+        <activity android:name=".PostDetailController" />
     </application>
+
 </manifest>

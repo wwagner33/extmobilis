@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import android.media.MediaRecorder;
+import android.media.MediaRecorder.OnInfoListener;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.util.Log;
@@ -82,6 +83,7 @@ public class RecordAudio {
 
 		@Override
 		protected Void doInBackground(Void... params) {
+			
 			recorder.start();
 			return null;
 		}
