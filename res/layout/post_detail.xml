@@ -44,33 +44,15 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
-            android:layout_margin="5dp"
+            android:layout_marginTop="5dp"
             android:layout_toRightOf="@id/avatar"
             android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/post_month"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginRight="5dp"
-            android:layout_marginTop="5dp" />
-
-        <TextView
-            android:id="@+id/post_day"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="5dp"
-            android:layout_marginTop="5dp"
-            android:layout_toLeftOf="@id/post_month" />
 
         <TextView
             android:id="@+id/post_body_detail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/user_name_detail"
-            android:layout_margin="4dp"
             android:layout_toRightOf="@id/avatar" />
 
         <Button
@@ -78,14 +60,8 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/post_body_detail"
+            android:layout_marginTop="5dp"
             android:text="@string/answer_topic_button_text" />
-
-        <EditText
-            android:id="@+id/response_body"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:inputType="text"
-            android:visibility="gone" />
     </RelativeLayout>
 
 </LinearLayout>

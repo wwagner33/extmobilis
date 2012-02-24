@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.paulo.android.solarmobile.controller"
+    package="com.mobilis.controller"
     android:versionCode="1"
     android:versionName="1.0" >
 
@@ -33,7 +33,7 @@
         <activity
             android:name=".ResponseController"
             android:windowSoftInputMode="adjustResize"/>
-        <activity android:name=".PostDetailController" />
+        <activity android:name="com.mobilis.controller.PostDetailController" />
     </application>
 
 </manifest>

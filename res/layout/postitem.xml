@@ -17,14 +17,13 @@
         android:src="@drawable/stock_person" />
 
     <TextView
-        android:layout_marginTop="5dp"
         android:id="@+id/post_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
         android:layout_toRightOf="@id/avatar"
         android:text="Nome"
         android:textStyle="bold" />
-
 
     <TextView
         android:id="@+id/post_date"
@@ -33,30 +32,27 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
         android:layout_marginRight="5dp"
-        android:layout_marginTop="5dp"
-       	/>
+        android:layout_marginTop="5dp" />
 
     <TextView
-        
         android:id="@+id/post_body"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/post_title"
         android:layout_marginBottom="5dp"
         android:layout_marginRight="5dp"
-        android:layout_toRightOf="@id/avatar"
-     />
+        android:layout_toRightOf="@id/avatar" />
 
     <LinearLayout
-        android:layout_below="@id/post_body"
         android:layout_width="fill_parent"
         android:layout_height="1dp"
+        android:layout_below="@id/post_body"
         android:orientation="vertical" />
-    
+
     <LinearLayout
-        android:layout_below="@id/avatar"
         android:layout_width="fill_parent"
         android:layout_height="2dp"
+        android:layout_below="@id/avatar"
         android:orientation="vertical" />
 
 </RelativeLayout>
