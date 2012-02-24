@@ -79,8 +79,6 @@ public class ParseJSON {
 				parsedValues[i].put("group_id",
 						(String) jsonObjects[i].get("group_id"));
 
-				// Log.w("group_id",)
-
 				parsedValues[i].put("offer_id",
 						(String) jsonObjects[i].get("offer_id"));
 
@@ -96,7 +94,6 @@ public class ParseJSON {
 				parsedValues[i]
 						.put("name", (String) jsonObjects[i].get("name"));
 
-				// parsedValues[i].put("isSelect", false);
 			}
 
 			return parsedValues;
@@ -123,6 +120,8 @@ public class ParseJSON {
 
 				parsedValues[i].put("semester",
 						(String) jsonObjects[i].get("semester"));
+				
+				
 
 			}
 
@@ -147,7 +146,6 @@ public class ParseJSON {
 
 				JSONObject teste2 = (JSONObject) jsonObjects[i]
 						.get("discussion");
-				// Log.w("OBJECT 1", teste2.toJSONString());
 
 				parsedValues[i] = new ContentValues();
 
@@ -161,10 +159,10 @@ public class ParseJSON {
 
 				parsedValues[i].put("name", (String) teste2.get("name"));
 
-				// Log.w("NAME", (String) jsonObjects[i].get("name"));
-
 				parsedValues[i].put("schedule_id",
 						(Long) teste2.get("schedule_id"));
+				
+				parsedValues[i].put("isClosed", (String) teste2.get("closed"));
 
 			}
 			return parsedValues;

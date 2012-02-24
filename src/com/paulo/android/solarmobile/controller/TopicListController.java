@@ -175,6 +175,7 @@ public class TopicListController extends ListActivity {
 				TextView topicTitle = (TextView) convertView
 						.findViewById(R.id.topic_name);
 				topicTitle.setText(values[position].getAsString("name"));
+				Log.w("isClosed", values[position].getAsString("isClosed"));
 			}
 
 			return convertView;
