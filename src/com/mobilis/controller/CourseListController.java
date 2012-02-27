@@ -6,7 +6,9 @@ import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -22,8 +24,6 @@ import com.mobilis.model.DBAdapter;
 import com.mobilis.threads.RequestCoursesThread;
 import com.mobilis.threads.RequestCurriculumUnitsThread;
 
-//import com.paulo.android.solarmobile.controller.R;
-
 public class CourseListController extends ListActivity {
 
 	private Intent intent;
@@ -35,10 +35,12 @@ public class CourseListController extends ListActivity {
 	private ProgressDialog dialog;
 	private RequestCurriculumUnits requestCurriculumUnits;
 	private RequestCourses requestCourses;
+	private SharedPreferences settings;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
 		setContentView(R.layout.course);
 
 		adapter = new DBAdapter(this);
@@ -121,6 +123,13 @@ public class CourseListController extends ListActivity {
 
 		Object semester = l.getAdapter().getItem(position);
 		semesterString = (String) semester;
+
+		// Settings
+		settings = PreferenceManager.getDefaultSharedPreferences(this);
+		SharedPreferences.Editor editor = settings.edit();
+		editor.putString("SelectedCourse", semesterString);
+		editor.commit();
+
 		Log.w("GroupID", semesterString);
 
 		adapter.open();
@@ -197,7 +206,7 @@ public class CourseListController extends ListActivity {
 			adapter.close();
 			updateList();
 			closeDialogIfItsVisible();
-			
+
 		}
 	}
 

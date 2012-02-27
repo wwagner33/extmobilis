@@ -2,13 +2,18 @@ package com.mobilis.controller;
 
 import java.util.Calendar;
 
-//import com.paulo.android.solarmobile.controller.R;
+import com.mobilis.model.DBAdapter;
+import com.mobilis.threads.RequestPostsThread;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.app.ListActivity;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -21,7 +26,6 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class PostList extends ListActivity implements OnClickListener {
 
@@ -35,12 +39,20 @@ public class PostList extends ListActivity implements OnClickListener {
 	private TextView textName;
 	private int currentDay, currentMonth, currentYear;
 	private Intent intent;
-	ImageView answerForum;
+	private ImageView answerForum;
+	SharedPreferences settings;
+	private Dialog dialog;
+	private RequestPosts requestPosts;
+	private DBAdapter adapter;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.post);
+
+		settings = PreferenceManager.getDefaultSharedPreferences(this);
+
+		adapter = new DBAdapter(this);
 
 		answerForum = (ImageView) findViewById(R.id.answer_topic_image);
 		answerForum.setOnClickListener(this);
@@ -90,6 +102,12 @@ public class PostList extends ListActivity implements OnClickListener {
 		}
 	}
 
+	public void closeDialogIfItsVisible() {
+		if (dialog != null && dialog.isShowing())
+			dialog.dismiss();
+
+	}
+
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);
@@ -110,12 +128,7 @@ public class PostList extends ListActivity implements OnClickListener {
 		parsedValues = jsonParser.parseJSON(source, Constants.PARSE_POSTS_ID);
 		listAdapter = new PostAdapter(this, parsedValues);
 		setListAdapter(listAdapter);
-	}
 
-	public void updateList(ContentValues[] values) {
-		Log.w("teste", "teste");
-		PostAdapter newAdapter = new PostAdapter(this, parsedValues);
-		setListAdapter(newAdapter);
 	}
 
 	public boolean postedToday(int postDay, int postMonth, int postYear) {
@@ -169,16 +182,44 @@ public class PostList extends ListActivity implements OnClickListener {
 
 	}
 
+	public void obtainPosts(String URLString) {
+		requestPosts = new RequestPosts(this);
+		adapter.open();
+		requestPosts.setConnectionParameters(URLString, adapter.getToken());
+		adapter.close();
+		requestPosts.execute();
+	}
+
+	public class RequestPosts extends RequestPostsThread {
+
+		public RequestPosts(Context context) {
+			super(context);
+		}
+
+		@Override
+		public void onPostsConnectionFailed() {
+			closeDialogIfItsVisible();
+		}
+
+		@Override
+		public void onPostsConnectionSucceded(String result) {
+			updateList(result);
+			closeDialogIfItsVisible();
+		}
+
+	}
+
 	public class PostAdapter extends BaseAdapter {
 
-		Activity activity;
+		// Activity activity;
+		Context context;
 		ContentValues[] data;
 		LayoutInflater inflater = null;
 
-		public PostAdapter(Activity activity, ContentValues[] data) {
-			this.activity = activity;
+		public PostAdapter(Context context, ContentValues[] data) {
+			this.context = context;
 			this.data = data;
-			inflater = LayoutInflater.from(activity);
+			inflater = LayoutInflater.from(context);
 		}
 
 		@Override
@@ -258,9 +299,12 @@ public class PostList extends ListActivity implements OnClickListener {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		// return super.onOptionsItemSelected(item);
 		if (item.getItemId() == R.id.menu_refresh) {
-			// TBI
+			String currentTopic = settings.getString("SelectedTopic", null);
+			dialog = Dialogs.getProgressDialog(this);
+			dialog.show();
+			obtainPosts(Constants.URL_DISCUSSION_PREFIX + currentTopic
+					+ Constants.URL_POSTS_SUFFIX);
 		}
 		return true;
 

@@ -6,7 +6,9 @@ import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -21,7 +23,7 @@ import android.widget.TextView;
 
 import com.mobilis.model.DBAdapter;
 import com.mobilis.threads.RequestPostsThread;
-//import com.paulo.android.solarmobile.controller.R;
+import com.mobilis.threads.RequestTopicsThread;
 
 public class TopicListController extends ListActivity {
 
@@ -37,11 +39,14 @@ public class TopicListController extends ListActivity {
 	private RequestPosts requestPosts;
 	private String forumName;
 	private ProgressDialog dialog;
+	SharedPreferences settings;
+	private RequestTopics requestTopics;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.topic);
+		settings = PreferenceManager.getDefaultSharedPreferences(this);
 		adapter = new DBAdapter(this);
 		Bundle extras = getIntent().getExtras();
 		String extraString = extras.getString("TopicList");
@@ -96,6 +101,11 @@ public class TopicListController extends ListActivity {
 		Object teste = l.getAdapter().getItem(position);
 		long TopicIdLong = (Long) teste;
 		topicIdString = String.valueOf(TopicIdLong);
+
+		SharedPreferences.Editor editor = settings.edit();
+		editor.putString("SelectedTopic", topicIdString);
+		editor.commit();
+
 		Log.w("TOPIC ID", topicIdString);
 
 		dialog = Dialogs.getProgressDialog(this);
@@ -113,6 +123,14 @@ public class TopicListController extends ListActivity {
 		adapter.close();
 		requestPosts.execute();
 
+	}
+
+	public void obtainTopics(String URLString) {
+		requestTopics = new RequestTopics(this);
+		adapter.open();
+		requestTopics.setConnectionParameters(URLString, adapter.getToken());
+		adapter.close();
+		requestTopics.execute();
 	}
 
 	public class RequestPosts extends RequestPostsThread {
@@ -135,6 +153,27 @@ public class TopicListController extends ListActivity {
 			intent.putExtra("PostList", (String) result);
 			intent.putExtra("topicId", topicIdString);
 			startActivity(intent);
+
+		}
+	}
+
+	public class RequestTopics extends RequestTopicsThread {
+
+		public RequestTopics(Context context) {
+			super(context);
+			// TODO Auto-generated constructor stub
+		}
+
+		@Override
+		public void onTopicsConnectionFailed() {
+			closeDialogIfItsVisible();
+
+		}
+
+		@Override
+		public void onTopicsConnectionSucceded(String result) {
+			updateList(result);
+			closeDialogIfItsVisible();
 
 		}
 	}
@@ -169,16 +208,13 @@ public class TopicListController extends ListActivity {
 
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
-			if (convertView == null) {
-				convertView = inflater.inflate(R.layout.topicitem, parent,
-						false);
 
-				TextView topicTitle = (TextView) convertView
-						.findViewById(R.id.topic_name);
-				topicTitle.setText(values[position].getAsString("name"));
-				Log.w("isClosed", values[position].getAsString("isClosed"));
-			}
+			convertView = inflater.inflate(R.layout.topicitem, parent, false);
 
+			TextView topicTitle = (TextView) convertView
+					.findViewById(R.id.topic_name);
+			topicTitle.setText(values[position].getAsString("name"));
+			Log.w("isClosed", values[position].getAsString("isClosed"));
 			return convertView;
 		}
 
@@ -193,9 +229,14 @@ public class TopicListController extends ListActivity {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		// return super.onOptionsItemSelected(item);
+
 		if (item.getItemId() == R.id.menu_refresh) {
-			// TBI
+
+			String currentClass = settings.getString("SelectedClass", null);
+			dialog = Dialogs.getProgressDialog(this);
+			dialog.show();
+			obtainTopics(Constants.URL_GROUPS_PREFIX + currentClass
+					+ Constants.URL_DISCUSSION_SUFFIX);
 		}
 		return true;
 

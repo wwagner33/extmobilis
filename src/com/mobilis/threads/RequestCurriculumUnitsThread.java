@@ -14,7 +14,6 @@ public abstract class RequestCurriculumUnitsThread extends ConnectionThread {
 
 	public RequestCurriculumUnitsThread(Context context) {
 		super(context);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override

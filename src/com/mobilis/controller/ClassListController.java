@@ -6,7 +6,9 @@ import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,8 +20,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.mobilis.model.DBAdapter;
+import com.mobilis.threads.RequestCurriculumUnitsThread;
 import com.mobilis.threads.RequestTopicsThread;
-//import com.mobilis.controller.R;
 
 public class ClassListController extends ListActivity {
 
@@ -31,12 +33,15 @@ public class ClassListController extends ListActivity {
 	private ProgressDialog dialog;
 	private Intent intent;
 	private RequestTopics requestTopics;
+	private RequestCurriculumUnits requestClasses;
+	SharedPreferences settings;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.curriculum_units);
 		adapter = new DBAdapter(this);
+		settings = PreferenceManager.getDefaultSharedPreferences(this);
 
 		Bundle extras = getIntent().getExtras();
 		extrasString = extras.getString("GroupList");
@@ -76,19 +81,19 @@ public class ClassListController extends ListActivity {
 		requestTopics.execute();
 	}
 
+	public void obtainClasses(String URLString) {
+		requestClasses = new RequestCurriculumUnits(this);
+		adapter.open();
+		requestClasses.setConnectionParameters(URLString, adapter.getToken());
+		adapter.close();
+		requestClasses.execute();
+	}
+
 	public void updateList() {
 
 		jsonParser = new ParseJSON();
 		parsedValues = jsonParser.parseJSON(extrasString,
 				Constants.PARSE_CLASSES_ID);
-		listAdapter = new ClassAdapter(this, parsedValues);
-		setListAdapter(listAdapter);
-
-	}
-
-	public void updateList(String temp) {
-		jsonParser = new ParseJSON();
-		parsedValues = jsonParser.parseJSON(temp, Constants.PARSE_CLASSES_ID);
 		listAdapter = new ClassAdapter(this, parsedValues);
 		setListAdapter(listAdapter);
 	}
@@ -99,6 +104,11 @@ public class ClassListController extends ListActivity {
 		super.onListItemClick(l, v, position, id);
 
 		classIdString = (String) l.getAdapter().getItem(position);
+
+		SharedPreferences.Editor editor = settings.edit();
+		editor.putString("SelectedClass", classIdString);
+		editor.commit();
+
 		dialog = Dialogs.getProgressDialog(this);
 		dialog.show();
 
@@ -131,16 +141,39 @@ public class ClassListController extends ListActivity {
 
 	}
 
+	public class RequestCurriculumUnits extends RequestCurriculumUnitsThread {
+
+		public RequestCurriculumUnits(Context context) {
+			super(context);
+		}
+
+		@Override
+		public void onCurriculumUnitsConnectionFailed() {
+			closeDialogIfItsVisible();
+
+		}
+
+		@Override
+		public void onCurriculumUnitsConnectionSuccedded(String result) {
+			ContentValues[] classValues = jsonParser.parseJSON(result,
+					Constants.PARSE_CLASSES_ID);
+			parsedValues = classValues;
+			listAdapter.notifyDataSetChanged();
+			closeDialogIfItsVisible();
+		}
+
+	}
+
 	public class ClassAdapter extends BaseAdapter {
 
-		Activity activity;
+		Context context;
 		ContentValues[] values;
 		LayoutInflater inflater = null;
 
-		public ClassAdapter(Activity a, ContentValues[] v) {
-			activity = a;
+		public ClassAdapter(Context c, ContentValues[] v) {
+			context = c;
 			values = v;
-			inflater = LayoutInflater.from(activity);
+			inflater = LayoutInflater.from(context);
 		}
 
 		@Override
@@ -185,11 +218,15 @@ public class ClassListController extends ListActivity {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		// return super.onOptionsItemSelected(item);
 		if (item.getItemId() == R.id.menu_refresh) {
-			// TBI
+
+			String selectedCourse = settings.getString("SelectedCourse", null);
+			dialog = Dialogs.getProgressDialog(this);
+			dialog.show();
+			obtainClasses(Constants.URL_CURRICULUM_UNITS_PREFIX
+					+ selectedCourse + Constants.URL_GROUPS_SUFFIX);
+
 		}
 		return true;
-
 	}
 }
