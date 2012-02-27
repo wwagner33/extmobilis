@@ -15,7 +15,7 @@ import android.widget.EditText;
 import com.mobilis.model.DBAdapter;
 import com.mobilis.threads.RequestCoursesThread;
 import com.mobilis.threads.RequestTokenThread;
-//import com.paulo.android.solarmobile.controller.R;
+
 
 public class Login extends Activity implements OnClickListener {
 

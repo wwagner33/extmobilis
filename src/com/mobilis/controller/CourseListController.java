@@ -19,7 +19,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.mobilis.model.DBAdapter;
+import com.mobilis.threads.RequestCoursesThread;
 import com.mobilis.threads.RequestCurriculumUnitsThread;
+
 //import com.paulo.android.solarmobile.controller.R;
 
 public class CourseListController extends ListActivity {
@@ -32,6 +34,7 @@ public class CourseListController extends ListActivity {
 	private CourseListAdapter customAdapter;
 	private ProgressDialog dialog;
 	private RequestCurriculumUnits requestCurriculumUnits;
+	private RequestCourses requestCourses;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -134,10 +137,6 @@ public class CourseListController extends ListActivity {
 
 	}
 
-	public void getCourseList() {
-		// implementado quando houver refresh
-	}
-
 	public void obtainCurriculumUnits(String URLString) {
 
 		requestCurriculumUnits = new RequestCurriculumUnits(this);
@@ -147,6 +146,14 @@ public class CourseListController extends ListActivity {
 		adapter.close();
 		requestCurriculumUnits.execute();
 
+	}
+
+	public void obtainCourses(String URLString) {
+		requestCourses = new RequestCourses(this);
+		adapter.open();
+		requestCourses.setConnectionParameters(URLString, adapter.getToken());
+		adapter.close();
+		requestCourses.execute();
 	}
 
 	public class RequestCurriculumUnits extends RequestCurriculumUnitsThread {
@@ -169,6 +176,28 @@ public class CourseListController extends ListActivity {
 			intent.putExtra("GroupList", result);
 			startActivity(intent);
 
+		}
+	}
+
+	public class RequestCourses extends RequestCoursesThread {
+
+		public RequestCourses(Context context) {
+			super(context);
+		}
+
+		@Override
+		public void onCoursesConnectionFailed() {
+			closeDialogIfItsVisible();
+		}
+
+		@Override
+		public void onCoursesConnectionSucceded(String result) {
+			adapter.open();
+			adapter.updateCourses(result);
+			adapter.close();
+			updateList();
+			closeDialogIfItsVisible();
+			
 		}
 	}
 
@@ -222,11 +251,11 @@ public class CourseListController extends ListActivity {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		// return super.onOptionsItemSelected(item);
 		if (item.getItemId() == R.id.menu_refresh) {
-			// TBI
+			dialog = Dialogs.getProgressDialog(this);
+			dialog.show();
+			obtainCourses(Constants.URL_COURSES);
 		}
 		return true;
-
 	}
 }
