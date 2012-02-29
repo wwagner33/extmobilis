@@ -2,10 +2,6 @@ package com.mobilis.controller;
 
 import java.util.Calendar;
 
-import com.mobilis.model.DBAdapter;
-import com.mobilis.threads.RequestPostsThread;
-
-import android.app.Activity;
 import android.app.Dialog;
 import android.app.ListActivity;
 import android.content.ContentValues;
@@ -27,20 +23,24 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.mobilis.model.DBAdapter;
+import com.mobilis.threads.RequestNewPostsThread;
+import com.mobilis.threads.RequestPostsThread;
+
 public class PostList extends ListActivity implements OnClickListener {
+
+	// http://apolo11teste.virtual.ufc.br/ws_solar/images/7/users
 
 	private static final long noParentId = 0;
 	private PostAdapter listAdapter;
-	private String extrasString, forumName, topicId;
+	private String forumName;
 	private ContentValues parsedValues[];
-	private Bundle extras;
-	private ContentValues[] emptyListFiller;
 	private ParseJSON jsonParser;
 	private TextView textName;
 	private int currentDay, currentMonth, currentYear;
 	private Intent intent;
 	private ImageView answerForum;
-	SharedPreferences settings;
+	public SharedPreferences settings;
 	private Dialog dialog;
 	private RequestPosts requestPosts;
 	private DBAdapter adapter;
@@ -70,36 +70,18 @@ public class PostList extends ListActivity implements OnClickListener {
 		currentMonth = calendar.get(Calendar.MONTH) + 1;
 
 		textName = (TextView) findViewById(R.id.nome_forum);
-		extras = getIntent().getExtras();
-		extrasString = extras.getString("PostList");
 
-		if (extrasString != null) {
+		textName.setText(settings.getString("CurrentForumName", null));
 
-			forumName = extras.getString("ForumName");
-			textName.setText(forumName);
-			topicId = extras.getString("topicId");
+		adapter.open();
+		updateList(adapter.getPosts());
+		adapter.close();
 
-		}
-
-		else {
-			emptyListFiller = new ContentValues[10];
-
-			for (int i = 1; i < emptyListFiller.length; i++) {
-				emptyListFiller[i] = new ContentValues();
-				emptyListFiller[i].put("nada", "nada");
-			}
-
-			listAdapter = new PostAdapter(this, emptyListFiller);
-			setListAdapter(listAdapter);
-		}
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
-		if (extrasString != null) {
-			updateList(extrasString);
-		}
 	}
 
 	public void closeDialogIfItsVisible() {
@@ -114,10 +96,16 @@ public class PostList extends ListActivity implements OnClickListener {
 		ContentValues listValue = (ContentValues) l.getAdapter().getItem(
 				position);
 		Intent intent = new Intent(this, PostDetailController.class);
-		intent.putExtra("username", listValue.getAsString("username"));
-		intent.putExtra("content", listValue.getAsString("content"));
-		intent.putExtra("forumName", forumName);
-		intent.putExtra("topicId", topicId);
+		intent.putExtra("username", listValue.getAsString("user_name"));
+
+		if (listValue.getAsString("content_last").equals("")) {
+			intent.putExtra("content", listValue.getAsString("content_first"));
+		} else {
+			intent.putExtra("content", listValue.getAsString("content_first")
+					+ listValue.getAsString("content_last"));
+		}
+
+		intent.putExtra("topicId", settings.getString("SelectedTopic", null));
 		intent.putExtra("parentId", listValue.getAsLong("id"));
 		Log.w("ID ON POSTS", String.valueOf(listValue.getAsLong("id")));
 		startActivity(intent);
@@ -125,7 +113,8 @@ public class PostList extends ListActivity implements OnClickListener {
 
 	public void updateList(String source) {
 		jsonParser = new ParseJSON();
-		parsedValues = jsonParser.parseJSON(source, Constants.PARSE_POSTS_ID);
+		parsedValues = jsonParser.parseJSON(source,
+				Constants.PARSE_NEW_POSTS_ID);
 		listAdapter = new PostAdapter(this, parsedValues);
 		setListAdapter(listAdapter);
 
@@ -209,9 +198,25 @@ public class PostList extends ListActivity implements OnClickListener {
 
 	}
 
+	public class RequestNewPosts extends RequestNewPostsThread {
+
+		public RequestNewPosts(Context context) {
+			super(context);
+		}
+
+		@Override
+		public void onNewPostsConnectionFalied() {
+			closeDialogIfItsVisible();
+		}
+
+		@Override
+		public void onNewPostConnectionSecceded(String result) {
+			updateList(result);
+		}
+	}
+
 	public class PostAdapter extends BaseAdapter {
 
-		// Activity activity;
 		Context context;
 		ContentValues[] data;
 		LayoutInflater inflater = null;
@@ -265,12 +270,12 @@ public class PostList extends ListActivity implements OnClickListener {
 
 			TextView postBody = (TextView) convertView
 					.findViewById(R.id.post_body);
-			postBody.setText(data[position].getAsString("content"));
+			postBody.setText(data[position].getAsString("content_first"));
 
 			TextView userName = (TextView) convertView
 					.findViewById(R.id.post_title);
 			userName.setText(String.valueOf(data[position]
-					.getAsString("username")));
+					.getAsString("user_name")));
 
 			return convertView;
 		}
@@ -281,10 +286,8 @@ public class PostList extends ListActivity implements OnClickListener {
 		if (v.getId() == R.id.answer_topic_image) {
 
 			intent = new Intent(this, ResponseController.class);
-			intent.putExtra("topicId", topicId);
+			intent.putExtra("topicId", "");
 			intent.putExtra("parentId", noParentId);
-			intent.putExtra("ForumName", forumName);
-
 			startActivity(intent);
 
 		}
@@ -300,11 +303,13 @@ public class PostList extends ListActivity implements OnClickListener {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if (item.getItemId() == R.id.menu_refresh) {
+
 			String currentTopic = settings.getString("SelectedTopic", null);
 			dialog = Dialogs.getProgressDialog(this);
 			dialog.show();
 			obtainPosts(Constants.URL_DISCUSSION_PREFIX + currentTopic
 					+ Constants.URL_POSTS_SUFFIX);
+
 		}
 		return true;
 

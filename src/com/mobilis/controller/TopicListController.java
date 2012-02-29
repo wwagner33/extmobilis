@@ -22,13 +22,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.mobilis.model.DBAdapter;
+import com.mobilis.threads.RequestNewPostsThread;
 import com.mobilis.threads.RequestPostsThread;
 import com.mobilis.threads.RequestTopicsThread;
 
 public class TopicListController extends ListActivity {
-
-	private String[] topics = { "Assunto1", "Assunto2", "Assunto3", "Assunto4",
-			"Assunto5", "Assunto6" };
 
 	private String topicIdString;
 	private DBAdapter adapter;
@@ -39,8 +37,11 @@ public class TopicListController extends ListActivity {
 	private RequestPosts requestPosts;
 	private String forumName;
 	private ProgressDialog dialog;
-	SharedPreferences settings;
+	private SharedPreferences settings;
 	private RequestTopics requestTopics;
+	private RequestNewPosts requestNewPosts;
+
+	private boolean updated = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -56,10 +57,6 @@ public class TopicListController extends ListActivity {
 		}
 
 		else {
-
-			ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-					R.layout.topicitem, topics);
-			setListAdapter(adapter);
 		}
 	}
 
@@ -104,15 +101,41 @@ public class TopicListController extends ListActivity {
 
 		SharedPreferences.Editor editor = settings.edit();
 		editor.putString("SelectedTopic", topicIdString);
+		editor.putString("CurrentForumName", forumName);
 		editor.commit();
 
 		Log.w("TOPIC ID", topicIdString);
 
 		dialog = Dialogs.getProgressDialog(this);
 		dialog.show();
-		obtainPosts(Constants.URL_DISCUSSION_PREFIX + topicIdString
-				+ Constants.URL_POSTS_SUFFIX);
 
+		// chamada velha
+		// obtainPosts(Constants.URL_DISCUSSION_PREFIX + topicIdString
+		// + Constants.URL_POSTS_SUFFIX);
+
+		// Nova chamada
+		adapter.open();
+		if (!adapter.postsStringExists()) {
+			adapter.close();
+			String url = "discussions/" + topicIdString + "/posts/"
+					+ Constants.oldDateString + "/news.json";
+			Log.w("NEW POSTS URL", url);
+			obtainNewPosts(url);
+		} else {
+			adapter.close();
+			intent = new Intent(this, PostList.class);
+			startActivity(intent);
+		}
+
+	}
+
+	public void obtainNewPosts(String urlString) {
+		requestNewPosts = new RequestNewPosts(this);
+		adapter.open();
+		requestNewPosts.setConnectionParameters(urlString, adapter.getToken());
+		Log.w("Posts String", urlString);
+		adapter.close();
+		requestNewPosts.execute();
 	}
 
 	public void obtainPosts(String URLString) {
@@ -133,6 +156,30 @@ public class TopicListController extends ListActivity {
 		requestTopics.execute();
 	}
 
+	public class RequestNewPosts extends RequestNewPostsThread {
+
+		public RequestNewPosts(Context context) {
+			super(context);
+		}
+
+		@Override
+		public void onNewPostsConnectionFalied() {
+			closeDialogIfItsVisible();
+		}
+
+		@Override
+		public void onNewPostConnectionSecceded(String result) {
+			Log.w("NEW POSTS RESULT", result);
+			adapter.open();
+			adapter.updatePostsString(result);
+			adapter.close();
+			intent = new Intent(getApplicationContext(), PostList.class);
+			startActivity(intent);
+
+		}
+
+	}
+
 	public class RequestPosts extends RequestPostsThread {
 
 		public RequestPosts(Context context) {
@@ -148,10 +195,11 @@ public class TopicListController extends ListActivity {
 
 		@Override
 		public void onPostsConnectionSucceded(String result) {
+
 			intent = new Intent(getApplicationContext(), PostList.class);
-			intent.putExtra("ForumName", forumName);
-			intent.putExtra("PostList", (String) result);
-			intent.putExtra("topicId", topicIdString);
+			adapter.open();
+			adapter.updatePostsString(result);
+			adapter.close();
 			startActivity(intent);
 
 		}
@@ -161,7 +209,6 @@ public class TopicListController extends ListActivity {
 
 		public RequestTopics(Context context) {
 			super(context);
-			// TODO Auto-generated constructor stub
 		}
 
 		@Override

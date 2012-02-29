@@ -4,7 +4,9 @@ package com.mobilis.controller;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -16,13 +18,15 @@ public class PostDetailController extends Activity implements OnClickListener {
 	private TextView body, userName, forumName;
 	private Bundle extras;
 	private Button response;
-	private String topicId, forumNameString;
+	private String topicId;
 	private long parentId;
+	private SharedPreferences settings;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.post_detail);
+		settings = PreferenceManager.getDefaultSharedPreferences(this);
 		body = (TextView) findViewById(R.id.post_body_detail);
 		forumName = (TextView) findViewById(R.id.nome_forum_detail);
 		userName = (TextView) findViewById(R.id.user_name_detail);
@@ -32,8 +36,7 @@ public class PostDetailController extends Activity implements OnClickListener {
 		extras = getIntent().getExtras();
 		if (extras != null) {
 			body.setText(extras.getString("content"));
-			forumName.setText(extras.getString("forumName"));
-			forumNameString = extras.getString("forumName");
+			forumName.setText(settings.getString("CurrentForumName", null));
 			userName.setText(extras.getString("username"));
 			topicId = extras.getString("topicId");
 			parentId = extras.getLong("parentId");
@@ -47,7 +50,6 @@ public class PostDetailController extends Activity implements OnClickListener {
 		Intent intent = new Intent(this, ResponseController.class);
 		intent.putExtra("topicId", topicId);
 		intent.putExtra("parentId", parentId);
-		intent.putExtra("ForumName", forumNameString);
 		startActivity(intent);
 	}
 

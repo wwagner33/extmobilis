@@ -10,11 +10,13 @@ import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaRecorder;
 import android.media.MediaRecorder.OnInfoListener;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -33,9 +35,11 @@ import android.widget.Toast;
 import com.mobilis.audio.PlayAudio;
 import com.mobilis.audio.RecordAudio;
 import com.mobilis.model.DBAdapter;
+import com.mobilis.threads.RequestNewPostsThread;
 import com.mobilis.threads.RequestPostsThread;
 import com.mobilis.threads.SubmitAudioResponseThread;
 import com.mobilis.threads.SubmitTextResponseThread;
+
 //import com.paulo.android.solarmobile.controller.R;
 
 public class ResponseController extends Activity implements OnClickListener,
@@ -58,6 +62,8 @@ public class ResponseController extends Activity implements OnClickListener,
 	private RelativeLayout audioPreviewBar;
 	private RequestPosts requestPosts;
 	private boolean existsRecording = false;
+	private RequestNewPosts requestNewPosts;
+	public SharedPreferences settings;
 
 	private String charSequenceAfter, charSequenceBefore;
 
@@ -84,6 +90,8 @@ public class ResponseController extends Activity implements OnClickListener,
 		stopWatch = (Chronometer) findViewById(R.id.recording_chronometer);
 		stopWatch.setOnChronometerTickListener(this);
 
+		settings = PreferenceManager.getDefaultSharedPreferences(this);
+
 		deleteRecording = (Button) findViewById(R.id.delete_recording);
 		deleteRecording.setOnClickListener(this);
 
@@ -103,7 +111,7 @@ public class ResponseController extends Activity implements OnClickListener,
 		if (extras != null) {
 
 			topicId = extras.getString("topicId");
-
+			Log.w("TopicId", topicId);
 			forumName = extras.getString("ForumName");
 
 		}
@@ -135,9 +143,10 @@ public class ResponseController extends Activity implements OnClickListener,
 	}
 
 	public void deleteRecording() {
-		File recordedFile = new File(Constants.RECORDING_PATH + Constants.RECORDING_FULLNAME);
+		File recordedFile = new File(Constants.RECORDING_PATH
+				+ Constants.RECORDING_FULLNAME);
 		recordedFile.delete();
-//		recorder.getAudioFile().delete();
+		// recorder.getAudioFile().delete();
 		Toast.makeText(this, "Gravação deletada com sucesso",
 				Toast.LENGTH_SHORT).show();
 		audioPreviewBar.setVisibility(View.GONE);
@@ -266,6 +275,15 @@ public class ResponseController extends Activity implements OnClickListener,
 
 	}
 
+	public void getNewPosts(String urlString) {
+		requestNewPosts = new RequestNewPosts(this);
+		adapter.open();
+
+		requestNewPosts.setConnectionParameters(urlString, adapter.getToken());
+		adapter.close();
+		requestNewPosts.execute();
+	}
+
 	public void sendAudioPost(String URLString, File audioFile) {
 		Log.w("ONSENDINGAUDIO", "TRUE");
 		submitAudio = new SubmitAudio(this);
@@ -312,8 +330,14 @@ public class ResponseController extends Activity implements OnClickListener,
 
 			} else {
 				Log.w("getPosts", "TRUE");
-				getPosts(Constants.URL_DISCUSSION_PREFIX + topicId
-						+ Constants.URL_POSTS_SUFFIX);
+
+				// chamada antiga
+				// getPosts(Constants.URL_DISCUSSION_PREFIX + topicId
+				// + Constants.URL_POSTS_SUFFIX);
+
+				getNewPosts("discussions/"
+						+ settings.getString("SelectedTopic", null) + "/posts/"
+						+ Constants.oldDateString + "/news.json");
 			}
 		}
 	}
@@ -337,6 +361,29 @@ public class ResponseController extends Activity implements OnClickListener,
 					+ Constants.URL_POSTS_SUFFIX);
 			closeDialogIfItsVisible();
 
+		}
+
+	}
+
+	public class RequestNewPosts extends RequestNewPostsThread {
+
+		public RequestNewPosts(Context context) {
+			super(context);
+		}
+
+		@Override
+		public void onNewPostsConnectionFalied() {
+			closeDialogIfItsVisible();
+		}
+
+		@Override
+		public void onNewPostConnectionSecceded(String result) {
+			adapter.open();
+			adapter.updatePostsString(result);
+			adapter.close();
+			intent = new Intent(getApplicationContext(), PostList.class);
+			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			startActivity(intent);
 		}
 
 	}
@@ -403,13 +450,6 @@ public class ResponseController extends Activity implements OnClickListener,
 	public void afterTextChanged(Editable editable) {
 
 		charCount.setText(String.valueOf(charSequenceAfter.length()));
-		/*
-		 * if (sizeBefore>sizeAfter) { charCount++;
-		 * charCountText.setText(String.valueOf(charCount)); } else {
-		 * charcount-- charcountText.setText(String.valueOf(charCount)); }
-		 * 
-		 * // charCount.setText()
-		 */
 
 	}
 

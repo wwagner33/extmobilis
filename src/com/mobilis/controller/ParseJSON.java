@@ -120,8 +120,6 @@ public class ParseJSON {
 
 				parsedValues[i].put("semester",
 						(String) jsonObjects[i].get("semester"));
-				
-				
 
 			}
 
@@ -161,7 +159,7 @@ public class ParseJSON {
 
 				parsedValues[i].put("schedule_id",
 						(Long) teste2.get("schedule_id"));
-				
+
 				parsedValues[i].put("isClosed", (String) teste2.get("closed"));
 
 			}
@@ -238,12 +236,55 @@ public class ParseJSON {
 			return parsedValues;
 		}
 
+		if (parseId == Constants.PARSE_NEW_POSTS_ID) {
+			Log.w("InsideParser", "TRUE");
+			Log.w("source", source);
+			Object object = JSONValue.parse(source);
+			JSONArray jsonArray = (JSONArray) object;
+			JSONObject jsonObjects[] = new JSONObject[jsonArray.size()];
+
+			parsedValues = new ContentValues[jsonArray.size()];
+
+			for (int i = 0; i < jsonArray.size(); i++) {
+
+				jsonObjects[i] = (JSONObject) jsonArray.get(i);
+
+				Log.w("Object", jsonObjects[i].toJSONString());
+
+				JSONObject teste2 = (JSONObject) jsonObjects[i]
+						.get("discussion_post");
+				Log.w("SINGLEOBJECT", teste2.toJSONString());
+
+				parsedValues[i] = new ContentValues();
+
+				parsedValues[i].put("content_first",
+						(String) teste2.get("content_first"));
+				parsedValues[i].put("content_last",
+						(String) teste2.get("content_last"));
+				parsedValues[i].put("discussion_id",
+						(Long) teste2.get("discussion_id"));
+				parsedValues[i].put("_id", (Long) teste2.get("id"));
+				parsedValues[i].putNull("parent_id");
+				parsedValues[i].put("profile_id",
+						(Long) teste2.get("profile_id"));
+				parsedValues[i].put("user_name",
+						(String) teste2.get("user_name"));
+				parsedValues[i].put("user_username",
+						(String) teste2.get("user_username"));
+				parseData(parsedValues, (String) teste2.get("updated"), i);
+				
+			}
+
+			return parsedValues;
+
+		}
+
 		return null;
 	}
 
-	public boolean isResponseSuccesful() {
-		return true;
-	}
+	// public boolean isResponseSuccesful() {
+	// return true;
+	// }
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public JSONObject buildTokenObject(String username, String password) {

@@ -50,10 +50,6 @@ public class DBAdapter {
 
 	}
 
-	// Queries Genéricas END
-
-	// Token Queries
-
 	public String getToken() {
 		Cursor teste = db.rawQuery("SELECT * FROM config WHERE _id=2", null);
 		teste.moveToFirst();
@@ -137,10 +133,45 @@ public class DBAdapter {
 		return result;
 	}
 
-	// Cursos Queries END
+	// POSTS Query
+	/*
+	 * public boolean postsExists() { Cursor cursor =
+	 * db.rawQuery("SELECT Count(*) FROM tb_posts", null); cursor.moveToFirst();
+	 * int numRows = cursor.getInt(0); cursor.close(); if (numRows > 0) { return
+	 * true; } else { return false; } }
+	 * 
+	 * public void updatePosts(ContentValues[] rawValues) { for (int i = 0; i <
+	 * rawValues.length; i++) { if (postsExists()) {
+	 * db.rawQuery("DELETE FROM tb_posts", null); } db.insert("tb_posts", null,
+	 * rawValues[i]);
+	 * 
+	 * } }
+	 */
 
-	// Cursos Queries START
+	public boolean postsStringExists() {
 
-	// Cursos Queries END
+		Cursor cursor = db.rawQuery("SELECT * FROM config WHERE _id=5", null);
+		cursor.moveToFirst();
+		String token = cursor.getString(cursor.getColumnIndex("valor"));
+		cursor.close();
+		if (token == null) {
+			return false;
+		} else
+			return true;
+	}
+
+	public String getPosts() {
+		Cursor cursor = db.rawQuery("SELECT * FROM config WHERE _id=5", null);
+		cursor.moveToFirst();
+		String result = cursor.getString(cursor.getColumnIndex("valor"));
+		cursor.close();
+		return result;
+	}
+
+	public void updatePostsString(String newPosts) {
+		ContentValues valores = new ContentValues();
+		valores.put("valor", newPosts);
+		db.update("config", valores, "_id=5", null);
+	}
 
 }
