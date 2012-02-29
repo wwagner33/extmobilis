@@ -291,6 +291,7 @@ public class PostList extends ListActivity implements OnClickListener {
 			startActivity(intent);
 
 		}
+
 	}
 
 	@Override

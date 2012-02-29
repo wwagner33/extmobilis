@@ -1,7 +1,9 @@
 package com.mobilis.ws;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -16,8 +18,12 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
 import org.json.simple.parser.ParseException;
 
+import android.graphics.Bitmap;
+import android.graphics.Bitmap.CompressFormat;
+import android.graphics.BitmapFactory;
 import android.os.Environment;
 import android.util.Log;
 
@@ -212,6 +218,44 @@ public class Connection {
 
 		resultSet[1] = Constants.ERROR_UNKNOWN;
 		return resultSet;
+
+	}
+
+	public void getImageFromServer(String url, String authToken)
+			throws ClientProtocolException, IOException {
+
+		FileOutputStream fileOutputStream = null;
+		DefaultHttpClient client = new DefaultHttpClient();
+		get = new HttpGet(Constants.URL_SERVER + url + "?auth_token="
+				+ authToken);
+
+		HttpResponse response = client.execute(get);
+		StatusLine statusLine = response.getStatusLine();
+		int statusCode = statusLine.getStatusCode();
+
+		Log.w("statusCode", String.valueOf(statusCode));
+
+		if (statusCode == 200) {
+			HttpEntity entity = response.getEntity();
+			String content = EntityUtils.toString(entity);
+			byte[] bytes = content.getBytes("UTF-8");
+
+			Bitmap myImage = BitmapFactory.decodeByteArray(bytes, 0,
+					bytes.length);
+
+			fileOutputStream = new FileOutputStream(Environment
+					.getExternalStorageDirectory().getAbsolutePath()
+					+ "/Mobilis/Recordings/" + "teste" + ".png");
+
+			BufferedOutputStream bos = new BufferedOutputStream(
+					fileOutputStream);
+
+			myImage.compress(CompressFormat.PNG, 1, fileOutputStream);
+
+			bos.flush();
+			bos.close();
+
+		}
 
 	}
 
