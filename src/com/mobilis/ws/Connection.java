@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
@@ -221,13 +222,17 @@ public class Connection {
 
 	}
 
-	public void getImageFromServer(String url, String authToken)
+	public Object[] getImageFromServer(String url, String authToken)
 			throws ClientProtocolException, IOException {
+
+		Object[] resultSet = new Object[2];
 
 		FileOutputStream fileOutputStream = null;
 		DefaultHttpClient client = new DefaultHttpClient();
 		get = new HttpGet(Constants.URL_SERVER + url + "?auth_token="
 				+ authToken);
+
+		Log.w("IMAGE UL", get.getURI().toString());
 
 		HttpResponse response = client.execute(get);
 		StatusLine statusLine = response.getStatusLine();
@@ -236,26 +241,39 @@ public class Connection {
 		Log.w("statusCode", String.valueOf(statusCode));
 
 		if (statusCode == 200) {
-			HttpEntity entity = response.getEntity();
-			String content = EntityUtils.toString(entity);
-			byte[] bytes = content.getBytes("UTF-8");
+			
+				//response.getEntity().getContent().;
+			/*
+			 * Header teste = response.getEntity().getContentType();
+			 * teste.getName();
+			 */
 
-			Bitmap myImage = BitmapFactory.decodeByteArray(bytes, 0,
-					bytes.length);
+			BitmapFactory.Options options = new BitmapFactory.Options();
+			options.inSampleSize=5;
+			Bitmap myImage = BitmapFactory.decodeStream(response.getEntity().getContent());
+					//	response.getEntity()
+					//BitmapFactory.decodeByteArray(bytes, 0,
+					//bytes.length,options);
 
 			fileOutputStream = new FileOutputStream(Environment
 					.getExternalStorageDirectory().getAbsolutePath()
-					+ "/Mobilis/Recordings/" + "teste" + ".png");
+					+ "/Mobilis/Recordings/" + "teste3" + ".png");
 
 			BufferedOutputStream bos = new BufferedOutputStream(
 					fileOutputStream);
 
-			myImage.compress(CompressFormat.PNG, 1, fileOutputStream);
+			// myImage.
+			myImage.compress(CompressFormat.PNG, 0, fileOutputStream);
 
 			bos.flush();
 			bos.close();
 
-		}
+			resultSet[1] = statusCode;
+			resultSet[0] = "teste";
+			return resultSet;
+
+		} else
+			return null;
 
 	}
 

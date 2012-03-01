@@ -1,5 +1,9 @@
 package com.mobilis.threads;
 
+import java.io.IOException;
+
+import org.apache.http.client.ClientProtocolException;
+
 import com.mobilis.controller.Constants;
 
 import android.content.Context;
@@ -32,8 +36,16 @@ public abstract class RequestImageThread extends ConnectionThread {
 
 	@Override
 	public Object[] connectionMethod() {
-		// TODO Auto-generated method stub
-		return null;
+	
+		try {
+			return super.connection.getImageFromServer(url, token);
+		} catch (ClientProtocolException e) {
+			e.printStackTrace();
+			return null;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	@Override

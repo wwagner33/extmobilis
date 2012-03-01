@@ -24,6 +24,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.mobilis.model.DBAdapter;
+import com.mobilis.threads.RequestImageThread;
 import com.mobilis.threads.RequestNewPostsThread;
 import com.mobilis.threads.RequestPostsThread;
 
@@ -44,6 +45,7 @@ public class PostList extends ListActivity implements OnClickListener {
 	private Dialog dialog;
 	private RequestPosts requestPosts;
 	private DBAdapter adapter;
+	private RequestImage requestImage;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -73,9 +75,12 @@ public class PostList extends ListActivity implements OnClickListener {
 
 		textName.setText(settings.getString("CurrentForumName", null));
 
-		adapter.open();
-		updateList(adapter.getPosts());
-		adapter.close();
+		//	getImageFormServer();
+		
+		 adapter.open();
+		 updateList(adapter.getPosts());
+		 adapter.close();
+		 
 
 	}
 
@@ -177,6 +182,38 @@ public class PostList extends ListActivity implements OnClickListener {
 		requestPosts.setConnectionParameters(URLString, adapter.getToken());
 		adapter.close();
 		requestPosts.execute();
+	}
+
+	public void getImageFormServer() {
+		Log.w("InsidePullImage", "TRUE");
+		requestImage = new RequestImage(this);
+		adapter.open();
+		requestImage.setConnectionParameters(
+		"images/1/users",
+				adapter.getToken());
+		adapter.close();
+		requestImage.execute();
+
+	}
+
+	public class RequestImage extends RequestImageThread {
+
+		public RequestImage(Context context) {
+			super(context);
+			// TODO Auto-generated constructor stub
+		}
+
+		@Override
+		public void onRequestImageConnectionFailed() {
+
+		}
+
+		@Override
+		public void onRequestImageConnectionSucceded(String result) {
+			Log.w("RESULT_OK", "TRUE");
+
+		}
+
 	}
 
 	public class RequestPosts extends RequestPostsThread {
