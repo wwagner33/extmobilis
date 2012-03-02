@@ -1,6 +1,17 @@
 package com.mobilis.controller;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Calendar;
+import java.util.Enumeration;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
+import java.util.zip.ZipFile;
+
+import org.apache.commons.io.IOUtils;
 
 import android.app.Dialog;
 import android.app.ListActivity;
@@ -9,6 +20,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,19 +30,26 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.mobilis.model.DBAdapter;
+import com.mobilis.threads.RequestHistoryPostsThread;
 import com.mobilis.threads.RequestImageThread;
 import com.mobilis.threads.RequestNewPostsThread;
 import com.mobilis.threads.RequestPostsThread;
 
-public class PostList extends ListActivity implements OnClickListener {
+public class PostList extends ListActivity implements OnClickListener,
+		OnScrollListener {
 
 	// http://apolo11teste.virtual.ufc.br/ws_solar/images/7/users
+	// /discussions/:id/posts/:date/history
+
+	// private static final int itemsPerPage = 20;
 
 	private static final long noParentId = 0;
 	private PostAdapter listAdapter;
@@ -46,11 +65,24 @@ public class PostList extends ListActivity implements OnClickListener {
 	private RequestPosts requestPosts;
 	private DBAdapter adapter;
 	private RequestImage requestImage;
+	private RequestNewPosts requestNewPosts;
+	private RequestHistoryPosts requestHistoryPosts;
+
+	// history
+	private boolean loadingMore = false;
+	private String oldestPostDate;
+	private View footerView;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.post);
+
+		/*
+		 * footerView = footerView = ((LayoutInflater) this
+		 * .getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(
+		 * R.layout.post_list_footer, null, false);
+		 */
 
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -75,12 +107,16 @@ public class PostList extends ListActivity implements OnClickListener {
 
 		textName.setText(settings.getString("CurrentForumName", null));
 
-		//	getImageFormServer();
-		
-		 adapter.open();
-		 updateList(adapter.getPosts());
-		 adapter.close();
-		 
+		// getImageFormServer();
+		// Unzip File
+
+		adapter.open();
+		updateList(adapter.getPosts());
+		adapter.close();
+
+		// dialog = Dialogs.getProgressDialog(this);
+		// dialog.show();
+		// unzipFile();
 
 	}
 
@@ -92,6 +128,69 @@ public class PostList extends ListActivity implements OnClickListener {
 	public void closeDialogIfItsVisible() {
 		if (dialog != null && dialog.isShowing())
 			dialog.dismiss();
+
+	}
+
+	private void createDir(File dir) {
+		if (dir.exists()) {
+			return;
+		}
+		if (!dir.mkdirs()) {
+			throw new RuntimeException("Can not create dir " + dir);
+		}
+	}
+
+	private void unzipEntry(ZipFile zipfile, ZipEntry entry, String outputDir)
+			throws IOException {
+
+		if (entry.isDirectory()) {
+			createDir(new File(outputDir, entry.getName()));
+			return;
+		}
+
+		File outputFile = new File(outputDir, entry.getName());
+		if (!outputFile.getParentFile().exists()) {
+			createDir(outputFile.getParentFile());
+		}
+
+		BufferedInputStream inputStream = new BufferedInputStream(
+				zipfile.getInputStream(entry));
+		BufferedOutputStream outputStream = new BufferedOutputStream(
+				new FileOutputStream(outputFile));
+
+		try {
+			IOUtils.copy(inputStream, outputStream);
+		} finally {
+			outputStream.close();
+			inputStream.close();
+		}
+
+	}
+
+	@SuppressWarnings("rawtypes")
+	public void unzipFile() {
+		// ZipInputStream = new ZipInputStream
+		String destinationPath = Environment.getExternalStorageDirectory()
+				.getAbsolutePath() + "/Mobilis/Recordings/";
+		File file = new File(Environment.getExternalStorageDirectory()
+				.getAbsolutePath() + "/Mobilis/Recordings/teste.zip");
+		try {
+			ZipFile zipFile = new ZipFile(file);
+
+			for (Enumeration e = zipFile.entries(); e.hasMoreElements();) {
+				ZipEntry entry = (ZipEntry) e.nextElement();
+				unzipEntry(zipFile, entry, destinationPath);
+
+			}
+
+		} catch (ZipException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		dialog.dismiss();
 
 	}
 
@@ -120,7 +219,20 @@ public class PostList extends ListActivity implements OnClickListener {
 		jsonParser = new ParseJSON();
 		parsedValues = jsonParser.parseJSON(source,
 				Constants.PARSE_NEW_POSTS_ID);
+		oldestPostDate = parsedValues[parsedValues.length - 1]
+				.getAsString("updated");
+		Log.w("OLDEST DATE ON LIST", oldestPostDate);
+
 		listAdapter = new PostAdapter(this, parsedValues);
+
+		/*
+		 * adding the footer view to the screen View footerView =
+		 * ((LayoutInflater) this
+		 * .getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(
+		 * R.layout.post_list_footer, null, false);
+		 * this.getListView().addFooterView(footerView);
+		 */
+
 		setListAdapter(listAdapter);
 
 	}
@@ -184,12 +296,19 @@ public class PostList extends ListActivity implements OnClickListener {
 		requestPosts.execute();
 	}
 
+	public void obtainNewPosts(String url) {
+		requestNewPosts = new RequestNewPosts(this);
+		adapter.open();
+		requestNewPosts.setConnectionParameters(url, adapter.getToken());
+		adapter.close();
+		requestNewPosts.execute();
+	}
+
 	public void getImageFormServer() {
 		Log.w("InsidePullImage", "TRUE");
 		requestImage = new RequestImage(this);
 		adapter.open();
-		requestImage.setConnectionParameters(
-		"images/1/users",
+		requestImage.setConnectionParameters("images/1/users",
 				adapter.getToken());
 		adapter.close();
 		requestImage.execute();
@@ -248,8 +367,33 @@ public class PostList extends ListActivity implements OnClickListener {
 
 		@Override
 		public void onNewPostConnectionSecceded(String result) {
+			adapter.open();
+			adapter.updatePostsString(result);
+			adapter.close();
 			updateList(result);
+			closeDialogIfItsVisible();
 		}
+	}
+
+	public class RequestHistoryPosts extends RequestHistoryPostsThread {
+
+		public RequestHistoryPosts(Context context) {
+			super(context);
+			// TODO Auto-generated constructor stub
+		}
+
+		@Override
+		public void onRequestHistoryPostsConnectionFailed() {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void onRequestHistoryPostsConnectionSucceded(String result) {
+			// TODO Auto-generated method stub
+
+		}
+
 	}
 
 	public class PostAdapter extends BaseAdapter {
@@ -345,11 +489,51 @@ public class PostList extends ListActivity implements OnClickListener {
 			String currentTopic = settings.getString("SelectedTopic", null);
 			dialog = Dialogs.getProgressDialog(this);
 			dialog.show();
-			obtainPosts(Constants.URL_DISCUSSION_PREFIX + currentTopic
-					+ Constants.URL_POSTS_SUFFIX);
+			String url = "discussions/"
+					+ settings.getString("SelectedTopic", null) + "/posts/"
+					+ Constants.oldDateString + "/news.json";
 
+			obtainNewPosts(url);
+
+			// Old call
+			/*
+			 * obtainPosts(Constants.URL_DISCUSSION_PREFIX + currentTopic +
+			 * Constants.URL_POSTS_SUFFIX);
+			 */
 		}
 		return true;
+
+	}
+
+	@Override
+	public void onScroll(AbsListView view, int firstVisibleItem,
+			int visibleItemCount, int totalItemCount) {
+		/*
+		 * if (this.getListView().getAdapter().getCount() > 20) { if
+		 * (!footerView.isVisible()) { footerView.setVisibility(View.VISIBLE); }
+		 * 
+		 * }
+		 */
+
+		int lastInScreen = firstVisibleItem + visibleItemCount;
+		if ((lastInScreen == totalItemCount) && !(loadingMore)) {
+
+			requestHistoryPosts = new RequestHistoryPosts(this);
+			adapter.open();
+
+			String url = "/discussions/"
+					+ settings.getString("SelectedTopic", null) + "/posts/"
+					+ oldestPostDate + "/history";
+			requestHistoryPosts
+					.setConnectionParameters(url, adapter.getToken());
+			adapter.close();
+			requestHistoryPosts.execute();
+		}
+
+	}
+
+	@Override
+	public void onScrollStateChanged(AbsListView view, int scrollState) {
 
 	}
 
