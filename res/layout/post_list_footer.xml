@@ -1,0 +1,22 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
+
+    <ProgressBar
+        android:layout_marginLeft="4dp"
+        android:layout_marginTop="5dp"
+        android:id="@+id/list_footer_progress"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_alignParentLeft="true"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:padding="5dp"
+        android:text="Carregando mais postagens" />
+
+</RelativeLayout><!-- android:layout_centerVertical="true" -->
