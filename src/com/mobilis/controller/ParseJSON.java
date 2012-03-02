@@ -271,8 +271,10 @@ public class ParseJSON {
 						(String) teste2.get("user_name"));
 				parsedValues[i].put("user_username",
 						(String) teste2.get("user_username"));
+
+				parsedValues[i].put("updated", (String) teste2.get("updated"));
 				parseData(parsedValues, (String) teste2.get("updated"), i);
-				
+
 			}
 
 			return parsedValues;
