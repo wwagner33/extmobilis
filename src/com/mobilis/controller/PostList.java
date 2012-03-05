@@ -221,18 +221,17 @@ public class PostList extends ListActivity implements OnClickListener,
 		parsedValues = jsonParser.parseJSON(source,
 				Constants.PARSE_NEW_POSTS_ID);
 
-		/*
-		 * if (parsedValues.length == 20) {
-		 * 
-		 * ((LayoutInflater) this
-		 * .getSystemService(Context.LAYOUT_INFLATER_SERVICE))
-		 * .inflate(R.layout.post_list_footer, null, false);
-		 * this.getListView().addFooterView(footerView); }
-		 */
+	
+		  if (parsedValues.length == 20) {
+		  
+		  ((LayoutInflater) this
+		  .getSystemService(Context.LAYOUT_INFLATER_SERVICE))
+		  .inflate(R.layout.post_list_footer, null, false);
+		  this.getListView().addFooterView(footerView); 
+		  }
+		 
 
-		// oldestPostDate = parsedValues[parsedValues.length - 1]
-		// .getAsString("updated");
-		// Log.w("OLDEST DATE ON LIST", oldestPostDate);//
+		oldestPostDate = parsedValues[parsedValues.length - 1].getAsString("updated");
 
 		listAdapter = new PostAdapter(this, parsedValues);
 
