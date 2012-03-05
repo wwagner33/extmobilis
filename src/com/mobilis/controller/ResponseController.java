@@ -257,7 +257,9 @@ public class ResponseController extends Activity implements OnClickListener,
 		token = adapter.getToken();
 		adapter.close();
 
-		URL = "discussions/" + topicId + "/posts?auth_token=" + token;
+		// URL = "discussions/" + topicId + "/posts?auth_token=" + token;
+		URL = "discussions/" + settings.getString("SelectedTopic", null)
+				+ "/posts?auth_token=" + token;
 
 		submitTextResponse = new SubmitTextResponse(this);
 		submitTextResponse.setConnectionParameters(URL, jsonString);

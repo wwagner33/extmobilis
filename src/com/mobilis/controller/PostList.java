@@ -51,6 +51,8 @@ public class PostList extends ListActivity implements OnClickListener,
 
 	// private static final int itemsPerPage = 20;
 
+	private int postHistoryCount;
+
 	private static final long noParentId = 0;
 	private PostAdapter listAdapter;
 	private String forumName;
@@ -67,6 +69,8 @@ public class PostList extends ListActivity implements OnClickListener,
 	private RequestImage requestImage;
 	private RequestNewPosts requestNewPosts;
 	private RequestHistoryPosts requestHistoryPosts;
+
+	private ContentValues[] sessionPosts;
 
 	// history
 	private boolean loadingMore = false;
@@ -136,7 +140,7 @@ public class PostList extends ListActivity implements OnClickListener,
 			return;
 		}
 		if (!dir.mkdirs()) {
-			throw new RuntimeException("Can not create dir " + dir);
+			throw new RuntimeException("Cannot create dir " + dir);
 		}
 	}
 
@@ -169,7 +173,6 @@ public class PostList extends ListActivity implements OnClickListener,
 
 	@SuppressWarnings("rawtypes")
 	public void unzipFile() {
-		// ZipInputStream = new ZipInputStream
 		String destinationPath = Environment.getExternalStorageDirectory()
 				.getAbsolutePath() + "/Mobilis/Recordings/";
 		File file = new File(Environment.getExternalStorageDirectory()
@@ -184,10 +187,8 @@ public class PostList extends ListActivity implements OnClickListener,
 			}
 
 		} catch (ZipException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		dialog.dismiss();
@@ -219,9 +220,19 @@ public class PostList extends ListActivity implements OnClickListener,
 		jsonParser = new ParseJSON();
 		parsedValues = jsonParser.parseJSON(source,
 				Constants.PARSE_NEW_POSTS_ID);
-		oldestPostDate = parsedValues[parsedValues.length - 1]
-				.getAsString("updated");
-		Log.w("OLDEST DATE ON LIST", oldestPostDate);
+
+		/*
+		 * if (parsedValues.length == 20) {
+		 * 
+		 * ((LayoutInflater) this
+		 * .getSystemService(Context.LAYOUT_INFLATER_SERVICE))
+		 * .inflate(R.layout.post_list_footer, null, false);
+		 * this.getListView().addFooterView(footerView); }
+		 */
+
+		// oldestPostDate = parsedValues[parsedValues.length - 1]
+		// .getAsString("updated");
+		// Log.w("OLDEST DATE ON LIST", oldestPostDate);//
 
 		listAdapter = new PostAdapter(this, parsedValues);
 
@@ -390,7 +401,6 @@ public class PostList extends ListActivity implements OnClickListener,
 
 		@Override
 		public void onRequestHistoryPostsConnectionSucceded(String result) {
-			// TODO Auto-generated method stub
 
 		}
 
@@ -486,7 +496,7 @@ public class PostList extends ListActivity implements OnClickListener,
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if (item.getItemId() == R.id.menu_refresh) {
 
-			String currentTopic = settings.getString("SelectedTopic", null);
+			// String currentTopic = settings.getString("SelectedTopic", null);
 			dialog = Dialogs.getProgressDialog(this);
 			dialog.show();
 			String url = "discussions/"
