@@ -5,6 +5,7 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Enumeration;
 import java.util.zip.ZipEntry;
@@ -51,12 +52,9 @@ public class PostList extends ListActivity implements OnClickListener,
 
 	// private static final int itemsPerPage = 20;
 
-	private int postHistoryCount;
-
 	private static final long noParentId = 0;
 	private PostAdapter listAdapter;
-	private String forumName;
-	private ContentValues parsedValues[];
+	private ArrayList<ContentValues> parsedValues, sessionList;
 	private ParseJSON jsonParser;
 	private TextView textName;
 	private int currentDay, currentMonth, currentYear;
@@ -69,8 +67,6 @@ public class PostList extends ListActivity implements OnClickListener,
 	private RequestImage requestImage;
 	private RequestNewPosts requestNewPosts;
 	private RequestHistoryPosts requestHistoryPosts;
-
-	private ContentValues[] sessionPosts;
 
 	// history
 	private boolean loadingMore = false;
@@ -110,6 +106,9 @@ public class PostList extends ListActivity implements OnClickListener,
 		textName = (TextView) findViewById(R.id.nome_forum);
 
 		textName.setText(settings.getString("CurrentForumName", null));
+
+		// Scroll Listener
+		getListView().setOnScrollListener(this);
 
 		// getImageFormServer();
 		// Unzip File
@@ -218,31 +217,20 @@ public class PostList extends ListActivity implements OnClickListener,
 
 	public void updateList(String source) {
 		jsonParser = new ParseJSON();
-		parsedValues = jsonParser.parseJSON(source,
-				Constants.PARSE_NEW_POSTS_ID);
+		parsedValues = jsonParser.parsePosts(source);
 
-	
-		  if (parsedValues.length == 20) {
-		  
-		  ((LayoutInflater) this
-		  .getSystemService(Context.LAYOUT_INFLATER_SERVICE))
-		  .inflate(R.layout.post_list_footer, null, false);
-		  this.getListView().addFooterView(footerView); 
-		  }
-		 
+		if (parsedValues.size() == 20) {
 
-		oldestPostDate = parsedValues[parsedValues.length - 1].getAsString("updated");
+			View footerView = ((LayoutInflater) this
+					.getSystemService(Context.LAYOUT_INFLATER_SERVICE))
+					.inflate(R.layout.post_list_footer, null, false);
+			this.getListView().addFooterView(footerView);
+		}
+
+		oldestPostDate = parsedValues.get(parsedValues.size() - 1).getAsString(
+				"updated");
 
 		listAdapter = new PostAdapter(this, parsedValues);
-
-		/*
-		 * adding the footer view to the screen View footerView =
-		 * ((LayoutInflater) this
-		 * .getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(
-		 * R.layout.post_list_footer, null, false);
-		 * this.getListView().addFooterView(footerView);
-		 */
-
 		setListAdapter(listAdapter);
 
 	}
@@ -394,24 +382,36 @@ public class PostList extends ListActivity implements OnClickListener,
 
 		@Override
 		public void onRequestHistoryPostsConnectionFailed() {
-			// TODO Auto-generated method stub
+			// edit footer
 
 		}
 
 		@Override
 		public void onRequestHistoryPostsConnectionSucceded(String result) {
-
+			ArrayList<ContentValues> temp = jsonParser.parsePosts(result);
+			parsedValues.addAll(temp);
+			if (parsedValues.size() % 20 != 0) {
+//				footerView.setVisibility(View.GONE);
+			}
+			listAdapter.notifyDataSetChanged();
+			// listAdapter.
+			/*
+			 * ContentValues[] historyList = jsonParser.parseJSON(result,
+			 * Constants.PARSE_NEW_POSTS_ID); ContentValues[] newList = new
+			 * ContentValues[parsedValues.length + historyList.length];
+			 */
 		}
 
+		// updateList(ArrayList<ContentValues>)
 	}
 
 	public class PostAdapter extends BaseAdapter {
 
 		Context context;
-		ContentValues[] data;
+		ArrayList<ContentValues> data;
 		LayoutInflater inflater = null;
 
-		public PostAdapter(Context context, ContentValues[] data) {
+		public PostAdapter(Context context, ArrayList<ContentValues> data) {
 			this.context = context;
 			this.data = data;
 			inflater = LayoutInflater.from(context);
@@ -419,12 +419,12 @@ public class PostList extends ListActivity implements OnClickListener,
 
 		@Override
 		public int getCount() {
-			return data.length;
+			return data.size();
 		}
 
 		@Override
 		public Object getItem(int position) {
-			return data[position];
+			return data.get(position);
 		}
 
 		@Override
@@ -435,38 +435,44 @@ public class PostList extends ListActivity implements OnClickListener,
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
 
-			convertView = inflater.inflate(R.layout.postitem, parent, false);
+			if (convertView == null) {
+				convertView = inflater
+						.inflate(R.layout.postitem, parent, false);
 
-			TextView postDate = (TextView) convertView
-					.findViewById(R.id.post_date);
+				TextView postDate = (TextView) convertView
+						.findViewById(R.id.post_date);
 
-			if (postedToday(data[position].getAsInteger("postDay"),
-					data[position].getAsInteger("postMonth"),
-					data[position].getAsInteger("postYear")))
+				if (postedToday(data.get(position).getAsInteger("postDay"),
+						data.get(position).getAsInteger("postMonth"),
+						data.get(position).getAsInteger("postYear")))
 
-			{
-				Log.w("POSTED TODAY", "TRUE");
-				postDate.setText(data[position].getAsString("postHour") + ":"
-						+ data[position].getAsString("postMinute"));
+				{
+					Log.w("POSTED TODAY", "TRUE");
+					postDate.setText(data.get(position).getAsString("postHour")
+							+ ":"
+							+ data.get(position).getAsString("postMinute"));
 
-			} else {
+				} else {
 
-				postDate.setText(data[position].getAsString("postDayString")
-						+ " "
-						+ getMonthAsText(data[position]
-								.getAsInteger("postMonth")));
-				Log.w("POSTED TODAY", "FALSE");
+					postDate.setText(data.get(position).getAsString(
+							"postDayString")
+							+ " "
+							+ getMonthAsText(data.get(position).getAsInteger(
+									"postMonth")));
+					Log.w("POSTED TODAY", "FALSE");
+				}
+
+				TextView postBody = (TextView) convertView
+						.findViewById(R.id.post_body);
+				postBody.setText(data.get(position)
+						.getAsString("content_first"));
+
+				TextView userName = (TextView) convertView
+						.findViewById(R.id.post_title);
+				userName.setText(String.valueOf(data.get(position).getAsString(
+						"user_name")));
+
 			}
-
-			TextView postBody = (TextView) convertView
-					.findViewById(R.id.post_body);
-			postBody.setText(data[position].getAsString("content_first"));
-
-			TextView userName = (TextView) convertView
-					.findViewById(R.id.post_title);
-			userName.setText(String.valueOf(data[position]
-					.getAsString("user_name")));
-
 			return convertView;
 		}
 	}
@@ -517,22 +523,24 @@ public class PostList extends ListActivity implements OnClickListener,
 	@Override
 	public void onScroll(AbsListView view, int firstVisibleItem,
 			int visibleItemCount, int totalItemCount) {
-		/*
-		 * if (this.getListView().getAdapter().getCount() > 20) { if
-		 * (!footerView.isVisible()) { footerView.setVisibility(View.VISIBLE); }
-		 * 
-		 * }
-		 */
+
+		// Log.w("onScroll", "scrolling");
+
+		// Log.w("Total Items", String.valueOf(totalItemCount));
+		// Log.w("ArraySize", String.valueOf(parsedValues.size()));
 
 		int lastInScreen = firstVisibleItem + visibleItemCount;
-		if ((lastInScreen == totalItemCount) && !(loadingMore)) {
+		if ((lastInScreen == totalItemCount) && !(loadingMore)
+				&& getListView().getCount() >= 20) {
+			loadingMore = true;
+			// Log.w("TESTE", "TESTE");
 
 			requestHistoryPosts = new RequestHistoryPosts(this);
 			adapter.open();
 
 			String url = "/discussions/"
 					+ settings.getString("SelectedTopic", null) + "/posts/"
-					+ oldestPostDate + "/history";
+					+ oldestPostDate + "/history.json";
 			requestHistoryPosts
 					.setConnectionParameters(url, adapter.getToken());
 			adapter.close();

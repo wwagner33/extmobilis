@@ -114,18 +114,19 @@ public class TopicListController extends ListActivity {
 		// + Constants.URL_POSTS_SUFFIX);
 
 		// Nova chamada
-		adapter.open();
-		if (!adapter.postsStringExists()) {
-			adapter.close();
+		
+	//	adapter.open();
+	//	if (!adapter.postsStringExists()) {
+	//		adapter.close();
 			String url = "discussions/" + topicIdString + "/posts/"
 					+ Constants.oldDateString + "/news.json";
-			Log.w("NEW POSTS URL", url);
+	//		Log.w("NEW POSTS URL", url);
 			obtainNewPosts(url);
-		} else {
-			adapter.close();
-			intent = new Intent(this, PostList.class);
-			startActivity(intent);
-		}
+	//	} else {
+	//		adapter.close();
+	//		intent = new Intent(this, PostList.class);
+	//		startActivity(intent);
+	//	}
 
 	}
 
