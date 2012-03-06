@@ -96,15 +96,26 @@ public class TopicListController extends ListActivity {
 
 		super.onListItemClick(l, v, position, id);
 		Object teste = l.getAdapter().getItem(position);
-		long TopicIdLong = (Long) teste;
+		ContentValues valuesSelected = (ContentValues) teste;
+
+		long TopicIdLong = valuesSelected.getAsLong("id");
 		topicIdString = String.valueOf(TopicIdLong);
 
 		SharedPreferences.Editor editor = settings.edit();
+
+		if (valuesSelected.getAsString("isClosed").equals("t")) {
+
+			editor.putBoolean("isForumClosed", true);
+
+		} else {
+			editor.putBoolean("isForumClosed", false);
+		}
+
 		editor.putString("SelectedTopic", topicIdString);
 		editor.putString("CurrentForumName", forumName);
 		editor.commit();
 
-		Log.w("TOPIC ID", topicIdString);
+		// Log.w("TOPIC ID", topicIdString);
 
 		dialog = Dialogs.getProgressDialog(this);
 		dialog.show();
@@ -114,19 +125,19 @@ public class TopicListController extends ListActivity {
 		// + Constants.URL_POSTS_SUFFIX);
 
 		// Nova chamada
-		
-	//	adapter.open();
-	//	if (!adapter.postsStringExists()) {
-	//		adapter.close();
-			String url = "discussions/" + topicIdString + "/posts/"
-					+ Constants.oldDateString + "/news.json";
-	//		Log.w("NEW POSTS URL", url);
-			obtainNewPosts(url);
-	//	} else {
-	//		adapter.close();
-	//		intent = new Intent(this, PostList.class);
-	//		startActivity(intent);
-	//	}
+
+		// adapter.open();
+		// if (!adapter.postsStringExists()) {
+		// adapter.close();
+		String url = "discussions/" + topicIdString + "/posts/"
+				+ Constants.oldDateString + "/news.json";
+		// Log.w("NEW POSTS URL", url);
+		obtainNewPosts(url);
+		// } else {
+		// adapter.close();
+		// intent = new Intent(this, PostList.class);
+		// startActivity(intent);
+		// }
 
 	}
 
@@ -245,8 +256,10 @@ public class TopicListController extends ListActivity {
 
 		@Override
 		public Object getItem(int position) {
+			ContentValues contentAtPosisiton = values[position];
 			forumName = values[position].getAsString("name");
-			return values[position].getAsLong("id");
+			// return values[position].getAsLong("id");
+			return contentAtPosisiton;
 		}
 
 		@Override

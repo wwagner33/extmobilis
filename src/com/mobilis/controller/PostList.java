@@ -36,7 +36,6 @@ import android.widget.AbsListView.OnScrollListener;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.mobilis.model.DBAdapter;
@@ -57,13 +56,15 @@ public class PostList extends ListActivity implements OnClickListener,
 
 	private static final long noParentId = 0;
 	private PostAdapter listAdapter;
-	private ArrayList<ContentValues> parsedValues, sessionList;
+	private ArrayList<ContentValues> parsedValues;
 	private ParseJSON jsonParser;
 	private TextView textName;
 	private int currentDay, currentMonth, currentYear;
 	private Intent intent;
 	private ImageView answerForum;
+
 	public SharedPreferences settings;
+
 	private Dialog dialog;
 	private RequestPosts requestPosts;
 	private DBAdapter adapter;
@@ -72,7 +73,7 @@ public class PostList extends ListActivity implements OnClickListener,
 	private RequestHistoryPosts requestHistoryPosts;
 	private boolean stopLoadingMore = false;
 
-	int totalItems;
+	// private int totalItems;
 
 	// history
 	private boolean loadingMore = false;
@@ -84,17 +85,6 @@ public class PostList extends ListActivity implements OnClickListener,
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.post);
 
-		/*
-		 * footerView = footerView = ((LayoutInflater) this
-		 * .getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(
-		 * R.layout.post_list_footer, null, false);
-		 */
-
-		// footerView2 = findViewById(R.layout.post_list_footer);
-
-		// footerView = (RelativeLayout)
-		// findViewById(R.layout.post_list_footer);
-
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
 
 		adapter = new DBAdapter(this);
@@ -102,6 +92,10 @@ public class PostList extends ListActivity implements OnClickListener,
 		answerForum = (ImageView) findViewById(R.id.answer_topic_image);
 		answerForum.setOnClickListener(this);
 		answerForum.setClickable(true);
+
+		if (settings.getBoolean("isForumClosed", false) == true) {
+			answerForum.setVisibility(View.GONE);
+		}
 
 		Calendar calendar = Calendar.getInstance();
 
@@ -118,11 +112,7 @@ public class PostList extends ListActivity implements OnClickListener,
 
 		textName.setText(settings.getString("CurrentForumName", null));
 
-		// Scroll Listener
 		getListView().setOnScrollListener(this);
-
-		// getImageFormServer();
-		// Unzip File
 
 		adapter.open();
 		updateList(adapter.getPosts());
@@ -416,15 +406,7 @@ public class PostList extends ListActivity implements OnClickListener,
 			listAdapter.notifyDataSetChanged();
 			loadingMore = false;
 			forceListToRedraw = true;
-			// listAdapter.
-			/*
-			 * ContentValues[] historyList = jsonParser.parseJSON(result,
-			 * Constants.PARSE_NEW_POSTS_ID); ContentValues[] newList = new
-			 * ContentValues[parsedValues.length + historyList.length];
-			 */
 		}
-
-		// updateList(ArrayList<ContentValues>)
 	}
 
 	public class PostAdapter extends BaseAdapter {

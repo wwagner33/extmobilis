@@ -281,8 +281,8 @@ public class ResponseController extends Activity implements OnClickListener,
 				}
 			}
 		}
-
 	}
+	
 
 	public void sendPost(String jsonString) {
 		dialog.show();

@@ -32,6 +32,9 @@ public class PostDetailController extends Activity implements OnClickListener {
 		userName = (TextView) findViewById(R.id.user_name_detail);
 		response = (Button) findViewById(R.id.answer_topic);
 		response.setOnClickListener(this);
+		if (settings.getBoolean("isForumClosed", false) == true) {
+			response.setVisibility(View.GONE);
+		}
 
 		extras = getIntent().getExtras();
 		if (extras != null) {
