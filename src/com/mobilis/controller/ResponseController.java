@@ -6,8 +6,6 @@ import java.io.IOException;
 import org.json.simple.JSONObject;
 
 import android.app.Activity;
-import android.app.KeyguardManager;
-import android.app.KeyguardManager.KeyguardLock;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
@@ -18,7 +16,6 @@ import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaRecorder;
 import android.media.MediaRecorder.OnInfoListener;
 import android.os.Bundle;
-import android.os.PowerManager.WakeLock;
 import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -393,8 +390,10 @@ public class ResponseController extends Activity implements OnClickListener,
 
 		@Override
 		public void onAudioResponseConnectionSucceded(String result) {
-			getPosts(Constants.URL_DISCUSSION_PREFIX + topicId
-					+ Constants.URL_POSTS_SUFFIX);
+			// OLD CALL
+			getNewPosts("discussions/"
+					+ settings.getString("SelectedTopic", null) + "/posts/"
+					+ Constants.oldDateString + "/news.json");
 			closeDialogIfItsVisible();
 
 		}
