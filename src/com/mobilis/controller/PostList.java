@@ -36,6 +36,7 @@ import android.widget.AbsListView.OnScrollListener;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.mobilis.model.DBAdapter;
@@ -52,6 +53,8 @@ public class PostList extends ListActivity implements OnClickListener,
 
 	// private static final int itemsPerPage = 20;
 
+	private boolean forceListToRedraw = true;
+
 	private static final long noParentId = 0;
 	private PostAdapter listAdapter;
 	private ArrayList<ContentValues> parsedValues, sessionList;
@@ -67,6 +70,9 @@ public class PostList extends ListActivity implements OnClickListener,
 	private RequestImage requestImage;
 	private RequestNewPosts requestNewPosts;
 	private RequestHistoryPosts requestHistoryPosts;
+	private boolean stopLoadingMore = false;
+
+	int totalItems;
 
 	// history
 	private boolean loadingMore = false;
@@ -83,6 +89,11 @@ public class PostList extends ListActivity implements OnClickListener,
 		 * .getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(
 		 * R.layout.post_list_footer, null, false);
 		 */
+
+		// footerView2 = findViewById(R.layout.post_list_footer);
+
+		// footerView = (RelativeLayout)
+		// findViewById(R.layout.post_list_footer);
 
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -196,6 +207,7 @@ public class PostList extends ListActivity implements OnClickListener,
 
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
+
 		super.onListItemClick(l, v, position, id);
 		ContentValues listValue = (ContentValues) l.getAdapter().getItem(
 				position);
@@ -221,7 +233,7 @@ public class PostList extends ListActivity implements OnClickListener,
 
 		if (parsedValues.size() == 20) {
 
-			View footerView = ((LayoutInflater) this
+			footerView = ((LayoutInflater) this
 					.getSystemService(Context.LAYOUT_INFLATER_SERVICE))
 					.inflate(R.layout.post_list_footer, null, false);
 			this.getListView().addFooterView(footerView);
@@ -365,10 +377,13 @@ public class PostList extends ListActivity implements OnClickListener,
 
 		@Override
 		public void onNewPostConnectionSecceded(String result) {
+
 			adapter.open();
 			adapter.updatePostsString(result);
 			adapter.close();
 			updateList(result);
+			loadingMore = false;
+			stopLoadingMore = false;
 			closeDialogIfItsVisible();
 		}
 	}
@@ -382,8 +397,7 @@ public class PostList extends ListActivity implements OnClickListener,
 
 		@Override
 		public void onRequestHistoryPostsConnectionFailed() {
-			// edit footer
-
+			// edit footer maybe
 		}
 
 		@Override
@@ -391,9 +405,17 @@ public class PostList extends ListActivity implements OnClickListener,
 			ArrayList<ContentValues> temp = jsonParser.parsePosts(result);
 			parsedValues.addAll(temp);
 			if (parsedValues.size() % 20 != 0) {
-//				footerView.setVisibility(View.GONE);
+
+				getListView().removeFooterView(footerView);
+				stopLoadingMore = true;
+				loadingMore = true;
+
+				// footerView2.setVisibility(View.GONE);
 			}
+			forceListToRedraw = false;
 			listAdapter.notifyDataSetChanged();
+			loadingMore = false;
+			forceListToRedraw = true;
 			// listAdapter.
 			/*
 			 * ContentValues[] historyList = jsonParser.parseJSON(result,
@@ -435,7 +457,8 @@ public class PostList extends ListActivity implements OnClickListener,
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
 
-			if (convertView == null) {
+			if (forceListToRedraw == true) {
+
 				convertView = inflater
 						.inflate(R.layout.postitem, parent, false);
 
@@ -531,7 +554,7 @@ public class PostList extends ListActivity implements OnClickListener,
 
 		int lastInScreen = firstVisibleItem + visibleItemCount;
 		if ((lastInScreen == totalItemCount) && !(loadingMore)
-				&& getListView().getCount() >= 20) {
+				&& getListView().getCount() >= 20 && !stopLoadingMore) {
 			loadingMore = true;
 			// Log.w("TESTE", "TESTE");
 
@@ -545,6 +568,7 @@ public class PostList extends ListActivity implements OnClickListener,
 					.setConnectionParameters(url, adapter.getToken());
 			adapter.close();
 			requestHistoryPosts.execute();
+
 		}
 
 	}
