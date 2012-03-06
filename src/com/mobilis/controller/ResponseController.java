@@ -6,6 +6,8 @@ import java.io.IOException;
 import org.json.simple.JSONObject;
 
 import android.app.Activity;
+import android.app.KeyguardManager;
+import android.app.KeyguardManager.KeyguardLock;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
@@ -16,18 +18,19 @@ import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaRecorder;
 import android.media.MediaRecorder.OnInfoListener;
 import android.os.Bundle;
+import android.os.PowerManager.WakeLock;
 import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.Chronometer.OnChronometerTickListener;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -39,8 +42,6 @@ import com.mobilis.threads.RequestNewPostsThread;
 import com.mobilis.threads.RequestPostsThread;
 import com.mobilis.threads.SubmitAudioResponseThread;
 import com.mobilis.threads.SubmitTextResponseThread;
-
-//import com.paulo.android.solarmobile.controller.R;
 
 public class ResponseController extends Activity implements OnClickListener,
 		OnChronometerTickListener, OnCompletionListener, TextWatcher,
@@ -65,7 +66,7 @@ public class ResponseController extends Activity implements OnClickListener,
 	private RequestNewPosts requestNewPosts;
 	public SharedPreferences settings;
 
-	private String charSequenceAfter, charSequenceBefore;
+	private String charSequenceAfter;
 
 	private long countUp;
 	private long startTime;
@@ -104,7 +105,6 @@ public class ResponseController extends Activity implements OnClickListener,
 		previewAudio.setOnClickListener(this);
 
 		charCount = (TextView) findViewById(R.id.char_number);
-		// charCount.addTextChangedListener(this);
 
 		jsonParser = new ParseJSON();
 
@@ -146,7 +146,6 @@ public class ResponseController extends Activity implements OnClickListener,
 		File recordedFile = new File(Constants.RECORDING_PATH
 				+ Constants.RECORDING_FULLNAME);
 		recordedFile.delete();
-		// recorder.getAudioFile().delete();
 		Toast.makeText(this, "Gravação deletada com sucesso",
 				Toast.LENGTH_SHORT).show();
 		audioPreviewBar.setVisibility(View.GONE);
@@ -213,20 +212,35 @@ public class ResponseController extends Activity implements OnClickListener,
 		if (v.getId() == R.id.btn_gravar) {
 
 			if (recorder.getRecordingState()) {
-				Toast.makeText(this, "gravação concluída", Toast.LENGTH_SHORT)
-						.show();
-				recorder.stopRecording();
-				stopWatch.stop();
-				timeUp.setText("00:00");
-				timeUp.setVisibility(View.GONE);
-				record.setImageResource(R.drawable.gravar_off);
-				if (!existsRecording) {
-					audioPreviewBar.setVisibility(View.VISIBLE);
-					existsRecording = true;
+
+				try {
+
+					getWindow()
+							.clearFlags(
+									android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+					Toast.makeText(this, "gravação concluída",
+							Toast.LENGTH_SHORT).show();
+					recorder.stopRecording();
+					stopWatch.stop();
+					timeUp.setText("00:00");
+					timeUp.setVisibility(View.GONE);
+					record.setImageResource(R.drawable.gravar_off);
+					if (!existsRecording) {
+						audioPreviewBar.setVisibility(View.VISIBLE);
+						existsRecording = true;
+					}
+
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
 
 			} else {
 				try {
+
+					getWindow().addFlags(
+							WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
 					Toast.makeText(this, "Gravando", Toast.LENGTH_SHORT).show();
 					recorder.startRecording(Constants.RECORDING_FILENAME);
 					timeUp.setVisibility(View.VISIBLE);
@@ -238,11 +252,31 @@ public class ResponseController extends Activity implements OnClickListener,
 					record.setImageResource(R.drawable.gravar_off);
 					stopWatch.stop();
 					timeUp.setText("00:00");
+
+					getWindow()
+							.clearFlags(
+									android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 					e.printStackTrace();
+
 				} catch (IOException e) {
 					record.setImageResource(R.drawable.gravar_off);
 					stopWatch.stop();
 					timeUp.setText("00:00");
+
+					getWindow()
+							.clearFlags(
+									android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+					e.printStackTrace();
+				}
+
+				catch (Exception e) {
+					record.setImageResource(R.drawable.gravar_off);
+					stopWatch.stop();
+					timeUp.setText("00:00");
+
+					getWindow()
+							.clearFlags(
+									android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 					e.printStackTrace();
 				}
 			}
@@ -462,7 +496,6 @@ public class ResponseController extends Activity implements OnClickListener,
 		Log.w("start", String.valueOf(start));
 		Log.w("count", String.valueOf(count));
 		Log.w("after", String.valueOf(after));
-		charSequenceBefore = s.toString();
 	}
 
 	@Override
