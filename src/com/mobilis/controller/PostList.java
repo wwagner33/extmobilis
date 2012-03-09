@@ -22,6 +22,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -83,8 +84,17 @@ public class PostList extends ListActivity implements OnClickListener,
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		// DEBUG
+	     StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().detectAll().build());
+		 StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+        .detectLeakedSqlLiteObjects()
+        .penaltyLog()
+        .penaltyDeath()
+        .build());
+		
+		
 		setContentView(R.layout.post);
-
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
 
 		adapter = new DBAdapter(this);

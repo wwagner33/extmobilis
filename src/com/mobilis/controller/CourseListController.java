@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -30,7 +31,7 @@ public class CourseListController extends ListActivity {
 	private DBAdapter adapter;
 	private ParseJSON jsonParser;
 	private ContentValues[] courseList;
-	private String semesterString, authToken;
+	private String semesterString;
 	private CourseListAdapter customAdapter;
 	private ProgressDialog dialog;
 	private RequestCurriculumUnits requestCurriculumUnits;
@@ -41,18 +42,23 @@ public class CourseListController extends ListActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		// DEBUG
+		StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+				.detectAll().build());
+		StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+				.detectLeakedSqlLiteObjects().penaltyLog().penaltyDeath()
+				.build());
+
 		setContentView(R.layout.course);
 
 		adapter = new DBAdapter(this);
 
-		Bundle extras = getIntent().getExtras();
-		if (extras != null) {
-
+//		Bundle extras = getIntent().getExtras();
+//		if (extras != null) {
+//			updateList();
+//		} else {
 			updateList();
-
-		} else {
-			updateList();
-		}
+//		}
 	}
 
 	public void closeDialogIfItsVisible() {
@@ -132,17 +138,24 @@ public class CourseListController extends ListActivity {
 
 		Log.w("GroupID", semesterString);
 
+		/*
+		 * adapter.open(); authToken = adapter.getToken(); adapter.close();
+		 * Log.w("TOKEN", authToken);
+		 */
 		adapter.open();
-		authToken = adapter.getToken();
-		adapter.close();
-		Log.w("TOKEN", authToken);
+		if (adapter.groupsExist()) {
+			adapter.close();
+			intent = new Intent(this, ClassListController.class);
+			startActivity(intent);
+		}
 
-		dialog = Dialogs.getProgressDialog(this);
-
-		dialog.show();
-
-		obtainCurriculumUnits(Constants.URL_CURRICULUM_UNITS_PREFIX
-				+ semesterString + Constants.URL_GROUPS_SUFFIX);
+		else {
+			adapter.close();
+			dialog = Dialogs.getProgressDialog(this);
+			dialog.show();
+			obtainCurriculumUnits(Constants.URL_CURRICULUM_UNITS_PREFIX
+					+ semesterString + Constants.URL_GROUPS_SUFFIX);
+		}
 
 	}
 
@@ -180,9 +193,13 @@ public class CourseListController extends ListActivity {
 
 		@Override
 		public void onCurriculumUnitsConnectionSuccedded(String result) {
+			adapter.open();
+			adapter.updateGroups(result);
+			adapter.close();
+
 			intent = new Intent(getApplicationContext(),
 					ClassListController.class);
-			intent.putExtra("GroupList", result);
+			// intent.putExtra("GroupList", result);
 			startActivity(intent);
 
 		}
@@ -206,7 +223,6 @@ public class CourseListController extends ListActivity {
 			adapter.close();
 			updateList();
 			closeDialogIfItsVisible();
-
 		}
 	}
 

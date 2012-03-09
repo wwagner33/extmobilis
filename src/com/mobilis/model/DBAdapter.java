@@ -7,47 +7,78 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 public class DBAdapter {
-	Context context;
-	SQLiteDatabase db;
-	DatabaseHelper helper;
+	private Context context;
+	private SQLiteDatabase db;
+	private DatabaseHelper helper;
+	Thread openBank;
+	Runnable runnable;
 
 	public DBAdapter(Context c) {
 		context = c;
 		helper = new DatabaseHelper(c);
-
 	}
 
 	public DBAdapter open() {
 		helper = new DatabaseHelper(context);
 		db = helper.getWritableDatabase();
 		return this;
+
 	}
 
+	/*
+	 * public synchronized void openAsync() {
+	 * 
+	 * runnable = new Runnable() { public void run() { helper = new
+	 * DatabaseHelper(context); db = helper.getWritableDatabase(); } };
+	 * 
+	 * if (openBank != null) openBank.run(); else { openBank = new
+	 * Thread(runnable); openBank.run(); } }
+	 */
 	public void close() {
 		helper.close();
 	}
 
 	// Queries genéricas
+	/*
+	 * public Cursor getOneRow(String tableName, int id) { Cursor cursor =
+	 * db.rawQuery("SELECT * FROM config WHERE _id=1", null);
+	 * cursor.moveToFirst(); return cursor; }
+	 * 
+	 * public Cursor getAllRows(String tableName) { Cursor cursor =
+	 * db.query(tableName, null, null, null, null, null, null); return cursor; }
+	 * 
+	 * public Cursor customQuery(String SQLQuery) { Cursor cursor =
+	 * db.rawQuery(SQLQuery, null); return cursor; }
+	 * 
+	 * public void updateTable(String tableName, int id, ContentValues valores)
+	 * { db.update(tableName, valores, "_id=" + id, null);
+	 * 
+	 * }
+	 */
+	public String getTopics() {
+		Cursor teste = db.rawQuery("SELECT * FROM config WHERE _id=1", null);
+		teste.moveToFirst();
+		String token = teste.getString(teste.getColumnIndex("valor"));
+		teste.close();
+		return token;
+	}
 
-	public Cursor getOneRow(String tableName, int id) {
+	public boolean TopicsExists() {
 		Cursor cursor = db.rawQuery("SELECT * FROM config WHERE _id=1", null);
 		cursor.moveToFirst();
-		return cursor;
+		String token = cursor.getString(cursor.getColumnIndex("valor"));
+		cursor.close();
+		if (token == null) {
+			return false;
+		} else
+			return true;
 	}
 
-	public Cursor getAllRows(String tableName) {
-		Cursor cursor = db.query(tableName, null, null, null, null, null, null);
-		return cursor;
-	}
+	public void updateTopics(String newTopics) {
+		ContentValues valores = new ContentValues();
+		valores.put("valor", newTopics);
 
-	public Cursor customQuery(String SQLQuery) {
-		Cursor cursor = db.rawQuery(SQLQuery, null);
-		return cursor;
-	}
-
-	public void updateTable(String tableName, int id, ContentValues valores) {
-		db.update(tableName, valores, "_id=" + id, null);
-
+		db.update("config", valores, "_id=1", null);
 	}
 
 	public String getToken() {
@@ -133,21 +164,6 @@ public class DBAdapter {
 		return result;
 	}
 
-	// POSTS Query
-	/*
-	 * public boolean postsExists() { Cursor cursor =
-	 * db.rawQuery("SELECT Count(*) FROM tb_posts", null); cursor.moveToFirst();
-	 * int numRows = cursor.getInt(0); cursor.close(); if (numRows > 0) { return
-	 * true; } else { return false; } }
-	 * 
-	 * public void updatePosts(ContentValues[] rawValues) { for (int i = 0; i <
-	 * rawValues.length; i++) { if (postsExists()) {
-	 * db.rawQuery("DELETE FROM tb_posts", null); } db.insert("tb_posts", null,
-	 * rawValues[i]);
-	 * 
-	 * } }
-	 */
-
 	public boolean postsStringExists() {
 
 		Cursor cursor = db.rawQuery("SELECT * FROM config WHERE _id=5", null);
@@ -173,5 +189,4 @@ public class DBAdapter {
 		valores.put("valor", newPosts);
 		db.update("config", valores, "_id=5", null);
 	}
-
 }

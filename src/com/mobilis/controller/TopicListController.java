@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -46,18 +47,26 @@ public class TopicListController extends ListActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		// DEBUG
+		StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+				.detectAll().build());
+		StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+				.detectLeakedSqlLiteObjects().penaltyLog().penaltyDeath()
+				.build());
+
 		setContentView(R.layout.topic);
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
 		adapter = new DBAdapter(this);
-		Bundle extras = getIntent().getExtras();
-		String extraString = extras.getString("TopicList");
+		// Bundle extras = getIntent().getExtras();
+		// String extraString = extras.getString("TopicList");
 
-		if (extraString != null) {
-			updateList(extraString);
-		}
+		// if (extraString != null) {
+		updateList();
+		// }
 
-		else {
-		}
+		// else {
+		// }
 	}
 
 	@Override
@@ -80,12 +89,14 @@ public class TopicListController extends ListActivity {
 
 	}
 
-	public void updateList(String topicJSON) {
-		Log.w("onUpdateList", "TRUE");
+	public void updateList() {
+		// Log.w("onUpdateList", "TRUE");
 
+		adapter.open();
 		jsonParser = new ParseJSON();
-		parsedValues = jsonParser.parseJSON(topicJSON,
+		parsedValues = jsonParser.parseJSON(adapter.getTopics(),
 				Constants.PARSE_TOPICS_ID);
+		adapter.close();
 		Log.w("parsedLenght", String.valueOf(parsedValues.length));
 		listAdapter = new TopicAdapter(this, parsedValues);
 		setListAdapter(listAdapter);
@@ -231,7 +242,10 @@ public class TopicListController extends ListActivity {
 
 		@Override
 		public void onTopicsConnectionSucceded(String result) {
-			updateList(result);
+			adapter.open();
+			adapter.updateTopics(result);
+			adapter.close();
+			updateList();
 			closeDialogIfItsVisible();
 
 		}

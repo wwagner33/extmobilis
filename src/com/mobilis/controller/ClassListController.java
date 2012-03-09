@@ -1,6 +1,5 @@
 package com.mobilis.controller;
 
-import android.app.Activity;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
@@ -8,7 +7,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -39,18 +40,26 @@ public class ClassListController extends ListActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		// DEBUG
+		StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+				.detectAll().build());
+		StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+				.detectLeakedSqlLiteObjects().penaltyLog().penaltyDeath()
+				.build());
+
 		setContentView(R.layout.curriculum_units);
 		adapter = new DBAdapter(this);
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
 
-		Bundle extras = getIntent().getExtras();
-		extrasString = extras.getString("GroupList");
-		if (extrasString != null) {
-			updateList();
+		// Bundle extras = getIntent().getExtras();
+		// extrasString = extras.getString("GroupList");
+		// if (extrasString != null) {
+		updateList();
 
-		} else {
-			// futura atualização da lista com os valores banco
-		}
+		// } else {
+		// futura atualização da lista com os valores banco
+		// }
 	}
 
 	@Override
@@ -90,10 +99,12 @@ public class ClassListController extends ListActivity {
 	}
 
 	public void updateList() {
-
 		jsonParser = new ParseJSON();
-		parsedValues = jsonParser.parseJSON(extrasString,
+		adapter.open();
+		Log.w("COURSESBANK", adapter.getCourseList());
+		parsedValues = jsonParser.parseJSON(adapter.getGroups(),
 				Constants.PARSE_CLASSES_ID);
+		adapter.close();
 		listAdapter = new ClassAdapter(this, parsedValues);
 		setListAdapter(listAdapter);
 	}
@@ -109,12 +120,20 @@ public class ClassListController extends ListActivity {
 		editor.putString("SelectedClass", classIdString);
 		editor.commit();
 
-		dialog = Dialogs.getProgressDialog(this);
-		dialog.show();
+		adapter.open();
+		if (adapter.TopicsExists()) {
+			adapter.close();
+			intent = new Intent(this, TopicListController.class);
+			startActivity(intent);
+		}
 
-		obtainTopics(Constants.URL_GROUPS_PREFIX + classIdString
-				+ Constants.URL_DISCUSSION_SUFFIX);
-
+		else {
+			adapter.close();
+			dialog = Dialogs.getProgressDialog(this);
+			dialog.show();
+			obtainTopics(Constants.URL_GROUPS_PREFIX + classIdString
+					+ Constants.URL_DISCUSSION_SUFFIX);
+		}
 	}
 
 	public class RequestTopics extends RequestTopicsThread {
@@ -132,9 +151,14 @@ public class ClassListController extends ListActivity {
 
 		@Override
 		public void onTopicsConnectionSucceded(String result) {
+
+			adapter.open();
+			adapter.updateTopics(result);
+			adapter.close();
+
 			intent = new Intent(getApplicationContext(),
 					TopicListController.class);
-			intent.putExtra("TopicList", result);
+			// intent.putExtra("TopicList", result);
 			startActivity(intent);
 
 		}

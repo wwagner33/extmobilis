@@ -16,8 +16,7 @@ public class ParseJSON {
 
 	private ArrayList<ContentValues> parsedPostValues;
 
-	public void parseData(ContentValues container, String data,
-			int position) {
+	public void parseData(ContentValues container, String data, int position) {
 
 		String year = data.substring(0, 4);
 		String month = data.substring(4, 6);
@@ -146,82 +145,34 @@ public class ParseJSON {
 
 				Log.w("Object", jsonObjects[i].toJSONString());
 
-				JSONObject teste2 = (JSONObject) jsonObjects[i]
+				JSONObject innerObject = (JSONObject) jsonObjects[i]
 						.get("discussion");
 
 				parsedValues[i] = new ContentValues();
 
 				parsedValues[i].put("allocation_tag_id",
-						(Long) teste2.get("allocation_tag_id"));
+						(Long) innerObject.get("allocation_tag_id"));
 
 				parsedValues[i].put("description",
-						(String) teste2.get("description"));
+						(String) innerObject.get("description"));
 
-				parsedValues[i].put("id", (Long) teste2.get("id"));
+				parsedValues[i].put("id", (Long) innerObject.get("id"));
 
-				parsedValues[i].put("name", (String) teste2.get("name"));
+				parsedValues[i].put("name", (String) innerObject.get("name"));
 
 				parsedValues[i].put("schedule_id",
-						(Long) teste2.get("schedule_id"));
+						(Long) innerObject.get("schedule_id"));
 
-				parsedValues[i].put("isClosed", (String) teste2.get("closed"));
+				parsedValues[i].put("isClosed",
+						(String) innerObject.get("closed"));
+
+				parsedValues[i].put("last_post_date",
+						(String) innerObject.get("last_post_date"));
 
 			}
 			return parsedValues;
 
 		}
-
-		/*
-		 * if (parseId == Constants.PARSE_POSTS_ID) { Log.w("InsideParser",
-		 * "TRUE");
-		 * 
-		 * Object object = JSONValue.parse(source); JSONArray jsonArray =
-		 * (JSONArray) object; JSONObject jsonObjects[] = new
-		 * JSONObject[jsonArray.size()];
-		 * 
-		 * parsedValues = new ContentValues[jsonArray.size()];
-		 * 
-		 * for (int i = 0; i < jsonArray.size(); i++) {
-		 * 
-		 * jsonObjects[i] = (JSONObject) jsonArray.get(i);
-		 * 
-		 * Log.w("Object", jsonObjects[i].toJSONString());
-		 * 
-		 * JSONObject teste2 = (JSONObject) jsonObjects[i]
-		 * .get("discussion_post"); Log.w("SINGLEOBJECT",
-		 * teste2.toJSONString());
-		 * 
-		 * parsedValues[i] = new ContentValues();
-		 * 
-		 * parsedValues[i].put("content", (String) teste2.get("content"));
-		 * 
-		 * parsedValues[i].put("created_at", (String) teste2.get("created_at"));
-		 * 
-		 * parsedValues[i].put("discussion_id", (Long)
-		 * teste2.get("discussion_id"));
-		 * 
-		 * parsedValues[i].put("id", (Long) teste2.get("id")); Log.w("POST ID",
-		 * String.valueOf(teste2.get("id")));
-		 * 
-		 * parsedValues[i].putNull("parent_id");
-		 * 
-		 * parsedValues[i].put("profile_id", (Long) teste2.get("profile_id"));
-		 * 
-		 * parsedValues[i].put("updated_at", (String) teste2.get("updated_at"));
-		 * 
-		 * parsedValues[i].put("user_id", (Long) teste2.get("user_id"));
-		 * 
-		 * parsedValues[i].put("username", (String)
-		 * teste2.get("user_username"));
-		 * 
-		 * parseData(parsedValues, (String) teste2.get("updated"), i);
-		 * 
-		 * }
-		 * 
-		 * return parsedValues;
-		 * 
-		 * }
-		 */
 
 		if (parseId == Constants.PARSE_TEXT_RESPONSE_ID) {
 			Object object = JSONValue.parse(source);
@@ -240,47 +191,6 @@ public class ParseJSON {
 			return parsedValues;
 		}
 
-		/*
-		 * if (parseId == Constants.PARSE_NEW_POSTS_ID) { Log.w("InsideParser",
-		 * "TRUE"); Log.w("source", source); Object object =
-		 * JSONValue.parse(source); JSONArray jsonArray = (JSONArray) object;
-		 * JSONObject jsonObjects[] = new JSONObject[jsonArray.size()];
-		 * 
-		 * // parsedValues = new ArrayList<ContentValues>(jsonArray.size());
-		 * parsedValues = new ArrayList<ContentValues>();
-		 * 
-		 * for (int i = 0; i < jsonArray.size(); i++) {
-		 * 
-		 * jsonObjects[i] = (JSONObject) jsonArray.get(i);
-		 * 
-		 * Log.w("Object", jsonObjects[i].toJSONString());
-		 * 
-		 * JSONObject teste2 = (JSONObject) jsonObjects[i]
-		 * .get("discussion_post"); Log.w("SINGLEOBJECT",
-		 * teste2.toJSONString());
-		 * 
-		 * ContentValues rowItem = new ContentValues();
-		 * 
-		 * rowItem.put("content_first", (String) teste2.get("content_first"));
-		 * rowItem.put("content_last", (String) teste2.get("content_last"));
-		 * rowItem.put("discussion_id", (Long) teste2.get("discussion_id"));
-		 * rowItem.put("_id", (Long) teste2.get("id"));
-		 * rowItem.putNull("parent_id"); rowItem.put("profile_id", (Long)
-		 * teste2.get("profile_id")); rowItem.put("user_name", (String)
-		 * teste2.get("user_name")); rowItem.put("user_username", (String)
-		 * teste2.get("user_username"));
-		 * 
-		 * rowItem.put("updated", (String) teste2.get("updated"));
-		 * parseData(parsedValues, (String) teste2.get("updated"), i);
-		 * parsedValues.add(rowItem);
-		 * 
-		 * }
-		 * 
-		 * return parsedValues;
-		 * 
-		 * }
-		 */
-
 		return null;
 	}
 
@@ -292,7 +202,6 @@ public class ParseJSON {
 		JSONArray jsonArray = (JSONArray) object;
 		JSONObject jsonObjects[] = new JSONObject[jsonArray.size()];
 
-		// parsedValues = new ArrayList<ContentValues>(jsonArray.size());
 		parsedPostValues = new ArrayList<ContentValues>();
 
 		for (int i = 0; i < jsonArray.size(); i++) {
@@ -325,10 +234,6 @@ public class ParseJSON {
 		return parsedPostValues;
 
 	}
-
-	// public boolean isResponseSuccesful() {
-	// return true;
-	// }
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public JSONObject buildTokenObject(String username, String password) {
