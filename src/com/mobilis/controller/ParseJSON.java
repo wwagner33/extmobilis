@@ -196,8 +196,8 @@ public class ParseJSON {
 
 	public ArrayList<ContentValues> parsePosts(String source) {
 
-		Log.w("InsideParser", "TRUE");
-		Log.w("source", source);
+//		Log.w("InsideParser", "TRUE");
+//		Log.w("source", source);
 		Object object = JSONValue.parse(source);
 		JSONArray jsonArray = (JSONArray) object;
 		JSONObject jsonObjects[] = new JSONObject[jsonArray.size()];

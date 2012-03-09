@@ -40,13 +40,12 @@ public class TopicListController extends ListActivity {
 	private RequestTopics requestTopics;
 	private RequestNewPosts requestNewPosts;
 
-//	private boolean updated = false;
+	// private boolean updated = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		
 		setContentView(R.layout.topic);
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
 		adapter = new DBAdapter(this);
@@ -188,6 +187,7 @@ public class TopicListController extends ListActivity {
 			adapter.open();
 			adapter.updatePostsString(result);
 			adapter.close();
+
 			intent = new Intent(getApplicationContext(), PostList.class);
 			startActivity(intent);
 
