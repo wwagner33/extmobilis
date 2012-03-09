@@ -16,7 +16,6 @@ import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaRecorder;
 import android.media.MediaRecorder.OnInfoListener;
 import android.os.Bundle;
-import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -76,14 +75,6 @@ public class ResponseController extends Activity implements OnClickListener,
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
-		// DEBUG
-	     StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().detectAll().build());
-		 StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-        .detectLeakedSqlLiteObjects()
-        .penaltyLog()
-        .penaltyDeath()
-        .build());
 		
 		
 		setContentView(R.layout.answer_topic);

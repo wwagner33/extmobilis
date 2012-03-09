@@ -6,7 +6,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.StrictMode;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -33,13 +32,7 @@ public class Login extends Activity implements OnClickListener {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		// DEBUG
-	     StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().detectAll().build());
-		 StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-         .detectLeakedSqlLiteObjects()
-         .penaltyLog()
-         .penaltyDeath()
-         .build());
+		
 		
 		
 		setContentView(R.layout.login);

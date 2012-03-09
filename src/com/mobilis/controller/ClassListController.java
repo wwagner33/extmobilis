@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -30,7 +29,7 @@ public class ClassListController extends ListActivity {
 	private ParseJSON jsonParser;
 	private ContentValues[] parsedValues;
 	private ClassAdapter listAdapter;
-	private String classIdString, extrasString;;
+	private String classIdString;
 	private ProgressDialog dialog;
 	private Intent intent;
 	private RequestTopics requestTopics;
@@ -41,12 +40,7 @@ public class ClassListController extends ListActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		// DEBUG
-		StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-				.detectAll().build());
-		StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-				.detectLeakedSqlLiteObjects().penaltyLog().penaltyDeath()
-				.build());
+	
 
 		setContentView(R.layout.curriculum_units);
 		adapter = new DBAdapter(this);

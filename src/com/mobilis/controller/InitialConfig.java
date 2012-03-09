@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.os.StrictMode;
 import android.util.Log;
 
 import com.mobilis.model.DBAdapter;
@@ -20,14 +19,6 @@ public class InitialConfig extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		// DEBUG
-	     StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().detectAll().build());
-		 StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-        .detectLeakedSqlLiteObjects()
-        .penaltyLog()
-        .penaltyDeath()
-        .build());
-		
 		
 		DatabaseHelper helper = new DatabaseHelper(this);
 		adapter = new DBAdapter(this);
