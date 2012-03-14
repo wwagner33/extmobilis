@@ -53,7 +53,6 @@ public class PostList extends ListActivity implements OnClickListener,
 	// private static final int itemsPerPage = 20;
 
 	private boolean forceListToRedraw = true;
-
 	private static final long noParentId = 0;
 	private PostAdapter listAdapter;
 	private ArrayList<ContentValues> parsedValues;
@@ -62,9 +61,7 @@ public class PostList extends ListActivity implements OnClickListener,
 	private int currentDay, currentMonth, currentYear;
 	private Intent intent;
 	private ImageView answerForum;
-
 	public SharedPreferences settings;
-
 	private Dialog dialog;
 	private RequestPosts requestPosts;
 	private DBAdapter adapter;
@@ -115,7 +112,8 @@ public class PostList extends ListActivity implements OnClickListener,
 		getListView().setOnScrollListener(this);
 
 		adapter.open();
-		updateList(adapter.getPosts());
+		updateList(adapter.getPostsFromTopic(Long.valueOf(settings.getString(
+				"SelectedTopic", null))));
 		adapter.close();
 
 		// dialog = Dialogs.getProgressDialog(this);
@@ -218,7 +216,7 @@ public class PostList extends ListActivity implements OnClickListener,
 	}
 
 	public void updateList(String source) {
-		jsonParser = new ParseJSON();
+		jsonParser = new ParseJSON(this);
 		parsedValues = jsonParser.parsePosts(source);
 
 		if (parsedValues.size() == 20) {
@@ -399,8 +397,6 @@ public class PostList extends ListActivity implements OnClickListener,
 				getListView().removeFooterView(footerView);
 				stopLoadingMore = true;
 				loadingMore = true;
-
-				// footerView2.setVisibility(View.GONE);
 			}
 			forceListToRedraw = false;
 			listAdapter.notifyDataSetChanged();
@@ -506,7 +502,6 @@ public class PostList extends ListActivity implements OnClickListener,
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if (item.getItemId() == R.id.menu_refresh) {
 
-			// String currentTopic = settings.getString("SelectedTopic", null);
 			dialog = Dialogs.getProgressDialog(this);
 			dialog.show();
 			String url = "discussions/"
@@ -515,11 +510,6 @@ public class PostList extends ListActivity implements OnClickListener,
 
 			obtainNewPosts(url);
 
-			// Old call
-			/*
-			 * obtainPosts(Constants.URL_DISCUSSION_PREFIX + currentTopic +
-			 * Constants.URL_POSTS_SUFFIX);
-			 */
 		}
 		return true;
 
@@ -528,11 +518,6 @@ public class PostList extends ListActivity implements OnClickListener,
 	@Override
 	public void onScroll(AbsListView view, int firstVisibleItem,
 			int visibleItemCount, int totalItemCount) {
-
-		// Log.w("onScroll", "scrolling");
-
-		// Log.w("Total Items", String.valueOf(totalItemCount));
-		// Log.w("ArraySize", String.valueOf(parsedValues.size()));
 
 		int lastInScreen = firstVisibleItem + visibleItemCount;
 		if ((lastInScreen == totalItemCount) && !(loadingMore)
@@ -557,7 +542,7 @@ public class PostList extends ListActivity implements OnClickListener,
 
 	@Override
 	public void onScrollStateChanged(AbsListView view, int scrollState) {
-
+		// Nothing here
 	}
 
 }

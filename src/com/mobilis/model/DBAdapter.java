@@ -25,36 +25,10 @@ public class DBAdapter {
 
 	}
 
-	/*
-	 * public synchronized void openAsync() {
-	 * 
-	 * runnable = new Runnable() { public void run() { helper = new
-	 * DatabaseHelper(context); db = helper.getWritableDatabase(); } };
-	 * 
-	 * if (openBank != null) openBank.run(); else { openBank = new
-	 * Thread(runnable); openBank.run(); } }
-	 */
 	public void close() {
 		helper.close();
 	}
 
-	// Queries genéricas
-	/*
-	 * public Cursor getOneRow(String tableName, int id) { Cursor cursor =
-	 * db.rawQuery("SELECT * FROM config WHERE _id=1", null);
-	 * cursor.moveToFirst(); return cursor; }
-	 * 
-	 * public Cursor getAllRows(String tableName) { Cursor cursor =
-	 * db.query(tableName, null, null, null, null, null, null); return cursor; }
-	 * 
-	 * public Cursor customQuery(String SQLQuery) { Cursor cursor =
-	 * db.rawQuery(SQLQuery, null); return cursor; }
-	 * 
-	 * public void updateTable(String tableName, int id, ContentValues valores)
-	 * { db.update(tableName, valores, "_id=" + id, null);
-	 * 
-	 * }
-	 */
 	public String getTopics() {
 		Cursor teste = db.rawQuery("SELECT * FROM config WHERE _id=1", null);
 		teste.moveToFirst();
@@ -164,24 +138,73 @@ public class DBAdapter {
 		return result;
 	}
 
-	public boolean postsStringExists() {
-
-		Cursor cursor = db.rawQuery("SELECT * FROM config WHERE _id=5", null);
-		cursor.moveToFirst();
-		String token = cursor.getString(cursor.getColumnIndex("valor"));
-		cursor.close();
-		if (token == null) {
-			return false;
-		} else
-			return true;
-	}
+	/*
+	 * public boolean postsStringExists() { // lembrar de deletar Cursor cursor
+	 * = db.rawQuery("SELECT * FROM config WHERE _id=5", null);
+	 * cursor.moveToFirst(); String token =
+	 * cursor.getString(cursor.getColumnIndex("valor")); cursor.close(); if
+	 * (token == null) { return false; } else return true; }
+	 */
 
 	public String getPosts() {
+		// lembrar de deletar
 		Cursor cursor = db.rawQuery("SELECT * FROM config WHERE _id=5", null);
 		cursor.moveToFirst();
 		String result = cursor.getString(cursor.getColumnIndex("valor"));
 		cursor.close();
 		return result;
+	}
+
+	public boolean postExistsOnTopic(long topicId) {
+
+		Cursor cursor = db.rawQuery("SELECT posts from topics WHERE topic_id="
+				+ topicId, null);
+		cursor.moveToFirst();
+
+		if (cursor.getString(cursor.getColumnIndex("posts"))!=null) {
+			cursor.close();
+			return true;
+		} else {
+			cursor.close();
+			return false;
+		}
+	}
+
+	public String getPostsFromTopic(long topicId) {
+		Cursor cursor = db.rawQuery("SELECT posts from topics WHERE topic_id="
+				+ topicId, null);
+		cursor.moveToFirst();
+		String posts = cursor.getString(cursor.getColumnIndex("posts"));
+		cursor.close();
+		return posts;
+
+	}
+
+	public void updatePosts(String newPosts, long topicId) {
+
+		ContentValues teste = new ContentValues();
+		teste.put("posts", newPosts);
+		db.update("topics", teste, "topic_id =" + topicId, null);
+	}
+
+	public void insertNewTopic(ContentValues newTopic) {
+		db.insert("topics", null, newTopic);
+	}
+
+	public boolean topicExists(long topicId) {
+
+		Cursor cursor = db.rawQuery("SELECT * FROM topics WHERE topic_id="
+				+ topicId, null);
+
+		if (cursor.getCount() >= 1) {
+			Log.w("TOPICEXISTS", "TRUE");
+			cursor.close();
+			return true;
+		} else {
+			cursor.close();
+			Log.w("TOPICEXISTS", "FALSE");
+			return false;
+		}
 	}
 
 	public void updatePostsString(String newPosts) {

@@ -40,8 +40,6 @@ public class TopicListController extends ListActivity {
 	private RequestTopics requestTopics;
 	private RequestNewPosts requestNewPosts;
 
-	// private boolean updated = false;
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -49,15 +47,7 @@ public class TopicListController extends ListActivity {
 		setContentView(R.layout.topic);
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
 		adapter = new DBAdapter(this);
-		// Bundle extras = getIntent().getExtras();
-		// String extraString = extras.getString("TopicList");
-
-		// if (extraString != null) {
 		updateList();
-		// }
-
-		// else {
-		// }
 	}
 
 	@Override
@@ -81,10 +71,9 @@ public class TopicListController extends ListActivity {
 	}
 
 	public void updateList() {
-		// Log.w("onUpdateList", "TRUE");
 
 		adapter.open();
-		jsonParser = new ParseJSON();
+		jsonParser = new ParseJSON(this);
 		parsedValues = jsonParser.parseJSON(adapter.getTopics(),
 				Constants.PARSE_TOPICS_ID);
 		adapter.close();
@@ -117,29 +106,21 @@ public class TopicListController extends ListActivity {
 		editor.putString("CurrentForumName", forumName);
 		editor.commit();
 
-		// Log.w("TOPIC ID", topicIdString);
-
-		dialog = Dialogs.getProgressDialog(this);
-		dialog.show();
-
-		// chamada velha
-		// obtainPosts(Constants.URL_DISCUSSION_PREFIX + topicIdString
-		// + Constants.URL_POSTS_SUFFIX);
-
-		// Nova chamada
-
-		// adapter.open();
-		// if (!adapter.postsStringExists()) {
-		// adapter.close();
-		String url = "discussions/" + topicIdString + "/posts/"
-				+ Constants.oldDateString + "/news.json";
-		// Log.w("NEW POSTS URL", url);
-		obtainNewPosts(url);
-		// } else {
-		// adapter.close();
-		// intent = new Intent(this, PostList.class);
-		// startActivity(intent);
-		// }
+		adapter.open();
+		if (adapter.postExistsOnTopic(Long.parseLong(topicIdString))) {
+			adapter.close();
+			Log.w("TRUE", "TRUE");
+			intent = new Intent(this, PostList.class);
+			startActivity(intent);
+		} else {
+			Log.w("FALSE", "FALSE");
+			adapter.close();
+			dialog = Dialogs.getProgressDialog(this);
+			dialog.show();
+			String url = "discussions/" + topicIdString + "/posts/"
+					+ Constants.oldDateString + "/news.json";
+			obtainNewPosts(url);
+		}
 
 	}
 
@@ -185,7 +166,9 @@ public class TopicListController extends ListActivity {
 		public void onNewPostConnectionSecceded(String result) {
 			Log.w("NEW POSTS RESULT", result);
 			adapter.open();
-			adapter.updatePostsString(result);
+			// adapter.updatePostsString(result); OLD
+			adapter.updatePosts(result,
+					Long.parseLong(settings.getString("SelectedTopic", null)));
 			adapter.close();
 
 			intent = new Intent(getApplicationContext(), PostList.class);

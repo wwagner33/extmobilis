@@ -93,7 +93,7 @@ public class ClassListController extends ListActivity {
 	}
 
 	public void updateList() {
-		jsonParser = new ParseJSON();
+		jsonParser = new ParseJSON(this);
 		adapter.open();
 		Log.w("COURSESBANK", adapter.getCourseList());
 		parsedValues = jsonParser.parseJSON(adapter.getGroups(),

@@ -41,22 +41,14 @@ public class CourseListController extends ListActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		
 		setContentView(R.layout.course);
 		adapter = new DBAdapter(this);
-
-//		Bundle extras = getIntent().getExtras();
-//		if (extras != null) {
-//			updateList();
-//		} else {
-			updateList();
-//		}
+		updateList();
 	}
 
 	public void closeDialogIfItsVisible() {
 		if (dialog != null && dialog.isShowing())
 			dialog.dismiss();
-
 	}
 
 	@Override
@@ -102,7 +94,7 @@ public class CourseListController extends ListActivity {
 	public void updateList() {
 
 		adapter.open();
-		jsonParser = new ParseJSON();
+		jsonParser = new ParseJSON(this);
 		courseList = jsonParser.parseJSON(adapter.getCourseList(),
 				Constants.PARSE_COURSES_ID);
 		adapter.close();
@@ -130,11 +122,8 @@ public class CourseListController extends ListActivity {
 
 		Log.w("GroupID", semesterString);
 
-		/*
-		 * adapter.open(); authToken = adapter.getToken(); adapter.close();
-		 * Log.w("TOKEN", authToken);
-		 */
 		adapter.open();
+
 		if (adapter.groupsExist()) {
 			adapter.close();
 			intent = new Intent(this, ClassListController.class);
@@ -188,10 +177,8 @@ public class CourseListController extends ListActivity {
 			adapter.open();
 			adapter.updateGroups(result);
 			adapter.close();
-
 			intent = new Intent(getApplicationContext(),
 					ClassListController.class);
-			// intent.putExtra("GroupList", result);
 			startActivity(intent);
 
 		}

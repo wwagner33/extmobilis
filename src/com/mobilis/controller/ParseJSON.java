@@ -8,13 +8,22 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.util.Log;
+
+import com.mobilis.model.DBAdapter;
 
 public class ParseJSON {
 
+	private Context context;
 	private ContentValues[] parsedValues;
-
+	private DBAdapter adapter;
 	private ArrayList<ContentValues> parsedPostValues;
+
+	public ParseJSON(Context context) {
+		this.context = context;
+		adapter = new DBAdapter(this.context);
+	}
 
 	public void parseData(ContentValues container, String data, int position) {
 
@@ -61,7 +70,6 @@ public class ParseJSON {
 			parsedValues[0].put("token", tokenString);
 
 			return parsedValues;
-
 		}
 
 		if (parseId == Constants.PARSE_COURSES_ID) {
@@ -169,6 +177,23 @@ public class ParseJSON {
 				parsedValues[i].put("last_post_date",
 						(String) innerObject.get("last_post_date"));
 
+				adapter.open();
+
+				if (!adapter.topicExists((Long) innerObject.get("id"))) {
+					ContentValues dbValues = new ContentValues();
+					dbValues.putNull("_id");
+					dbValues.put("topic_id", (Long) innerObject.get("id"));
+
+					dbValues.put("name", (String) innerObject.get("name"));
+					dbValues.put("oldestPost",
+							(String) innerObject.get("last_post_date"));
+					dbValues.putNull("posts");
+					adapter.insertNewTopic(dbValues);
+
+				}
+
+				adapter.close();
+
 			}
 			return parsedValues;
 
@@ -196,8 +221,6 @@ public class ParseJSON {
 
 	public ArrayList<ContentValues> parsePosts(String source) {
 
-//		Log.w("InsideParser", "TRUE");
-//		Log.w("source", source);
 		Object object = JSONValue.parse(source);
 		JSONArray jsonArray = (JSONArray) object;
 		JSONObject jsonObjects[] = new JSONObject[jsonArray.size()];
@@ -210,25 +233,42 @@ public class ParseJSON {
 
 			Log.w("Object", jsonObjects[i].toJSONString());
 
-			JSONObject teste2 = (JSONObject) jsonObjects[i]
+			JSONObject innerObject = (JSONObject) jsonObjects[i]
 					.get("discussion_post");
-			Log.w("SINGLEOBJECT", teste2.toJSONString());
+			Log.w("SINGLEOBJECT", innerObject.toJSONString());
 
 			ContentValues rowItem = new ContentValues();
 
-			rowItem.put("content_first", (String) teste2.get("content_first"));
-			rowItem.put("content_last", (String) teste2.get("content_last"));
-			rowItem.put("discussion_id", (Long) teste2.get("discussion_id"));
-			rowItem.put("_id", (Long) teste2.get("id"));
+			rowItem.put("content_first",
+					(String) innerObject.get("content_first"));
+			rowItem.put("content_last",
+					(String) innerObject.get("content_last"));
+			rowItem.put("discussion_id",
+					(Long) innerObject.get("discussion_id"));
+			rowItem.put("_id", (Long) innerObject.get("id"));
 			rowItem.putNull("parent_id");
-			rowItem.put("profile_id", (Long) teste2.get("profile_id"));
-			rowItem.put("user_name", (String) teste2.get("user_name"));
-			rowItem.put("user_username", (String) teste2.get("user_username"));
+			rowItem.put("profile_id", (Long) innerObject.get("profile_id"));
+			rowItem.put("user_name", (String) innerObject.get("user_name"));
+			rowItem.put("user_username",
+					(String) innerObject.get("user_username"));
 
-			rowItem.put("updated", (String) teste2.get("updated"));
-			parseData(rowItem, (String) teste2.get("updated"), i);
+			rowItem.put("updated", (String) innerObject.get("updated"));
+			parseData(rowItem, (String) innerObject.get("updated"), i);
 			parsedPostValues.add(rowItem);
 
+			/*
+			 * adapter.open(); if (!adapter.postExists((Long)
+			 * innerObject.get("id"))) { ContentValues bankValues = new
+			 * ContentValues(); bankValues.putNull("_id");
+			 * bankValues.put("post_id", (Long) innerObject.get("id"));
+			 * bankValues.put("topic_id", (Long)
+			 * innerObject.get("discussion_id")); bankValues.put("posts",
+			 * source); adapter.insertNewPost(bankValues);
+			 * 
+			 * // }
+			 * 
+			 * // adapter.close();
+			 */
 		}
 
 		return parsedPostValues;

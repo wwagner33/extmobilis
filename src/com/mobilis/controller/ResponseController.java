@@ -75,8 +75,7 @@ public class ResponseController extends Activity implements OnClickListener,
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
-		
+
 		setContentView(R.layout.answer_topic);
 		extras = getIntent().getExtras();
 		dialog = Dialogs.getProgressDialog(this);
@@ -105,7 +104,7 @@ public class ResponseController extends Activity implements OnClickListener,
 
 		charCount = (TextView) findViewById(R.id.char_number);
 
-		jsonParser = new ParseJSON();
+		jsonParser = new ParseJSON(this);
 
 		if (extras != null) {
 
@@ -281,7 +280,6 @@ public class ResponseController extends Activity implements OnClickListener,
 			}
 		}
 	}
-	
 
 	public void sendPost(String jsonString) {
 		dialog.show();
@@ -345,7 +343,8 @@ public class ResponseController extends Activity implements OnClickListener,
 			Log.w("RESULT", result);
 
 			ContentValues[] resultFromServer;
-			jsonParser = new ParseJSON();
+			jsonParser = new ParseJSON(getApplicationContext()); // unnecessary
+																	// ?
 			resultFromServer = jsonParser.parseJSON(result,
 					Constants.PARSE_TEXT_RESPONSE_ID);
 			Log.w("RESULTNEW",
@@ -416,8 +415,11 @@ public class ResponseController extends Activity implements OnClickListener,
 		@Override
 		public void onNewPostConnectionSecceded(String result) {
 			adapter.open();
-			adapter.updatePostsString(result);
+			// adapter.updatePostsString(result);
+			adapter.updatePosts(result,
+					Long.parseLong(settings.getString("SelectedTopic", null)));
 			adapter.close();
+			
 			intent = new Intent(getApplicationContext(), PostList.class);
 			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			startActivity(intent);

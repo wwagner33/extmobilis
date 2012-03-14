@@ -98,7 +98,7 @@ public class Login extends Activity implements OnClickListener {
 	public void requestToken() {
 
 		requestToken = new RequestToken(this);
-		jsonParser = new ParseJSON();
+		jsonParser = new ParseJSON(this);
 
 		requestToken.setConnectionParameters(jsonParser.buildTokenObject(login
 				.getText().toString(), password.getText().toString()),
@@ -155,7 +155,7 @@ public class Login extends Activity implements OnClickListener {
 		@Override
 		public void onTokenConnectionSucceded(String result) {
 
-			jsonParser = new ParseJSON();
+			jsonParser = new ParseJSON(getApplicationContext());
 			ContentValues[] tokenParsed = jsonParser.parseJSON(result,
 					Constants.PARSE_TOKEN_ID);
 			Log.w("TOKENPARSED", tokenParsed[0].getAsString("token"));
