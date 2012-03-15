@@ -51,7 +51,6 @@ public class DBAdapter {
 	public void updateTopics(String newTopics) {
 		ContentValues valores = new ContentValues();
 		valores.put("valor", newTopics);
-
 		db.update("config", valores, "_id=1", null);
 	}
 
@@ -78,7 +77,6 @@ public class DBAdapter {
 	public void updateToken(String authToken) {
 		ContentValues valores = new ContentValues();
 		valores.put("valor", authToken);
-
 		db.update("config", valores, "_id=2", null);
 	}
 
@@ -97,11 +95,11 @@ public class DBAdapter {
 			return true;
 	}
 
-	public void updateCourses(String newValues) {
-		ContentValues valores = new ContentValues();
-		valores.put("valor", newValues);
-		db.update("config", valores, "_id=3", null);
-	}
+	// public void updateCourses(String newValues) {
+	// ContentValues valores = new ContentValues();
+	// valores.put("valor", newValues);
+	// db.update("config", valores, "_id=3", null);
+	// }
 
 	public String getCourseList() {
 		Cursor cursor = db.rawQuery("SELECT * FROM config WHERE _id=3", null);
@@ -146,6 +144,12 @@ public class DBAdapter {
 	 * (token == null) { return false; } else return true; }
 	 */
 
+	public void updatePostsString(String newPosts) {
+		ContentValues valores = new ContentValues();
+		valores.put("valor", newPosts);
+		db.update("config", valores, "_id=5", null);
+	}
+
 	public String getPosts() {
 		// lembrar de deletar
 		Cursor cursor = db.rawQuery("SELECT * FROM config WHERE _id=5", null);
@@ -153,21 +157,6 @@ public class DBAdapter {
 		String result = cursor.getString(cursor.getColumnIndex("valor"));
 		cursor.close();
 		return result;
-	}
-
-	public boolean postExistsOnTopic(long topicId) {
-
-		Cursor cursor = db.rawQuery("SELECT posts from topics WHERE topic_id="
-				+ topicId, null);
-		cursor.moveToFirst();
-
-		if (cursor.getString(cursor.getColumnIndex("posts"))!=null) {
-			cursor.close();
-			return true;
-		} else {
-			cursor.close();
-			return false;
-		}
 	}
 
 	public String getPostsFromTopic(long topicId) {
@@ -180,7 +169,123 @@ public class DBAdapter {
 
 	}
 
-	public void updatePosts(String newPosts, long topicId) {
+	// CLASSES OPERATIONS
+
+	public boolean existsTopicsOnClass(long classId) {
+
+		Cursor cursor = db.rawQuery(
+				"SELECT topics from classes WHERE class_id=" + classId, null);
+		cursor.moveToFirst();
+
+		if (cursor.getString(cursor.getColumnIndex("topics")) != null) {
+			cursor.close();
+			return true;
+		} else {
+			cursor.close();
+			return false;
+		}
+
+	}
+
+	public String getTopicsFromClasses(long classId) {
+
+		Cursor cursor = db.rawQuery(
+				"SELECT topics from classes WHERE class_id=" + classId, null);
+		cursor.moveToFirst();
+		String courses = cursor.getString(cursor.getColumnIndex("topics"));
+		cursor.close();
+		return courses;
+	}
+
+	public boolean existsClassWithId(long classId) {
+
+		Cursor cursor = db.rawQuery("SELECT * from classes WHERE class_id="
+				+ classId, null);
+
+		if (cursor.getCount() >= 1) {
+			Log.w("CLASSEXISTS", "TRUE");
+			cursor.close();
+			return true;
+		} else {
+			cursor.close();
+			Log.w("CLASSEXISTS", "FALSE");
+			return false;
+		}
+	}
+
+	public void insertNewClass(ContentValues newClass) {
+		db.insert("classes", null, newClass);
+	}
+
+	public void updateTopicsFromClasses(String topics, long classId) {
+		ContentValues newValues = new ContentValues();
+		newValues.put("topics", topics);
+		db.update("classes", newValues, "class_id =" + classId, null);
+	}
+
+	// COURSES OPERATIONS
+
+	public boolean existsClassesOnCourse(long courseId) {
+		Cursor cursor = db
+				.rawQuery("SELECT classes from courses WHERE course_id="
+						+ courseId, null);
+		cursor.moveToFirst();
+
+		if (cursor.getString(cursor.getColumnIndex("classes")) != null) {
+			cursor.close();
+			return true;
+		} else {
+			cursor.close();
+			return false;
+		}
+	}
+
+	public String getClassesFromCourse(long courseId) {
+
+		Cursor cursor = db
+				.rawQuery("SELECT classes from courses WHERE course_id="
+						+ courseId, null);
+		cursor.moveToFirst();
+		String courses = cursor.getString(cursor.getColumnIndex("classes"));
+		cursor.close();
+		return courses;
+	}
+
+	public boolean existsCourseWithId(long courseId) {
+
+		Cursor cursor = db.rawQuery("SELECT * from courses WHERE course_id="
+				+ courseId, null);
+
+		if (cursor.getCount() >= 1) {
+			Log.w("COURSEEXISTS", "TRUE");
+			cursor.close();
+			return true;
+		} else {
+			cursor.close();
+			Log.w("COURSEEXISTS", "FALSE");
+			return false;
+		}
+	}
+
+	public void updateClassesFromCourse(String classes, long courseId) {
+		ContentValues teste = new ContentValues();
+		teste.put("classes", classes);
+		db.update("courses", teste, "course_id =" + courseId, null);
+	}
+
+	public void updateCourses(String newValues) {
+		ContentValues valores = new ContentValues();
+		valores.put("valor", newValues);
+		db.update("config", valores, "_id=3", null);
+	}
+
+	public void insertNewCourse(ContentValues newCourse) {
+		db.insert("courses", null, newCourse);
+	}
+
+	// TOPICS OPERATIONS
+
+	public void updatePostsFromTopic(String newPosts, long topicId) {
 
 		ContentValues teste = new ContentValues();
 		teste.put("posts", newPosts);
@@ -207,9 +312,18 @@ public class DBAdapter {
 		}
 	}
 
-	public void updatePostsString(String newPosts) {
-		ContentValues valores = new ContentValues();
-		valores.put("valor", newPosts);
-		db.update("config", valores, "_id=5", null);
+	public boolean postExistsOnTopic(long topicId) {
+
+		Cursor cursor = db.rawQuery("SELECT posts from topics WHERE topic_id="
+				+ topicId, null);
+		cursor.moveToFirst();
+
+		if (cursor.getString(cursor.getColumnIndex("posts")) != null) {
+			cursor.close();
+			return true;
+		} else {
+			cursor.close();
+			return false;
+		}
 	}
 }

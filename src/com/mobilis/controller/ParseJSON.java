@@ -81,6 +81,8 @@ public class ParseJSON {
 			JSONObject jsonObjects[] = new JSONObject[jsonArray.size()];
 			parsedValues = new ContentValues[jsonArray.size()];
 
+			adapter.open();
+
 			for (int i = 0; i < jsonArray.size(); i++) {
 				jsonObjects[i] = (JSONObject) jsonArray.get(i);
 				Log.w("Object", jsonObjects[i].toJSONString());
@@ -105,8 +107,19 @@ public class ParseJSON {
 				parsedValues[i]
 						.put("name", (String) jsonObjects[i].get("name"));
 
+				if (!adapter.existsCourseWithId(Long
+						.parseLong((String) jsonObjects[i].get("group_id")))) {
+					ContentValues newCourse = new ContentValues();
+					newCourse.putNull("_id");
+					newCourse.put("course_id",
+							(String) jsonObjects[i].get("curriculum_unit_id"));
+					newCourse.putNull("classes");
+					adapter.insertNewCourse(newCourse);
+
+				}
 			}
 
+			adapter.close();
 			return parsedValues;
 		}
 
@@ -118,6 +131,7 @@ public class ParseJSON {
 			JSONObject jsonObjects[] = new JSONObject[jsonArray.size()];
 			parsedValues = new ContentValues[jsonArray.size()];
 
+			adapter.open();
 			for (int i = 0; i < jsonArray.size(); i++) {
 				jsonObjects[i] = (JSONObject) jsonArray.get(i);
 				Log.w("Object", jsonObjects[i].toJSONString());
@@ -132,8 +146,19 @@ public class ParseJSON {
 				parsedValues[i].put("semester",
 						(String) jsonObjects[i].get("semester"));
 
-			}
+				if (!adapter.existsClassWithId(Long
+						.parseLong((String) jsonObjects[i].get("id")))) {
 
+					ContentValues newClass = new ContentValues();
+					newClass.putNull("_id");
+					newClass.put("class_id", (String) jsonObjects[i].get("id"));
+					newClass.putNull("topics");
+					adapter.insertNewClass(newClass);
+
+				}
+
+			}
+			adapter.close();
 			return parsedValues;
 
 		}

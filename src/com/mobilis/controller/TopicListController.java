@@ -74,9 +74,15 @@ public class TopicListController extends ListActivity {
 
 		adapter.open();
 		jsonParser = new ParseJSON(this);
-		parsedValues = jsonParser.parseJSON(adapter.getTopics(),
-				Constants.PARSE_TOPICS_ID);
+
+		String topics = adapter.getTopicsFromClasses(Long.parseLong(settings
+				.getString("SelectedClass", null)));
+		parsedValues = jsonParser.parseJSON(topics, Constants.PARSE_TOPICS_ID);
+		// parsedValues =
+		// jsonParser.parseJSON(adapter.getTopics(),Constants.PARSE_TOPICS_ID);
+
 		adapter.close();
+
 		Log.w("parsedLenght", String.valueOf(parsedValues.length));
 		listAdapter = new TopicAdapter(this, parsedValues);
 		setListAdapter(listAdapter);
@@ -167,7 +173,7 @@ public class TopicListController extends ListActivity {
 			Log.w("NEW POSTS RESULT", result);
 			adapter.open();
 			// adapter.updatePostsString(result); OLD
-			adapter.updatePosts(result,
+			adapter.updatePostsFromTopic(result,
 					Long.parseLong(settings.getString("SelectedTopic", null)));
 			adapter.close();
 

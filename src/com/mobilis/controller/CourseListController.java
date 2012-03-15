@@ -30,7 +30,7 @@ public class CourseListController extends ListActivity {
 	private DBAdapter adapter;
 	private ParseJSON jsonParser;
 	private ContentValues[] courseList;
-	private String semesterString;
+	private String courseId;
 	private CourseListAdapter customAdapter;
 	private ProgressDialog dialog;
 	private RequestCurriculumUnits requestCurriculumUnits;
@@ -112,19 +112,20 @@ public class CourseListController extends ListActivity {
 		Log.w("item id", String.valueOf(id));
 
 		Object semester = l.getAdapter().getItem(position);
-		semesterString = (String) semester;
+		courseId = (String) semester;
 
 		// Settings
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
 		SharedPreferences.Editor editor = settings.edit();
-		editor.putString("SelectedCourse", semesterString);
+		editor.putString("SelectedCourse", courseId);
 		editor.commit();
 
-		Log.w("GroupID", semesterString);
+		Log.w("GroupID", courseId);
 
 		adapter.open();
 
-		if (adapter.groupsExist()) {
+		if (adapter.existsClassesOnCourse(Long.parseLong(settings.getString(
+				"SelectedCourse", null)))) {
 			adapter.close();
 			intent = new Intent(this, ClassListController.class);
 			startActivity(intent);
@@ -135,7 +136,7 @@ public class CourseListController extends ListActivity {
 			dialog = Dialogs.getProgressDialog(this);
 			dialog.show();
 			obtainCurriculumUnits(Constants.URL_CURRICULUM_UNITS_PREFIX
-					+ semesterString + Constants.URL_GROUPS_SUFFIX);
+					+ courseId + Constants.URL_GROUPS_SUFFIX);
 		}
 
 	}
@@ -175,7 +176,11 @@ public class CourseListController extends ListActivity {
 		@Override
 		public void onCurriculumUnitsConnectionSuccedded(String result) {
 			adapter.open();
-			adapter.updateGroups(result);
+
+			// adapter.updateGroups(result);
+			adapter.updateClassesFromCourse(result,
+					Long.parseLong(settings.getString("SelectedCourse", null)));
+
 			adapter.close();
 			intent = new Intent(getApplicationContext(),
 					ClassListController.class);

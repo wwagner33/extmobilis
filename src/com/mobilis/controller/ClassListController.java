@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.mobilis.model.DBAdapter;
 import com.mobilis.threads.RequestCurriculumUnitsThread;
@@ -34,26 +35,17 @@ public class ClassListController extends ListActivity {
 	private Intent intent;
 	private RequestTopics requestTopics;
 	private RequestCurriculumUnits requestClasses;
-	SharedPreferences settings;
+	private SharedPreferences settings;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-	
-
 		setContentView(R.layout.curriculum_units);
 		adapter = new DBAdapter(this);
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
 
-		// Bundle extras = getIntent().getExtras();
-		// extrasString = extras.getString("GroupList");
-		// if (extrasString != null) {
 		updateList();
-
-		// } else {
-		// futura atualização da lista com os valores banco
-		// }
 	}
 
 	@Override
@@ -93,14 +85,22 @@ public class ClassListController extends ListActivity {
 	}
 
 	public void updateList() {
+
 		jsonParser = new ParseJSON(this);
 		adapter.open();
-		Log.w("COURSESBANK", adapter.getCourseList());
-		parsedValues = jsonParser.parseJSON(adapter.getGroups(),
-				Constants.PARSE_CLASSES_ID);
+		String classes = adapter.getClassesFromCourse(Long.parseLong(settings
+				.getString("SelectedCourse", null)));
+
+		// parsedValues =
+		// jsonParser.parseJSON(adapter.getGroups(),Constants.PARSE_CLASSES_ID);
+		// OLD CALL
+		parsedValues = jsonParser
+				.parseJSON(classes, Constants.PARSE_CLASSES_ID);
 		adapter.close();
+
 		listAdapter = new ClassAdapter(this, parsedValues);
 		setListAdapter(listAdapter);
+
 	}
 
 	@Override
@@ -115,13 +115,16 @@ public class ClassListController extends ListActivity {
 		editor.commit();
 
 		adapter.open();
-		if (adapter.TopicsExists()) {
-			adapter.close();
+
+		if (adapter.existsTopicsOnClass(Long.parseLong(settings.getString(
+				"SelectedClass", null)))) {
 			intent = new Intent(this, TopicListController.class);
 			startActivity(intent);
+
 		}
 
 		else {
+
 			adapter.close();
 			dialog = Dialogs.getProgressDialog(this);
 			dialog.show();
@@ -146,15 +149,26 @@ public class ClassListController extends ListActivity {
 		@Override
 		public void onTopicsConnectionSucceded(String result) {
 
-			adapter.open();
-			adapter.updateTopics(result);
-			adapter.close();
+			// Log.w("resultLenght", String.valueOf(result.length()));
+			if (result.length() <= 2) {
+				Toast.makeText(getApplicationContext(), "Fórum Vazio",
+						Toast.LENGTH_SHORT).show();
+				closeDialogIfItsVisible();
+			}
 
-			intent = new Intent(getApplicationContext(),
-					TopicListController.class);
-			// intent.putExtra("TopicList", result);
-			startActivity(intent);
+			else {
 
+				adapter.open();
+				// adapter.updateTopics(result);
+				adapter.updateTopicsFromClasses(result, Long.parseLong(settings
+						.getString("SelectedClass", null)));
+				adapter.close();
+
+				intent = new Intent(getApplicationContext(),
+						TopicListController.class);
+				startActivity(intent);
+
+			}
 		}
 
 	}
@@ -173,6 +187,12 @@ public class ClassListController extends ListActivity {
 
 		@Override
 		public void onCurriculumUnitsConnectionSuccedded(String result) {
+
+			adapter.open();
+			adapter.updateClassesFromCourse(result,
+					Long.parseLong(settings.getString("SelectedCourse", null)));
+			adapter.close();
+
 			ContentValues[] classValues = jsonParser.parseJSON(result,
 					Constants.PARSE_CLASSES_ID);
 			parsedValues = classValues;

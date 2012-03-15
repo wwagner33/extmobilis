@@ -416,7 +416,7 @@ public class ResponseController extends Activity implements OnClickListener,
 		public void onNewPostConnectionSecceded(String result) {
 			adapter.open();
 			// adapter.updatePostsString(result);
-			adapter.updatePosts(result,
+			adapter.updatePostsFromTopic(result,
 					Long.parseLong(settings.getString("SelectedTopic", null)));
 			adapter.close();
 			
