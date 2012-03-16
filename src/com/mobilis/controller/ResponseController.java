@@ -149,13 +149,11 @@ public class ResponseController extends Activity implements OnClickListener,
 	@Override
 	public void onBackPressed() {
 
-		
 		if (message.length() > 0 || existsRecording) {
 			AlertDialog alertDialog = dialogs.getAlerDialog();
 			alertDialog.show();
-		}
-		else {
-			 super.onBackPressed();
+		} else {
+			super.onBackPressed();
 		}
 	}
 

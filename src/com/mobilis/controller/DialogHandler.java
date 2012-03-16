@@ -27,6 +27,8 @@ public class DialogHandler extends Handler {
 			// activity.finish();
 			// Toast.makeText(activity, "onHandlerPositive", Toast.LENGTH_SHORT)
 			// .show();
+			Toast.makeText(activity, "Mensagem descartada", Toast.LENGTH_SHORT)
+					.show();
 			activity.finish();
 		}
 
