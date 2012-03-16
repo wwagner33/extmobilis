@@ -10,7 +10,7 @@ public class DialogHandler extends Handler {
 
 	private Activity activity;
 	private ResponseController teste;
-//	private Dialog dialog;
+	private Dialog dialog;
 
 	public DialogHandler(Dialog d, Activity a, ResponseController teste) {
 		this.teste = teste;
