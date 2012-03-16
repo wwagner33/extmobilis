@@ -9,9 +9,11 @@ import android.widget.Toast;
 public class DialogHandler extends Handler {
 
 	private Activity activity;
-	private Dialog dialog;
+	private ResponseController teste;
+//	private Dialog dialog;
 
-	public DialogHandler(Dialog d, Activity a) {
+	public DialogHandler(Dialog d, Activity a, ResponseController teste) {
+		this.teste = teste;
 		activity = a;
 		dialog = d;
 	}
@@ -24,20 +26,14 @@ public class DialogHandler extends Handler {
 		super.handleMessage(msg);
 
 		if (msg.what == POSITIVE_BUTTON) {
-			// activity.finish();
-			// Toast.makeText(activity, "onHandlerPositive", Toast.LENGTH_SHORT)
-			// .show();
 			Toast.makeText(activity, "Mensagem descartada", Toast.LENGTH_SHORT)
 					.show();
 			activity.finish();
 		}
 
 		if (msg.what == NEGATIVE_BUTTON) {
-			// dialog.dismiss();
 			Toast.makeText(activity, "onHandlerNegative", Toast.LENGTH_SHORT)
 					.show();
 		}
-
 	}
-
 }
