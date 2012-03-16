@@ -38,7 +38,7 @@ public class RecordAudio {
 			IOException {
 
 		if (!path.exists()) {
-			path.mkdir();
+			path.mkdirs();
 		}
 
 		if (isReseted) {
