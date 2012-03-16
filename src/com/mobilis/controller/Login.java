@@ -27,13 +27,14 @@ public class Login extends Activity implements OnClickListener {
 	private ParseJSON jsonParser;
 	private RequestToken requestToken;
 	private RequestCourses requestCourses;
+	private Dialogs dialogs;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
 		
-		
+		dialogs = new Dialogs(this);
 		
 		setContentView(R.layout.login);
 		login = (EditText) findViewById(R.id.campo1);
@@ -82,7 +83,7 @@ public class Login extends Activity implements OnClickListener {
 			boolean ok = true;
 			if (ok) {
 
-				dialog = Dialogs.getProgressDialog(this);
+				dialog = dialogs.getProgressDialog();
 				dialog.show();
 				requestToken();
 			}

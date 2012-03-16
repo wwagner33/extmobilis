@@ -6,9 +6,11 @@ import java.io.IOException;
 import org.json.simple.JSONObject;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.MediaPlayer;
@@ -62,8 +64,9 @@ public class ResponseController extends Activity implements OnClickListener,
 	private boolean existsRecording = false;
 	private RequestNewPosts requestNewPosts;
 	public SharedPreferences settings;
-
+	// private Handler dialogHandler;
 	private String charSequenceAfter;
+	private Dialogs dialogs;
 
 	private long countUp;
 	private long startTime;
@@ -71,14 +74,17 @@ public class ResponseController extends Activity implements OnClickListener,
 
 	private RecordAudio recorder;
 	private PlayAudio player;
+	public static DialogInterface.OnClickListener dialogClick;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		dialogs = new Dialogs(this);
+
 		setContentView(R.layout.answer_topic);
 		extras = getIntent().getExtras();
-		dialog = Dialogs.getProgressDialog(this);
+		dialog = dialogs.getProgressDialog();
 		submit = (Button) findViewById(R.id.criar_topico_submit);
 		submit.setOnClickListener(this);
 		message = (EditText) findViewById(R.id.criar_topico_conteudo);
@@ -94,8 +100,8 @@ public class ResponseController extends Activity implements OnClickListener,
 		deleteRecording = (Button) findViewById(R.id.delete_recording);
 		deleteRecording.setOnClickListener(this);
 
-		cancelar = (Button) findViewById(R.id.resposta_btn_cancel);
-		cancelar.setOnClickListener(this);
+		// cancelar = (Button) findViewById(R.id.resposta_btn_cancel);
+		// cancelar.setOnClickListener(this);
 
 		audioPreviewBar = (RelativeLayout) findViewById(R.id.audio_preview_bar);
 
@@ -140,6 +146,19 @@ public class ResponseController extends Activity implements OnClickListener,
 
 	}
 
+	@Override
+	public void onBackPressed() {
+
+		
+		if (message.length() > 0 || existsRecording) {
+			AlertDialog alertDialog = dialogs.getAlerDialog();
+			alertDialog.show();
+		}
+		else {
+			 super.onBackPressed();
+		}
+	}
+
 	public void deleteRecording() {
 		File recordedFile = new File(Constants.RECORDING_PATH
 				+ Constants.RECORDING_FULLNAME);
@@ -172,19 +191,19 @@ public class ResponseController extends Activity implements OnClickListener,
 			}
 		}
 
-		if (v.getId() == R.id.resposta_btn_cancel) {
+		// if (v.getId() == R.id.resposta_btn_cancel) {
 
-			/*
-			 * Log.w("OnClick", "YES"); if (previewFragment.isShown())
-			 * previewFragment.setVisibility(View.GONE); else
-			 * previewFragment.setVisibility(View.VISIBLE);
-			 */
+		/*
+		 * Log.w("OnClick", "YES"); if (previewFragment.isShown())
+		 * previewFragment.setVisibility(View.GONE); else
+		 * previewFragment.setVisibility(View.VISIBLE);
+		 */
 
-			// if existsRecording = true;
-			// Dialog == mensagem será descartada, continuar ?
-			// else finish ()
+		// if existsRecording = true;
+		// Dialog == mensagem será descartada, continuar ?
+		// else finish ()
 
-		}
+		// }
 
 		if (v.getId() == R.id.delete_recording) {
 			deleteRecording();
@@ -419,7 +438,7 @@ public class ResponseController extends Activity implements OnClickListener,
 			adapter.updatePostsFromTopic(result,
 					Long.parseLong(settings.getString("SelectedTopic", null)));
 			adapter.close();
-			
+
 			intent = new Intent(getApplicationContext(), PostList.class);
 			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			startActivity(intent);
@@ -514,4 +533,5 @@ public class ResponseController extends Activity implements OnClickListener,
 	public void onInfo(MediaRecorder mr, int what, int extra) {
 		Log.w("OnInfoListener", "TRUE");
 	}
+
 }

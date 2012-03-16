@@ -39,11 +39,13 @@ public class TopicListController extends ListActivity {
 	private SharedPreferences settings;
 	private RequestTopics requestTopics;
 	private RequestNewPosts requestNewPosts;
+	private Dialogs dialogs;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		dialogs = new Dialogs(this);
 		setContentView(R.layout.topic);
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
 		adapter = new DBAdapter(this);
@@ -78,11 +80,7 @@ public class TopicListController extends ListActivity {
 		String topics = adapter.getTopicsFromClasses(Long.parseLong(settings
 				.getString("SelectedClass", null)));
 		parsedValues = jsonParser.parseJSON(topics, Constants.PARSE_TOPICS_ID);
-		// parsedValues =
-		// jsonParser.parseJSON(adapter.getTopics(),Constants.PARSE_TOPICS_ID);
-
 		adapter.close();
-
 		Log.w("parsedLenght", String.valueOf(parsedValues.length));
 		listAdapter = new TopicAdapter(this, parsedValues);
 		setListAdapter(listAdapter);
@@ -121,7 +119,7 @@ public class TopicListController extends ListActivity {
 		} else {
 			Log.w("FALSE", "FALSE");
 			adapter.close();
-			dialog = Dialogs.getProgressDialog(this);
+			dialog = dialogs.getProgressDialog();
 			dialog.show();
 			String url = "discussions/" + topicIdString + "/posts/"
 					+ Constants.oldDateString + "/news.json";
@@ -172,7 +170,6 @@ public class TopicListController extends ListActivity {
 		public void onNewPostConnectionSecceded(String result) {
 			Log.w("NEW POSTS RESULT", result);
 			adapter.open();
-			// adapter.updatePostsString(result); OLD
 			adapter.updatePostsFromTopic(result,
 					Long.parseLong(settings.getString("SelectedTopic", null)));
 			adapter.close();
@@ -253,7 +250,6 @@ public class TopicListController extends ListActivity {
 		public Object getItem(int position) {
 			ContentValues contentAtPosisiton = values[position];
 			forumName = values[position].getAsString("name");
-			// return values[position].getAsLong("id");
 			return contentAtPosisiton;
 		}
 
@@ -289,7 +285,7 @@ public class TopicListController extends ListActivity {
 		if (item.getItemId() == R.id.menu_refresh) {
 
 			String currentClass = settings.getString("SelectedClass", null);
-			dialog = Dialogs.getProgressDialog(this);
+			dialog = dialogs.getProgressDialog();
 			dialog.show();
 			obtainTopics(Constants.URL_GROUPS_PREFIX + currentClass
 					+ Constants.URL_DISCUSSION_SUFFIX);

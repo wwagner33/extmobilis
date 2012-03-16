@@ -281,23 +281,9 @@ public class ParseJSON {
 			parseData(rowItem, (String) innerObject.get("updated"), i);
 			parsedPostValues.add(rowItem);
 
-			/*
-			 * adapter.open(); if (!adapter.postExists((Long)
-			 * innerObject.get("id"))) { ContentValues bankValues = new
-			 * ContentValues(); bankValues.putNull("_id");
-			 * bankValues.put("post_id", (Long) innerObject.get("id"));
-			 * bankValues.put("topic_id", (Long)
-			 * innerObject.get("discussion_id")); bankValues.put("posts",
-			 * source); adapter.insertNewPost(bankValues);
-			 * 
-			 * // }
-			 * 
-			 * // adapter.close();
-			 */
 		}
 
 		return parsedPostValues;
-
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })

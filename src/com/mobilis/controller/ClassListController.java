@@ -7,8 +7,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -36,11 +37,13 @@ public class ClassListController extends ListActivity {
 	private RequestTopics requestTopics;
 	private RequestCurriculumUnits requestClasses;
 	private SharedPreferences settings;
+	private Dialogs dialogs;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		dialogs = new Dialogs(this);
 		setContentView(R.layout.curriculum_units);
 		adapter = new DBAdapter(this);
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
@@ -91,9 +94,6 @@ public class ClassListController extends ListActivity {
 		String classes = adapter.getClassesFromCourse(Long.parseLong(settings
 				.getString("SelectedCourse", null)));
 
-		// parsedValues =
-		// jsonParser.parseJSON(adapter.getGroups(),Constants.PARSE_CLASSES_ID);
-		// OLD CALL
 		parsedValues = jsonParser
 				.parseJSON(classes, Constants.PARSE_CLASSES_ID);
 		adapter.close();
@@ -126,7 +126,7 @@ public class ClassListController extends ListActivity {
 		else {
 
 			adapter.close();
-			dialog = Dialogs.getProgressDialog(this);
+			dialog = dialogs.getProgressDialog();
 			dialog.show();
 			obtainTopics(Constants.URL_GROUPS_PREFIX + classIdString
 					+ Constants.URL_DISCUSSION_SUFFIX);
@@ -149,7 +149,6 @@ public class ClassListController extends ListActivity {
 		@Override
 		public void onTopicsConnectionSucceded(String result) {
 
-			// Log.w("resultLenght", String.valueOf(result.length()));
 			if (result.length() <= 2) {
 				Toast.makeText(getApplicationContext(), "Fórum Vazio",
 						Toast.LENGTH_SHORT).show();
@@ -159,7 +158,6 @@ public class ClassListController extends ListActivity {
 			else {
 
 				adapter.open();
-				// adapter.updateTopics(result);
 				adapter.updateTopicsFromClasses(result, Long.parseLong(settings
 						.getString("SelectedClass", null)));
 				adapter.close();
@@ -259,12 +257,22 @@ public class ClassListController extends ListActivity {
 		if (item.getItemId() == R.id.menu_refresh) {
 
 			String selectedCourse = settings.getString("SelectedCourse", null);
-			dialog = Dialogs.getProgressDialog(this);
+			dialog = dialogs.getProgressDialog();
 			dialog.show();
 			obtainClasses(Constants.URL_CURRICULUM_UNITS_PREFIX
 					+ selectedCourse + Constants.URL_GROUPS_SUFFIX);
 
 		}
 		return true;
+	}
+
+	public class DialogHandler extends Handler {
+
+		@Override
+		public void handleMessage(Message msg) {
+			// TODO Auto-generated method stub
+			super.handleMessage(msg);
+
+		}
 	}
 }

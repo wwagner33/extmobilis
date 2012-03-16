@@ -36,11 +36,13 @@ public class CourseListController extends ListActivity {
 	private RequestCurriculumUnits requestCurriculumUnits;
 	private RequestCourses requestCourses;
 	private SharedPreferences settings;
+	private Dialogs dialogs;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		dialogs = new Dialogs(this);
 		setContentView(R.layout.course);
 		adapter = new DBAdapter(this);
 		updateList();
@@ -114,7 +116,6 @@ public class CourseListController extends ListActivity {
 		Object semester = l.getAdapter().getItem(position);
 		courseId = (String) semester;
 
-		// Settings
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
 		SharedPreferences.Editor editor = settings.edit();
 		editor.putString("SelectedCourse", courseId);
@@ -133,7 +134,7 @@ public class CourseListController extends ListActivity {
 
 		else {
 			adapter.close();
-			dialog = Dialogs.getProgressDialog(this);
+			dialog = dialogs.getProgressDialog();
 			dialog.show();
 			obtainCurriculumUnits(Constants.URL_CURRICULUM_UNITS_PREFIX
 					+ courseId + Constants.URL_GROUPS_SUFFIX);
@@ -261,7 +262,7 @@ public class CourseListController extends ListActivity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if (item.getItemId() == R.id.menu_refresh) {
-			dialog = Dialogs.getProgressDialog(this);
+			dialog = dialogs.getProgressDialog();
 			dialog.show();
 			obtainCourses(Constants.URL_COURSES);
 		}

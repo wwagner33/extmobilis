@@ -69,6 +69,7 @@ public class PostList extends ListActivity implements OnClickListener,
 	private RequestNewPosts requestNewPosts;
 	private RequestHistoryPosts requestHistoryPosts;
 	private boolean stopLoadingMore = false;
+	private Dialogs dialogs;
 
 	// private int totalItems;
 
@@ -81,6 +82,7 @@ public class PostList extends ListActivity implements OnClickListener,
 	protected void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
+		dialogs = new Dialogs(this);
 
 		setContentView(R.layout.post);
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
@@ -502,7 +504,7 @@ public class PostList extends ListActivity implements OnClickListener,
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if (item.getItemId() == R.id.menu_refresh) {
 
-			dialog = Dialogs.getProgressDialog(this);
+			dialog = dialogs.getProgressDialog();
 			dialog.show();
 			String url = "discussions/"
 					+ settings.getString("SelectedTopic", null) + "/posts/"
