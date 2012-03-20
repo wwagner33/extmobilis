@@ -7,6 +7,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.util.zip.ZipInputStream;
 
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -34,6 +36,7 @@ public class Connection {
 	private HttpResponse response;
 	private HttpPost post;
 	private HttpGet get;
+	int byteCount;
 
 	public Object[] getFromServer(String URL, String authToken)
 			throws ClientProtocolException, IOException
@@ -241,19 +244,20 @@ public class Connection {
 		Log.w("statusCode", String.valueOf(statusCode));
 
 		if (statusCode == 200) {
-			
-				//response.getEntity().getContent().;
+
+			// response.getEntity().getContent().;
 			/*
 			 * Header teste = response.getEntity().getContentType();
 			 * teste.getName();
 			 */
 
 			BitmapFactory.Options options = new BitmapFactory.Options();
-			options.inSampleSize=5;
-			Bitmap myImage = BitmapFactory.decodeStream(response.getEntity().getContent());
-					//	response.getEntity()
-					//BitmapFactory.decodeByteArray(bytes, 0,
-					//bytes.length,options);
+			options.inSampleSize = 5;
+			Bitmap myImage = BitmapFactory.decodeStream(response.getEntity()
+					.getContent());
+			// response.getEntity()
+			// BitmapFactory.decodeByteArray(bytes, 0,
+			// bytes.length,options);
 
 			fileOutputStream = new FileOutputStream(Environment
 					.getExternalStorageDirectory().getAbsolutePath()
@@ -267,6 +271,59 @@ public class Connection {
 
 			bos.flush();
 			bos.close();
+
+			resultSet[1] = statusCode;
+			resultSet[0] = "teste";
+			return resultSet;
+
+		} else
+			return null;
+
+	}
+
+	public Object[] getZippedImages(String url, String token)
+			throws ClientProtocolException, IOException {
+
+		Object[] resultSet = new Object[2];
+
+		FileOutputStream fileOutputStream = null;
+		DefaultHttpClient client = new DefaultHttpClient();
+		// get = new HttpGet(Constants.URL_SERVER + url + "?auth_token=" +
+		// token);
+		get = new HttpGet(Constants.URL_SERVER + url);
+
+		Log.w("IMAGE UL", get.getURI().toString());
+
+		HttpResponse response = client.execute(get);
+		StatusLine statusLine = response.getStatusLine();
+		int statusCode = statusLine.getStatusCode();
+
+		Log.w("statusCode", String.valueOf(statusCode));
+
+		if (statusCode == 200) {
+
+			// BitmapFactory.Options options = new BitmapFactory.Options();
+			// options.inSampleSize = 5;
+			// Bitmap myImage = BitmapFactory.decodeStream(response.getEntity()
+			// .getContent());
+
+			InputStream content = response.getEntity().getContent();
+			ZipInputStream zip = new ZipInputStream(content);
+
+			fileOutputStream = new FileOutputStream(Environment
+					.getExternalStorageDirectory().getAbsolutePath()
+					+ "/Mobilis/Recordings/" + "teste" + ".zip");
+
+			byteCount = 0;
+
+			byte[] buffer = new byte[4096];
+			int bytesRead = -1;
+			while ((bytesRead = content.read(buffer)) != -1) {
+				fileOutputStream.write(buffer, 0, bytesRead);
+				byteCount += bytesRead;
+			}
+			fileOutputStream.flush();
+			fileOutputStream.close();
 
 			resultSet[1] = statusCode;
 			resultSet[0] = "teste";

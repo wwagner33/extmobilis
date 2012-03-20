@@ -7,6 +7,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.StateListDrawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -17,10 +18,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.mobilis.model.DBAdapter;
+import com.mobilis.threads.RequestImagesThread;
 import com.mobilis.threads.RequestNewPostsThread;
 import com.mobilis.threads.RequestPostsThread;
 import com.mobilis.threads.RequestTopicsThread;
@@ -40,6 +44,7 @@ public class TopicListController extends ListActivity {
 	private RequestTopics requestTopics;
 	private RequestNewPosts requestNewPosts;
 	private Dialogs dialogs;
+	private RequestImages requestImages;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -100,6 +105,8 @@ public class TopicListController extends ListActivity {
 
 		if (valuesSelected.getAsString("isClosed").equals("t")) {
 
+			Log.w("FORUMCLOSED", "TRUE");
+			// v.setBackgroundColor(Color.BLACK);
 			editor.putBoolean("isForumClosed", true);
 
 		} else {
@@ -114,8 +121,12 @@ public class TopicListController extends ListActivity {
 		if (adapter.postExistsOnTopic(Long.parseLong(topicIdString))) {
 			adapter.close();
 			Log.w("TRUE", "TRUE");
+
 			intent = new Intent(this, PostList.class);
 			startActivity(intent);
+
+			// getImages();
+
 		} else {
 			Log.w("FALSE", "FALSE");
 			adapter.close();
@@ -153,6 +164,15 @@ public class TopicListController extends ListActivity {
 		requestTopics.setConnectionParameters(URLString, adapter.getToken());
 		adapter.close();
 		requestTopics.execute();
+	}
+
+	public void getImages() {
+		requestImages = new RequestImages(this);
+		adapter.open();
+		String testeURL = "images/10/users";
+		requestImages.setConnectionParameters(testeURL, adapter.getToken());
+		adapter.close();
+		requestImages.execute();
 	}
 
 	public class RequestNewPosts extends RequestNewPostsThread {
@@ -229,6 +249,27 @@ public class TopicListController extends ListActivity {
 		}
 	}
 
+	public class RequestImages extends RequestImagesThread {
+
+		public RequestImages(Context context) {
+			super(context);
+			// TODO Auto-generated constructor stub
+		}
+
+		@Override
+		public void onRequestImagesSucceded(String result) {
+			Toast.makeText(getApplicationContext(), "OK", Toast.LENGTH_SHORT)
+					.show();
+		}
+
+		@Override
+		public void onRequestImagesFailed() {
+			Toast.makeText(getApplicationContext(), "Failed",
+					Toast.LENGTH_SHORT).show();
+		}
+
+	}
+
 	public class TopicAdapter extends BaseAdapter {
 
 		Activity activity;
@@ -262,6 +303,26 @@ public class TopicListController extends ListActivity {
 		public View getView(int position, View convertView, ViewGroup parent) {
 
 			convertView = inflater.inflate(R.layout.topicitem, parent, false);
+
+			if (values[position].getAsString("isClosed").equals("t")) {
+
+				StateListDrawable states = new StateListDrawable();
+				states.addState(
+						new int[] {},
+						getResources().getDrawable(
+								R.drawable.course_list_closed_selector));
+				convertView.setBackgroundDrawable(states);
+				TextView topicTitle = (TextView) convertView
+						.findViewById(R.id.topic_name);
+				LinearLayout teste = (LinearLayout)convertView.findViewById(R.id.left_bar);
+				teste.setBackgroundColor(R.color.very_dark_gray);
+				
+				topicTitle.setTextColor(R.color.very_dark_gray);
+				topicTitle.setText(values[position].getAsString("name"));
+				Log.w("isClosed", values[position].getAsString("isClosed"));
+				return convertView;
+
+			}
 
 			TextView topicTitle = (TextView) convertView
 					.findViewById(R.id.topic_name);
