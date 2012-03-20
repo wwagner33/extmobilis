@@ -85,8 +85,8 @@ public class ResponseController extends Activity implements OnClickListener,
 		setContentView(R.layout.answer_topic);
 		extras = getIntent().getExtras();
 		dialog = dialogs.getProgressDialog();
-		submit = (Button) findViewById(R.id.criar_topico_submit);
-		submit.setOnClickListener(this);
+		// submit = (Button) findViewById(R.id.criar_topico_submit);
+		// submit.setOnClickListener(this);
 		message = (EditText) findViewById(R.id.criar_topico_conteudo);
 		message.addTextChangedListener(this);
 		record = (ImageButton) findViewById(R.id.btn_gravar);
@@ -207,22 +207,22 @@ public class ResponseController extends Activity implements OnClickListener,
 			deleteRecording();
 		}
 
-		if (v.getId() == R.id.criar_topico_submit) {
-
-			if (extras.getLong("parentId") > 0) {
-
-				postObject = jsonParser.buildTextResponseWithParentObject(
-						message.getText().toString(),
-						extras.getLong("parentId"));
-
-			} else {
-				postObject = jsonParser.buildTextResponseWithoutParent(message
-						.getText().toString());
-			}
-
-			sendPost(postObject.toJSONString());
-
-		}
+		/*
+		 * if (v.getId() == R.id.criar_topico_submit) {
+		 * 
+		 * if (extras.getLong("parentId") > 0) {
+		 * 
+		 * postObject = jsonParser.buildTextResponseWithParentObject(
+		 * message.getText().toString(), extras.getLong("parentId"));
+		 * 
+		 * } else { postObject =
+		 * jsonParser.buildTextResponseWithoutParent(message
+		 * .getText().toString()); }
+		 * 
+		 * sendPost(postObject.toJSONString());
+		 * 
+		 * }
+		 */
 
 		if (v.getId() == R.id.btn_gravar) {
 
