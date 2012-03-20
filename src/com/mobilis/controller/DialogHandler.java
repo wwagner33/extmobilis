@@ -12,8 +12,8 @@ public class DialogHandler extends Handler {
 	private ResponseController teste;
 	private Dialog dialog;
 
-	public DialogHandler(Dialog d, Activity a, ResponseController teste) {
-		this.teste = teste;
+	public DialogHandler(Dialog d, Activity a) {
+//		this.teste = teste;
 		activity = a;
 		dialog = d;
 	}
