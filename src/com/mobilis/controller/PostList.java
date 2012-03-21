@@ -1,18 +1,7 @@
 package com.mobilis.controller;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Enumeration;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipException;
-import java.util.zip.ZipFile;
-
-import org.apache.commons.io.IOUtils;
 
 import android.app.Dialog;
 import android.app.ListActivity;
@@ -21,7 +10,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -70,10 +58,6 @@ public class PostList extends ListActivity implements OnClickListener,
 	private RequestHistoryPosts requestHistoryPosts;
 	private boolean stopLoadingMore = false;
 	private Dialogs dialogs;
-
-	// private int totalItems;
-
-	// history
 	private boolean loadingMore = false;
 	private String oldestPostDate;
 	private View footerView;
@@ -132,66 +116,6 @@ public class PostList extends ListActivity implements OnClickListener,
 	public void closeDialogIfItsVisible() {
 		if (dialog != null && dialog.isShowing())
 			dialog.dismiss();
-
-	}
-
-	private void createDir(File dir) {
-		if (dir.exists()) {
-			return;
-		}
-		if (!dir.mkdirs()) {
-			throw new RuntimeException("Cannot create dir " + dir);
-		}
-	}
-
-	private void unzipEntry(ZipFile zipfile, ZipEntry entry, String outputDir)
-			throws IOException {
-
-		if (entry.isDirectory()) {
-			createDir(new File(outputDir, entry.getName()));
-			return;
-		}
-
-		File outputFile = new File(outputDir, entry.getName());
-		if (!outputFile.getParentFile().exists()) {
-			createDir(outputFile.getParentFile());
-		}
-
-		BufferedInputStream inputStream = new BufferedInputStream(
-				zipfile.getInputStream(entry));
-		BufferedOutputStream outputStream = new BufferedOutputStream(
-				new FileOutputStream(outputFile));
-
-		try {
-			IOUtils.copy(inputStream, outputStream);
-		} finally {
-			outputStream.close();
-			inputStream.close();
-		}
-
-	}
-
-	@SuppressWarnings("rawtypes")
-	public void unzipFile() {
-		String destinationPath = Environment.getExternalStorageDirectory()
-				.getAbsolutePath() + "/Mobilis/Recordings/";
-		File file = new File(Environment.getExternalStorageDirectory()
-				.getAbsolutePath() + "/Mobilis/Recordings/teste.zip");
-		try {
-			ZipFile zipFile = new ZipFile(file);
-
-			for (Enumeration e = zipFile.entries(); e.hasMoreElements();) {
-				ZipEntry entry = (ZipEntry) e.nextElement();
-				unzipEntry(zipFile, entry, destinationPath);
-
-			}
-
-		} catch (ZipException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		dialog.dismiss();
 
 	}
 
@@ -442,6 +366,17 @@ public class PostList extends ListActivity implements OnClickListener,
 				convertView = inflater
 						.inflate(R.layout.postitem, parent, false);
 
+				// ImageView avatar = (ImageView) convertView
+				// .findViewById(R.id.avatar);
+				// long postId = data.get(position).getAsLong("profile_id");
+				// if (postId == 1) {
+				// BitmapDrawable bitmap = new BitmapDrawable(Environment
+				// .getExternalStorageDirectory().getAbsolutePath()
+				// + "/Mobilis/Recordings/" + 7 + ".jpg");
+				// avatar.setImageBitmap(bitmap.getBitmap());
+				// }
+				//
+
 				TextView postDate = (TextView) convertView
 						.findViewById(R.id.post_date);
 
@@ -456,6 +391,13 @@ public class PostList extends ListActivity implements OnClickListener,
 							+ data.get(position).getAsString("postMinute"));
 
 				} else {
+
+					/*
+					 * if (postId == 7) { BitmapDrawable bitmap = new
+					 * BitmapDrawable(Environment .getExternalStorageDirectory()
+					 * .getAbsolutePath() + "/Mobilis/Recordings/" + postId +
+					 * ".jpg"); avatar.setImageBitmap(bitmap.getBitmap()); }
+					 */
 
 					postDate.setText(data.get(position).getAsString(
 							"postDayString")

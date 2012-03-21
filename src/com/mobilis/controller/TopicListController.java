@@ -1,5 +1,7 @@
 package com.mobilis.controller;
 
+import java.io.File;
+
 import android.app.Activity;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
@@ -28,6 +30,7 @@ import com.mobilis.threads.RequestImagesThread;
 import com.mobilis.threads.RequestNewPostsThread;
 import com.mobilis.threads.RequestPostsThread;
 import com.mobilis.threads.RequestTopicsThread;
+import com.mobilis.util.ZipManager;
 
 public class TopicListController extends ListActivity {
 
@@ -45,13 +48,15 @@ public class TopicListController extends ListActivity {
 	private RequestNewPosts requestNewPosts;
 	private Dialogs dialogs;
 	private RequestImages requestImages;
+	private ZipManager zipManager;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		dialogs = new Dialogs(this);
 		setContentView(R.layout.topic);
+		zipManager = new ZipManager();
+		dialogs = new Dialogs(this);
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
 		adapter = new DBAdapter(this);
 		updateList();
@@ -106,7 +111,6 @@ public class TopicListController extends ListActivity {
 		if (valuesSelected.getAsString("isClosed").equals("t")) {
 
 			Log.w("FORUMCLOSED", "TRUE");
-			// v.setBackgroundColor(Color.BLACK);
 			editor.putBoolean("isForumClosed", true);
 
 		} else {
@@ -166,11 +170,11 @@ public class TopicListController extends ListActivity {
 		requestTopics.execute();
 	}
 
-	public void getImages() {
+	public void getImages(String idPosts) {
 		requestImages = new RequestImages(this);
 		adapter.open();
-		String testeURL = "images/10/users";
-		requestImages.setConnectionParameters(testeURL, adapter.getToken());
+		// String testeURL = "images/1,2,3,5,7/users";
+		requestImages.setConnectionParameters(idPosts, adapter.getToken());
 		adapter.close();
 		requestImages.execute();
 	}
@@ -197,6 +201,13 @@ public class TopicListController extends ListActivity {
 			intent = new Intent(getApplicationContext(), PostList.class);
 			startActivity(intent);
 
+
+			/*
+			 * Checar se as imagens dos posts já existem na pasta Images
+			 * Antes de baixar;
+			 */
+
+			// getImages();
 		}
 
 	}
@@ -253,13 +264,15 @@ public class TopicListController extends ListActivity {
 
 		public RequestImages(Context context) {
 			super(context);
-			// TODO Auto-generated constructor stub
 		}
 
 		@Override
 		public void onRequestImagesSucceded(String result) {
-			Toast.makeText(getApplicationContext(), "OK", Toast.LENGTH_SHORT)
-					.show();
+
+			zipManager.unzipFile();
+			intent = new Intent(getApplicationContext(), PostList.class);
+			startActivity(intent);
+
 		}
 
 		@Override
@@ -314,9 +327,10 @@ public class TopicListController extends ListActivity {
 				convertView.setBackgroundDrawable(states);
 				TextView topicTitle = (TextView) convertView
 						.findViewById(R.id.topic_name);
-				LinearLayout teste = (LinearLayout)convertView.findViewById(R.id.left_bar);
+				LinearLayout teste = (LinearLayout) convertView
+						.findViewById(R.id.left_bar);
 				teste.setBackgroundColor(R.color.very_dark_gray);
-				
+
 				topicTitle.setTextColor(R.color.very_dark_gray);
 				topicTitle.setText(values[position].getAsString("name"));
 				Log.w("isClosed", values[position].getAsString("isClosed"));
