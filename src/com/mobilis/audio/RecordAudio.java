@@ -4,9 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import android.media.MediaRecorder;
-import android.media.MediaRecorder.OnInfoListener;
 import android.os.AsyncTask;
-import android.os.Environment;
 import android.util.Log;
 
 import com.mobilis.controller.Constants;
@@ -15,8 +13,9 @@ public class RecordAudio {
 
 	public static final int RECORDING_STARTED = 1;
 	public static final int RECORDING_STOPPED = 2;
-	private File path = new File(Environment.getExternalStorageDirectory()
-			.getAbsolutePath() + Constants.RECORDING_PATH);
+	// private File path = new File(Environment.getExternalStorageDirectory()
+	// .getAbsolutePath() + Constants.PATH_RECORDINGS);
+	private File path = new File(Constants.PATH_RECORDINGS);
 	private File audioFile;
 	private MediaRecorder recorder;
 	private RecordOnBackground recordOnBackgroundThread;

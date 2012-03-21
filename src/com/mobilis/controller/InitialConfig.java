@@ -1,9 +1,12 @@
 package com.mobilis.controller;
 
+import java.io.File;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 
 import com.mobilis.model.DBAdapter;
@@ -19,7 +22,10 @@ public class InitialConfig extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		
+		File file = new File(Constants.PATH_MAIN_FOLDER);
+		if (!file.exists()) {
+			file.mkdirs();
+		}
 		DatabaseHelper helper = new DatabaseHelper(this);
 		adapter = new DBAdapter(this);
 

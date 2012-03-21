@@ -5,7 +5,6 @@ import java.io.IOException;
 
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
-import android.os.Environment;
 
 import com.mobilis.controller.Constants;
 
@@ -17,9 +16,8 @@ public class PlayAudio {
 
 	public void playOwnAudio() throws IllegalArgumentException,
 			IllegalStateException, IOException {
-		File recordedAudioPath = new File(Environment
-				.getExternalStorageDirectory().getAbsolutePath()
-				+ Constants.RECORDING_PATH + Constants.RECORDING_FULLNAME);
+		File recordedAudioPath = new File(Constants.PATH_RECORDINGS
+				+ Constants.RECORDING_FULLNAME);
 		player = new MediaPlayer();
 		player.setDataSource(recordedAudioPath.getAbsolutePath());
 		player.prepare();

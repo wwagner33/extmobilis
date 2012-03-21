@@ -158,7 +158,7 @@ public class ResponseController extends Activity implements OnClickListener,
 	}
 
 	public void deleteRecording() {
-		File recordedFile = new File(Constants.RECORDING_PATH
+		File recordedFile = new File(Constants.PATH_RECORDINGS
 				+ Constants.RECORDING_FULLNAME);
 		recordedFile.delete();
 		Toast.makeText(this, "Gravação deletada com sucesso",
