@@ -1,5 +1,7 @@
 package com.mobilis.controller;
 
+import android.os.Environment;
+
 public class Constants {
 
 	// URL
@@ -46,8 +48,14 @@ public class Constants {
 	public static final int PARSE_NEW_POSTS_ID = 227;
 	public static final int PARSE_HISTORY_POSTS_ID = 228;
 
-	// Recording Path
-	public static final String RECORDING_PATH = "/Mobilis/Recordings/";
+	// Folder Paths
+	public static final String PATH_SD_CARD = Environment.getExternalStorageDirectory().getAbsolutePath();
+	public static final String PATH_MAIN_FOLDER = PATH_SD_CARD + "/Mobilis/";
+	public static final String PATH_RECORDINGS = PATH_MAIN_FOLDER + "/Recordings/";
+	public static final String PATH_IMAGES = PATH_MAIN_FOLDER + "/Images/";
+	public static final String PATH_IMAGESZIP = PATH_MAIN_FOLDER + "images.zip"; 
+	
+	
 	public static final String RECORDING_FILENAME = "recording"; // PREFIX
 	public static final String RECORDING_EXTENSION = ".3gp";
 	public static final String RECORDING_FULLNAME = "recording.3gp";
