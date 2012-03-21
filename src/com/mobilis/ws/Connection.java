@@ -288,9 +288,7 @@ public class Connection {
 
 		FileOutputStream fileOutputStream = null;
 		DefaultHttpClient client = new DefaultHttpClient();
-		// get = new HttpGet(Constants.URL_SERVER + url + "?auth_token=" +
-		// token);
-		get = new HttpGet(Constants.URL_SERVER + url);
+		get = new HttpGet(Constants.URL_SERVER + url + "?auth_token=" + token);
 
 		Log.w("IMAGE UL", get.getURI().toString());
 
@@ -302,17 +300,8 @@ public class Connection {
 
 		if (statusCode == 200) {
 
-			// BitmapFactory.Options options = new BitmapFactory.Options();
-			// options.inSampleSize = 5;
-			// Bitmap myImage = BitmapFactory.decodeStream(response.getEntity()
-			// .getContent());
-
 			InputStream content = response.getEntity().getContent();
-			ZipInputStream zip = new ZipInputStream(content);
-
-			fileOutputStream = new FileOutputStream(Environment
-					.getExternalStorageDirectory().getAbsolutePath()
-					+ "/Mobilis/Recordings/" + "teste" + ".zip");
+			fileOutputStream = new FileOutputStream(Constants.PATH_IMAGESZIP);
 
 			byteCount = 0;
 
