@@ -9,13 +9,9 @@ import android.widget.Toast;
 public class DialogHandler extends Handler {
 
 	private Activity activity;
-	private ResponseController teste;
-	private Dialog dialog;
 
-	public DialogHandler(Dialog d, Activity a) {
-//		this.teste = teste;
+	public DialogHandler(Activity a) {
 		activity = a;
-		dialog = d;
 	}
 
 	private static final int POSITIVE_BUTTON = 1;

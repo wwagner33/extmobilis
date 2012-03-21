@@ -34,7 +34,7 @@ public class Dialogs implements OnClickListener {
 		builder.setMessage("Tem certeza que deseja descartar essa mensagem?");
 		builder.setTitle("Descartar?");
 		AlertDialog dialog = builder.create();
-		handler = new DialogHandler(dialog, activity);
+		handler = new DialogHandler(activity);
 		return dialog;
 	}
 
