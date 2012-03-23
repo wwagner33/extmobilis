@@ -64,7 +64,6 @@ public class ResponseController extends Activity implements OnClickListener,
 	private boolean existsRecording = false;
 	private RequestNewPosts requestNewPosts;
 	public SharedPreferences settings;
-	// private Handler dialogHandler;
 	private String charSequenceAfter;
 	private Dialogs dialogs;
 
@@ -85,8 +84,8 @@ public class ResponseController extends Activity implements OnClickListener,
 		setContentView(R.layout.answer_topic);
 		extras = getIntent().getExtras();
 		dialog = dialogs.getProgressDialog();
-		// submit = (Button) findViewById(R.id.criar_topico_submit);
-		// submit.setOnClickListener(this);
+		submit = (Button) findViewById(R.id.criar_topico_submit);
+		submit.setOnClickListener(this);
 		message = (EditText) findViewById(R.id.criar_topico_conteudo);
 		message.addTextChangedListener(this);
 		record = (ImageButton) findViewById(R.id.btn_gravar);
@@ -99,11 +98,6 @@ public class ResponseController extends Activity implements OnClickListener,
 
 		deleteRecording = (Button) findViewById(R.id.delete_recording);
 		deleteRecording.setOnClickListener(this);
-
-		// cancelar = (Button) findViewById(R.id.resposta_btn_cancel);
-		// cancelar.setOnClickListener(this);
-
-		audioPreviewBar = (RelativeLayout) findViewById(R.id.audio_preview_bar);
 
 		previewAudio = (Button) findViewById(R.id.preview_recording);
 		previewAudio.setOnClickListener(this);
@@ -189,40 +183,26 @@ public class ResponseController extends Activity implements OnClickListener,
 			}
 		}
 
-		// if (v.getId() == R.id.resposta_btn_cancel) {
-
-		/*
-		 * Log.w("OnClick", "YES"); if (previewFragment.isShown())
-		 * previewFragment.setVisibility(View.GONE); else
-		 * previewFragment.setVisibility(View.VISIBLE);
-		 */
-
-		// if existsRecording = true;
-		// Dialog == mensagem será descartada, continuar ?
-		// else finish ()
-
-		// }
-
 		if (v.getId() == R.id.delete_recording) {
 			deleteRecording();
 		}
 
-		/*
-		 * if (v.getId() == R.id.criar_topico_submit) {
-		 * 
-		 * if (extras.getLong("parentId") > 0) {
-		 * 
-		 * postObject = jsonParser.buildTextResponseWithParentObject(
-		 * message.getText().toString(), extras.getLong("parentId"));
-		 * 
-		 * } else { postObject =
-		 * jsonParser.buildTextResponseWithoutParent(message
-		 * .getText().toString()); }
-		 * 
-		 * sendPost(postObject.toJSONString());
-		 * 
-		 * }
-		 */
+		if (v.getId() == R.id.criar_topico_submit) {
+
+			if (extras.getLong("parentId") > 0) {
+
+				postObject = jsonParser.buildTextResponseWithParentObject(
+						message.getText().toString(),
+						extras.getLong("parentId"));
+
+			} else {
+				postObject = jsonParser.buildTextResponseWithoutParent(message
+						.getText().toString());
+			}
+
+			sendPost(postObject.toJSONString());
+
+		}
 
 		if (v.getId() == R.id.btn_gravar) {
 
@@ -305,7 +285,6 @@ public class ResponseController extends Activity implements OnClickListener,
 		token = adapter.getToken();
 		adapter.close();
 
-		// URL = "discussions/" + topicId + "/posts?auth_token=" + token;
 		URL = "discussions/" + settings.getString("SelectedTopic", null)
 				+ "/posts?auth_token=" + token;
 
@@ -360,8 +339,8 @@ public class ResponseController extends Activity implements OnClickListener,
 			Log.w("RESULT", result);
 
 			ContentValues[] resultFromServer;
-			jsonParser = new ParseJSON(getApplicationContext()); // unnecessary
-																	// ?
+			jsonParser = new ParseJSON(getApplicationContext());
+
 			resultFromServer = jsonParser.parseJSON(result,
 					Constants.PARSE_TEXT_RESPONSE_ID);
 			Log.w("RESULTNEW",
@@ -381,10 +360,6 @@ public class ResponseController extends Activity implements OnClickListener,
 
 			} else {
 				Log.w("getPosts", "TRUE");
-
-				// chamada antiga
-				// getPosts(Constants.URL_DISCUSSION_PREFIX + topicId
-				// + Constants.URL_POSTS_SUFFIX);
 
 				getNewPosts("discussions/"
 						+ settings.getString("SelectedTopic", null) + "/posts/"
@@ -408,7 +383,6 @@ public class ResponseController extends Activity implements OnClickListener,
 
 		@Override
 		public void onAudioResponseConnectionSucceded(String result) {
-			// OLD CALL
 			getNewPosts("discussions/"
 					+ settings.getString("SelectedTopic", null) + "/posts/"
 					+ Constants.oldDateString + "/news.json");
