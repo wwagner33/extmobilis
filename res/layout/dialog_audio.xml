@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="fill_parent"
+    android:background="@color/white"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/courseListIdle"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp" >
+
+        <ImageView
+            android:id="@+id/image_audio"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentLeft="true"
+            android:src="@drawable/ic_lock_silent_mode_off" />
+
+        <TextView
+            android:id="@+id/recording_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:layout_marginTop="5dp"
+            android:layout_toRightOf="@id/image_audio"
+            android:text="Data da Gravação"
+            android:textColor="@color/black" />
+
+        <TextView
+            android:id="@+id/recording_duration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/recording_date"
+            android:layout_marginLeft="15dp"
+            android:layout_marginTop="5dp"
+            android:layout_toRightOf="@id/image_audio"
+            android:text="duração" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/listen_area"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/audio_dialog_item_selector"
+        android:clickable="true" >
+
+        <TextView
+            android:id="@+id/img_listen"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="25dp"
+            android:layout_marginTop="10dp"
+            android:paddingBottom="7dp"
+            android:text="Ouvir"
+            android:textColor="@color/black" />
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:background="@color/courseListIdle" />
+
+    <LinearLayout
+        android:id="@+id/delete_area"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/audio_dialog_item_selector"
+        android:clickable="true" >
+
+        <TextView
+            android:id="@+id/img_delete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="25dp"
+            android:layout_marginTop="10dp"
+            android:paddingBottom="10dp"
+            android:text="Deletar"
+            android:textColor="@color/black" />
+    </LinearLayout>
+
+</LinearLayout>

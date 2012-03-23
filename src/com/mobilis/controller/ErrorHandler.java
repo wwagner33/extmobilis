@@ -22,7 +22,9 @@ public class ErrorHandler {
 					.show();
 		}
 		if (errorId == Constants.ERROR_TOKEN_EXPIRED) {
-			Toast.makeText(context, "Token expirou", Toast.LENGTH_SHORT).show();
+			
+//			Toast.makeText(context, "Token expirou", Toast.LENGTH_SHORT).show();
+			Toast.makeText(context, "Senha ou Login inválidos", Toast.LENGTH_SHORT).show();
 		}
 
 		if (errorId == Constants.ERROR_UNKNOWN) {

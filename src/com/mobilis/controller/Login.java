@@ -16,7 +16,6 @@ import com.mobilis.model.DBAdapter;
 import com.mobilis.threads.RequestCoursesThread;
 import com.mobilis.threads.RequestTokenThread;
 
-
 public class Login extends Activity implements OnClickListener {
 
 	private EditText login, password;
@@ -32,10 +31,9 @@ public class Login extends Activity implements OnClickListener {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
-		
+
 		dialogs = new Dialogs(this);
-		
+
 		setContentView(R.layout.login);
 		login = (EditText) findViewById(R.id.campo1);
 		password = (EditText) findViewById(R.id.campo2);
@@ -44,19 +42,18 @@ public class Login extends Activity implements OnClickListener {
 		adapter = new DBAdapter(this);
 	}
 
-	
 	@Override
 	protected void onResume() {
 		// TODO Auto-generated method stub
 		super.onResume();
-		if (dialog!=null) {
+		if (dialog != null) {
 			if (dialog.isShowing()) {
 				dialog.dismiss();
 			}
 		}
-		
+
 	}
-	
+
 	@Override
 	public void onClick(View v) {
 

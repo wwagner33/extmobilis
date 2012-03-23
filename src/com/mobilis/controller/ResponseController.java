@@ -7,6 +7,7 @@ import org.json.simple.JSONObject;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
@@ -30,7 +31,7 @@ import android.widget.Chronometer;
 import android.widget.Chronometer.OnChronometerTickListener;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.RelativeLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -47,7 +48,7 @@ public class ResponseController extends Activity implements OnClickListener,
 		OnInfoListener {
 
 	private EditText message;
-	private Button submit, cancelar, deleteRecording, previewAudio;
+	private Button submit;
 	private TextView timeUp, charCount;
 	private ImageButton record;
 	private ProgressDialog dialog;
@@ -59,13 +60,15 @@ public class ResponseController extends Activity implements OnClickListener,
 	private Intent intent;
 	private JSONObject postObject;
 	private SubmitAudio submitAudio;
-	private RelativeLayout audioPreviewBar;
+	// private RelativeLayout audioPreviewBar;
 	private RequestPosts requestPosts;
 	private boolean existsRecording = false;
 	private RequestNewPosts requestNewPosts;
 	public SharedPreferences settings;
 	private String charSequenceAfter;
 	private Dialogs dialogs;
+	private ImageView recordImage;
+	private Dialog audioDialog;
 
 	private long countUp;
 	private long startTime;
@@ -93,14 +96,10 @@ public class ResponseController extends Activity implements OnClickListener,
 		timeUp = (TextView) findViewById(R.id.recording_lenght);
 		stopWatch = (Chronometer) findViewById(R.id.recording_chronometer);
 		stopWatch.setOnChronometerTickListener(this);
+		recordImage = (ImageView) findViewById(R.id.record_image);
+		recordImage.setOnClickListener(this);
 
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
-
-		deleteRecording = (Button) findViewById(R.id.delete_recording);
-		deleteRecording.setOnClickListener(this);
-
-		previewAudio = (Button) findViewById(R.id.preview_recording);
-		previewAudio.setOnClickListener(this);
 
 		charCount = (TextView) findViewById(R.id.char_number);
 
@@ -151,16 +150,6 @@ public class ResponseController extends Activity implements OnClickListener,
 		}
 	}
 
-	public void deleteRecording() {
-		File recordedFile = new File(Constants.PATH_RECORDINGS
-				+ Constants.RECORDING_FULLNAME);
-		recordedFile.delete();
-		Toast.makeText(this, "Gravação deletada com sucesso",
-				Toast.LENGTH_SHORT).show();
-		audioPreviewBar.setVisibility(View.GONE);
-		existsRecording = false;
-	}
-
 	public void closeDialogIfItsVisible() {
 		if (dialog != null && dialog.isShowing())
 			dialog.dismiss();
@@ -170,21 +159,10 @@ public class ResponseController extends Activity implements OnClickListener,
 	@Override
 	public void onClick(View v) {
 
-		if (v.getId() == R.id.preview_recording) {
-			player = new PlayAudio();
-			try {
-				player.playOwnAudio();
-			} catch (IllegalArgumentException e) {
-				e.printStackTrace();
-			} catch (IllegalStateException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-
-		if (v.getId() == R.id.delete_recording) {
-			deleteRecording();
+		if (v.getId() == R.id.record_image) {
+			dialogs = new Dialogs(this);
+			audioDialog = dialogs.getAudioDialog();
+			audioDialog.show();
 		}
 
 		if (v.getId() == R.id.criar_topico_submit) {
@@ -222,7 +200,8 @@ public class ResponseController extends Activity implements OnClickListener,
 					timeUp.setVisibility(View.GONE);
 					record.setImageResource(R.drawable.gravar_off);
 					if (!existsRecording) {
-						audioPreviewBar.setVisibility(View.VISIBLE);
+						recordImage.setVisibility(View.VISIBLE);
+						// audioPreviewBar.setVisibility(View.VISIBLE);
 						existsRecording = true;
 					}
 
@@ -504,6 +483,33 @@ public class ResponseController extends Activity implements OnClickListener,
 	@Override
 	public void onInfo(MediaRecorder mr, int what, int extra) {
 		Log.w("OnInfoListener", "TRUE");
+	}
+
+	public void playRecording() {
+		player = new PlayAudio();
+
+		try {
+			player.playOwnAudio();
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+		} catch (IllegalStateException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void deleteRecording() {
+
+		File recordedFile = new File(Constants.PATH_RECORDINGS
+				+ Constants.RECORDING_FULLNAME);
+		recordedFile.delete();
+		Toast.makeText(this, "Gravação deletada com sucesso",
+				Toast.LENGTH_SHORT).show();
+		recordImage.setVisibility(View.GONE);
+		audioDialog.dismiss();
+
+		existsRecording = false;
 	}
 
 }

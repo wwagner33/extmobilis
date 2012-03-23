@@ -1,7 +1,5 @@
 package com.mobilis.controller;
 
-import java.io.File;
-
 import android.app.Activity;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
@@ -9,7 +7,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.drawable.StateListDrawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -340,7 +337,6 @@ public class TopicListController extends ListActivity {
 			Log.w("isClosed", values[position].getAsString("isClosed"));
 			return convertView;
 		}
-
 	}
 
 	@Override

@@ -80,6 +80,7 @@
             android:text="@string/password_field_text" />
 
         <Button
+            android:background="@drawable/button_enter"
             android:id="@+id/submit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -88,7 +89,11 @@
             android:layout_gravity="center"
             android:layout_marginRight="50dp"
             android:layout_marginTop="10dp"
-            android:text="@string/login_submit_button_text" />
+             />
+   
     </RelativeLayout>
+    
+    <!-- android:text="@string/login_submit_button_text" -->
+
 
 </LinearLayout>
