@@ -124,15 +124,10 @@ public class TopicListController extends ListActivity {
 		adapter.open();
 		if (adapter.postExistsOnTopic(Long.parseLong(topicIdString))) {
 			adapter.close();
-			Log.w("TRUE", "TRUE");
-
 			intent = new Intent(this, PostList.class);
 			startActivity(intent);
 
-			// getImages();
-
 		} else {
-			Log.w("FALSE", "FALSE");
 			adapter.close();
 			dialog = dialogs.getProgressDialog();
 			dialog.show();
@@ -173,7 +168,6 @@ public class TopicListController extends ListActivity {
 	public void getImages(String idPosts) {
 		requestImages = new RequestImages(this);
 		adapter.open();
-		// String testeURL = "images/1,2,3,5,7/users";
 		requestImages.setConnectionParameters(idPosts, adapter.getToken());
 		adapter.close();
 		requestImages.execute();
@@ -201,10 +195,9 @@ public class TopicListController extends ListActivity {
 			intent = new Intent(getApplicationContext(), PostList.class);
 			startActivity(intent);
 
-
 			/*
-			 * Checar se as imagens dos posts já existem na pasta Images
-			 * Antes de baixar;
+			 * Checar se as imagens dos posts já existem na pasta Images Antes
+			 * de baixar;
 			 */
 
 			// getImages();
@@ -319,14 +312,17 @@ public class TopicListController extends ListActivity {
 
 			if (values[position].getAsString("isClosed").equals("t")) {
 
-				StateListDrawable states = new StateListDrawable();
-				states.addState(
-						new int[] {},
-						getResources().getDrawable(
-								R.drawable.course_list_closed_selector));
-				convertView.setBackgroundDrawable(states);
+				/*
+				 * StateListDrawable states = new StateListDrawable();
+				 * states.addState( new int[] {}, getResources().getDrawable(
+				 * R.drawable.course_list_closed_selector));
+				 * convertView.setBackgroundDrawable(states);
+				 */
+
 				TextView topicTitle = (TextView) convertView
 						.findViewById(R.id.topic_name);
+				topicTitle.setTextColor(R.color.very_dark_gray);
+
 				LinearLayout teste = (LinearLayout) convertView
 						.findViewById(R.id.left_bar);
 				teste.setBackgroundColor(R.color.very_dark_gray);
