@@ -76,7 +76,11 @@ public class DBAdapter {
 
 	public void updateToken(String authToken) {
 		ContentValues valores = new ContentValues();
-		valores.put("valor", authToken);
+		if (authToken == null) {
+			valores.putNull("valor");
+		} else {
+			valores.put("valor", authToken);
+		}
 		db.update("config", valores, "_id=2", null);
 	}
 

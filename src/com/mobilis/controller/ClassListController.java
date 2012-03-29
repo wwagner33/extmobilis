@@ -21,6 +21,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.mobilis.dialog.DialogMaker;
 import com.mobilis.model.DBAdapter;
 import com.mobilis.threads.RequestCurriculumUnitsThread;
 import com.mobilis.threads.RequestTopicsThread;
@@ -37,15 +38,17 @@ public class ClassListController extends ListActivity {
 	private RequestTopics requestTopics;
 	private RequestCurriculumUnits requestClasses;
 	private SharedPreferences settings;
-	private Dialogs dialogs;
+	private DialogMaker dialogMaker;
+
+	// private Dialogs dialogs;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		dialogs = new Dialogs(this);
 		setContentView(R.layout.curriculum_units);
 		adapter = new DBAdapter(this);
+		dialogMaker = new DialogMaker(this);
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
 
 		updateList();
@@ -126,7 +129,8 @@ public class ClassListController extends ListActivity {
 		else {
 
 			adapter.close();
-			dialog = dialogs.getProgressDialog();
+			dialog = dialogMaker
+					.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
 			dialog.show();
 			obtainTopics(Constants.URL_GROUPS_PREFIX + classIdString
 					+ Constants.URL_DISCUSSION_SUFFIX);
@@ -257,11 +261,25 @@ public class ClassListController extends ListActivity {
 		if (item.getItemId() == R.id.menu_refresh) {
 
 			String selectedCourse = settings.getString("SelectedCourse", null);
-			dialog = dialogs.getProgressDialog();
+			dialog = dialogMaker
+					.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
 			dialog.show();
 			obtainClasses(Constants.URL_CURRICULUM_UNITS_PREFIX
 					+ selectedCourse + Constants.URL_GROUPS_SUFFIX);
 
+		}
+
+		if (item.getItemId() == R.id.menu_logout) {
+			adapter.open();
+			adapter.updateToken(null);
+			intent = new Intent(this, Login.class);
+			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			startActivity(intent);
+
+		}
+		if (item.getItemId() == R.id.menu_config) {
+			intent = new Intent(this, Config.class);
+			startActivity(intent);
 		}
 		return true;
 	}

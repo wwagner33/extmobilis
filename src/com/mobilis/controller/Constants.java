@@ -16,8 +16,6 @@ public class Constants {
 	public static final String URL_CURRICULUM_UNITS_PREFIX = "curriculum_units/";
 	public static final String URL_POSTS_SUFFIX = "/posts.json";
 
-	// Nova chamada
-
 	// Dialogs
 	public static final String TEXT_PROGRESS_DIALOG = "Carregando, por favor aguarde";
 
@@ -49,13 +47,14 @@ public class Constants {
 	public static final int PARSE_HISTORY_POSTS_ID = 228;
 
 	// Folder Paths
-	public static final String PATH_SD_CARD = Environment.getExternalStorageDirectory().getAbsolutePath();
+	public static final String PATH_SD_CARD = Environment
+			.getExternalStorageDirectory().getAbsolutePath();
 	public static final String PATH_MAIN_FOLDER = PATH_SD_CARD + "/Mobilis/";
-	public static final String PATH_RECORDINGS = PATH_MAIN_FOLDER + "/Recordings/";
+	public static final String PATH_RECORDINGS = PATH_MAIN_FOLDER
+			+ "/Recordings/";
 	public static final String PATH_IMAGES = PATH_MAIN_FOLDER + "/Images/";
-	public static final String PATH_IMAGESZIP = PATH_MAIN_FOLDER + "images.zip"; 
-	
-	
+	public static final String PATH_IMAGESZIP = PATH_MAIN_FOLDER + "images.zip";
+
 	public static final String RECORDING_FILENAME = "recording"; // PREFIX
 	public static final String RECORDING_EXTENSION = ".3gp";
 	public static final String RECORDING_FULLNAME = "recording.3gp";
@@ -71,7 +70,16 @@ public class Constants {
 
 	public static final String oldDateString = "2000101010241010";
 
-	public static final int DIALOG_PROGRESS = 400;
-	public static final int DIALOG_ALERT = 401;
+	// public static final int DIALOG_PROGRESS = 400;
+	// public static final int DIALOG_ALERT = 401;
+	public static final int DIALOG_PROGRESS_STANDART = 401;
+	public static final int DIALOG_ALERT_DISCARD = 402;
+
+	// Dialog messages
+	public static final int DIALOG_PLAYBACK_AREA_CLICKED = 500;
+	public static final int DIALOG_LISTEN_AREA_CLICKED = 501;
+	public static final int DIALOG_DELETE_AREA_CLICKED = 502;
+	public static final int DIALOG_ALERT_POSITIVE_BUTTON_CLICKED = 503;
+	public static final int DIALOG_ALERT_NEGATIVE_BUTTON_CLICKED = 504;
 
 }

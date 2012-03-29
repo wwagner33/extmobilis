@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical" >
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
 
     <RelativeLayout
         android:id="@+id/layout1"
         style="@style/SolarTheme.layout1"
         android:layout_width="fill_parent"
-        android:layout_height="120dp" >
+        android:layout_height="120dp"
+        android:layout_alignParentTop="true" >
 
         <ImageView
             android:id="@+id/title_2"
@@ -34,27 +34,31 @@
     <LinearLayout
         android:id="@+id/empty_space"
         android:layout_width="wrap_content"
-        android:layout_height="10dp" />
+        android:layout_height="40dp"
+        android:layout_below="@id/layout1" />
 
     <RelativeLayout
+        android:id="@+id/text_fileds"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content"
+        android:layout_below="@id/empty_space" >
 
         <EditText
             android:id="@+id/campo1"
             android:layout_width="170dp"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:layout_marginRight="50dp"
+            android:layout_marginRight="45dp"
             android:inputType="text" />
 
         <TextView
+            android:textColor="@color/headerColor"
             android:id="@+id/login_user_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBaseline="@id/campo1"
             android:layout_alignParentLeft="true"
-            android:layout_marginLeft="50dp"
+            android:layout_marginLeft="45dp"
             android:layout_toLeftOf="@id/campo1"
             android:text="@string/login_field_text" />
 
@@ -64,36 +68,52 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_below="@id/campo1"
-            android:layout_marginRight="50dp"
+            android:layout_marginRight="45dp"
             android:layout_marginTop="10dp"
             android:inputType="textPassword" />
 
         <TextView
+            android:textColor="@color/headerColor"
             android:id="@+id/login_password_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBaseline="@id/campo2"
             android:layout_alignParentLeft="true"
             android:layout_below="@id/campo1"
-            android:layout_marginLeft="50dp"
+            android:layout_marginLeft="45dp"
             android:layout_toLeftOf="@id/campo2"
             android:text="@string/password_field_text" />
 
         <Button
-            android:background="@drawable/button_enter"
             android:id="@+id/submit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_below="@id/campo2"
             android:layout_gravity="center"
-            android:layout_marginRight="50dp"
+            android:layout_marginRight="45dp"
             android:layout_marginTop="10dp"
-             />
-   
+            android:background="@drawable/button_enter" />
     </RelativeLayout>
-    
+
+    <LinearLayout
+        android:id="@+id/highlight_bar"
+        android:layout_width="fill_parent"
+        android:layout_height="9dp"
+        android:layout_alignParentBottom="true"
+        android:background="@color/yellow_hightlight"
+        android:orientation="vertical" />
+
+    <TextView
+        android:textColor="@color/dark_gray"
+        android:layout_marginBottom="8dp"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/bottom_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/highlight_bar"
+        android:text="INSTITUTO UNIVERSIDADE VIRTUAL - 2012" />
+
     <!-- android:text="@string/login_submit_button_text" -->
 
-
-</LinearLayout>
+</RelativeLayout>

@@ -2,6 +2,7 @@ package com.mobilis.controller;
 
 import android.os.Handler;
 import android.os.Message;
+import android.widget.Toast;
 
 public class ResponseControllerHandler extends Handler {
 
@@ -11,22 +12,22 @@ public class ResponseControllerHandler extends Handler {
 		this.activity = activity;
 	}
 
-	public static final int LISTEN_BUTTON_CLICKED = 800;
-	public static final int DELETE_BUTTON_CLICKED = 801;
-
 	@Override
 	public void handleMessage(Message msg) {
 		// TODO Auto-generated method stub
 		super.handleMessage(msg);
 
-		if (msg.what == LISTEN_BUTTON_CLICKED) {
-			activity.playRecording();
+		if (msg.what == Constants.DIALOG_ALERT_POSITIVE_BUTTON_CLICKED) {
+			Toast.makeText(activity, "Mensagem descartada", Toast.LENGTH_SHORT)
+					.show();
+			activity.finish();
 		}
 
-		if (msg.what == DELETE_BUTTON_CLICKED) {
-			activity.deleteRecording();
-		}
+		if (msg.what == Constants.DIALOG_ALERT_NEGATIVE_BUTTON_CLICKED) {
+			Toast.makeText(activity, "onHandlerNegative", Toast.LENGTH_SHORT)
+					.show();
 
+		}
 	}
 
 }

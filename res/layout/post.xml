@@ -1,16 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <include layout="@layout/solar_logo_bar" />
+    <include
+        android:id="@+id/top_bar"
+        layout="@layout/solar_logo_bar" />
 
     <RelativeLayout
-        android:id="@+id/layout3"
+        android:id="@+id/middle_bar"
         style="@style/SolarTheme"
         android:layout_width="fill_parent"
-        android:layout_height="50dp" >
+        android:layout_height="50dp"
+        android:layout_below="@id/top_bar" >
 
         <TextView
             android:id="@+id/nome_forum"
@@ -32,16 +35,27 @@
             android:layout_centerInParent="true"
             android:layout_marginRight="5dp"
             android:clickable="true"
-            android:src="@drawable/new_post_selector"
-            android:contentDescription="@string/new_topic_image_description" />
+            android:contentDescription="@string/new_topic_image_description"
+            android:src="@drawable/new_post_selector" />
     </RelativeLayout>
 
     <RelativeLayout
+        android:layout_below="@id/middle_bar"
         style="@style/SolarTheme"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent" >
 
+        <LinearLayout
+        android:id="@+id/highlight_bar"
+        android:layout_width="fill_parent"
+        android:layout_height="9dp"
+        android:layout_alignParentBottom="true"
+        android:background="@color/yellow_hightlight"
+        android:orientation="vertical" />
+        
         <ListView
+           	android:layout_below="@id/middle_bar"
+           	android:layout_above="@id/highlight_bar"
             android:id="@android:id/list"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent" />
@@ -54,4 +68,4 @@
             android:text="@string/empty_forum_message" />
     </RelativeLayout>
 
-</LinearLayout>
+</RelativeLayout>

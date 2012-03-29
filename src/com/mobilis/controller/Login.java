@@ -12,6 +12,7 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.mobilis.dialog.DialogMaker;
 import com.mobilis.model.DBAdapter;
 import com.mobilis.threads.RequestCoursesThread;
 import com.mobilis.threads.RequestTokenThread;
@@ -26,13 +27,15 @@ public class Login extends Activity implements OnClickListener {
 	private ParseJSON jsonParser;
 	private RequestToken requestToken;
 	private RequestCourses requestCourses;
-	private Dialogs dialogs;
+	private DialogMaker dialogMaker;
+	// private Dialogs dialogs;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		dialogs = new Dialogs(this);
+		// dialogs = new Dialogs(this);
+		dialogMaker = new DialogMaker(this);
 
 		setContentView(R.layout.login);
 		login = (EditText) findViewById(R.id.campo1);
@@ -80,7 +83,8 @@ public class Login extends Activity implements OnClickListener {
 			boolean ok = true;
 			if (ok) {
 
-				dialog = dialogs.getProgressDialog();
+				dialog = dialogMaker
+						.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
 				dialog.show();
 				requestToken();
 			}

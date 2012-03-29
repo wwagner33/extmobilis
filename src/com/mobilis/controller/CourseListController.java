@@ -20,6 +20,7 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.mobilis.dialog.DialogMaker;
 import com.mobilis.model.DBAdapter;
 import com.mobilis.threads.RequestCoursesThread;
 import com.mobilis.threads.RequestCurriculumUnitsThread;
@@ -36,13 +37,15 @@ public class CourseListController extends ListActivity {
 	private RequestCurriculumUnits requestCurriculumUnits;
 	private RequestCourses requestCourses;
 	private SharedPreferences settings;
-	private Dialogs dialogs;
+	// private Dialogs dialogs;
+	private DialogMaker dialogMaker;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		dialogs = new Dialogs(this);
+		dialogMaker = new DialogMaker(this);
+		// dialogs = new Dialogs(this);
 		setContentView(R.layout.course);
 		adapter = new DBAdapter(this);
 		updateList();
@@ -134,7 +137,8 @@ public class CourseListController extends ListActivity {
 
 		else {
 			adapter.close();
-			dialog = dialogs.getProgressDialog();
+			dialog = dialogMaker
+					.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
 			dialog.show();
 			obtainCurriculumUnits(Constants.URL_CURRICULUM_UNITS_PREFIX
 					+ courseId + Constants.URL_GROUPS_SUFFIX);
@@ -262,9 +266,22 @@ public class CourseListController extends ListActivity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if (item.getItemId() == R.id.menu_refresh) {
-			dialog = dialogs.getProgressDialog();
+			dialog = dialogMaker
+					.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
 			dialog.show();
 			obtainCourses(Constants.URL_COURSES);
+		}
+		if (item.getItemId() == R.id.menu_logout) {
+			adapter.open();
+			adapter.updateToken(null);
+			intent = new Intent(this, Login.class);
+			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			startActivity(intent);
+
+		}
+		if (item.getItemId() == R.id.menu_config) {
+			intent = new Intent(this, Config.class);
+			startActivity(intent);
 		}
 		return true;
 	}

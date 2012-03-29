@@ -7,6 +7,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.StateListDrawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -22,6 +23,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.mobilis.dialog.DialogMaker;
 import com.mobilis.model.DBAdapter;
 import com.mobilis.threads.RequestImagesThread;
 import com.mobilis.threads.RequestNewPostsThread;
@@ -43,9 +45,10 @@ public class TopicListController extends ListActivity {
 	private SharedPreferences settings;
 	private RequestTopics requestTopics;
 	private RequestNewPosts requestNewPosts;
-	private Dialogs dialogs;
+	// private Dialogs dialogs;
 	private RequestImages requestImages;
 	private ZipManager zipManager;
+	private DialogMaker dialogMaker;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +56,8 @@ public class TopicListController extends ListActivity {
 
 		setContentView(R.layout.topic);
 		zipManager = new ZipManager();
-		dialogs = new Dialogs(this);
+		dialogMaker = new DialogMaker(this);
+		// dialogs = new Dialogs(this);
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
 		adapter = new DBAdapter(this);
 		updateList();
@@ -126,7 +130,8 @@ public class TopicListController extends ListActivity {
 
 		} else {
 			adapter.close();
-			dialog = dialogs.getProgressDialog();
+			dialog = dialogMaker
+					.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
 			dialog.show();
 			String url = "discussions/" + topicIdString + "/posts/"
 					+ Constants.oldDateString + "/news.json";
@@ -309,12 +314,12 @@ public class TopicListController extends ListActivity {
 
 			if (values[position].getAsString("isClosed").equals("t")) {
 
-				/*
-				 * StateListDrawable states = new StateListDrawable();
-				 * states.addState( new int[] {}, getResources().getDrawable(
-				 * R.drawable.course_list_closed_selector));
-				 * convertView.setBackgroundDrawable(states);
-				 */
+				StateListDrawable states = new StateListDrawable();
+				states.addState(
+						new int[] {},
+						getResources().getDrawable(
+								R.drawable.course_list_closed_selector));
+				convertView.setBackgroundDrawable(states);
 
 				TextView topicTitle = (TextView) convertView
 						.findViewById(R.id.topic_name);
@@ -352,10 +357,23 @@ public class TopicListController extends ListActivity {
 		if (item.getItemId() == R.id.menu_refresh) {
 
 			String currentClass = settings.getString("SelectedClass", null);
-			dialog = dialogs.getProgressDialog();
+			dialog = dialogMaker
+					.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
 			dialog.show();
 			obtainTopics(Constants.URL_GROUPS_PREFIX + currentClass
 					+ Constants.URL_DISCUSSION_SUFFIX);
+		}
+		if (item.getItemId() == R.id.menu_logout) {
+			adapter.open();
+			adapter.updateToken(null);
+			intent = new Intent(this, Login.class);
+			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			startActivity(intent);
+
+		}
+		if (item.getItemId() == R.id.menu_config) {
+			intent = new Intent(this, Config.class);
+			startActivity(intent);
 		}
 		return true;
 

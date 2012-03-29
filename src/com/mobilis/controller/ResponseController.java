@@ -7,7 +7,6 @@ import org.json.simple.JSONObject;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
@@ -35,8 +34,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.mobilis.audio.PlayAudio;
-import com.mobilis.audio.RecordAudio;
+import com.mobilis.audio.AudioPlayer;
+import com.mobilis.audio.AudioRecorder;
+import com.mobilis.dialog.AudioDialog;
+import com.mobilis.dialog.DialogMaker;
 import com.mobilis.model.DBAdapter;
 import com.mobilis.threads.RequestNewPostsThread;
 import com.mobilis.threads.RequestPostsThread;
@@ -60,33 +61,35 @@ public class ResponseController extends Activity implements OnClickListener,
 	private Intent intent;
 	private JSONObject postObject;
 	private SubmitAudio submitAudio;
-	// private RelativeLayout audioPreviewBar;
 	private RequestPosts requestPosts;
 	private boolean existsRecording = false;
 	private RequestNewPosts requestNewPosts;
 	public SharedPreferences settings;
 	private String charSequenceAfter;
-	private Dialogs dialogs;
+	private DialogMaker dialogMaker;
 	private ImageView recordImage;
-	private Dialog audioDialog;
 
 	private long countUp;
 	private long startTime;
 	private Chronometer stopWatch;
 
-	private RecordAudio recorder;
-	private PlayAudio player;
+	private AudioRecorder recorder;
+	private AudioPlayer player;
 	public static DialogInterface.OnClickListener dialogClick;
+
+	ResponseControllerHandler handler;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		dialogs = new Dialogs(this);
+		handler = new ResponseControllerHandler(this);
+		dialogMaker = new DialogMaker(this);
 
 		setContentView(R.layout.answer_topic);
 		extras = getIntent().getExtras();
-		dialog = dialogs.getProgressDialog();
+		dialog = dialogMaker
+				.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
 		submit = (Button) findViewById(R.id.criar_topico_submit);
 		submit.setOnClickListener(this);
 		message = (EditText) findViewById(R.id.criar_topico_conteudo);
@@ -98,6 +101,7 @@ public class ResponseController extends Activity implements OnClickListener,
 		stopWatch.setOnChronometerTickListener(this);
 		recordImage = (ImageView) findViewById(R.id.record_image);
 		recordImage.setOnClickListener(this);
+		player = new AudioPlayer();
 
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -119,7 +123,7 @@ public class ResponseController extends Activity implements OnClickListener,
 	protected void onResume() {
 
 		super.onResume();
-		recorder = new RecordAudio();
+		recorder = new AudioRecorder();
 	}
 
 	@Override
@@ -143,7 +147,8 @@ public class ResponseController extends Activity implements OnClickListener,
 	public void onBackPressed() {
 
 		if (message.length() > 0 || existsRecording) {
-			AlertDialog alertDialog = dialogs.getAlerDialog();
+			AlertDialog alertDialog = dialogMaker.makeAlertDialog(
+					Constants.DIALOG_ALERT_DISCARD, handler);
 			alertDialog.show();
 		} else {
 			super.onBackPressed();
@@ -160,8 +165,8 @@ public class ResponseController extends Activity implements OnClickListener,
 	public void onClick(View v) {
 
 		if (v.getId() == R.id.record_image) {
-			dialogs = new Dialogs(this);
-			audioDialog = dialogs.getAudioDialog();
+
+			AudioDialog audioDialog = new AudioDialog(this, player, handler);
 			audioDialog.show();
 		}
 
@@ -201,7 +206,6 @@ public class ResponseController extends Activity implements OnClickListener,
 					record.setImageResource(R.drawable.gravar_off);
 					if (!existsRecording) {
 						recordImage.setVisibility(View.VISIBLE);
-						// audioPreviewBar.setVisibility(View.VISIBLE);
 						existsRecording = true;
 					}
 
@@ -385,7 +389,6 @@ public class ResponseController extends Activity implements OnClickListener,
 		@Override
 		public void onNewPostConnectionSecceded(String result) {
 			adapter.open();
-			// adapter.updatePostsString(result);
 			adapter.updatePostsFromTopic(result,
 					Long.parseLong(settings.getString("SelectedTopic", null)));
 			adapter.close();
@@ -483,33 +486,6 @@ public class ResponseController extends Activity implements OnClickListener,
 	@Override
 	public void onInfo(MediaRecorder mr, int what, int extra) {
 		Log.w("OnInfoListener", "TRUE");
-	}
-
-	public void playRecording() {
-		player = new PlayAudio();
-
-		try {
-			player.playOwnAudio();
-		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
-		} catch (IllegalStateException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public void deleteRecording() {
-
-		File recordedFile = new File(Constants.PATH_RECORDINGS
-				+ Constants.RECORDING_FULLNAME);
-		recordedFile.delete();
-		Toast.makeText(this, "Gravação deletada com sucesso",
-				Toast.LENGTH_SHORT).show();
-		recordImage.setVisibility(View.GONE);
-		audioDialog.dismiss();
-
-		existsRecording = false;
 	}
 
 }

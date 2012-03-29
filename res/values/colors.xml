@@ -11,5 +11,9 @@
     <color name="forumClosedIdle">#D0D0D0</color>
     <color name="very_dark_gray">#A8A8A8</color>
     <color name="white">#FFFFFF</color>
-	<color name="black">#000000</color>
+    <color name="black">#000000</color>
+    <color name="disabled">#EFEFEF</color>
+    <color name="yellow_hightlight">#FFFF00</color>
+    <color name="light_gray">#D3D3D3</color>
+
 </resources>

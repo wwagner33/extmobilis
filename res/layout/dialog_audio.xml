@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
+    android:layout_width="300dp"
     android:layout_height="fill_parent"
     android:background="@color/white"
     android:orientation="vertical" >
 
     <RelativeLayout
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:background="@color/courseListIdle"
-        android:paddingLeft="20dp"
-        android:paddingRight="20dp" >
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp" >
 
         <ImageView
             android:id="@+id/image_audio"
@@ -37,7 +37,8 @@
             android:layout_marginLeft="15dp"
             android:layout_marginTop="5dp"
             android:layout_toRightOf="@id/image_audio"
-            android:text="duração" />
+            android:text="duração"
+            android:textColor="@color/black" />
     </RelativeLayout>
 
     <LinearLayout
@@ -57,6 +58,37 @@
             android:text="Ouvir"
             android:textColor="@color/black" />
     </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/playback_area"
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:clickable="false"
+        android:visibility="gone" >
+
+        <ImageView
+            android:id="@+id/button_pause_blue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:src="@drawable/button_pause_blue" />
+
+        <ImageView
+            android:id="@+id/stop_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/button_pause_blue"
+            android:src="@drawable/button_stop_red" />
+
+        <SeekBar
+            android:id="@+id/player_bar"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="false"
+            android:layout_toRightOf="@id/stop_button"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="5dp" />
+    </RelativeLayout>
 
     <TextView
         android:layout_width="fill_parent"

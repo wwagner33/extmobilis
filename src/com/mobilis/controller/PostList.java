@@ -26,11 +26,13 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.mobilis.dialog.DialogMaker;
 import com.mobilis.model.DBAdapter;
 import com.mobilis.threads.RequestHistoryPostsThread;
 import com.mobilis.threads.RequestImageThread;
 import com.mobilis.threads.RequestNewPostsThread;
 import com.mobilis.threads.RequestPostsThread;
+import com.mobilis.util.Time;
 
 public class PostList extends ListActivity implements OnClickListener,
 		OnScrollListener {
@@ -57,16 +59,18 @@ public class PostList extends ListActivity implements OnClickListener,
 	private RequestNewPosts requestNewPosts;
 	private RequestHistoryPosts requestHistoryPosts;
 	private boolean stopLoadingMore = false;
-	private Dialogs dialogs;
+	// private Dialogs dialogs;
 	private boolean loadingMore = false;
 	private String oldestPostDate;
 	private View footerView;
+	private DialogMaker dialogMaker;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
-		dialogs = new Dialogs(this);
+		// dialogs = new Dialogs(this);
+		dialogMaker = new DialogMaker(this);
 
 		setContentView(R.layout.post);
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
@@ -168,48 +172,6 @@ public class PostList extends ListActivity implements OnClickListener,
 			return true;
 		else
 			return false;
-	}
-
-	public String getMonthAsText(int postMonth) {
-		if (postMonth == 1)
-
-			return "Jan";
-		if (postMonth == 2)
-
-			return "Fev";
-		if (postMonth == 3)
-
-			return "Mar";
-		if (postMonth == 4)
-
-			return "Abr";
-		if (postMonth == 5)
-
-			return "Mai";
-		if (postMonth == 6)
-
-			return "Jun";
-		if (postMonth == 7)
-
-			return "Jul";
-		if (postMonth == 8)
-
-			return "Ago";
-		if (postMonth == 9)
-
-			return "Set";
-		if (postMonth == 10)
-
-			return "Out";
-		if (postMonth == 11)
-
-			return "Nov";
-		if (postMonth == 12)
-
-			return "Dez";
-
-		return "?";
-
 	}
 
 	public void obtainPosts(String URLString) {
@@ -402,8 +364,8 @@ public class PostList extends ListActivity implements OnClickListener,
 					postDate.setText(data.get(position).getAsString(
 							"postDayString")
 							+ " "
-							+ getMonthAsText(data.get(position).getAsInteger(
-									"postMonth")));
+							+ Time.getMonthAsText(data.get(position)
+									.getAsInteger("postMonth")));
 					Log.w("POSTED TODAY", "FALSE");
 				}
 
@@ -446,7 +408,7 @@ public class PostList extends ListActivity implements OnClickListener,
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if (item.getItemId() == R.id.menu_refresh) {
 
-			dialog = dialogs.getProgressDialog();
+			dialog = dialogMaker.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
 			dialog.show();
 			String url = "discussions/"
 					+ settings.getString("SelectedTopic", null) + "/posts/"
@@ -454,6 +416,19 @@ public class PostList extends ListActivity implements OnClickListener,
 
 			obtainNewPosts(url);
 
+		}
+
+		if (item.getItemId() == R.id.menu_logout) {
+			adapter.open();
+			adapter.updateToken(null);
+			intent = new Intent(this, Login.class);
+			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			startActivity(intent);
+
+		}
+		if (item.getItemId() == R.id.menu_config) {
+			intent = new Intent(this, Config.class);
+			startActivity(intent);
 		}
 		return true;
 
