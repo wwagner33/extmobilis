@@ -9,7 +9,7 @@ import android.util.Log;
 
 import com.mobilis.controller.Constants;
 
-public class RecordAudio {
+public class AudioRecorder {
 
 	public static final int RECORDING_STARTED = 1;
 	public static final int RECORDING_STOPPED = 2;
@@ -23,7 +23,7 @@ public class RecordAudio {
 	public boolean isPrepared = false;
 	public boolean isReseted = false;
 
-	public RecordAudio() {
+	public AudioRecorder() {
 
 		recorder = new MediaRecorder();
 		recorder.setAudioSource(MediaRecorder.AudioSource.MIC);

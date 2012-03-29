@@ -8,21 +8,43 @@ import android.os.AsyncTask;
 
 import com.mobilis.controller.Constants;
 
-public class PlayAudio {
+public class AudioPlayer {
 	private MediaPlayer player;
 	private boolean isPrepared = false;
 	public playOnBackgroundThread playerThread;
 	private volatile int progress = 0;
+	File recordedAudioPath = new File(Constants.PATH_RECORDINGS
+			+ Constants.RECORDING_FULLNAME);
 
 	public void playOwnAudio() throws IllegalArgumentException,
 			IllegalStateException, IOException {
-		File recordedAudioPath = new File(Constants.PATH_RECORDINGS
-				+ Constants.RECORDING_FULLNAME);
+
+		play();
+
+	}
+
+	public void prepare() throws IllegalArgumentException,
+			IllegalStateException, IOException {
 		player = new MediaPlayer();
 		player.setDataSource(recordedAudioPath.getAbsolutePath());
 		player.prepare();
-		play();
+		isPrepared = true;
 
+	}
+	
+	public MediaPlayer getPlayerInstance() {
+		return player;
+	}
+
+	public int getAudioDuration() {
+		if (isPrepared)
+			return player.getDuration() / 1000;
+		else
+			return 0;
+	}
+
+	public int getCurrentPosition() {
+		return player.getCurrentPosition();
 	}
 
 	public void dispose() {
