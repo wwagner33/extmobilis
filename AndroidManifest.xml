@@ -9,32 +9,47 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.INTERNET" />
-    
 
     <application
         android:icon="@drawable/launcher"
         android:label="@string/app_name"
         android:theme="@android:style/Theme.Light.NoTitleBar"
-        android:windowSoftInputMode="stateVisible|adjustPan"    
-         >
+        android:windowSoftInputMode="stateVisible|adjustPan" >
         <activity
             android:name=".InitialConfig"
-            android:label="@string/app_name" >
+            android:label="@string/app_name"
+            android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Login" />
-        <activity android:name=".CourseListController" />
-        <activity android:name=".PostList" />
-        <activity android:name=".ClassListController" />
-        <activity android:name=".TopicListController" />
+        <activity
+            android:name=".Login"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".CourseListController"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".PostList"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ClassListController"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".TopicListController"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ResponseController"
+            android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden|adjustResize" />
-        <activity android:name="com.mobilis.controller.PostDetailController" />
+        <activity
+            android:name="com.mobilis.controller.PostDetailController"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.mobilis.controller.Config"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>
