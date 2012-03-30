@@ -10,14 +10,14 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 public class PostDetailController extends Activity implements OnClickListener {
 
 	private TextView body, userName, forumName;
 	private Bundle extras;
-	private Button response;
+	private ImageView response;
 	private String topicId;
 	private long parentId;
 	private SharedPreferences settings;
@@ -31,7 +31,7 @@ public class PostDetailController extends Activity implements OnClickListener {
 		body = (TextView) findViewById(R.id.post_body_detail);
 		forumName = (TextView) findViewById(R.id.nome_forum_detail);
 		userName = (TextView) findViewById(R.id.user_name_detail);
-		response = (Button) findViewById(R.id.answer_topic);
+		response = (ImageView) findViewById(R.id.answer_topic);
 		response.setOnClickListener(this);
 		if (settings.getBoolean("isForumClosed", false) == true) {
 			response.setVisibility(View.GONE);

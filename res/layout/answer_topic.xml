@@ -87,7 +87,7 @@
             android:layout_marginTop="4dp"
             android:contentDescription="@string/recod_button_description"
             android:scaleType="centerInside"
-            android:src="@drawable/gravar_off" />
+            android:src="@drawable/gravador_parado" />
 
         <Button
             android:id="@+id/criar_topico_submit"

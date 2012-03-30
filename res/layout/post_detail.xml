@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
     android:orientation="vertical" >
 
     <include layout="@layout/solar_logo_bar" />
@@ -25,7 +25,7 @@
     </RelativeLayout>
 
     <RelativeLayout
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content" >
 
         <ImageView
@@ -52,16 +52,27 @@
             android:id="@+id/post_body_detail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
             android:layout_below="@id/user_name_detail"
             android:layout_toRightOf="@id/avatar" />
 
-        <Button
+        <ImageView
             android:id="@+id/answer_topic"
-            android:layout_width="fill_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
             android:layout_below="@id/post_body_detail"
-            android:layout_marginTop="5dp"
-            android:text="@string/answer_topic_button_text" />
+            android:layout_marginTop="10dp"
+            android:clickable="true"
+            android:paddingRight="5dp"
+            android:src="@drawable/answer_button_selector" />
     </RelativeLayout>
 
-</LinearLayout>
+</LinearLayout> <!-- <Button -->
+<!-- android:id="@+id/answer_topic" -->
+<!-- android:layout_width="fill_parent" -->
+<!-- android:layout_height="wrap_content" -->
+<!-- android:layout_below="@id/post_body_detail" -->
+<!-- android:layout_marginTop="5dp" -->
+<!-- android:text="@string/answer_topic_button_text" /> -->
+

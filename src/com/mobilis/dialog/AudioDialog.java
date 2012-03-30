@@ -8,6 +8,7 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.view.View;
 import android.view.Window;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
@@ -30,6 +31,7 @@ public class AudioDialog extends Dialog implements OnSeekBarChangeListener,
 	private RelativeLayout mediaBar;
 	private Handler activityHandler;
 	private SeekBarUpdater updater;
+	private ImageView pause, stop;
 
 	// PlayAudio auioPlayer;
 
@@ -68,6 +70,12 @@ public class AudioDialog extends Dialog implements OnSeekBarChangeListener,
 		deleteArea = (LinearLayout) this.findViewById(R.id.delete_area);
 		deleteArea.setOnClickListener(this);
 
+		pause = (ImageView) this.findViewById(R.id.button_pause_blue);
+		pause.setOnClickListener(this);
+
+		stop = (ImageView) this.findViewById(R.id.stop_button);
+		stop.setOnClickListener(this);
+
 		playerBar = (SeekBar) this.findViewById(R.id.player_bar);
 		playerBar.setMax(duration * 1000);
 		playerBar.setOnSeekBarChangeListener(this);
@@ -100,7 +108,8 @@ public class AudioDialog extends Dialog implements OnSeekBarChangeListener,
 	@Override
 	public void onProgressChanged(SeekBar arg0, int progress, boolean fromUser) {
 
-		// pl.seekTo(progress);
+		if (fromUser)
+			player.getPlayerInstance().seekTo(progress);
 
 	}
 
@@ -123,7 +132,7 @@ public class AudioDialog extends Dialog implements OnSeekBarChangeListener,
 
 			activityHandler
 					.sendEmptyMessage(Constants.DIALOG_DELETE_AREA_CLICKED);
-			// letting the activity handle
+			this.dismiss();
 
 		}
 
@@ -152,7 +161,15 @@ public class AudioDialog extends Dialog implements OnSeekBarChangeListener,
 				}
 
 			}
+		}
+		if (v.getId() == R.id.button_pause_blue) {
+			player.pause();
+		}
 
+		if (v.getId() == R.id.stop_button) {
+			player.getPlayerInstance().seekTo(0);
+			player.stop();
+			playerBar.setProgress(0);
 		}
 	}
 
@@ -160,13 +177,14 @@ public class AudioDialog extends Dialog implements OnSeekBarChangeListener,
 
 		@Override
 		protected Void doInBackground(Void... params) {
-			while (player.isPlaying()) {
+			while (player.isPlaying() || player.isPaused()) {
 				try {
 					Thread.sleep(1000);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-				playerBar.setProgress(player.getCurrentPosition());
+				if (!player.isPaused() || !player.isPlaying())
+					playerBar.setProgress(player.getCurrentPosition());
 			}
 			return null;
 		}

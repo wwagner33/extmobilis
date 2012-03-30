@@ -71,23 +71,25 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
-            android:src="@drawable/button_pause_blue" />
+            android:src="@drawable/botao_pause"
+            android:clickable="true" />
 
         <ImageView
             android:id="@+id/stop_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_toRightOf="@id/button_pause_blue"
-            android:src="@drawable/button_stop_red" />
+            android:src="@drawable/botao_parar"
+            android:clickable="true" />
 
         <SeekBar
             android:id="@+id/player_bar"
             android:layout_width="150dp"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="false"
-            android:layout_toRightOf="@id/stop_button"
             android:layout_centerVertical="true"
-            android:layout_marginRight="5dp" />
+            android:layout_marginRight="5dp"
+            android:layout_toRightOf="@id/stop_button" />
     </RelativeLayout>
 
     <TextView

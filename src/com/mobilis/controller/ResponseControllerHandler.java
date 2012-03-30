@@ -28,6 +28,10 @@ public class ResponseControllerHandler extends Handler {
 					.show();
 
 		}
+
+		if (msg.what == Constants.DIALOG_DELETE_AREA_CLICKED) {
+			activity.deleteRecording();
+		}
 	}
 
 }

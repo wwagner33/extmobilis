@@ -10,7 +10,7 @@ import com.mobilis.controller.Constants;
 
 public class AudioPlayer {
 	private MediaPlayer player;
-	private boolean isPrepared = false;
+	private boolean isPrepared = false, isPaused = false;
 	public playOnBackgroundThread playerThread;
 	private volatile int progress = 0;
 	File recordedAudioPath = new File(Constants.PATH_RECORDINGS
@@ -19,19 +19,25 @@ public class AudioPlayer {
 	public void playOwnAudio() throws IllegalArgumentException,
 			IllegalStateException, IOException {
 
+		if (!isPrepared)
+			prepare();
+
 		play();
 
 	}
 
 	public void prepare() throws IllegalArgumentException,
 			IllegalStateException, IOException {
-		player = new MediaPlayer();
-		player.setDataSource(recordedAudioPath.getAbsolutePath());
+
+		if (player == null) {
+			player = new MediaPlayer();
+			player.setDataSource(recordedAudioPath.getAbsolutePath());
+		}
 		player.prepare();
 		isPrepared = true;
 
 	}
-	
+
 	public MediaPlayer getPlayerInstance() {
 		return player;
 	}
@@ -60,6 +66,10 @@ public class AudioPlayer {
 
 	public boolean isStopped() {
 		return !isPrepared;
+	}
+
+	public boolean isPaused() {
+		return isPaused;
 	}
 
 	public boolean isPlaying() {
@@ -97,7 +107,14 @@ public class AudioPlayer {
 	}
 
 	public void pause() {
-		player.pause();
+
+		if (isPaused) {
+			player.start();
+			isPaused = false;
+		} else {
+			player.pause();
+			isPaused = true;
+		}
 	}
 
 	public int getProgress() {
@@ -109,7 +126,7 @@ public class AudioPlayer {
 		@Override
 		protected Void doInBackground(Void... arg0) {
 			player.start();
-			while (player.isPlaying()) {
+			while (player.isPlaying() || isPaused()) {
 				onProgressUpdate(player.getCurrentPosition());
 			}
 			return null;

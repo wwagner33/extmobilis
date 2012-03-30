@@ -4,6 +4,7 @@
 
         <CheckBoxPreference
             android:key="checkbox_preference"
+            android:summary="Pula a tela de login após a validação ter sido efetuada"
             android:title="Login automático" />
     </PreferenceCategory>
 

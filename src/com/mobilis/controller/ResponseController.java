@@ -203,7 +203,7 @@ public class ResponseController extends Activity implements OnClickListener,
 					stopWatch.stop();
 					timeUp.setText("00:00");
 					timeUp.setVisibility(View.GONE);
-					record.setImageResource(R.drawable.gravar_off);
+					record.setImageResource(R.drawable.gravador_parado);
 					if (!existsRecording) {
 						recordImage.setVisibility(View.VISIBLE);
 						existsRecording = true;
@@ -224,10 +224,10 @@ public class ResponseController extends Activity implements OnClickListener,
 					timeUp.setVisibility(View.VISIBLE);
 					startTime = System.currentTimeMillis();
 					stopWatch.start();
-					record.setImageResource(R.drawable.gravar_on);
+					record.setImageResource(R.drawable.gravador_gravando);
 				} catch (IllegalStateException e) {
 					Log.w("EXCEPTION", "ILLEGAL STATE EXCEPTION");
-					record.setImageResource(R.drawable.gravar_off);
+					record.setImageResource(R.drawable.gravador_parado);
 					stopWatch.stop();
 					timeUp.setText("00:00");
 
@@ -462,6 +462,18 @@ public class ResponseController extends Activity implements OnClickListener,
 	public void afterTextChanged(Editable editable) {
 
 		charCount.setText(String.valueOf(charSequenceAfter.length()));
+
+	}
+
+	public void deleteRecording() {
+
+		File file = new File(Constants.PATH_RECORDINGS
+				+ Constants.RECORDING_FULLNAME);
+		file.delete();
+		existsRecording = false;
+		recordImage.setVisibility(View.GONE);
+		Toast.makeText(this, "Gravação deletada com sucesso",
+				Toast.LENGTH_SHORT).show();
 
 	}
 
