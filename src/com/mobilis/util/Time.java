@@ -1,5 +1,7 @@
 package com.mobilis.util;
 
+import java.util.Calendar;
+
 public class Time {
 
 	public static String getMonthAsText(int postMonth) {
@@ -44,4 +46,24 @@ public class Time {
 
 	}
 
+	public static String getCurrentDate() {
+		StringBuilder builder = new StringBuilder();
+		Calendar calendar = Calendar.getInstance();
+
+		String year;
+		String month;
+		String day;
+
+		year = String.valueOf(calendar.get(Calendar.YEAR));
+		month = String.valueOf(calendar.get(Calendar.MONTH));
+		day = String.valueOf(calendar.get(Calendar.DAY_OF_MONTH));
+
+		builder.append(year);
+		builder.append("/");
+		builder.append(month);
+		builder.append("/");
+		builder.append(day);
+
+		return builder.toString();
+	}
 }

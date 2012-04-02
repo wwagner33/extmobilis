@@ -24,13 +24,14 @@ import android.widget.TextView;
 import com.mobilis.audio.AudioPlayer;
 import com.mobilis.controller.Constants;
 import com.mobilis.controller.R;
+import com.mobilis.util.Time;
 
 public class AudioDialog extends Dialog implements OnSeekBarChangeListener,
 		android.view.View.OnClickListener {
 
 	private Context context;
 	private AudioPlayer player;
-	private TextView audioDuration, audioProgress;
+	private TextView audioDuration, audioProgress, date;
 	private SeekBar playerBar;
 	private LinearLayout playArea;
 	private LinearLayout deleteArea;
@@ -76,6 +77,9 @@ public class AudioDialog extends Dialog implements OnSeekBarChangeListener,
 		int duration = player.getAudioDuration();
 		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		this.setContentView(R.layout.dialog_audio);
+
+		date = (TextView) this.findViewById(R.id.recording_date);
+		date.setText(Time.getCurrentDate().toString());
 
 		audioDuration = (TextView) this.findViewById(R.id.recording_duration);
 
