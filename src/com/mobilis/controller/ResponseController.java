@@ -13,6 +13,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaRecorder;
@@ -82,6 +83,8 @@ public class ResponseController extends Activity implements OnClickListener,
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
 		handler = new ResponseControllerHandler(this);
 		dialogMaker = new DialogMaker(this);
