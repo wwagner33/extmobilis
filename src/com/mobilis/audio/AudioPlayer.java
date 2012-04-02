@@ -118,7 +118,7 @@ public class AudioPlayer {
 	}
 
 	public int getProgress() {
-		return progress;
+		return player.getCurrentPosition() / 1000;
 	}
 
 	private class playOnBackgroundThread extends AsyncTask<Void, Integer, Void> {

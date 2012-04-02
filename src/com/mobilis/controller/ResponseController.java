@@ -165,7 +165,8 @@ public class ResponseController extends Activity implements OnClickListener,
 	public void onClick(View v) {
 
 		if (v.getId() == R.id.record_image) {
-
+			
+			player = new AudioPlayer();
 			AudioDialog audioDialog = new AudioDialog(this, player, handler);
 			audioDialog.show();
 		}

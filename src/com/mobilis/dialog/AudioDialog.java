@@ -4,14 +4,20 @@ import java.io.IOException;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.media.AudioFormat;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
+import android.widget.SlidingDrawer;
+import android.widget.Toast;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 
@@ -24,14 +30,21 @@ public class AudioDialog extends Dialog implements OnSeekBarChangeListener,
 
 	private Context context;
 	private AudioPlayer player;
-	private TextView audioDuration;
+	private TextView audioDuration, audioProgress;
 	private SeekBar playerBar;
 	private LinearLayout playArea;
 	private LinearLayout deleteArea;
 	private RelativeLayout mediaBar;
 	private Handler activityHandler;
-	private SeekBarUpdater updater;
+	// private SeekBarUpdater updater;
 	private ImageView pause, stop;
+	private Thread seekbarThread;
+	private static final int teste = 5;
+	private AudioHandler audioHandler;
+	int i = 0;
+	private Message message;
+	private Bundle bundle;
+	private String durationString;
 
 	// PlayAudio auioPlayer;
 
@@ -42,6 +55,10 @@ public class AudioDialog extends Dialog implements OnSeekBarChangeListener,
 		this.activityHandler = activityHandler;
 		this.context = context;
 		this.player = player;
+		audioHandler = new AudioHandler();
+		// message = new Message();
+		message = Message.obtain();
+		bundle = new Bundle();
 
 		try {
 			player.prepare();
@@ -61,6 +78,9 @@ public class AudioDialog extends Dialog implements OnSeekBarChangeListener,
 		this.setContentView(R.layout.dialog_audio);
 
 		audioDuration = (TextView) this.findViewById(R.id.recording_duration);
+
+		audioProgress = (TextView) this
+				.findViewById(R.id.recording_progress_teste);
 
 		playArea = (LinearLayout) this.findViewById(R.id.listen_area);
 		playArea.setOnClickListener(this);
@@ -83,26 +103,38 @@ public class AudioDialog extends Dialog implements OnSeekBarChangeListener,
 		if (duration == 0) {
 			audioDuration.setText("00:00");
 		} else {
-			int minutes = duration / 60;
-			int seconds = duration % 60;
 
-			String secondsString, minutesString;
-
-			if (minutes < 10)
-				minutesString = "0" + String.valueOf(minutes);
-			else
-				minutesString = String.valueOf(minutes);
-
-			if (seconds < 10)
-				secondsString = "0" + String.valueOf(seconds);
-			else
-				secondsString = String.valueOf(seconds);
-
-			String durationString = minutesString + ":" + secondsString;
-
-			audioDuration.setText(durationString);
+			audioDuration.setText(formatProgress(duration));
+			durationString = audioDuration.getText().toString();
 		}
 
+	}
+
+	public String formatProgress(int duration) {
+
+		int minutes = duration / 60;
+		int seconds = duration % 60;
+
+		String secondsString, minutesString;
+
+		if (minutes < 10)
+			minutesString = "0" + String.valueOf(minutes);
+		else
+			minutesString = String.valueOf(minutes);
+
+		if (seconds < 10)
+			secondsString = "0" + String.valueOf(seconds);
+		else
+			secondsString = String.valueOf(seconds);
+
+		String durationString = minutesString + ":" + secondsString;
+
+		return durationString;
+
+	}
+
+	public void teste(String teste) {
+		audioProgress.setText("teste");
 	}
 
 	@Override
@@ -140,6 +172,12 @@ public class AudioDialog extends Dialog implements OnSeekBarChangeListener,
 
 			synchronized (this) {
 
+				audioDuration.setVisibility(View.GONE);
+				audioProgress.setText("00:00/"
+						+ audioDuration.getText().toString());
+
+				audioProgress.setVisibility(View.VISIBLE);
+
 				activityHandler
 						.sendEmptyMessage(Constants.DIALOG_LISTEN_AREA_CLICKED);
 				playArea.setVisibility(View.GONE);
@@ -147,11 +185,42 @@ public class AudioDialog extends Dialog implements OnSeekBarChangeListener,
 
 				activityHandler
 						.sendEmptyMessage(Constants.DIALOG_PLAYBACK_AREA_CLICKED);
-				updater = new SeekBarUpdater();
+				// updater = new SeekBarUpdater();
+				seekbarThread = new Thread(new Runnable() {
+
+					@Override
+					public void run() {
+						while (player.isPlaying() || player.isPaused()) {
+
+							try {
+								Thread.sleep(1000);
+								bundle = new Bundle();
+								message = new Message();
+								bundle.putInt("Update", player.getProgress());
+								message.setData(bundle);
+								audioHandler.sendMessage(message);
+
+							} catch (InterruptedException e) {
+								e.printStackTrace();
+							}
+
+							if (!player.isPaused() || !player.isPlaying()) {
+								playerBar.setProgress(player
+										.getCurrentPosition());
+							}
+
+						}
+						audioHandler.sendEmptyMessage(teste);
+
+					}
+				});
+
 				try {
 					// player.prepare();
 					player.playOwnAudio();
-					updater.execute();
+					// updater.execute();
+
+					seekbarThread.start();
 				} catch (IllegalArgumentException e) {
 					e.printStackTrace();
 				} catch (IllegalStateException e) {
@@ -171,30 +240,29 @@ public class AudioDialog extends Dialog implements OnSeekBarChangeListener,
 			player.stop();
 			playerBar.setProgress(0);
 		}
+
 	}
 
-	public class SeekBarUpdater extends AsyncTask<Void, Void, Void> {
-
+	public class AudioHandler extends Handler {
 		@Override
-		protected Void doInBackground(Void... params) {
-			while (player.isPlaying() || player.isPaused()) {
-				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				if (!player.isPaused() || !player.isPlaying())
-					playerBar.setProgress(player.getCurrentPosition());
+		public void handleMessage(Message msg) {
+			super.handleMessage(msg);
+
+			if (msg.getData() != null) {
+				Log.w("DURATION", audioDuration.getText().toString());
+				audioProgress.setText(formatProgress(msg.getData().getInt(
+						"Update"))
+						+ "/" + audioDuration.getText());
 			}
-			return null;
-		}
 
-		@Override
-		protected void onPostExecute(Void result) {
-			playArea.setVisibility(View.VISIBLE);
-			mediaBar.setVisibility(View.GONE);
-			super.onPostExecute(result);
-		}
+			if (msg.what == teste) {
 
+				audioProgress.setVisibility(View.GONE);
+				audioDuration.setVisibility(View.VISIBLE);
+				playArea.setVisibility(View.VISIBLE);
+				mediaBar.setVisibility(View.GONE);
+
+			}
+		}
 	}
 }

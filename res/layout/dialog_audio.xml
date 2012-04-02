@@ -30,6 +30,18 @@
             android:textColor="@color/black" />
 
         <TextView
+            android:id="@+id/recording_progress_teste"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/recording_date"
+            android:layout_marginLeft="15dp"
+            android:layout_marginTop="5dp"
+            android:layout_toRightOf="@id/image_audio"
+            android:text="00:00/00:15"
+            android:textColor="@color/black"
+            android:visibility="gone" />
+
+        <TextView
             android:id="@+id/recording_duration"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -71,16 +83,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
-            android:src="@drawable/botao_pause"
-            android:clickable="true" />
+            android:clickable="true"
+            android:src="@drawable/botao_pause" />
 
         <ImageView
             android:id="@+id/stop_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_toRightOf="@id/button_pause_blue"
-            android:src="@drawable/botao_parar"
-            android:clickable="true" />
+            android:clickable="true"
+            android:src="@drawable/botao_parar" />
 
         <SeekBar
             android:id="@+id/player_bar"
