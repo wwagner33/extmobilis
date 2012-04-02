@@ -34,8 +34,6 @@ public class Config extends PreferenceActivity implements
 	public boolean onPreferenceChange(Preference preference, Object value) {
 		// newValue = (Boolean) newValue;
 		boolean newValue = ((Boolean) value) ? true : false;
-		Toast.makeText(this, String.valueOf(newValue), Toast.LENGTH_SHORT)
-				.show();
 
 		if (newValue == true) {
 
