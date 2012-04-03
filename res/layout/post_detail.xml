@@ -65,7 +65,7 @@
             android:layout_marginTop="10dp"
             android:clickable="true"
             android:paddingRight="5dp"
-            android:src="@drawable/answer_button_selector" />
+            android:src="@drawable/button_response_selector" />
     </RelativeLayout>
 
 </LinearLayout> <!-- <Button -->

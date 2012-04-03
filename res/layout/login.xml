@@ -52,7 +52,6 @@
             android:inputType="text" />
 
         <TextView
-            android:textColor="@color/headerColor"
             android:id="@+id/login_user_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -60,7 +59,8 @@
             android:layout_alignParentLeft="true"
             android:layout_marginLeft="45dp"
             android:layout_toLeftOf="@id/campo1"
-            android:text="@string/login_field_text" />
+            android:text="@string/login_field_text"
+            android:textColor="@color/headerColor" />
 
         <EditText
             android:id="@+id/campo2"
@@ -73,7 +73,6 @@
             android:inputType="textPassword" />
 
         <TextView
-            android:textColor="@color/headerColor"
             android:id="@+id/login_password_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -82,7 +81,8 @@
             android:layout_below="@id/campo1"
             android:layout_marginLeft="45dp"
             android:layout_toLeftOf="@id/campo2"
-            android:text="@string/password_field_text" />
+            android:text="@string/password_field_text"
+            android:textColor="@color/headerColor" />
 
         <Button
             android:id="@+id/submit"
@@ -93,7 +93,7 @@
             android:layout_gravity="center"
             android:layout_marginRight="45dp"
             android:layout_marginTop="10dp"
-            android:background="@drawable/button_enter" />
+            android:background="@drawable/button_enter_selector" />
     </RelativeLayout>
 
     <LinearLayout
@@ -105,14 +105,14 @@
         android:orientation="vertical" />
 
     <TextView
-        android:textColor="@color/dark_gray"
-        android:layout_marginBottom="8dp"
-        android:layout_centerHorizontal="true"
         android:id="@+id/bottom_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@id/highlight_bar"
-        android:text="INSTITUTO UNIVERSIDADE VIRTUAL - 2012" />
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="8dp"
+        android:text="INSTITUTO UNIVERSIDADE VIRTUAL - 2012"
+        android:textColor="@color/dark_gray" />
 
     <!-- android:text="@string/login_submit_button_text" -->
 

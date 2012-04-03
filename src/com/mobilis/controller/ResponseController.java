@@ -89,7 +89,7 @@ public class ResponseController extends Activity implements OnClickListener,
 		handler = new ResponseControllerHandler(this);
 		dialogMaker = new DialogMaker(this);
 
-		setContentView(R.layout.answer_topic);
+		setContentView(R.layout.response);
 		extras = getIntent().getExtras();
 		dialog = dialogMaker
 				.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);

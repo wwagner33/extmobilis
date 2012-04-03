@@ -84,7 +84,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:clickable="true"
-            android:src="@drawable/botao_pause" />
+            android:src="@drawable/button_pause_selector" />
 
         <ImageView
             android:id="@+id/stop_button"
@@ -92,7 +92,7 @@
             android:layout_height="wrap_content"
             android:layout_toRightOf="@id/button_pause_blue"
             android:clickable="true"
-            android:src="@drawable/botao_parar" />
+            android:src="@drawable/button_stop_selector" />
 
         <SeekBar
             android:id="@+id/player_bar"

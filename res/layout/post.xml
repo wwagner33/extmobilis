@@ -36,7 +36,7 @@
             android:layout_marginRight="5dp"
             android:clickable="true"
             android:contentDescription="@string/new_topic_image_description"
-            android:src="@drawable/new_post_selector" />
+            android:src="@drawable/button_message_selector" />
     </RelativeLayout>
 
     <RelativeLayout
