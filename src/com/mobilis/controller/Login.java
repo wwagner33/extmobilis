@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.mobilis.dialog.DialogMaker;
 import com.mobilis.model.DBAdapter;
@@ -28,6 +29,7 @@ public class Login extends Activity implements OnClickListener {
 	private RequestToken requestToken;
 	private RequestCourses requestCourses;
 	private DialogMaker dialogMaker;
+
 	// private Dialogs dialogs;
 
 	@Override
@@ -62,31 +64,16 @@ public class Login extends Activity implements OnClickListener {
 
 		if (v.equals(submit)) {
 
-			/*
-			 * Validação do Login
-			 * 
-			 * if (LoginField.getText().toString().equals("") ||
-			 * PassField.getText().toString().equals("")) {
-			 * 
-			 * Toast.makeText(this,
-			 * " campos login ou senha não podem ser vazios",
-			 * Toast.LENGTH_SHORT).show(); }
-			 * 
-			 * else {
-			 * 
-			 * 
-			 * /* adapter.open(); ContentValues valores = new ContentValues();
-			 * valores.put("nome", PassField.getText().toString());
-			 * adapter.updateTable("config", 1, valores);
-			 */
-
-			boolean ok = true;
-			if (ok) {
-
+			if (!(login.getText().length() == 0 || password.getText().length() == 0)) {
 				dialog = dialogMaker
 						.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
 				dialog.show();
 				requestToken();
+			}
+
+			else {
+				Toast.makeText(this, "Campos não podem ser vazios",
+						Toast.LENGTH_SHORT).show();
 			}
 		}
 	}
