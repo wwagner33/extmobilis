@@ -176,18 +176,29 @@ public class ResponseController extends Activity implements OnClickListener,
 
 		if (v.getId() == R.id.criar_topico_submit) {
 
-			if (extras.getLong("parentId") > 0) {
+			if (!existsRecording && message.getText().length() == 0) {
+				Toast.makeText(this, "Mensagem não pode ser vazia",
+						Toast.LENGTH_SHORT).show();
 
-				postObject = jsonParser.buildTextResponseWithParentObject(
-						message.getText().toString(),
-						extras.getLong("parentId"));
-
-			} else {
-				postObject = jsonParser.buildTextResponseWithoutParent(message
-						.getText().toString());
 			}
 
-			sendPost(postObject.toJSONString());
+			else {
+
+				if (extras.getLong("parentId") > 0) {
+
+					postObject = jsonParser.buildTextResponseWithParentObject(
+							message.getText().toString(),
+							extras.getLong("parentId"));
+
+				} else {
+					postObject = jsonParser
+							.buildTextResponseWithoutParent(message.getText()
+									.toString());
+				}
+
+				sendPost(postObject.toJSONString());
+
+			}
 
 		}
 
