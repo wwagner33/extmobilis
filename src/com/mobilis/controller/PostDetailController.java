@@ -1,12 +1,11 @@
 package com.mobilis.controller;
 
-//import com.paulo.android.solarmobile.controller.R;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -29,6 +28,7 @@ public class PostDetailController extends Activity implements OnClickListener {
 		setContentView(R.layout.post_detail);
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
 		body = (TextView) findViewById(R.id.post_body_detail);
+		body.setMovementMethod(new ScrollingMovementMethod());
 		forumName = (TextView) findViewById(R.id.nome_forum_detail);
 		userName = (TextView) findViewById(R.id.user_name_detail);
 		response = (ImageView) findViewById(R.id.answer_topic);
@@ -44,7 +44,7 @@ public class PostDetailController extends Activity implements OnClickListener {
 			userName.setText(extras.getString("username"));
 			topicId = extras.getString("topicId");
 			parentId = extras.getLong("parentId");
-			Log.w("ParentId on DETAILS", String.valueOf(parentId));
+			// Log.w("ParentId on DETAILS", String.valueOf(parentId));
 		}
 
 	}

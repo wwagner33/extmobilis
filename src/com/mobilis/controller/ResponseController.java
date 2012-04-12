@@ -2,6 +2,7 @@ package com.mobilis.controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Calendar;
 
 import org.json.simple.JSONObject;
 
@@ -19,6 +20,7 @@ import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaRecorder;
 import android.media.MediaRecorder.OnInfoListener;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -69,14 +71,14 @@ public class ResponseController extends Activity implements OnClickListener,
 	private String charSequenceAfter;
 	private DialogMaker dialogMaker;
 	private ImageView recordImage;
-
 	private long countUp;
 	private long startTime;
 	private Chronometer stopWatch;
-
+	private Toast teste;
 	private AudioRecorder recorder;
 	private AudioPlayer player;
 	public static DialogInterface.OnClickListener dialogClick;
+	float toastTimer = 0;
 
 	ResponseControllerHandler handler;
 
@@ -106,9 +108,13 @@ public class ResponseController extends Activity implements OnClickListener,
 		recordImage.setOnClickListener(this);
 		player = new AudioPlayer();
 
+		teste = new Toast(this);
+
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
 
 		charCount = (TextView) findViewById(R.id.char_number);
+
+		charCount.setText("0/" + Constants.TEXT_MAX_CHARACTER_LENGHT);
 
 		jsonParser = new ParseJSON(this);
 
@@ -177,6 +183,7 @@ public class ResponseController extends Activity implements OnClickListener,
 		if (v.getId() == R.id.criar_topico_submit) {
 
 			if (!existsRecording && message.getText().length() == 0) {
+
 				Toast.makeText(this, "Mensagem não pode ser vazia",
 						Toast.LENGTH_SHORT).show();
 
@@ -184,11 +191,11 @@ public class ResponseController extends Activity implements OnClickListener,
 
 			else {
 
-				if (extras.getLong("parentId") > 0) {
+				if (settings.getLong("SelectedPost", 0) > 0) {
 
 					postObject = jsonParser.buildTextResponseWithParentObject(
 							message.getText().toString(),
-							extras.getLong("parentId"));
+							settings.getLong("SelectedPost", 0));
 
 				} else {
 					postObject = jsonParser
@@ -197,9 +204,7 @@ public class ResponseController extends Activity implements OnClickListener,
 				}
 
 				sendPost(postObject.toJSONString());
-
 			}
-
 		}
 
 		if (v.getId() == R.id.btn_gravar) {
@@ -476,7 +481,27 @@ public class ResponseController extends Activity implements OnClickListener,
 	@Override
 	public void afterTextChanged(Editable editable) {
 
-		charCount.setText(String.valueOf(charSequenceAfter.length()));
+		if (charSequenceAfter.length() > Constants.TEXT_MAX_CHARACTER_LENGHT) {
+
+			Log.w("Time Difference",
+					String.valueOf(toastTimer - System.currentTimeMillis()));
+
+			if ((toastTimer - System.currentTimeMillis()) <= -2500) {
+				Toast.makeText(
+						this,
+						"Mensagem deve conter no máximo "
+								+ Constants.TEXT_MAX_CHARACTER_LENGHT
+								+ " caracteres", Toast.LENGTH_SHORT).show();
+				toastTimer = System.currentTimeMillis();
+
+			}
+			message.getText().delete(message.getText().length() - 1,
+					message.getText().length());
+
+		}
+
+		charCount.setText(String.valueOf(charSequenceAfter.length()) + "/"
+				+ Constants.TEXT_MAX_CHARACTER_LENGHT);
 
 	}
 
@@ -496,23 +521,23 @@ public class ResponseController extends Activity implements OnClickListener,
 	public void beforeTextChanged(CharSequence s, int start, int count,
 			int after) {
 		Log.w("charSequenceOnBefore", s.toString());
-		Log.w("start", String.valueOf(start));
-		Log.w("count", String.valueOf(count));
-		Log.w("after", String.valueOf(after));
+		// Log.w("start", String.valueOf(start));
+		// Log.w("count", String.valueOf(count));
+		// Log.w("after", String.valueOf(after));
 	}
 
 	@Override
 	public void onTextChanged(CharSequence s, int start, int before, int count) {
-		Log.w("start", String.valueOf(start));
-		Log.w("before", String.valueOf(before));
-		Log.w("count", String.valueOf(count));
-		Log.w("charSequenceOnAfter", s.toString());
+		// Log.w("start", String.valueOf(start));
+		// Log.w("before", String.valueOf(before));
+		// Log.w("count", String.valueOf(count));
+		// Log.w("charSequenceOnAfter", s.toString());
 		charSequenceAfter = s.toString();
 	}
 
 	@Override
 	public void onInfo(MediaRecorder mr, int what, int extra) {
-		Log.w("OnInfoListener", "TRUE");
+		// Log.w("OnInfoListener", "TRUE");
 	}
 
 }

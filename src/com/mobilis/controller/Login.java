@@ -30,15 +30,11 @@ public class Login extends Activity implements OnClickListener {
 	private RequestCourses requestCourses;
 	private DialogMaker dialogMaker;
 
-	// private Dialogs dialogs;
-
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		// dialogs = new Dialogs(this);
 		dialogMaker = new DialogMaker(this);
-
 		setContentView(R.layout.login);
 		login = (EditText) findViewById(R.id.campo1);
 		password = (EditText) findViewById(R.id.campo2);
@@ -49,7 +45,6 @@ public class Login extends Activity implements OnClickListener {
 
 	@Override
 	protected void onResume() {
-		// TODO Auto-generated method stub
 		super.onResume();
 		if (dialog != null) {
 			if (dialog.isShowing()) {
@@ -114,7 +109,6 @@ public class Login extends Activity implements OnClickListener {
 		if (adapter != null) {
 			adapter.close();
 		}
-
 	}
 
 	@Override

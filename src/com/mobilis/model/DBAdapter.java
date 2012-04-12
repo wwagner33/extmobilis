@@ -10,8 +10,6 @@ public class DBAdapter {
 	private Context context;
 	private SQLiteDatabase db;
 	private DatabaseHelper helper;
-	Thread openBank;
-	Runnable runnable;
 
 	public DBAdapter(Context c) {
 		context = c;
@@ -167,6 +165,7 @@ public class DBAdapter {
 		Cursor cursor = db.rawQuery("SELECT posts from topics WHERE topic_id="
 				+ topicId, null);
 		cursor.moveToFirst();
+		Log.i("CURSOR SIZE", String.valueOf(cursor.getCount()));
 		String posts = cursor.getString(cursor.getColumnIndex("posts"));
 		cursor.close();
 		return posts;

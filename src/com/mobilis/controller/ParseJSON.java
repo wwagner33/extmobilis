@@ -9,6 +9,8 @@ import org.json.simple.JSONValue;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.text.Html;
+import android.text.Spanned;
 import android.util.Log;
 
 import com.mobilis.model.DBAdapter;
@@ -264,18 +266,43 @@ public class ParseJSON {
 
 			ContentValues rowItem = new ContentValues();
 
-			rowItem.put("content_first",
-					(String) innerObject.get("content_first"));
-			rowItem.put("content_last",
-					(String) innerObject.get("content_last"));
+			String contentFirst = (String) innerObject.get("content_first");
+			String contentLast = (String) innerObject.get("content_last");
+
+			
+			if (contentFirst!=null) {
+			Spanned markUpFirst = Html.fromHtml(contentFirst);
+			rowItem.put("content_first", markUpFirst.toString());
+			}
+			else {
+				rowItem.put("content_first","");
+			}
+			
+			if (contentLast!=null) {
+			Spanned markUpLast = Html.fromHtml(contentLast);
+			rowItem.put("content_last", markUpLast.toString());
+			}
+			else {
+				rowItem.put("content_last","");
+			}
+			
+			// contentFirst = TextUtils.htmlEncode(contentFirst);
+			// contentLast = TextUtils.htmlEncode(contentLast);
+
+			// contentFirst = String.format(contentFirst);
+			// contentLast = String.format(contentLast);
+
+		
+//			rowItem.put("content_last", markUpLast.toString());
 			rowItem.put("discussion_id",
 					(Long) innerObject.get("discussion_id"));
 			rowItem.put("_id", (Long) innerObject.get("id"));
 			rowItem.putNull("parent_id");
 			rowItem.put("profile_id", (Long) innerObject.get("profile_id"));
-			rowItem.put("user_name", (String) innerObject.get("user_name"));
-			rowItem.put("user_username",
-					(String) innerObject.get("user_username"));
+//			rowItem.put("user_name", (String) innerObject.get("user_name"));
+//			rowItem.put("user_username",
+//					(String) innerObject.get("user_username"));
+			rowItem.put("user_nick", (String)innerObject.get("user_nick"));
 
 			rowItem.put("updated", (String) innerObject.get("updated"));
 			parseData(rowItem, (String) innerObject.get("updated"), i);

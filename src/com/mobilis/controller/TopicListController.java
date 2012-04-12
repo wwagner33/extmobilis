@@ -45,7 +45,6 @@ public class TopicListController extends ListActivity {
 	private SharedPreferences settings;
 	private RequestTopics requestTopics;
 	private RequestNewPosts requestNewPosts;
-	// private Dialogs dialogs;
 	private RequestImages requestImages;
 	private ZipManager zipManager;
 	private DialogMaker dialogMaker;
@@ -57,7 +56,6 @@ public class TopicListController extends ListActivity {
 		setContentView(R.layout.topic);
 		zipManager = new ZipManager();
 		dialogMaker = new DialogMaker(this);
-		// dialogs = new Dialogs(this);
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
 		adapter = new DBAdapter(this);
 		updateList();
@@ -202,7 +200,7 @@ public class TopicListController extends ListActivity {
 			 * de baixar;
 			 */
 
-			// getImages();
+			// getImages("");
 		}
 
 	}
@@ -246,8 +244,13 @@ public class TopicListController extends ListActivity {
 
 		@Override
 		public void onTopicsConnectionSucceded(String result) {
+
+			ContentValues[] postContent = jsonParser.parseJSON(result,
+					Constants.PARSE_TOPICS_ID);
+
 			adapter.open();
-			adapter.updateTopics(result);
+			adapter.updateTopicsFromClasses(result,
+					Long.parseLong(settings.getString("SelectedClass", null)));
 			adapter.close();
 			updateList();
 			closeDialogIfItsVisible();
@@ -371,6 +374,7 @@ public class TopicListController extends ListActivity {
 			startActivity(intent);
 
 		}
+
 		if (item.getItemId() == R.id.menu_config) {
 			intent = new Intent(this, Config.class);
 			startActivity(intent);

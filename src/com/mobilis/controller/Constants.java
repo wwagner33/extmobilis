@@ -17,7 +17,7 @@ public class Constants {
 	public static final String URL_POSTS_SUFFIX = "/posts.json";
 
 	// Dialogs
-	public static final String TEXT_PROGRESS_DIALOG = "Carregando, por favor aguarde";
+	public static final String TEXT_PROGRESS_DIALOG = "Carregando";
 
 	// Error ids
 	public static final int ERROR_CONNECTION_FAILED = 101;
@@ -81,5 +81,8 @@ public class Constants {
 	public static final int DIALOG_DELETE_AREA_CLICKED = 502;
 	public static final int DIALOG_ALERT_POSITIVE_BUTTON_CLICKED = 503;
 	public static final int DIALOG_ALERT_NEGATIVE_BUTTON_CLICKED = 504;
+
+	// Texto
+	public static final int TEXT_MAX_CHARACTER_LENGHT = 400;
 
 }

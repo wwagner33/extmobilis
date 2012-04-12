@@ -21,6 +21,8 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicHeader;
+import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.json.simple.parser.ParseException;
 
@@ -99,8 +101,11 @@ public class Connection {
 
 		post = new HttpPost(Constants.URL_SERVER + URL);
 
-		StringEntity se = new StringEntity(jsonString);
-		Log.w("ENTITY", jsonString);
+		// StringEntity se = new StringEntity(jsonString);
+		StringEntity se = new StringEntity(jsonString, "UTF-8");
+		se.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE,
+				"application/json"));
+		se.setContentType("application/json");
 		post.setEntity(se);
 		post.setHeader("Accept", "application/json");
 		post.setHeader("Content-type", "application/json");

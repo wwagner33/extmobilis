@@ -37,7 +37,6 @@ public class AudioDialog extends Dialog implements OnSeekBarChangeListener,
 	private LinearLayout deleteArea;
 	private RelativeLayout mediaBar;
 	private Handler activityHandler;
-	// private SeekBarUpdater updater;
 	private ImageView pause, stop;
 	private Thread seekbarThread;
 	private static final int teste = 5;
@@ -220,9 +219,8 @@ public class AudioDialog extends Dialog implements OnSeekBarChangeListener,
 				});
 
 				try {
-					// player.prepare();
+					
 					player.playOwnAudio();
-					// updater.execute();
 
 					seekbarThread.start();
 				} catch (IllegalArgumentException e) {

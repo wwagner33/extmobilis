@@ -37,11 +37,6 @@ import com.mobilis.util.Time;
 public class PostList extends ListActivity implements OnClickListener,
 		OnScrollListener {
 
-	// http://apolo11teste.virtual.ufc.br/ws_solar/images/7/users
-	// /discussions/:id/posts/:date/history
-
-	// private static final int itemsPerPage = 20;
-
 	private boolean forceListToRedraw = true;
 	private static final long noParentId = 0;
 	private PostAdapter listAdapter;
@@ -59,7 +54,6 @@ public class PostList extends ListActivity implements OnClickListener,
 	private RequestNewPosts requestNewPosts;
 	private RequestHistoryPosts requestHistoryPosts;
 	private boolean stopLoadingMore = false;
-	// private Dialogs dialogs;
 	private boolean loadingMore = false;
 	private String oldestPostDate;
 	private View footerView;
@@ -69,7 +63,6 @@ public class PostList extends ListActivity implements OnClickListener,
 	protected void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
-		// dialogs = new Dialogs(this);
 		dialogMaker = new DialogMaker(this);
 
 		setContentView(R.layout.post);
@@ -130,7 +123,7 @@ public class PostList extends ListActivity implements OnClickListener,
 		ContentValues listValue = (ContentValues) l.getAdapter().getItem(
 				position);
 		Intent intent = new Intent(this, PostDetailController.class);
-		intent.putExtra("username", listValue.getAsString("user_name"));
+		intent.putExtra("username", listValue.getAsString("user_nick"));
 
 		if (listValue.getAsString("content_last").equals("")) {
 			intent.putExtra("content", listValue.getAsString("content_first"));
@@ -140,6 +133,11 @@ public class PostList extends ListActivity implements OnClickListener,
 		}
 
 		intent.putExtra("topicId", settings.getString("SelectedTopic", null));
+
+		SharedPreferences.Editor editor = settings.edit();
+		editor.putLong("SelectedPost", listValue.getAsInteger("_id"));
+		editor.commit();
+
 		intent.putExtra("parentId", listValue.getAsLong("id"));
 		Log.w("ID ON POSTS", String.valueOf(listValue.getAsLong("id")));
 		startActivity(intent);
@@ -149,6 +147,11 @@ public class PostList extends ListActivity implements OnClickListener,
 		jsonParser = new ParseJSON(this);
 		parsedValues = jsonParser.parsePosts(source);
 
+		if (parsedValues.size() > 1) {
+			oldestPostDate = parsedValues.get(parsedValues.size() - 1)
+					.getAsString("updated");
+		}
+
 		if (parsedValues.size() == 20) {
 
 			footerView = ((LayoutInflater) this
@@ -156,9 +159,6 @@ public class PostList extends ListActivity implements OnClickListener,
 					.inflate(R.layout.post_list_footer, null, false);
 			this.getListView().addFooterView(footerView);
 		}
-
-		oldestPostDate = parsedValues.get(parsedValues.size() - 1).getAsString(
-				"updated");
 
 		listAdapter = new PostAdapter(this, parsedValues);
 		setListAdapter(listAdapter);
@@ -255,7 +255,8 @@ public class PostList extends ListActivity implements OnClickListener,
 		public void onNewPostConnectionSecceded(String result) {
 
 			adapter.open();
-			adapter.updatePostsString(result);
+			adapter.updatePostsFromTopic(result,
+					Long.parseLong(settings.getString("SelectedTopic", null)));
 			adapter.close();
 			updateList(result);
 			loadingMore = false;
@@ -328,17 +329,6 @@ public class PostList extends ListActivity implements OnClickListener,
 				convertView = inflater
 						.inflate(R.layout.postitem, parent, false);
 
-				// ImageView avatar = (ImageView) convertView
-				// .findViewById(R.id.avatar);
-				// long postId = data.get(position).getAsLong("profile_id");
-				// if (postId == 1) {
-				// BitmapDrawable bitmap = new BitmapDrawable(Environment
-				// .getExternalStorageDirectory().getAbsolutePath()
-				// + "/Mobilis/Recordings/" + 7 + ".jpg");
-				// avatar.setImageBitmap(bitmap.getBitmap());
-				// }
-				//
-
 				TextView postDate = (TextView) convertView
 						.findViewById(R.id.post_date);
 
@@ -353,13 +343,6 @@ public class PostList extends ListActivity implements OnClickListener,
 							+ data.get(position).getAsString("postMinute"));
 
 				} else {
-
-					/*
-					 * if (postId == 7) { BitmapDrawable bitmap = new
-					 * BitmapDrawable(Environment .getExternalStorageDirectory()
-					 * .getAbsolutePath() + "/Mobilis/Recordings/" + postId +
-					 * ".jpg"); avatar.setImageBitmap(bitmap.getBitmap()); }
-					 */
 
 					postDate.setText(data.get(position).getAsString(
 							"postDayString")
@@ -377,7 +360,7 @@ public class PostList extends ListActivity implements OnClickListener,
 				TextView userName = (TextView) convertView
 						.findViewById(R.id.post_title);
 				userName.setText(String.valueOf(data.get(position).getAsString(
-						"user_name")));
+						"user_nick")));
 
 			}
 			return convertView;
@@ -394,7 +377,6 @@ public class PostList extends ListActivity implements OnClickListener,
 			startActivity(intent);
 
 		}
-
 	}
 
 	@Override
@@ -408,7 +390,8 @@ public class PostList extends ListActivity implements OnClickListener,
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if (item.getItemId() == R.id.menu_refresh) {
 
-			dialog = dialogMaker.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
+			dialog = dialogMaker
+					.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
 			dialog.show();
 			String url = "discussions/"
 					+ settings.getString("SelectedTopic", null) + "/posts/"
@@ -442,7 +425,6 @@ public class PostList extends ListActivity implements OnClickListener,
 		if ((lastInScreen == totalItemCount) && !(loadingMore)
 				&& getListView().getCount() >= 20 && !stopLoadingMore) {
 			loadingMore = true;
-			// Log.w("TESTE", "TESTE");
 
 			requestHistoryPosts = new RequestHistoryPosts(this);
 			adapter.open();
@@ -456,7 +438,6 @@ public class PostList extends ListActivity implements OnClickListener,
 			requestHistoryPosts.execute();
 
 		}
-
 	}
 
 	@Override
