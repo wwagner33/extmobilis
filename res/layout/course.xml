@@ -41,6 +41,16 @@
         android:layout_marginRight="15dp"
         android:divider="@null"
         android:dividerHeight="4dp"
-        android:drawSelectorOnTop="false" />
+        android:drawSelectorOnTop="false" >
+
+    </ListView>
+    
+        <TextView
+            android:id="@android:id/empty"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:text="Nenhum curso disponível"/>
 
 </RelativeLayout>

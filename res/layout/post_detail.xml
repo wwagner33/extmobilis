@@ -42,9 +42,11 @@
             android:id="@+id/user_name_detail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginTop="5dp"
+            android:layout_alignBaseline="@id/avatar"
+            android:layout_alignParentRight="false"
+            android:layout_alignParentTop="false"
+            android:layout_centerHorizontal="false"
+            android:layout_marginTop="15dp"
             android:layout_toRightOf="@id/avatar"
             android:textStyle="bold" />
 
@@ -53,26 +55,24 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:layout_below="@id/user_name_detail"
-            android:layout_toRightOf="@id/avatar" />
+            android:layout_below="@id/avatar"
+            android:layout_marginTop="12dp"
+            android:layout_toRightOf="@id/avatar"
+            android:scrollbars="vertical" />
 
         <ImageView
             android:id="@+id/answer_topic"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:layout_below="@id/post_body_detail"
             android:layout_marginTop="10dp"
             android:clickable="true"
             android:paddingRight="5dp"
             android:src="@drawable/button_response_selector" />
     </RelativeLayout>
 
-</LinearLayout> <!-- <Button -->
-<!-- android:id="@+id/answer_topic" -->
-<!-- android:layout_width="fill_parent" -->
-<!-- android:layout_height="wrap_content" -->
-<!-- android:layout_below="@id/post_body_detail" -->
-<!-- android:layout_marginTop="5dp" -->
-<!-- android:text="@string/answer_topic_button_text" /> -->
+</LinearLayout> <!-- android:layout_below="@id/post_body_detail" -->
+<!-- android:layout_alignParentRight="true" -->
+<!-- android:layout_alignParentBottom="true" -->
 
+<!-- android:layout_toRightOf="@id/user_name_detail" -->

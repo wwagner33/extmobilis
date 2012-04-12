@@ -15,5 +15,6 @@
     <color name="disabled">#EFEFEF</color>
     <color name="yellow_hightlight">#FFFF00</color>
     <color name="light_gray">#D3D3D3</color>
+    <color name="red">#FF0000</color>
 
 </resources>
