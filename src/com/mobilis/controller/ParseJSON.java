@@ -27,7 +27,7 @@ public class ParseJSON {
 		adapter = new DBAdapter(this.context);
 	}
 
-	public void parseData(ContentValues container, String data, int position) {
+	public void parseDate(ContentValues container, String data, int position) {
 
 		String year = data.substring(0, 4);
 		String month = data.substring(4, 6);
@@ -36,20 +36,19 @@ public class ParseJSON {
 		String minute = data.substring(10, 12);
 		String second = data.substring(12, 14);
 
-		container.put("postYear", Integer.parseInt(year));
-		container.put("postMonth", Integer.parseInt(month));
-		container.put("postDay", Integer.parseInt(day));
-		container.put("postDayString", day);
-		container.put("postHour", hour);
-		container.put("postMinute", minute);
-		container.put("postSecond", second);
+		container.put("post_year", Integer.parseInt(year));
+		container.put("post_month", Integer.parseInt(month));
+		container.put("post_day", Integer.parseInt(day));
+		container.put("post_hour", Integer.parseInt(hour));
+		container.put("post_minute", Integer.parseInt(minute));
+		container.put("post_second", Integer.parseInt(second));
 
-		Log.w("ANO", year);
-		Log.w("Mês", month);
-		Log.w("dia", day);
-		Log.w("hora", hour);
-		Log.w("minuto", minute);
-		Log.w("segundo", second);
+		// Log.w("ANO", year);
+		// Log.w("Mês", month);
+		// Log.w("dia", day);
+		// Log.w("hora", hour);
+		// Log.w("minuto", minute);
+		// Log.w("segundo", second);
 
 	}
 
@@ -269,45 +268,31 @@ public class ParseJSON {
 			String contentFirst = (String) innerObject.get("content_first");
 			String contentLast = (String) innerObject.get("content_last");
 
-			
-			if (contentFirst!=null) {
-			Spanned markUpFirst = Html.fromHtml(contentFirst);
-			rowItem.put("content_first", markUpFirst.toString());
+			if (contentFirst != null) {
+				Spanned markUpFirst = Html.fromHtml(contentFirst);
+				rowItem.put("content_first", markUpFirst.toString());
+			} else {
+				rowItem.put("content_first", "");
 			}
-			else {
-				rowItem.put("content_first","");
-			}
-			
-			if (contentLast!=null) {
-			Spanned markUpLast = Html.fromHtml(contentLast);
-			rowItem.put("content_last", markUpLast.toString());
-			}
-			else {
-				rowItem.put("content_last","");
-			}
-			
-			// contentFirst = TextUtils.htmlEncode(contentFirst);
-			// contentLast = TextUtils.htmlEncode(contentLast);
 
-			// contentFirst = String.format(contentFirst);
-			// contentLast = String.format(contentLast);
+			if (contentLast != null) {
+				Spanned markUpLast = Html.fromHtml(contentLast);
+				rowItem.put("content_last", markUpLast.toString());
+			} else {
+				rowItem.put("content_last", "");
+			}
 
-		
-//			rowItem.put("content_last", markUpLast.toString());
 			rowItem.put("discussion_id",
 					(Long) innerObject.get("discussion_id"));
 			rowItem.put("_id", (Long) innerObject.get("id"));
-			rowItem.putNull("parent_id");
+
+			rowItem.put("parent_id", (Long) innerObject.get("parent_id"));
+			rowItem.put("user_id", (Long) innerObject.get("user_id"));
 			rowItem.put("profile_id", (Long) innerObject.get("profile_id"));
-//			rowItem.put("user_name", (String) innerObject.get("user_name"));
-//			rowItem.put("user_username",
-//					(String) innerObject.get("user_username"));
-			rowItem.put("user_nick", (String)innerObject.get("user_nick"));
-
+			rowItem.put("user_nick", (String) innerObject.get("user_nick"));
 			rowItem.put("updated", (String) innerObject.get("updated"));
-			parseData(rowItem, (String) innerObject.get("updated"), i);
+			parseDate(rowItem, (String) innerObject.get("updated"), i);
 			parsedPostValues.add(rowItem);
-
 		}
 
 		return parsedPostValues;

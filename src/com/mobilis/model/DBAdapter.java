@@ -97,12 +97,6 @@ public class DBAdapter {
 			return true;
 	}
 
-	// public void updateCourses(String newValues) {
-	// ContentValues valores = new ContentValues();
-	// valores.put("valor", newValues);
-	// db.update("config", valores, "_id=3", null);
-	// }
-
 	public String getCourseList() {
 		Cursor cursor = db.rawQuery("SELECT * FROM config WHERE _id=3", null);
 		cursor.moveToFirst();
@@ -138,30 +132,16 @@ public class DBAdapter {
 		return result;
 	}
 
-	/*
-	 * public boolean postsStringExists() { // lembrar de deletar Cursor cursor
-	 * = db.rawQuery("SELECT * FROM config WHERE _id=5", null);
-	 * cursor.moveToFirst(); String token =
-	 * cursor.getString(cursor.getColumnIndex("valor")); cursor.close(); if
-	 * (token == null) { return false; } else return true; }
-	 */
-
 	public void updatePostsString(String newPosts) {
 		ContentValues valores = new ContentValues();
 		valores.put("valor", newPosts);
 		db.update("config", valores, "_id=5", null);
 	}
 
-	public String getPosts() {
-		// lembrar de deletar
-		Cursor cursor = db.rawQuery("SELECT * FROM config WHERE _id=5", null);
-		cursor.moveToFirst();
-		String result = cursor.getString(cursor.getColumnIndex("valor"));
-		cursor.close();
-		return result;
-	}
-
 	public String getPostsFromTopic(long topicId) {
+
+		/* OLD */
+
 		Cursor cursor = db.rawQuery("SELECT posts from topics WHERE topic_id="
 				+ topicId, null);
 		cursor.moveToFirst();
@@ -289,6 +269,8 @@ public class DBAdapter {
 	// TOPICS OPERATIONS
 
 	public void updatePostsFromTopic(String newPosts, long topicId) {
+
+		/* OLD */
 
 		ContentValues teste = new ContentValues();
 		teste.put("posts", newPosts);

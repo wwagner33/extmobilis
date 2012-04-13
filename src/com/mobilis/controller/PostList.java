@@ -9,6 +9,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -25,9 +26,11 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.mobilis.dialog.DialogMaker;
 import com.mobilis.model.DBAdapter;
+import com.mobilis.model.PostDAO;
 import com.mobilis.threads.RequestHistoryPostsThread;
 import com.mobilis.threads.RequestImageThread;
 import com.mobilis.threads.RequestNewPostsThread;
@@ -58,12 +61,17 @@ public class PostList extends ListActivity implements OnClickListener,
 	private String oldestPostDate;
 	private View footerView;
 	private DialogMaker dialogMaker;
+	private PostDAO postDAO;
+	private Cursor cursor;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
 		dialogMaker = new DialogMaker(this);
+
+		postDAO = new PostDAO(this);
+		jsonParser = new ParseJSON(this);
 
 		setContentView(R.layout.post);
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
@@ -94,14 +102,16 @@ public class PostList extends ListActivity implements OnClickListener,
 
 		getListView().setOnScrollListener(this);
 
-		adapter.open();
-		updateList(adapter.getPostsFromTopic(Long.valueOf(settings.getString(
-				"SelectedTopic", null))));
-		adapter.close();
-
-		// dialog = Dialogs.getProgressDialog(this);
-		// dialog.show();
-		// unzipFile();
+		/*
+		 * adapter.open();
+		 * updateList(adapter.getPostsFromTopic(Long.valueOf(settings.getString(
+		 * "SelectedTopic", null)))); adapter.close();
+		 */
+		postDAO.open();
+		cursor = postDAO.getPostsFromTopic(Integer.parseInt(settings.getString(
+				"SelectedTopic", null)));
+		updateList(cursor);
+		postDAO.close();
 
 	}
 
@@ -139,15 +149,42 @@ public class PostList extends ListActivity implements OnClickListener,
 		editor.commit();
 
 		intent.putExtra("parentId", listValue.getAsLong("id"));
-		Log.w("ID ON POSTS", String.valueOf(listValue.getAsLong("id")));
 		startActivity(intent);
+
 	}
 
 	public void updateList(String source) {
+
 		jsonParser = new ParseJSON(this);
 		parsedValues = jsonParser.parsePosts(source);
 
 		if (parsedValues.size() > 1) {
+			oldestPostDate = parsedValues.get(parsedValues.size() - 1)
+					.getAsString("updated");
+		}
+
+		if (parsedValues.size() == 20) {
+
+			footerView = ((LayoutInflater) this
+					.getSystemService(Context.LAYOUT_INFLATER_SERVICE))
+					.inflate(R.layout.post_list_footer, null, false);
+			this.getListView().addFooterView(footerView);
+		}
+
+		/*
+		 * listAdapter = new PostAdapter(this, parsedValues);
+		 * setListAdapter(listAdapter);
+		 */
+
+	}
+
+	public void updateList(Cursor cursor) {
+
+		postDAO.open();
+		parsedValues = postDAO.cursorToContentValues(cursor);
+		postDAO.close();
+
+		if (parsedValues.size() > 0) {
 			oldestPostDate = parsedValues.get(parsedValues.size() - 1)
 					.getAsString("updated");
 		}
@@ -165,13 +202,10 @@ public class PostList extends ListActivity implements OnClickListener,
 
 	}
 
-	public boolean postedToday(int postDay, int postMonth, int postYear) {
+	public boolean postedToday(int post_day, int post_month, int post_year) {
 
-		if (postDay == currentDay && postMonth == currentMonth
-				&& postYear == currentYear)
-			return true;
-		else
-			return false;
+		return (post_day == currentDay && post_month == currentMonth && post_year == currentYear) ? true
+				: false;
 	}
 
 	public void obtainPosts(String URLString) {
@@ -254,11 +288,21 @@ public class PostList extends ListActivity implements OnClickListener,
 		@Override
 		public void onNewPostConnectionSecceded(String result) {
 
-			adapter.open();
-			adapter.updatePostsFromTopic(result,
-					Long.parseLong(settings.getString("SelectedTopic", null)));
-			adapter.close();
-			updateList(result);
+			// adapter.open();
+			// adapter.updatePostsFromTopic(result,
+			// Long.parseLong(settings.getString("SelectedTopic", null)));
+			// adapter.close();
+
+			postDAO.open();
+			postDAO.addPosts(jsonParser.parsePosts(result),
+					Integer.parseInt(settings.getString("SelectedTopic", null)));
+
+			Cursor cursor = postDAO.getPostsFromTopic(Integer.parseInt(settings
+					.getString("SelectedTopic", null)));
+
+			updateList(cursor);
+			postDAO.close();
+
 			loadingMore = false;
 			stopLoadingMore = false;
 			closeDialogIfItsVisible();
@@ -332,23 +376,24 @@ public class PostList extends ListActivity implements OnClickListener,
 				TextView postDate = (TextView) convertView
 						.findViewById(R.id.post_date);
 
-				if (postedToday(data.get(position).getAsInteger("postDay"),
-						data.get(position).getAsInteger("postMonth"),
-						data.get(position).getAsInteger("postYear")))
+				if (postedToday(data.get(position).getAsInteger("post_day"),
+						data.get(position).getAsInteger("post_month"), data
+								.get(position).getAsInteger("post_year")))
 
 				{
 					Log.w("POSTED TODAY", "TRUE");
-					postDate.setText(data.get(position).getAsString("postHour")
+					postDate.setText(data.get(position).getAsInteger(
+							"post_hour")
 							+ ":"
-							+ data.get(position).getAsString("postMinute"));
+							+ data.get(position).getAsInteger("post_minute"));
 
 				} else {
 
-					postDate.setText(data.get(position).getAsString(
-							"postDayString")
+					postDate.setText(data.get(position)
+							.getAsInteger("post_day")
 							+ " "
 							+ Time.getMonthAsText(data.get(position)
-									.getAsInteger("postMonth")));
+									.getAsInteger("post_month")));
 					Log.w("POSTED TODAY", "FALSE");
 				}
 

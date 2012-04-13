@@ -1,5 +1,7 @@
 package com.mobilis.controller;
 
+import java.util.ArrayList;
+
 import android.app.Activity;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
@@ -25,6 +27,7 @@ import android.widget.Toast;
 
 import com.mobilis.dialog.DialogMaker;
 import com.mobilis.model.DBAdapter;
+import com.mobilis.model.PostDAO;
 import com.mobilis.threads.RequestImagesThread;
 import com.mobilis.threads.RequestNewPostsThread;
 import com.mobilis.threads.RequestPostsThread;
@@ -39,7 +42,6 @@ public class TopicListController extends ListActivity {
 	private ContentValues[] parsedValues;
 	private ParseJSON jsonParser;
 	private TopicAdapter listAdapter;
-	private RequestPosts requestPosts;
 	private String forumName;
 	private ProgressDialog dialog;
 	private SharedPreferences settings;
@@ -49,11 +51,16 @@ public class TopicListController extends ListActivity {
 	private ZipManager zipManager;
 	private DialogMaker dialogMaker;
 
+	private PostDAO postDAO;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.topic);
+
+		postDAO = new PostDAO(this);
+
 		zipManager = new ZipManager();
 		dialogMaker = new DialogMaker(this);
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
@@ -109,7 +116,6 @@ public class TopicListController extends ListActivity {
 
 		if (valuesSelected.getAsString("isClosed").equals("t")) {
 
-			Log.w("FORUMCLOSED", "TRUE");
 			editor.putBoolean("isForumClosed", true);
 
 		} else {
@@ -142,19 +148,8 @@ public class TopicListController extends ListActivity {
 		requestNewPosts = new RequestNewPosts(this);
 		adapter.open();
 		requestNewPosts.setConnectionParameters(urlString, adapter.getToken());
-		Log.w("Posts String", urlString);
 		adapter.close();
 		requestNewPosts.execute();
-	}
-
-	public void obtainPosts(String URLString) {
-
-		requestPosts = new RequestPosts(this);
-		adapter.open();
-		requestPosts.setConnectionParameters(URLString, adapter.getToken());
-		adapter.close();
-		requestPosts.execute();
-
 	}
 
 	public void obtainTopics(String URLString) {
@@ -186,45 +181,16 @@ public class TopicListController extends ListActivity {
 
 		@Override
 		public void onNewPostConnectionSecceded(String result) {
-			Log.w("NEW POSTS RESULT", result);
-			adapter.open();
-			adapter.updatePostsFromTopic(result,
-					Long.parseLong(settings.getString("SelectedTopic", null)));
-			adapter.close();
 
 			intent = new Intent(getApplicationContext(), PostList.class);
-			startActivity(intent);
 
-			/*
-			 * Checar se as imagens dos posts já existem na pasta Images Antes
-			 * de baixar;
-			 */
+			ArrayList<ContentValues> parsedValues = jsonParser
+					.parsePosts(result);
+			postDAO.open();
+			postDAO.addPosts(parsedValues,
+					Integer.parseInt(settings.getString("SelectedTopic", null)));
+			postDAO.close();
 
-			// getImages("");
-		}
-
-	}
-
-	public class RequestPosts extends RequestPostsThread {
-
-		public RequestPosts(Context context) {
-			super(context);
-
-		}
-
-		@Override
-		public void onPostsConnectionFailed() {
-			closeDialogIfItsVisible();
-
-		}
-
-		@Override
-		public void onPostsConnectionSucceded(String result) {
-
-			intent = new Intent(getApplicationContext(), PostList.class);
-			adapter.open();
-			adapter.updatePostsString(result);
-			adapter.close();
 			startActivity(intent);
 
 		}
@@ -244,9 +210,6 @@ public class TopicListController extends ListActivity {
 
 		@Override
 		public void onTopicsConnectionSucceded(String result) {
-
-			ContentValues[] postContent = jsonParser.parseJSON(result,
-					Constants.PARSE_TOPICS_ID);
 
 			adapter.open();
 			adapter.updateTopicsFromClasses(result,
