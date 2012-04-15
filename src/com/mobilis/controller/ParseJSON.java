@@ -13,18 +13,14 @@ import android.text.Html;
 import android.text.Spanned;
 import android.util.Log;
 
-import com.mobilis.model.DBAdapter;
-
 public class ParseJSON {
 
 	private Context context;
 	private ContentValues[] parsedValues;
-	private DBAdapter adapter;
 	private ArrayList<ContentValues> parsedPostValues;
 
 	public ParseJSON(Context context) {
 		this.context = context;
-		adapter = new DBAdapter(this.context);
 	}
 
 	public void parseDate(ContentValues container, String data, int position) {
@@ -42,13 +38,6 @@ public class ParseJSON {
 		container.put("post_hour", Integer.parseInt(hour));
 		container.put("post_minute", Integer.parseInt(minute));
 		container.put("post_second", Integer.parseInt(second));
-
-		// Log.w("ANO", year);
-		// Log.w("Mês", month);
-		// Log.w("dia", day);
-		// Log.w("hora", hour);
-		// Log.w("minuto", minute);
-		// Log.w("segundo", second);
 
 	}
 
@@ -82,15 +71,13 @@ public class ParseJSON {
 			JSONObject jsonObjects[] = new JSONObject[jsonArray.size()];
 			parsedValues = new ContentValues[jsonArray.size()];
 
-			adapter.open();
-
 			for (int i = 0; i < jsonArray.size(); i++) {
 				jsonObjects[i] = (JSONObject) jsonArray.get(i);
 				Log.w("Object", jsonObjects[i].toJSONString());
 
 				parsedValues[i] = new ContentValues();
 
-				parsedValues[i].put("group_id",
+				parsedValues[i].put("_id",
 						(String) jsonObjects[i].get("group_id"));
 
 				parsedValues[i].put("offer_id",
@@ -107,20 +94,8 @@ public class ParseJSON {
 
 				parsedValues[i]
 						.put("name", (String) jsonObjects[i].get("name"));
-
-				if (!adapter.existsCourseWithId(Long
-						.parseLong((String) jsonObjects[i].get("group_id")))) {
-					ContentValues newCourse = new ContentValues();
-					newCourse.putNull("_id");
-					newCourse.put("course_id",
-							(String) jsonObjects[i].get("curriculum_unit_id"));
-					newCourse.putNull("classes");
-					adapter.insertNewCourse(newCourse);
-
-				}
 			}
 
-			adapter.close();
 			return parsedValues;
 		}
 
@@ -132,14 +107,13 @@ public class ParseJSON {
 			JSONObject jsonObjects[] = new JSONObject[jsonArray.size()];
 			parsedValues = new ContentValues[jsonArray.size()];
 
-			adapter.open();
 			for (int i = 0; i < jsonArray.size(); i++) {
 				jsonObjects[i] = (JSONObject) jsonArray.get(i);
 				Log.w("Object", jsonObjects[i].toJSONString());
 
 				parsedValues[i] = new ContentValues();
 
-				parsedValues[i].put("id", (String) jsonObjects[i].get("id"));
+				parsedValues[i].put("_id", (String) jsonObjects[i].get("id"));
 
 				parsedValues[i]
 						.put("code", (String) jsonObjects[i].get("code"));
@@ -147,19 +121,7 @@ public class ParseJSON {
 				parsedValues[i].put("semester",
 						(String) jsonObjects[i].get("semester"));
 
-				if (!adapter.existsClassWithId(Long
-						.parseLong((String) jsonObjects[i].get("id")))) {
-
-					ContentValues newClass = new ContentValues();
-					newClass.putNull("_id");
-					newClass.put("class_id", (String) jsonObjects[i].get("id"));
-					newClass.putNull("topics");
-					adapter.insertNewClass(newClass);
-
-				}
-
 			}
-			adapter.close();
 			return parsedValues;
 
 		}
@@ -190,35 +152,18 @@ public class ParseJSON {
 				parsedValues[i].put("description",
 						(String) innerObject.get("description"));
 
-				parsedValues[i].put("id", (Long) innerObject.get("id"));
+				parsedValues[i].put("_id", (Long) innerObject.get("id"));
 
 				parsedValues[i].put("name", (String) innerObject.get("name"));
 
 				parsedValues[i].put("schedule_id",
 						(Long) innerObject.get("schedule_id"));
 
-				parsedValues[i].put("isClosed",
+				parsedValues[i].put("closed",
 						(String) innerObject.get("closed"));
 
 				parsedValues[i].put("last_post_date",
 						(String) innerObject.get("last_post_date"));
-
-				adapter.open();
-
-				if (!adapter.topicExists((Long) innerObject.get("id"))) {
-					ContentValues dbValues = new ContentValues();
-					dbValues.putNull("_id");
-					dbValues.put("topic_id", (Long) innerObject.get("id"));
-
-					dbValues.put("name", (String) innerObject.get("name"));
-					dbValues.put("oldestPost",
-							(String) innerObject.get("last_post_date"));
-					dbValues.putNull("posts");
-					adapter.insertNewTopic(dbValues);
-
-				}
-
-				adapter.close();
 
 			}
 			return parsedValues;

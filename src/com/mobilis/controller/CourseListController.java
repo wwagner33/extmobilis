@@ -1,12 +1,12 @@
 package com.mobilis.controller;
 
-import android.app.Activity;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -16,38 +16,41 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
+import android.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.mobilis.dialog.DialogMaker;
-import com.mobilis.model.DBAdapter;
+import com.mobilis.model.ClassDAO;
+import com.mobilis.model.CourseDAO;
 import com.mobilis.threads.RequestCoursesThread;
 import com.mobilis.threads.RequestCurriculumUnitsThread;
 
 public class CourseListController extends ListActivity {
 
 	private Intent intent;
-	private DBAdapter adapter;
 	private ParseJSON jsonParser;
-	private ContentValues[] courseList;
-	private String courseId;
-	private CourseListAdapter customAdapter;
 	private ProgressDialog dialog;
 	private RequestCurriculumUnits requestCurriculumUnits;
 	private RequestCourses requestCourses;
 	private SharedPreferences settings;
-	// private Dialogs dialogs;
 	private DialogMaker dialogMaker;
+	private LayoutInflater inflater;
+	private CourseListAdapter2 listAdapter;
+	private CourseDAO courseDAO;
+	private Cursor cursor;
+	private ClassDAO classDAO;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		dialogMaker = new DialogMaker(this);
-		// dialogs = new Dialogs(this);
 		setContentView(R.layout.course);
-		adapter = new DBAdapter(this);
+		courseDAO = new CourseDAO(this);
+		classDAO = new ClassDAO(this);
+		dialogMaker = new DialogMaker(this);
+		jsonParser = new ParseJSON(this);
+		settings = PreferenceManager.getDefaultSharedPreferences(this);
 		updateList();
 	}
 
@@ -74,20 +77,8 @@ public class CourseListController extends ListActivity {
 	}
 
 	@Override
-	protected void onResume() {
-
-		super.onResume();
-		if (adapter == null) {
-			adapter.open();
-		}
-	}
-
-	@Override
 	protected void onStop() {
 		super.onStop();
-		if (adapter != null) {
-			adapter.close();
-		}
 		if (dialog != null) {
 			if (dialog.isShowing()) {
 				dialog.dismiss();
@@ -98,14 +89,11 @@ public class CourseListController extends ListActivity {
 
 	public void updateList() {
 
-		adapter.open();
-		jsonParser = new ParseJSON(this);
-		courseList = jsonParser.parseJSON(adapter.getCourseList(),
-				Constants.PARSE_COURSES_ID);
-		adapter.close();
-		customAdapter = new CourseListAdapter(this, courseList);
-		setListAdapter(customAdapter);
-
+		courseDAO.open();
+		cursor = courseDAO.getAllCourses();
+		courseDAO.close();
+		listAdapter = new CourseListAdapter2(this, cursor);
+		setListAdapter(listAdapter);
 	}
 
 	@Override
@@ -113,55 +101,48 @@ public class CourseListController extends ListActivity {
 
 		super.onListItemClick(l, v, position, id);
 
-		Log.w("Item position", String.valueOf(position));
-		Log.w("item id", String.valueOf(id));
-
-		Object semester = l.getAdapter().getItem(position);
-		courseId = (String) semester;
+		Object courseItem = l.getAdapter().getItem(position);
+		// courseId = String.valueOf(courseItem);
+		int courseId = (Integer) courseItem;
 
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
 		SharedPreferences.Editor editor = settings.edit();
-		editor.putString("SelectedCourse", courseId);
+		editor.putInt("SelectedCourse", courseId);
 		editor.commit();
 
-		Log.w("GroupID", courseId);
+		Log.w("GroupID", String.valueOf(courseId));
 
-		adapter.open();
+		classDAO.open();
 
-		if (adapter.existsClassesOnCourse(Long.parseLong(settings.getString(
-				"SelectedCourse", null)))) {
-			adapter.close();
+		if (classDAO.existClasses(settings.getInt("SelectedCourse", 0))) {
+			classDAO.close();
 			intent = new Intent(this, ClassListController.class);
 			startActivity(intent);
 		}
 
 		else {
-			adapter.close();
+			classDAO.close();
 			dialog = dialogMaker
 					.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
 			dialog.show();
 			obtainCurriculumUnits(Constants.URL_CURRICULUM_UNITS_PREFIX
 					+ courseId + Constants.URL_GROUPS_SUFFIX);
 		}
-
 	}
 
 	public void obtainCurriculumUnits(String URLString) {
 
 		requestCurriculumUnits = new RequestCurriculumUnits(this);
-		adapter.open();
 		requestCurriculumUnits.setConnectionParameters(URLString,
-				adapter.getToken());
-		adapter.close();
+				settings.getString("token", null));
 		requestCurriculumUnits.execute();
 
 	}
 
 	public void obtainCourses(String URLString) {
 		requestCourses = new RequestCourses(this);
-		adapter.open();
-		requestCourses.setConnectionParameters(URLString, adapter.getToken());
-		adapter.close();
+		requestCourses.setConnectionParameters(URLString,
+				settings.getString("token", null));
 		requestCourses.execute();
 	}
 
@@ -180,13 +161,17 @@ public class CourseListController extends ListActivity {
 
 		@Override
 		public void onCurriculumUnitsConnectionSuccedded(String result) {
-			adapter.open();
 
-			// adapter.updateGroups(result);
-			adapter.updateClassesFromCourse(result,
-					Long.parseLong(settings.getString("SelectedCourse", null)));
+			Log.i("RESULT", result);
 
-			adapter.close();
+			ContentValues[] values = jsonParser.parseJSON(result,
+					Constants.PARSE_CLASSES_ID);
+
+			classDAO.open();
+
+			classDAO.addClasses(values, settings.getInt("SelectedCourse", 0));
+			classDAO.close();
+
 			intent = new Intent(getApplicationContext(),
 					ClassListController.class);
 			startActivity(intent);
@@ -207,52 +192,46 @@ public class CourseListController extends ListActivity {
 
 		@Override
 		public void onCoursesConnectionSucceded(String result) {
-			adapter.open();
-			adapter.updateCourses(result);
-			adapter.close();
+
+			ContentValues[] values = jsonParser.parseJSON(result,
+					Constants.PARSE_COURSES_ID);
+
+			courseDAO.open();
+			courseDAO.addCourses(values);
+			courseDAO.close();
 			updateList();
 			closeDialogIfItsVisible();
 		}
 	}
 
-	public class CourseListAdapter extends BaseAdapter {
+	public class CourseListAdapter2 extends CursorAdapter {
 
-		Activity activity;
-		ContentValues[] values;
-		LayoutInflater inflater = null;
-
-		public CourseListAdapter(Activity activity, ContentValues[] values) {
-			this.activity = activity;
-			this.values = values;
-			inflater = LayoutInflater.from(activity);
+		public CourseListAdapter2(Context context, Cursor c) {
+			super(context, c);
+			inflater = LayoutInflater.from(context);
 		}
 
 		@Override
-		public int getCount() {
-			return values.length;
+		public void bindView(View convertView, Context context, Cursor cursor) {
+
+			if (cursor != null) {
+
+				TextView courseName = (TextView) convertView
+						.findViewById(R.id.item);
+				courseName.setText(cursor.getString(cursor
+						.getColumnIndex("name")));
+			}
+		}
+
+		@Override
+		public View newView(Context context, Cursor cursor, ViewGroup parent) {
+
+			return inflater.inflate(R.layout.course_item, parent, false);
 		}
 
 		@Override
 		public Object getItem(int position) {
-			return values[position].getAsString("group_id");
-
-		}
-
-		@Override
-		public long getItemId(int position) {
-			return position;
-		}
-
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
-			if (convertView == null) {
-				convertView = inflater.inflate(R.layout.course_item, parent,
-						false);
-				TextView courseName = (TextView) convertView
-						.findViewById(R.id.item);
-				courseName.setText(values[position].getAsString("name"));
-			}
-			return convertView;
+			return getCursor().getInt(getCursor().getColumnIndex("_id"));
 		}
 	}
 
@@ -272,8 +251,10 @@ public class CourseListController extends ListActivity {
 			obtainCourses(Constants.URL_COURSES);
 		}
 		if (item.getItemId() == R.id.menu_logout) {
-			adapter.open();
-			adapter.updateToken(null);
+
+			SharedPreferences.Editor editor = settings.edit();
+			editor.putString("token", null);
+			editor.commit();
 			intent = new Intent(this, Login.class);
 			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			startActivity(intent);

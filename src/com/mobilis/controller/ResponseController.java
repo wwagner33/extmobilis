@@ -2,7 +2,7 @@ package com.mobilis.controller;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Calendar;
+import java.util.ArrayList;
 
 import org.json.simple.JSONObject;
 
@@ -11,7 +11,6 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
@@ -20,7 +19,6 @@ import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaRecorder;
 import android.media.MediaRecorder.OnInfoListener;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -41,7 +39,7 @@ import com.mobilis.audio.AudioPlayer;
 import com.mobilis.audio.AudioRecorder;
 import com.mobilis.dialog.AudioDialog;
 import com.mobilis.dialog.DialogMaker;
-import com.mobilis.model.DBAdapter;
+import com.mobilis.model.PostDAO;
 import com.mobilis.threads.RequestNewPostsThread;
 import com.mobilis.threads.RequestPostsThread;
 import com.mobilis.threads.SubmitAudioResponseThread;
@@ -58,7 +56,6 @@ public class ResponseController extends Activity implements OnClickListener,
 	private ProgressDialog dialog;
 	private Bundle extras;
 	private SubmitTextResponse submitTextResponse;
-	private DBAdapter adapter;
 	private String token, URL, topicId, forumName;
 	private ParseJSON jsonParser;
 	private Intent intent;
@@ -74,11 +71,10 @@ public class ResponseController extends Activity implements OnClickListener,
 	private long countUp;
 	private long startTime;
 	private Chronometer stopWatch;
-	private Toast teste;
 	private AudioRecorder recorder;
 	private AudioPlayer player;
-	public static DialogInterface.OnClickListener dialogClick;
 	float toastTimer = 0;
+	private PostDAO postDAO;
 
 	ResponseControllerHandler handler;
 
@@ -90,6 +86,8 @@ public class ResponseController extends Activity implements OnClickListener,
 
 		handler = new ResponseControllerHandler(this);
 		dialogMaker = new DialogMaker(this);
+
+		postDAO = new PostDAO(this);
 
 		setContentView(R.layout.response);
 		extras = getIntent().getExtras();
@@ -108,8 +106,6 @@ public class ResponseController extends Activity implements OnClickListener,
 		recordImage.setOnClickListener(this);
 		player = new AudioPlayer();
 
-		teste = new Toast(this);
-
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
 
 		charCount = (TextView) findViewById(R.id.char_number);
@@ -117,14 +113,6 @@ public class ResponseController extends Activity implements OnClickListener,
 		charCount.setText("0/" + Constants.TEXT_MAX_CHARACTER_LENGHT);
 
 		jsonParser = new ParseJSON(this);
-
-		if (extras != null) {
-
-			topicId = extras.getString("topicId");
-			Log.w("TopicId", topicId);
-			forumName = extras.getString("ForumName");
-
-		}
 
 	}
 
@@ -139,9 +127,6 @@ public class ResponseController extends Activity implements OnClickListener,
 	protected void onStop() {
 
 		super.onStop();
-		if (adapter != null) {
-			adapter.close();
-		}
 		if (dialog != null) {
 			if (dialog.isShowing()) {
 				dialog.dismiss();
@@ -283,12 +268,9 @@ public class ResponseController extends Activity implements OnClickListener,
 
 	public void sendPost(String jsonString) {
 		dialog.show();
-		adapter = new DBAdapter(this);
-		adapter.open();
-		token = adapter.getToken();
-		adapter.close();
+		token = settings.getString("token", null);
 
-		URL = "discussions/" + settings.getString("SelectedTopic", null)
+		URL = "discussions/" + settings.getInt("SelectedTopic", 0)
 				+ "/posts?auth_token=" + token;
 
 		submitTextResponse = new SubmitTextResponse(this);
@@ -300,19 +282,16 @@ public class ResponseController extends Activity implements OnClickListener,
 	public void getPosts(String URLString) {
 
 		requestPosts = new RequestPosts(this);
-		adapter.open();
-		requestPosts.setConnectionParameters(URLString, adapter.getToken());
-		adapter.close();
+		requestPosts.setConnectionParameters(URLString,
+				settings.getString("token", null));
 		requestPosts.execute();
 
 	}
 
 	public void getNewPosts(String urlString) {
 		requestNewPosts = new RequestNewPosts(this);
-		adapter.open();
-
-		requestNewPosts.setConnectionParameters(urlString, adapter.getToken());
-		adapter.close();
+		requestNewPosts.setConnectionParameters(urlString,
+				settings.getString("token", null));
 		requestNewPosts.execute();
 	}
 
@@ -353,11 +332,10 @@ public class ResponseController extends Activity implements OnClickListener,
 
 			if (existsRecording) {
 
-				adapter.open();
 				String postURL = "posts/"
 						+ String.valueOf(resultFromServer[0].get("post_id"))
-						+ "/attach_file?auth_token=" + adapter.getToken();
-				adapter.close();
+						+ "/attach_file?auth_token="
+						+ settings.getString("token", null);
 				Log.w("PostURL", postURL);
 				sendAudioPost(postURL, recorder.getAudioFile());
 
@@ -365,7 +343,7 @@ public class ResponseController extends Activity implements OnClickListener,
 				Log.w("getPosts", "TRUE");
 
 				getNewPosts("discussions/"
-						+ settings.getString("SelectedTopic", null) + "/posts/"
+						+ settings.getInt("SelectedTopic", 0) + "/posts/"
 						+ Constants.oldDateString + "/news.json");
 			}
 		}
@@ -386,9 +364,8 @@ public class ResponseController extends Activity implements OnClickListener,
 
 		@Override
 		public void onAudioResponseConnectionSucceded(String result) {
-			getNewPosts("discussions/"
-					+ settings.getString("SelectedTopic", null) + "/posts/"
-					+ Constants.oldDateString + "/news.json");
+			getNewPosts("discussions/" + settings.getInt("SelectedTopic", 0)
+					+ "/posts/" + Constants.oldDateString + "/news.json");
 			closeDialogIfItsVisible();
 
 		}
@@ -408,10 +385,12 @@ public class ResponseController extends Activity implements OnClickListener,
 
 		@Override
 		public void onNewPostConnectionSecceded(String result) {
-			adapter.open();
-			adapter.updatePostsFromTopic(result,
-					Long.parseLong(settings.getString("SelectedTopic", null)));
-			adapter.close();
+
+			ArrayList<ContentValues> values = jsonParser.parsePosts(result);
+
+			postDAO.open();
+			postDAO.addPosts(values, settings.getInt("SelectedTopic", 0));
+			postDAO.close();
 
 			intent = new Intent(getApplicationContext(), PostList.class);
 			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -521,23 +500,15 @@ public class ResponseController extends Activity implements OnClickListener,
 	public void beforeTextChanged(CharSequence s, int start, int count,
 			int after) {
 		Log.w("charSequenceOnBefore", s.toString());
-		// Log.w("start", String.valueOf(start));
-		// Log.w("count", String.valueOf(count));
-		// Log.w("after", String.valueOf(after));
 	}
 
 	@Override
 	public void onTextChanged(CharSequence s, int start, int before, int count) {
-		// Log.w("start", String.valueOf(start));
-		// Log.w("before", String.valueOf(before));
-		// Log.w("count", String.valueOf(count));
-		// Log.w("charSequenceOnAfter", s.toString());
 		charSequenceAfter = s.toString();
 	}
 
 	@Override
 	public void onInfo(MediaRecorder mr, int what, int extra) {
-		// Log.w("OnInfoListener", "TRUE");
 	}
 
 }

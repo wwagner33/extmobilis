@@ -10,13 +10,11 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import com.mobilis.model.DBAdapter;
 import com.mobilis.model.DatabaseHelper;
 
 public class InitialConfig extends Activity {
 	private Intent intent;
 	private Cursor cursor;
-	private DBAdapter adapter;
 	private Bundle extras;
 	private SharedPreferences settings;
 
@@ -31,7 +29,6 @@ public class InitialConfig extends Activity {
 			file.mkdirs();
 		}
 		DatabaseHelper helper = new DatabaseHelper(this);
-		adapter = new DBAdapter(this);
 
 		if (getIntent().getExtras() != null) {
 			extras = getIntent().getExtras();
@@ -45,9 +42,8 @@ public class InitialConfig extends Activity {
 		else {
 
 			if (helper.checkDataBaseExistence()) {
-				adapter.open();
 
-				if (adapter.tokenExists()) {
+				if (settings.getString("token", null) != null) {
 
 					if (settings.getBoolean("AutoLogin", true)) {
 						Log.w("TOKEN TESTE", "TOKEN OK");
@@ -94,9 +90,6 @@ public class InitialConfig extends Activity {
 		super.onStop();
 		if (cursor != null) {
 			cursor.close();
-		}
-		if (adapter != null) {
-			adapter.close();
 		}
 	}
 }

@@ -5,8 +5,9 @@ import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -14,7 +15,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.mobilis.dialog.DialogMaker;
-import com.mobilis.model.DBAdapter;
+import com.mobilis.model.CourseDAO;
 import com.mobilis.threads.RequestCoursesThread;
 import com.mobilis.threads.RequestTokenThread;
 
@@ -23,24 +24,27 @@ public class Login extends Activity implements OnClickListener {
 	private EditText login, password;
 	private Button submit;
 	private Intent intent;
-	private DBAdapter adapter;
 	private ProgressDialog dialog;
 	private ParseJSON jsonParser;
 	private RequestToken requestToken;
 	private RequestCourses requestCourses;
 	private DialogMaker dialogMaker;
+	private CourseDAO courseDAO;
+	private SharedPreferences settings;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		dialogMaker = new DialogMaker(this);
 		setContentView(R.layout.login);
+		settings = PreferenceManager.getDefaultSharedPreferences(this);
+		jsonParser = new ParseJSON(this);
+		courseDAO = new CourseDAO(this);
+		dialogMaker = new DialogMaker(this);
 		login = (EditText) findViewById(R.id.campo1);
 		password = (EditText) findViewById(R.id.campo2);
 		submit = (Button) findViewById(R.id.submit);
 		submit.setOnClickListener(this);
-		adapter = new DBAdapter(this);
 	}
 
 	@Override
@@ -51,7 +55,13 @@ public class Login extends Activity implements OnClickListener {
 				dialog.dismiss();
 			}
 		}
+	}
 
+	@Override
+	protected void onStop() {
+		// TODO Auto-generated method stub
+		super.onStop();
+		closeDialogIfItsVisible();
 	}
 
 	@Override
@@ -94,21 +104,10 @@ public class Login extends Activity implements OnClickListener {
 	public void getCourseList(String token) {
 
 		requestCourses = new RequestCourses(this);
-		adapter.open();
 		requestCourses.setConnectionParameters(Constants.URL_COURSES,
-				adapter.getToken());
-		adapter.close();
+				settings.getString("token", null));
 		requestCourses.execute();
 
-	}
-
-	@Override
-	protected void onStop() {
-
-		super.onStop();
-		if (adapter != null) {
-			adapter.close();
-		}
 	}
 
 	@Override
@@ -141,12 +140,14 @@ public class Login extends Activity implements OnClickListener {
 			jsonParser = new ParseJSON(getApplicationContext());
 			ContentValues[] tokenParsed = jsonParser.parseJSON(result,
 					Constants.PARSE_TOKEN_ID);
-			Log.w("TOKENPARSED", tokenParsed[0].getAsString("token"));
-			adapter.open();
-			Log.w("UpdateToken", "updateToken");
-			adapter.updateToken(tokenParsed[0].getAsString("token"));
-			String token = adapter.getToken();
-			adapter.close();
+			// adapter.open();
+			// adapter.updateToken(tokenParsed[0].getAsString("token"));
+			SharedPreferences.Editor editor = settings.edit();
+			editor.putString("token", tokenParsed[0].getAsString("token"));
+			editor.commit();
+
+			String token = settings.getString("token", null);
+			// adapter.close();
 			getCourseList(token);
 
 		}
@@ -167,9 +168,13 @@ public class Login extends Activity implements OnClickListener {
 
 		@Override
 		public void onCoursesConnectionSucceded(String result) {
-			adapter.open();
-			adapter.updateCourses(result);
-			adapter.close();
+
+			ContentValues[] values = jsonParser.parseJSON(result,
+					Constants.PARSE_COURSES_ID);
+			courseDAO.open();
+			courseDAO.addCourses(values);
+			courseDAO.close();
+
 			intent = new Intent(getApplicationContext(),
 					CourseListController.class);
 			startActivity(intent);

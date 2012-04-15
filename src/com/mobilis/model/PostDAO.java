@@ -7,7 +7,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.util.Log;
 
-public class PostDAO extends DBAdapter2 {
+public class PostDAO extends DBAdapter {
 
 	public PostDAO(Context context) {
 		super(context);
@@ -25,12 +25,16 @@ public class PostDAO extends DBAdapter2 {
 
 	public int getPostCount(int topic_id) {
 		Cursor cursor = getDatabase().rawQuery(
-				"SELECT count(id) FROM posts WHERE discussion_id= " + topic_id,
+				"SELECT count(_id) FROM posts WHERE discussion_id= " + topic_id,
 				null);
 		cursor.moveToFirst();
 		int count = cursor.getInt(0);
 		cursor.close();
 		return count;
+	}
+
+	public boolean postExistsOnTopic(int topic_id) {
+		return (getPostCount(topic_id) > 0) ? true : false;
 	}
 
 	public void clearPostsFromTopic(int topic_id) {

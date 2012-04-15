@@ -2,13 +2,13 @@ package com.mobilis.controller;
 
 import java.util.ArrayList;
 
-import android.app.Activity;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.graphics.drawable.StateListDrawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -19,29 +19,24 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
+import android.widget.CursorAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mobilis.dialog.DialogMaker;
-import com.mobilis.model.DBAdapter;
 import com.mobilis.model.PostDAO;
+import com.mobilis.model.TopicDAO;
 import com.mobilis.threads.RequestImagesThread;
 import com.mobilis.threads.RequestNewPostsThread;
-import com.mobilis.threads.RequestPostsThread;
 import com.mobilis.threads.RequestTopicsThread;
 import com.mobilis.util.ZipManager;
 
 public class TopicListController extends ListActivity {
 
-	private String topicIdString;
-	private DBAdapter adapter;
 	private Intent intent;
-	private ContentValues[] parsedValues;
 	private ParseJSON jsonParser;
-	private TopicAdapter listAdapter;
 	private String forumName;
 	private ProgressDialog dialog;
 	private SharedPreferences settings;
@@ -50,8 +45,10 @@ public class TopicListController extends ListActivity {
 	private RequestImages requestImages;
 	private ZipManager zipManager;
 	private DialogMaker dialogMaker;
-
+	private TopicDAO topicDAO;
 	private PostDAO postDAO;
+	private Cursor cursor;
+	private TopicAdapter listAdapter;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -59,25 +56,31 @@ public class TopicListController extends ListActivity {
 
 		setContentView(R.layout.topic);
 
+		jsonParser = new ParseJSON(this);
 		postDAO = new PostDAO(this);
-
+		topicDAO = new TopicDAO(this);
 		zipManager = new ZipManager();
 		dialogMaker = new DialogMaker(this);
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
-		adapter = new DBAdapter(this);
+		// adapter = new DBAdapter(this);
 		updateList();
 	}
 
 	@Override
 	protected void onStop() {
 		super.onStop();
-		if (adapter != null) {
-			adapter.close();
-		}
 		if (dialog != null) {
 			if (dialog.isShowing()) {
 				dialog.dismiss();
 			}
+		}
+		if (postDAO != null) {
+			if (postDAO.isOpen())
+				postDAO.close();
+		}
+		if (topicDAO != null) {
+			if (postDAO.isOpen())
+				topicDAO.close();
 		}
 
 	}
@@ -90,54 +93,53 @@ public class TopicListController extends ListActivity {
 
 	public void updateList() {
 
-		adapter.open();
-		jsonParser = new ParseJSON(this);
-
-		String topics = adapter.getTopicsFromClasses(Long.parseLong(settings
-				.getString("SelectedClass", null)));
-		parsedValues = jsonParser.parseJSON(topics, Constants.PARSE_TOPICS_ID);
-		adapter.close();
-		Log.w("parsedLenght", String.valueOf(parsedValues.length));
-		listAdapter = new TopicAdapter(this, parsedValues);
+		topicDAO.open();
+		cursor = topicDAO.getTopicsFromClass(settings
+				.getInt("SelectedClass", 0));
+		topicDAO.close();
+		listAdapter = new TopicAdapter(this, cursor);
 		setListAdapter(listAdapter);
+
 	}
 
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 
 		super.onListItemClick(l, v, position, id);
-		Object teste = l.getAdapter().getItem(position);
-		ContentValues valuesSelected = (ContentValues) teste;
+		Object content = l.getAdapter().getItem(position);
+		ContentValues item = (ContentValues) content;
 
-		long TopicIdLong = valuesSelected.getAsLong("id");
-		topicIdString = String.valueOf(TopicIdLong);
+		int topicId = item.getAsInteger("_id");
+		forumName = item.getAsString("name");
 
 		SharedPreferences.Editor editor = settings.edit();
 
-		if (valuesSelected.getAsString("isClosed").equals("t")) {
+		Log.i("CLOSED", item.getAsString("closed"));
 
+		if (item.getAsString("closed").equals("t")) {
 			editor.putBoolean("isForumClosed", true);
 
 		} else {
 			editor.putBoolean("isForumClosed", false);
 		}
 
-		editor.putString("SelectedTopic", topicIdString);
+		editor.putInt("SelectedTopic", topicId);
 		editor.putString("CurrentForumName", forumName);
 		editor.commit();
 
-		adapter.open();
-		if (adapter.postExistsOnTopic(Long.parseLong(topicIdString))) {
-			adapter.close();
+		postDAO.open();
+
+		if (postDAO.postExistsOnTopic(topicId)) {
+			postDAO.close();
 			intent = new Intent(this, PostList.class);
 			startActivity(intent);
 
 		} else {
-			adapter.close();
+			postDAO.close();
 			dialog = dialogMaker
 					.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
 			dialog.show();
-			String url = "discussions/" + topicIdString + "/posts/"
+			String url = "discussions/" + topicId + "/posts/"
 					+ Constants.oldDateString + "/news.json";
 			obtainNewPosts(url);
 		}
@@ -146,25 +148,22 @@ public class TopicListController extends ListActivity {
 
 	public void obtainNewPosts(String urlString) {
 		requestNewPosts = new RequestNewPosts(this);
-		adapter.open();
-		requestNewPosts.setConnectionParameters(urlString, adapter.getToken());
-		adapter.close();
+		requestNewPosts.setConnectionParameters(urlString,
+				settings.getString("token", null));
 		requestNewPosts.execute();
 	}
 
 	public void obtainTopics(String URLString) {
 		requestTopics = new RequestTopics(this);
-		adapter.open();
-		requestTopics.setConnectionParameters(URLString, adapter.getToken());
-		adapter.close();
+		requestTopics.setConnectionParameters(URLString,
+				settings.getString("token", null));
 		requestTopics.execute();
 	}
 
 	public void getImages(String idPosts) {
 		requestImages = new RequestImages(this);
-		adapter.open();
-		requestImages.setConnectionParameters(idPosts, adapter.getToken());
-		adapter.close();
+		requestImages.setConnectionParameters(idPosts,
+				settings.getString("token", null));
 		requestImages.execute();
 	}
 
@@ -187,8 +186,7 @@ public class TopicListController extends ListActivity {
 			ArrayList<ContentValues> parsedValues = jsonParser
 					.parsePosts(result);
 			postDAO.open();
-			postDAO.addPosts(parsedValues,
-					Integer.parseInt(settings.getString("SelectedTopic", null)));
+			postDAO.addPosts(parsedValues, settings.getInt("SelectedTopic", 0));
 			postDAO.close();
 
 			startActivity(intent);
@@ -211,10 +209,12 @@ public class TopicListController extends ListActivity {
 		@Override
 		public void onTopicsConnectionSucceded(String result) {
 
-			adapter.open();
-			adapter.updateTopicsFromClasses(result,
-					Long.parseLong(settings.getString("SelectedClass", null)));
-			adapter.close();
+			ContentValues[] values = jsonParser.parseJSON(result,
+					Constants.PARSE_TOPICS_ID);
+
+			topicDAO.open();
+			topicDAO.addTopics(values, settings.getInt("SelectedClass", 0));
+			topicDAO.close();
 			updateList();
 			closeDialogIfItsVisible();
 
@@ -244,69 +244,72 @@ public class TopicListController extends ListActivity {
 
 	}
 
-	public class TopicAdapter extends BaseAdapter {
+	public class TopicAdapter extends CursorAdapter {
 
-		Activity activity;
-		ContentValues[] values;
-		LayoutInflater inflater = null;
+		LayoutInflater inflater;
 
-		public TopicAdapter(Activity activity, ContentValues[] values) {
-			this.activity = activity;
-			this.values = values;
-			inflater = LayoutInflater.from(activity);
+		public TopicAdapter(Context context, Cursor c) {
+			super(context, c);
+			inflater = LayoutInflater.from(context);
 		}
 
 		@Override
-		public int getCount() {
-			return values.length;
+		public void bindView(View convertView, Context context, Cursor cursor) {
+
+			if (cursor != null) {
+
+				if (cursor.getString(cursor.getColumnIndex("closed")).equals(
+						"t")) {
+
+					StateListDrawable states = new StateListDrawable();
+					states.addState(
+							new int[] {},
+							getResources().getDrawable(
+									R.drawable.course_list_closed_selector));
+					convertView.setBackgroundDrawable(states);
+
+					TextView topicTitle = (TextView) convertView
+							.findViewById(R.id.topic_name);
+					topicTitle.setTextColor(R.color.very_dark_gray);
+
+					LinearLayout teste = (LinearLayout) convertView
+							.findViewById(R.id.left_bar);
+					teste.setBackgroundColor(R.color.very_dark_gray);
+
+					topicTitle.setTextColor(R.color.very_dark_gray);
+					topicTitle.setText(cursor.getString(cursor
+							.getColumnIndex("name")));
+					Log.w("isClosed",
+							cursor.getString(cursor.getColumnIndex("closed")));
+
+				}
+
+				TextView topicTitle = (TextView) convertView
+						.findViewById(R.id.topic_name);
+
+				topicTitle.setText(cursor.getString(cursor
+						.getColumnIndex("name")));
+
+				Log.w("isClosed",
+						cursor.getString(cursor.getColumnIndex("closed")));
+			}
+		}
+
+		@Override
+		public View newView(Context context, Cursor cursor, ViewGroup parent) {
+			return inflater.inflate(R.layout.topicitem, parent, false);
 		}
 
 		@Override
 		public Object getItem(int position) {
-			ContentValues contentAtPosisiton = values[position];
-			forumName = values[position].getAsString("name");
-			return contentAtPosisiton;
-		}
-
-		@Override
-		public long getItemId(int position) {
-			return position;
-		}
-
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
-
-			convertView = inflater.inflate(R.layout.topicitem, parent, false);
-
-			if (values[position].getAsString("isClosed").equals("t")) {
-
-				StateListDrawable states = new StateListDrawable();
-				states.addState(
-						new int[] {},
-						getResources().getDrawable(
-								R.drawable.course_list_closed_selector));
-				convertView.setBackgroundDrawable(states);
-
-				TextView topicTitle = (TextView) convertView
-						.findViewById(R.id.topic_name);
-				topicTitle.setTextColor(R.color.very_dark_gray);
-
-				LinearLayout teste = (LinearLayout) convertView
-						.findViewById(R.id.left_bar);
-				teste.setBackgroundColor(R.color.very_dark_gray);
-
-				topicTitle.setTextColor(R.color.very_dark_gray);
-				topicTitle.setText(values[position].getAsString("name"));
-				Log.w("isClosed", values[position].getAsString("isClosed"));
-				return convertView;
-
-			}
-
-			TextView topicTitle = (TextView) convertView
-					.findViewById(R.id.topic_name);
-			topicTitle.setText(values[position].getAsString("name"));
-			Log.w("isClosed", values[position].getAsString("isClosed"));
-			return convertView;
+			ContentValues item = new ContentValues();
+			item.put("closed",
+					getCursor().getString(getCursor().getColumnIndex("closed")));
+			item.put("_id",
+					getCursor().getInt(getCursor().getColumnIndex("_id")));
+			item.put("name",
+					getCursor().getString(getCursor().getColumnIndex("name")));
+			return item;
 		}
 	}
 
@@ -322,7 +325,7 @@ public class TopicListController extends ListActivity {
 
 		if (item.getItemId() == R.id.menu_refresh) {
 
-			String currentClass = settings.getString("SelectedClass", null);
+			int currentClass = settings.getInt("SelectedClass", 0);
 			dialog = dialogMaker
 					.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
 			dialog.show();
@@ -330,8 +333,10 @@ public class TopicListController extends ListActivity {
 					+ Constants.URL_DISCUSSION_SUFFIX);
 		}
 		if (item.getItemId() == R.id.menu_logout) {
-			adapter.open();
-			adapter.updateToken(null);
+
+			SharedPreferences.Editor editor = settings.edit();
+			editor.putString("token", null);
+			editor.commit();
 			intent = new Intent(this, Login.class);
 			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			startActivity(intent);

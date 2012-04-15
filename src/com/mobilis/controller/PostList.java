@@ -26,10 +26,8 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.mobilis.dialog.DialogMaker;
-import com.mobilis.model.DBAdapter;
 import com.mobilis.model.PostDAO;
 import com.mobilis.threads.RequestHistoryPostsThread;
 import com.mobilis.threads.RequestImageThread;
@@ -52,7 +50,6 @@ public class PostList extends ListActivity implements OnClickListener,
 	public SharedPreferences settings;
 	private Dialog dialog;
 	private RequestPosts requestPosts;
-	private DBAdapter adapter;
 	private RequestImage requestImage;
 	private RequestNewPosts requestNewPosts;
 	private RequestHistoryPosts requestHistoryPosts;
@@ -75,8 +72,6 @@ public class PostList extends ListActivity implements OnClickListener,
 
 		setContentView(R.layout.post);
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
-
-		adapter = new DBAdapter(this);
 
 		answerForum = (ImageView) findViewById(R.id.answer_topic_image);
 		answerForum.setOnClickListener(this);
@@ -102,17 +97,19 @@ public class PostList extends ListActivity implements OnClickListener,
 
 		getListView().setOnScrollListener(this);
 
-		/*
-		 * adapter.open();
-		 * updateList(adapter.getPostsFromTopic(Long.valueOf(settings.getString(
-		 * "SelectedTopic", null)))); adapter.close();
-		 */
 		postDAO.open();
-		cursor = postDAO.getPostsFromTopic(Integer.parseInt(settings.getString(
-				"SelectedTopic", null)));
-		updateList(cursor);
+		cursor = postDAO.getPostsFromTopic(settings.getInt("SelectedTopic", 0));
 		postDAO.close();
+		updateList(cursor);
 
+	}
+
+	@Override
+	protected void onStop() {
+		// TODO Auto-generated method stub
+		super.onStop();
+		if (postDAO.isOpen())
+			postDAO.close();
 	}
 
 	@Override
@@ -142,7 +139,7 @@ public class PostList extends ListActivity implements OnClickListener,
 					+ listValue.getAsString("content_last"));
 		}
 
-		intent.putExtra("topicId", settings.getString("SelectedTopic", null));
+		intent.putExtra("topicId", settings.getInt("SelectedTopic", 0));
 
 		SharedPreferences.Editor editor = settings.edit();
 		editor.putLong("SelectedPost", listValue.getAsInteger("_id"));
@@ -170,12 +167,6 @@ public class PostList extends ListActivity implements OnClickListener,
 					.inflate(R.layout.post_list_footer, null, false);
 			this.getListView().addFooterView(footerView);
 		}
-
-		/*
-		 * listAdapter = new PostAdapter(this, parsedValues);
-		 * setListAdapter(listAdapter);
-		 */
-
 	}
 
 	public void updateList(Cursor cursor) {
@@ -210,27 +201,24 @@ public class PostList extends ListActivity implements OnClickListener,
 
 	public void obtainPosts(String URLString) {
 		requestPosts = new RequestPosts(this);
-		adapter.open();
-		requestPosts.setConnectionParameters(URLString, adapter.getToken());
-		adapter.close();
+
+		requestPosts.setConnectionParameters(URLString,
+				settings.getString("token", null));
 		requestPosts.execute();
 	}
 
 	public void obtainNewPosts(String url) {
 		requestNewPosts = new RequestNewPosts(this);
-		adapter.open();
-		requestNewPosts.setConnectionParameters(url, adapter.getToken());
-		adapter.close();
+		requestNewPosts.setConnectionParameters(url,
+				settings.getString("token", null));
 		requestNewPosts.execute();
 	}
 
 	public void getImageFormServer() {
 		Log.w("InsidePullImage", "TRUE");
 		requestImage = new RequestImage(this);
-		adapter.open();
 		requestImage.setConnectionParameters("images/1/users",
-				adapter.getToken());
-		adapter.close();
+				settings.getString("token", null));
 		requestImage.execute();
 
 	}
@@ -252,7 +240,6 @@ public class PostList extends ListActivity implements OnClickListener,
 			Log.w("RESULT_OK", "TRUE");
 
 		}
-
 	}
 
 	public class RequestPosts extends RequestPostsThread {
@@ -288,17 +275,12 @@ public class PostList extends ListActivity implements OnClickListener,
 		@Override
 		public void onNewPostConnectionSecceded(String result) {
 
-			// adapter.open();
-			// adapter.updatePostsFromTopic(result,
-			// Long.parseLong(settings.getString("SelectedTopic", null)));
-			// adapter.close();
-
 			postDAO.open();
 			postDAO.addPosts(jsonParser.parsePosts(result),
-					Integer.parseInt(settings.getString("SelectedTopic", null)));
+					settings.getInt("SelectedTopic", 0));
 
-			Cursor cursor = postDAO.getPostsFromTopic(Integer.parseInt(settings
-					.getString("SelectedTopic", null)));
+			Cursor cursor = postDAO.getPostsFromTopic(settings.getInt(
+					"SelectedTopic", 0));
 
 			updateList(cursor);
 			postDAO.close();
@@ -438,17 +420,18 @@ public class PostList extends ListActivity implements OnClickListener,
 			dialog = dialogMaker
 					.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
 			dialog.show();
-			String url = "discussions/"
-					+ settings.getString("SelectedTopic", null) + "/posts/"
-					+ Constants.oldDateString + "/news.json";
+			String url = "discussions/" + settings.getInt("SelectedTopic", 0)
+					+ "/posts/" + Constants.oldDateString + "/news.json";
 
 			obtainNewPosts(url);
 
 		}
 
 		if (item.getItemId() == R.id.menu_logout) {
-			adapter.open();
-			adapter.updateToken(null);
+
+			SharedPreferences.Editor editor = settings.edit();
+			editor.putString("token", null);
+			editor.commit();
 			intent = new Intent(this, Login.class);
 			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			startActivity(intent);
@@ -472,14 +455,11 @@ public class PostList extends ListActivity implements OnClickListener,
 			loadingMore = true;
 
 			requestHistoryPosts = new RequestHistoryPosts(this);
-			adapter.open();
 
-			String url = "/discussions/"
-					+ settings.getString("SelectedTopic", null) + "/posts/"
-					+ oldestPostDate + "/history.json";
-			requestHistoryPosts
-					.setConnectionParameters(url, adapter.getToken());
-			adapter.close();
+			String url = "discussions/" + settings.getInt("SelectedTopic", 0)
+					+ "/posts/" + oldestPostDate + "/history.json";
+			requestHistoryPosts.setConnectionParameters(url,
+					settings.getString("token", null));
 			requestHistoryPosts.execute();
 
 		}

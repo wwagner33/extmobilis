@@ -88,7 +88,7 @@ public abstract class ConnectionThread extends AsyncTask<Void, Void, Object[]> {
 		protected Integer doInBackground(Integer... params) {
 
 			try {
-				Thread.sleep(15000);
+				Thread.sleep(20000);
 			} catch (InterruptedException e) {
 
 				e.printStackTrace();
