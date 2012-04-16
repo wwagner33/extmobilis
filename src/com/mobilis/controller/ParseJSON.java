@@ -206,7 +206,6 @@ public class ParseJSON {
 
 			JSONObject innerObject = (JSONObject) jsonObjects[i]
 					.get("discussion_post");
-			Log.w("SINGLEOBJECT", innerObject.toJSONString());
 
 			ContentValues rowItem = new ContentValues();
 

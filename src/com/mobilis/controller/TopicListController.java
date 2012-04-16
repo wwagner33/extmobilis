@@ -11,6 +11,8 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.drawable.StateListDrawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -28,10 +30,8 @@ import android.widget.Toast;
 import com.mobilis.dialog.DialogMaker;
 import com.mobilis.model.PostDAO;
 import com.mobilis.model.TopicDAO;
-import com.mobilis.threads.RequestImagesThread;
-import com.mobilis.threads.RequestNewPostsThread;
-import com.mobilis.threads.RequestTopicsThread;
 import com.mobilis.util.ZipManager;
+import com.mobilis.ws.Connection;
 
 public class TopicListController extends ListActivity {
 
@@ -40,15 +40,15 @@ public class TopicListController extends ListActivity {
 	private String forumName;
 	private ProgressDialog dialog;
 	private SharedPreferences settings;
-	private RequestTopics requestTopics;
-	private RequestNewPosts requestNewPosts;
-	private RequestImages requestImages;
+
 	private ZipManager zipManager;
 	private DialogMaker dialogMaker;
 	private TopicDAO topicDAO;
 	private PostDAO postDAO;
 	private Cursor cursor;
 	private TopicAdapter listAdapter;
+	private TopicHandler handler;
+	private Connection connection;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +56,8 @@ public class TopicListController extends ListActivity {
 
 		setContentView(R.layout.topic);
 
+		handler = new TopicHandler();
+		connection = new Connection(handler, this);
 		jsonParser = new ParseJSON(this);
 		postDAO = new PostDAO(this);
 		topicDAO = new TopicDAO(this);
@@ -146,101 +148,20 @@ public class TopicListController extends ListActivity {
 
 	}
 
-	public void obtainNewPosts(String urlString) {
-		requestNewPosts = new RequestNewPosts(this);
-		requestNewPosts.setConnectionParameters(urlString,
+	public void obtainNewPosts(String url) {
+
+		connection.getFromServer(Constants.CONNECTION_GET_NEW_POSTS, url,
 				settings.getString("token", null));
-		requestNewPosts.execute();
 	}
 
-	public void obtainTopics(String URLString) {
-		requestTopics = new RequestTopics(this);
-		requestTopics.setConnectionParameters(URLString,
+	public void obtainTopics(String url) {
+
+		connection.getFromServer(Constants.CONNECTION_GET_TOPICS, url,
 				settings.getString("token", null));
-		requestTopics.execute();
+
 	}
 
 	public void getImages(String idPosts) {
-		requestImages = new RequestImages(this);
-		requestImages.setConnectionParameters(idPosts,
-				settings.getString("token", null));
-		requestImages.execute();
-	}
-
-	public class RequestNewPosts extends RequestNewPostsThread {
-
-		public RequestNewPosts(Context context) {
-			super(context);
-		}
-
-		@Override
-		public void onNewPostsConnectionFalied() {
-			closeDialogIfItsVisible();
-		}
-
-		@Override
-		public void onNewPostConnectionSecceded(String result) {
-
-			intent = new Intent(getApplicationContext(), PostList.class);
-
-			ArrayList<ContentValues> parsedValues = jsonParser
-					.parsePosts(result);
-			postDAO.open();
-			postDAO.addPosts(parsedValues, settings.getInt("SelectedTopic", 0));
-			postDAO.close();
-
-			startActivity(intent);
-
-		}
-	}
-
-	public class RequestTopics extends RequestTopicsThread {
-
-		public RequestTopics(Context context) {
-			super(context);
-		}
-
-		@Override
-		public void onTopicsConnectionFailed() {
-			closeDialogIfItsVisible();
-
-		}
-
-		@Override
-		public void onTopicsConnectionSucceded(String result) {
-
-			ContentValues[] values = jsonParser.parseJSON(result,
-					Constants.PARSE_TOPICS_ID);
-
-			topicDAO.open();
-			topicDAO.addTopics(values, settings.getInt("SelectedClass", 0));
-			topicDAO.close();
-			updateList();
-			closeDialogIfItsVisible();
-
-		}
-	}
-
-	public class RequestImages extends RequestImagesThread {
-
-		public RequestImages(Context context) {
-			super(context);
-		}
-
-		@Override
-		public void onRequestImagesSucceded(String result) {
-
-			zipManager.unzipFile();
-			intent = new Intent(getApplicationContext(), PostList.class);
-			startActivity(intent);
-
-		}
-
-		@Override
-		public void onRequestImagesFailed() {
-			Toast.makeText(getApplicationContext(), "Failed",
-					Toast.LENGTH_SHORT).show();
-		}
 
 	}
 
@@ -349,5 +270,46 @@ public class TopicListController extends ListActivity {
 		}
 		return true;
 
+	}
+
+	private class TopicHandler extends Handler {
+		@Override
+		public void handleMessage(Message msg) {
+			// TODO Auto-generated method stub
+			super.handleMessage(msg);
+
+			if (msg.what == Constants.MESSAGE_CONNECTION_FAILED) {
+				closeDialogIfItsVisible();
+			}
+
+			if (msg.what == Constants.MESSAGE_TOPIC_CONNECTION_OK) {
+
+				ContentValues[] values = jsonParser.parseJSON(msg.getData()
+						.getString("content"), Constants.PARSE_TOPICS_ID);
+
+				topicDAO.open();
+				topicDAO.addTopics(values, settings.getInt("SelectedClass", 0));
+				topicDAO.close();
+				updateList();
+				closeDialogIfItsVisible();
+
+			}
+
+			if (msg.what == Constants.MESSAGE_NEW_POST_CONNECTION_OK) {
+
+				intent = new Intent(getApplicationContext(), PostList.class);
+
+				ArrayList<ContentValues> parsedValues = jsonParser
+						.parsePosts(msg.getData().getString("content"));
+				postDAO.open();
+				postDAO.addPosts(parsedValues,
+						settings.getInt("SelectedTopic", 0));
+				postDAO.close();
+
+				startActivity(intent);
+
+			}
+
+		}
 	}
 }

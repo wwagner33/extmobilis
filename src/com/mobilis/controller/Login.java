@@ -1,12 +1,15 @@
 package com.mobilis.controller;
 
+import org.json.simple.JSONObject;
+
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -16,8 +19,7 @@ import android.widget.Toast;
 
 import com.mobilis.dialog.DialogMaker;
 import com.mobilis.model.CourseDAO;
-import com.mobilis.threads.RequestCoursesThread;
-import com.mobilis.threads.RequestTokenThread;
+import com.mobilis.ws.Connection;
 
 public class Login extends Activity implements OnClickListener {
 
@@ -26,17 +28,21 @@ public class Login extends Activity implements OnClickListener {
 	private Intent intent;
 	private ProgressDialog dialog;
 	private ParseJSON jsonParser;
-	private RequestToken requestToken;
-	private RequestCourses requestCourses;
 	private DialogMaker dialogMaker;
 	private CourseDAO courseDAO;
 	private SharedPreferences settings;
+
+	private Connection connection;
+	private LoginHandler handler;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.login);
+
+		handler = new LoginHandler();
+		connection = new Connection(handler, this);
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
 		jsonParser = new ParseJSON(this);
 		courseDAO = new CourseDAO(this);
@@ -59,7 +65,6 @@ public class Login extends Activity implements OnClickListener {
 
 	@Override
 	protected void onStop() {
-		// TODO Auto-generated method stub
 		super.onStop();
 		closeDialogIfItsVisible();
 	}
@@ -91,22 +96,18 @@ public class Login extends Activity implements OnClickListener {
 
 	public void requestToken() {
 
-		requestToken = new RequestToken(this);
-		jsonParser = new ParseJSON(this);
+		JSONObject jsonObject = jsonParser.buildTokenObject(login.getText()
+				.toString(), password.getText().toString());
 
-		requestToken.setConnectionParameters(jsonParser.buildTokenObject(login
-				.getText().toString(), password.getText().toString()),
-				Constants.URL_TOKEN);
-		requestToken.execute();
+		connection.postToServer(Constants.CONNECTION_POST_TOKEN,
+				jsonObject.toString(), Constants.URL_TOKEN);
 
 	}
 
 	public void getCourseList(String token) {
 
-		requestCourses = new RequestCourses(this);
-		requestCourses.setConnectionParameters(Constants.URL_COURSES,
-				settings.getString("token", null));
-		requestCourses.execute();
+		connection.getFromServer(Constants.CONNECTION_GET_COURSES,
+				Constants.URL_COURSES, settings.getString("token", null));
 
 	}
 
@@ -121,63 +122,46 @@ public class Login extends Activity implements OnClickListener {
 		startActivity(intent);
 	}
 
-	public class RequestToken extends RequestTokenThread {
-
-		public RequestToken(Context context) {
-			super(context);
-
-		}
-
+	private class LoginHandler extends Handler {
 		@Override
-		public void onTokenConnectionFailed() {
-			closeDialogIfItsVisible();
+		public void handleMessage(Message msg) {
+			// TODO Auto-generated method stub
+			super.handleMessage(msg);
 
-		}
+			if (msg.what == Constants.MESSAGE_TOKEN_CONNECTION_OK) {
 
-		@Override
-		public void onTokenConnectionSucceded(String result) {
+				jsonParser = new ParseJSON(getApplicationContext());
+				ContentValues[] tokenParsed = jsonParser.parseJSON(msg
+						.getData().getString("content"),
+						Constants.PARSE_TOKEN_ID);
+				SharedPreferences.Editor editor = settings.edit();
+				editor.putString("token", tokenParsed[0].getAsString("token"));
+				editor.commit();
 
-			jsonParser = new ParseJSON(getApplicationContext());
-			ContentValues[] tokenParsed = jsonParser.parseJSON(result,
-					Constants.PARSE_TOKEN_ID);
-			// adapter.open();
-			// adapter.updateToken(tokenParsed[0].getAsString("token"));
-			SharedPreferences.Editor editor = settings.edit();
-			editor.putString("token", tokenParsed[0].getAsString("token"));
-			editor.commit();
+				String token = settings.getString("token", null);
+				getCourseList(token);
 
-			String token = settings.getString("token", null);
-			// adapter.close();
-			getCourseList(token);
+			}
 
+			if (msg.what == Constants.MESSAGE_COURSE_CONNECTION_OK) {
+
+				ContentValues[] values = jsonParser.parseJSON(msg.getData()
+						.getString("content"), Constants.PARSE_COURSES_ID);
+				courseDAO.open();
+				courseDAO.addCourses(values);
+				courseDAO.close();
+
+				intent = new Intent(getApplicationContext(),
+						CourseListController.class);
+
+				startActivity(intent);
+
+			}
+
+			if (msg.what == Constants.MESSAGE_CONNECTION_FAILED) {
+				closeDialogIfItsVisible();
+			}
 		}
 	}
 
-	public class RequestCourses extends RequestCoursesThread {
-
-		public RequestCourses(Context context) {
-			super(context);
-
-		}
-
-		@Override
-		public void onCoursesConnectionFailed() {
-			closeDialogIfItsVisible();
-
-		}
-
-		@Override
-		public void onCoursesConnectionSucceded(String result) {
-
-			ContentValues[] values = jsonParser.parseJSON(result,
-					Constants.PARSE_COURSES_ID);
-			courseDAO.open();
-			courseDAO.addCourses(values);
-			courseDAO.close();
-
-			intent = new Intent(getApplicationContext(),
-					CourseListController.class);
-			startActivity(intent);
-		}
-	}
 }

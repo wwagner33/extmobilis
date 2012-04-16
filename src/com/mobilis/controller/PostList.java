@@ -11,6 +11,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -29,11 +31,8 @@ import android.widget.TextView;
 
 import com.mobilis.dialog.DialogMaker;
 import com.mobilis.model.PostDAO;
-import com.mobilis.threads.RequestHistoryPostsThread;
-import com.mobilis.threads.RequestImageThread;
-import com.mobilis.threads.RequestNewPostsThread;
-import com.mobilis.threads.RequestPostsThread;
 import com.mobilis.util.Time;
+import com.mobilis.ws.Connection;
 
 public class PostList extends ListActivity implements OnClickListener,
 		OnScrollListener {
@@ -49,10 +48,7 @@ public class PostList extends ListActivity implements OnClickListener,
 	private ImageView answerForum;
 	public SharedPreferences settings;
 	private Dialog dialog;
-	private RequestPosts requestPosts;
-	private RequestImage requestImage;
-	private RequestNewPosts requestNewPosts;
-	private RequestHistoryPosts requestHistoryPosts;
+
 	private boolean stopLoadingMore = false;
 	private boolean loadingMore = false;
 	private String oldestPostDate;
@@ -61,16 +57,25 @@ public class PostList extends ListActivity implements OnClickListener,
 	private PostDAO postDAO;
 	private Cursor cursor;
 
+	private PostHandler handler;
+	private Connection connection;
+
+	// private RequestImage requestImage;
+	// private RequestNewPosts requestNewPosts;
+	// private RequestHistoryPosts requestHistoryPosts;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
-		dialogMaker = new DialogMaker(this);
+		setContentView(R.layout.post);
 
+		handler = new PostHandler();
+		connection = new Connection(handler, this);
+
+		dialogMaker = new DialogMaker(this);
 		postDAO = new PostDAO(this);
 		jsonParser = new ParseJSON(this);
-
-		setContentView(R.layout.post);
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
 
 		answerForum = (ImageView) findViewById(R.id.answer_topic_image);
@@ -199,125 +204,24 @@ public class PostList extends ListActivity implements OnClickListener,
 				: false;
 	}
 
-	public void obtainPosts(String URLString) {
-		requestPosts = new RequestPosts(this);
+	public void obtainHistoryPosts(String url) {
 
-		requestPosts.setConnectionParameters(URLString,
+		connection.getFromServer(Constants.CONNECTION_GET_HISTORY_POSTS, url,
 				settings.getString("token", null));
-		requestPosts.execute();
+
 	}
 
 	public void obtainNewPosts(String url) {
-		requestNewPosts = new RequestNewPosts(this);
-		requestNewPosts.setConnectionParameters(url,
+
+		connection.getFromServer(Constants.CONNECTION_GET_NEW_POSTS, url,
 				settings.getString("token", null));
-		requestNewPosts.execute();
+
 	}
 
 	public void getImageFormServer() {
-		Log.w("InsidePullImage", "TRUE");
-		requestImage = new RequestImage(this);
-		requestImage.setConnectionParameters("images/1/users",
-				settings.getString("token", null));
-		requestImage.execute();
 
-	}
+		// images/1/users"
 
-	public class RequestImage extends RequestImageThread {
-
-		public RequestImage(Context context) {
-			super(context);
-			// TODO Auto-generated constructor stub
-		}
-
-		@Override
-		public void onRequestImageConnectionFailed() {
-
-		}
-
-		@Override
-		public void onRequestImageConnectionSucceded(String result) {
-			Log.w("RESULT_OK", "TRUE");
-
-		}
-	}
-
-	public class RequestPosts extends RequestPostsThread {
-
-		public RequestPosts(Context context) {
-			super(context);
-		}
-
-		@Override
-		public void onPostsConnectionFailed() {
-			closeDialogIfItsVisible();
-		}
-
-		@Override
-		public void onPostsConnectionSucceded(String result) {
-			updateList(result);
-			closeDialogIfItsVisible();
-		}
-
-	}
-
-	public class RequestNewPosts extends RequestNewPostsThread {
-
-		public RequestNewPosts(Context context) {
-			super(context);
-		}
-
-		@Override
-		public void onNewPostsConnectionFalied() {
-			closeDialogIfItsVisible();
-		}
-
-		@Override
-		public void onNewPostConnectionSecceded(String result) {
-
-			postDAO.open();
-			postDAO.addPosts(jsonParser.parsePosts(result),
-					settings.getInt("SelectedTopic", 0));
-
-			Cursor cursor = postDAO.getPostsFromTopic(settings.getInt(
-					"SelectedTopic", 0));
-
-			updateList(cursor);
-			postDAO.close();
-
-			loadingMore = false;
-			stopLoadingMore = false;
-			closeDialogIfItsVisible();
-		}
-	}
-
-	public class RequestHistoryPosts extends RequestHistoryPostsThread {
-
-		public RequestHistoryPosts(Context context) {
-			super(context);
-			// TODO Auto-generated constructor stub
-		}
-
-		@Override
-		public void onRequestHistoryPostsConnectionFailed() {
-			// edit footer maybe
-		}
-
-		@Override
-		public void onRequestHistoryPostsConnectionSucceded(String result) {
-			ArrayList<ContentValues> temp = jsonParser.parsePosts(result);
-			parsedValues.addAll(temp);
-			if (parsedValues.size() % 20 != 0) {
-
-				getListView().removeFooterView(footerView);
-				stopLoadingMore = true;
-				loadingMore = true;
-			}
-			forceListToRedraw = false;
-			listAdapter.notifyDataSetChanged();
-			loadingMore = false;
-			forceListToRedraw = true;
-		}
 	}
 
 	public class PostAdapter extends BaseAdapter {
@@ -454,13 +358,9 @@ public class PostList extends ListActivity implements OnClickListener,
 				&& getListView().getCount() >= 20 && !stopLoadingMore) {
 			loadingMore = true;
 
-			requestHistoryPosts = new RequestHistoryPosts(this);
-
 			String url = "discussions/" + settings.getInt("SelectedTopic", 0)
 					+ "/posts/" + oldestPostDate + "/history.json";
-			requestHistoryPosts.setConnectionParameters(url,
-					settings.getString("token", null));
-			requestHistoryPosts.execute();
+			obtainHistoryPosts(url);
 
 		}
 	}
@@ -468,6 +368,55 @@ public class PostList extends ListActivity implements OnClickListener,
 	@Override
 	public void onScrollStateChanged(AbsListView view, int scrollState) {
 		// Nothing here
+	}
+
+	private class PostHandler extends Handler {
+		@Override
+		public void handleMessage(Message msg) {
+			// TODO Auto-generated method stub
+			super.handleMessage(msg);
+
+			if (msg.what == Constants.MESSAGE_CONNECTION_FAILED) {
+				closeDialogIfItsVisible();
+			}
+
+			if (msg.what == Constants.MESSAGE_NEW_POST_CONNECTION_OK) {
+
+				postDAO.open();
+				postDAO.addPosts(jsonParser.parsePosts(msg.getData().getString(
+						"content")), settings.getInt("SelectedTopic", 0));
+
+				Cursor cursor = postDAO.getPostsFromTopic(settings.getInt(
+						"SelectedTopic", 0));
+
+				updateList(cursor);
+				postDAO.close();
+
+				loadingMore = false;
+				stopLoadingMore = false;
+				closeDialogIfItsVisible();
+
+			}
+
+			if (msg.what == Constants.MESSAGE_HISTORY_POST_CONNECTION_OK) {
+
+				ArrayList<ContentValues> temp = jsonParser.parsePosts(msg
+						.getData().getString("content"));
+				parsedValues.addAll(temp);
+				if (parsedValues.size() % 20 != 0) {
+
+					getListView().removeFooterView(footerView);
+					stopLoadingMore = true;
+					loadingMore = true;
+				}
+				forceListToRedraw = false;
+				listAdapter.notifyDataSetChanged();
+				loadingMore = false;
+				forceListToRedraw = true;
+
+			}
+
+		}
 	}
 
 }

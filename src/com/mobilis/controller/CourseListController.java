@@ -8,6 +8,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,33 +21,37 @@ import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.mobilis.dialog.DialogMaker;
 import com.mobilis.model.ClassDAO;
 import com.mobilis.model.CourseDAO;
-import com.mobilis.threads.RequestCoursesThread;
-import com.mobilis.threads.RequestCurriculumUnitsThread;
+import com.mobilis.ws.Connection;
 
 public class CourseListController extends ListActivity {
 
 	private Intent intent;
 	private ParseJSON jsonParser;
 	private ProgressDialog dialog;
-	private RequestCurriculumUnits requestCurriculumUnits;
-	private RequestCourses requestCourses;
+
 	private SharedPreferences settings;
 	private DialogMaker dialogMaker;
 	private LayoutInflater inflater;
-	private CourseListAdapter2 listAdapter;
+	private CourseListAdapter listAdapter;
 	private CourseDAO courseDAO;
 	private Cursor cursor;
 	private ClassDAO classDAO;
+
+	private Connection connection;
+	private CourseHandler handler;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.course);
+		handler = new CourseHandler();
+		connection = new Connection(handler, this);
 		courseDAO = new CourseDAO(this);
 		classDAO = new ClassDAO(this);
 		dialogMaker = new DialogMaker(this);
@@ -92,7 +98,7 @@ public class CourseListController extends ListActivity {
 		courseDAO.open();
 		cursor = courseDAO.getAllCourses();
 		courseDAO.close();
-		listAdapter = new CourseListAdapter2(this, cursor);
+		listAdapter = new CourseListAdapter(this, cursor);
 		setListAdapter(listAdapter);
 	}
 
@@ -102,7 +108,6 @@ public class CourseListController extends ListActivity {
 		super.onListItemClick(l, v, position, id);
 
 		Object courseItem = l.getAdapter().getItem(position);
-		// courseId = String.valueOf(courseItem);
 		int courseId = (Integer) courseItem;
 
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
@@ -130,83 +135,23 @@ public class CourseListController extends ListActivity {
 		}
 	}
 
-	public void obtainCurriculumUnits(String URLString) {
+	public void obtainCurriculumUnits(String url) {
 
-		requestCurriculumUnits = new RequestCurriculumUnits(this);
-		requestCurriculumUnits.setConnectionParameters(URLString,
+		connection.getFromServer(Constants.CONNECTION_GET_CLASSES, url,
 				settings.getString("token", null));
-		requestCurriculumUnits.execute();
 
 	}
 
-	public void obtainCourses(String URLString) {
-		requestCourses = new RequestCourses(this);
-		requestCourses.setConnectionParameters(URLString,
-				settings.getString("token", null));
-		requestCourses.execute();
+	public void obtainCourses(String url) {
+
+		connection.getFromServer(Constants.CONNECTION_GET_COURSES,
+				Constants.URL_COURSES, settings.getString("token", null));
+
 	}
 
-	public class RequestCurriculumUnits extends RequestCurriculumUnitsThread {
+	private class CourseListAdapter extends CursorAdapter {
 
-		public RequestCurriculumUnits(Context context) {
-			super(context);
-
-		}
-
-		@Override
-		public void onCurriculumUnitsConnectionFailed() {
-			closeDialogIfItsVisible();
-
-		}
-
-		@Override
-		public void onCurriculumUnitsConnectionSuccedded(String result) {
-
-			Log.i("RESULT", result);
-
-			ContentValues[] values = jsonParser.parseJSON(result,
-					Constants.PARSE_CLASSES_ID);
-
-			classDAO.open();
-
-			classDAO.addClasses(values, settings.getInt("SelectedCourse", 0));
-			classDAO.close();
-
-			intent = new Intent(getApplicationContext(),
-					ClassListController.class);
-			startActivity(intent);
-
-		}
-	}
-
-	public class RequestCourses extends RequestCoursesThread {
-
-		public RequestCourses(Context context) {
-			super(context);
-		}
-
-		@Override
-		public void onCoursesConnectionFailed() {
-			closeDialogIfItsVisible();
-		}
-
-		@Override
-		public void onCoursesConnectionSucceded(String result) {
-
-			ContentValues[] values = jsonParser.parseJSON(result,
-					Constants.PARSE_COURSES_ID);
-
-			courseDAO.open();
-			courseDAO.addCourses(values);
-			courseDAO.close();
-			updateList();
-			closeDialogIfItsVisible();
-		}
-	}
-
-	public class CourseListAdapter2 extends CursorAdapter {
-
-		public CourseListAdapter2(Context context, Cursor c) {
+		public CourseListAdapter(Context context, Cursor c) {
 			super(context, c);
 			inflater = LayoutInflater.from(context);
 		}
@@ -265,5 +210,47 @@ public class CourseListController extends ListActivity {
 			startActivity(intent);
 		}
 		return true;
+	}
+
+	private class CourseHandler extends Handler {
+		@Override
+		public void handleMessage(Message msg) {
+			// TODO Auto-generated method stub
+			super.handleMessage(msg);
+
+			if (msg.what == Constants.MESSAGE_COURSE_CONNECTION_OK) {
+
+				ContentValues[] values = jsonParser.parseJSON(msg.getData()
+						.getString("content"), Constants.PARSE_COURSES_ID);
+				courseDAO.open();
+				courseDAO.addCourses(values);
+				courseDAO.close();
+				updateList();
+				closeDialogIfItsVisible();
+
+			}
+
+			if (msg.what == Constants.MESSAGE_CLASS_CONNECTION_OK) {
+
+				Log.i("RESULT", msg.getData().getString("content"));
+
+				ContentValues[] values = jsonParser.parseJSON(msg.getData()
+						.getString("content"), Constants.PARSE_CLASSES_ID);
+
+				classDAO.open();
+
+				classDAO.addClasses(values,
+						settings.getInt("SelectedCourse", 0));
+				classDAO.close();
+
+				intent = new Intent(getApplicationContext(),
+						ClassListController.class);
+				startActivity(intent);
+			}
+
+			if (msg.what == Constants.MESSAGE_CONNECTION_FAILED) {
+				closeDialogIfItsVisible();
+			}
+		}
 	}
 }

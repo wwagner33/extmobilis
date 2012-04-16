@@ -10,7 +10,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
@@ -19,6 +18,8 @@ import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaRecorder;
 import android.media.MediaRecorder.OnInfoListener;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -40,10 +41,7 @@ import com.mobilis.audio.AudioRecorder;
 import com.mobilis.dialog.AudioDialog;
 import com.mobilis.dialog.DialogMaker;
 import com.mobilis.model.PostDAO;
-import com.mobilis.threads.RequestNewPostsThread;
-import com.mobilis.threads.RequestPostsThread;
-import com.mobilis.threads.SubmitAudioResponseThread;
-import com.mobilis.threads.SubmitTextResponseThread;
+import com.mobilis.ws.Connection;
 
 public class ResponseController extends Activity implements OnClickListener,
 		OnChronometerTickListener, OnCompletionListener, TextWatcher,
@@ -54,16 +52,10 @@ public class ResponseController extends Activity implements OnClickListener,
 	private TextView timeUp, charCount;
 	private ImageButton record;
 	private ProgressDialog dialog;
-	private Bundle extras;
-	private SubmitTextResponse submitTextResponse;
-	private String token, URL, topicId, forumName;
 	private ParseJSON jsonParser;
 	private Intent intent;
 	private JSONObject postObject;
-	private SubmitAudio submitAudio;
-	private RequestPosts requestPosts;
 	private boolean existsRecording = false;
-	private RequestNewPosts requestNewPosts;
 	public SharedPreferences settings;
 	private String charSequenceAfter;
 	private DialogMaker dialogMaker;
@@ -76,7 +68,8 @@ public class ResponseController extends Activity implements OnClickListener,
 	float toastTimer = 0;
 	private PostDAO postDAO;
 
-	ResponseControllerHandler handler;
+	private ResponseHandler handler;
+	private Connection connection;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -84,13 +77,13 @@ public class ResponseController extends Activity implements OnClickListener,
 
 		setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
-		handler = new ResponseControllerHandler(this);
+		// handler = new ResponseControllerHandler(this);
+		handler = new ResponseHandler();
+		connection = new Connection(handler, this);
+
 		dialogMaker = new DialogMaker(this);
-
 		postDAO = new PostDAO(this);
-
 		setContentView(R.layout.response);
-		extras = getIntent().getExtras();
 		dialog = dialogMaker
 				.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
 		submit = (Button) findViewById(R.id.criar_topico_submit);
@@ -268,161 +261,28 @@ public class ResponseController extends Activity implements OnClickListener,
 
 	public void sendPost(String jsonString) {
 		dialog.show();
-		token = settings.getString("token", null);
+		String token = settings.getString("token", null);
 
-		URL = "discussions/" + settings.getInt("SelectedTopic", 0)
+		String url = "discussions/" + settings.getInt("SelectedTopic", 0)
 				+ "/posts?auth_token=" + token;
 
-		submitTextResponse = new SubmitTextResponse(this);
-		submitTextResponse.setConnectionParameters(URL, jsonString);
-		submitTextResponse.execute();
+		connection.postToServer(Constants.CONNECTION_POST_TEXT_RESPONSE,
+				jsonString, url);
 
 	}
 
-	public void getPosts(String URLString) {
+	public void getNewPosts(String url) {
 
-		requestPosts = new RequestPosts(this);
-		requestPosts.setConnectionParameters(URLString,
+		connection.getFromServer(Constants.CONNECTION_GET_NEW_POSTS, url,
 				settings.getString("token", null));
-		requestPosts.execute();
 
 	}
 
-	public void getNewPosts(String urlString) {
-		requestNewPosts = new RequestNewPosts(this);
-		requestNewPosts.setConnectionParameters(urlString,
-				settings.getString("token", null));
-		requestNewPosts.execute();
-	}
+	public void sendAudioPost(String url, File audioFile) {
 
-	public void sendAudioPost(String URLString, File audioFile) {
-		Log.w("ONSENDINGAUDIO", "TRUE");
-		submitAudio = new SubmitAudio(this);
-		submitAudio.setConnectionParameters(URLString, audioFile);
-		submitAudio.execute();
+		connection
+				.postToServer(Constants.CONNECTION_POST_AUDIO, url, audioFile);
 
-	}
-
-	public class SubmitTextResponse extends SubmitTextResponseThread {
-
-		public SubmitTextResponse(Context context) {
-			super(context);
-
-		}
-
-		@Override
-		public void onTextResponseConnectionFailed() {
-			closeDialogIfItsVisible();
-		}
-
-		@Override
-		public void onTextResponseConnectionSucceded(String result) {
-
-			Log.w("RESULT", result);
-
-			ContentValues[] resultFromServer;
-			jsonParser = new ParseJSON(getApplicationContext());
-
-			resultFromServer = jsonParser.parseJSON(result,
-					Constants.PARSE_TEXT_RESPONSE_ID);
-			Log.w("RESULTNEW",
-					String.valueOf(resultFromServer[0].get("result")));
-			Log.w("POST_IDNEW",
-					String.valueOf(resultFromServer[0].get("post_id")));
-
-			if (existsRecording) {
-
-				String postURL = "posts/"
-						+ String.valueOf(resultFromServer[0].get("post_id"))
-						+ "/attach_file?auth_token="
-						+ settings.getString("token", null);
-				Log.w("PostURL", postURL);
-				sendAudioPost(postURL, recorder.getAudioFile());
-
-			} else {
-				Log.w("getPosts", "TRUE");
-
-				getNewPosts("discussions/"
-						+ settings.getInt("SelectedTopic", 0) + "/posts/"
-						+ Constants.oldDateString + "/news.json");
-			}
-		}
-	}
-
-	public class SubmitAudio extends SubmitAudioResponseThread {
-
-		public SubmitAudio(Context context) {
-			super(context);
-
-		}
-
-		@Override
-		public void onAudioResponseConnectionFailed() {
-			closeDialogIfItsVisible();
-
-		}
-
-		@Override
-		public void onAudioResponseConnectionSucceded(String result) {
-			getNewPosts("discussions/" + settings.getInt("SelectedTopic", 0)
-					+ "/posts/" + Constants.oldDateString + "/news.json");
-			closeDialogIfItsVisible();
-
-		}
-
-	}
-
-	public class RequestNewPosts extends RequestNewPostsThread {
-
-		public RequestNewPosts(Context context) {
-			super(context);
-		}
-
-		@Override
-		public void onNewPostsConnectionFalied() {
-			closeDialogIfItsVisible();
-		}
-
-		@Override
-		public void onNewPostConnectionSecceded(String result) {
-
-			ArrayList<ContentValues> values = jsonParser.parsePosts(result);
-
-			postDAO.open();
-			postDAO.addPosts(values, settings.getInt("SelectedTopic", 0));
-			postDAO.close();
-
-			intent = new Intent(getApplicationContext(), PostList.class);
-			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			startActivity(intent);
-		}
-
-	}
-
-	public class RequestPosts extends RequestPostsThread {
-
-		public RequestPosts(Context context) {
-			super(context);
-
-		}
-
-		@Override
-		public void onPostsConnectionFailed() {
-			closeDialogIfItsVisible();
-
-		}
-
-		@Override
-		public void onPostsConnectionSucceded(String result) {
-			intent = new Intent(getApplicationContext(), PostList.class);
-			intent.putExtra("ForumName", forumName);
-			intent.putExtra("PostList", (String) result);
-			intent.putExtra("topicId", topicId);
-			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			intent.putExtra("TESTE", "TESTE");
-			startActivity(intent);
-
-		}
 	}
 
 	@Override
@@ -511,4 +371,89 @@ public class ResponseController extends Activity implements OnClickListener,
 	public void onInfo(MediaRecorder mr, int what, int extra) {
 	}
 
+	private class ResponseHandler extends Handler {
+
+		@Override
+		public void handleMessage(Message msg) {
+			super.handleMessage(msg);
+
+			if (msg.what == Constants.DIALOG_ALERT_POSITIVE_BUTTON_CLICKED) {
+				Toast.makeText(getApplicationContext(), "Mensagem descartada",
+						Toast.LENGTH_SHORT).show();
+				finish();
+			}
+
+			if (msg.what == Constants.DIALOG_ALERT_NEGATIVE_BUTTON_CLICKED) {
+				Toast.makeText(getApplicationContext(), "onHandlerNegative",
+						Toast.LENGTH_SHORT).show();
+
+			}
+
+			if (msg.what == Constants.DIALOG_DELETE_AREA_CLICKED) {
+				deleteRecording();
+			}
+
+			if (msg.what == Constants.MESSAGE_CONNECTION_FAILED) {
+				closeDialogIfItsVisible();
+			}
+
+			if (msg.what == Constants.MESSAGE_TEXT_RESPONSE_OK) {
+
+				Log.w("RESULT", msg.getData().getString("content"));
+
+				ContentValues[] resultFromServer;
+				jsonParser = new ParseJSON(getApplicationContext());
+
+				resultFromServer = jsonParser
+						.parseJSON(msg.getData().getString("content"),
+								Constants.PARSE_TEXT_RESPONSE_ID);
+				Log.w("RESULTNEW",
+						String.valueOf(resultFromServer[0].get("result")));
+				Log.w("POST_IDNEW",
+						String.valueOf(resultFromServer[0].get("post_id")));
+
+				if (existsRecording) {
+
+					String postURL = "posts/"
+							+ String.valueOf(resultFromServer[0].get("post_id"))
+							+ "/attach_file?auth_token="
+							+ settings.getString("token", null);
+					Log.w("PostURL", postURL);
+					sendAudioPost(postURL, recorder.getAudioFile());
+
+				} else {
+					Log.w("getPosts", "TRUE");
+
+					getNewPosts("discussions/"
+							+ settings.getInt("SelectedTopic", 0) + "/posts/"
+							+ Constants.oldDateString + "/news.json");
+				}
+
+			}
+
+			if (msg.what == Constants.MESSAGE_AUDIO_POST_OK) {
+
+				getNewPosts("discussions/"
+						+ settings.getInt("SelectedTopic", 0) + "/posts/"
+						+ Constants.oldDateString + "/news.json");
+				closeDialogIfItsVisible();
+
+			}
+
+			if (msg.what == Constants.MESSAGE_NEW_POST_CONNECTION_OK) {
+
+				ArrayList<ContentValues> values = jsonParser.parsePosts(msg
+						.getData().getString("content"));
+
+				postDAO.open();
+				postDAO.addPosts(values, settings.getInt("SelectedTopic", 0));
+				postDAO.close();
+
+				intent = new Intent(getApplicationContext(), PostList.class);
+				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				startActivity(intent);
+
+			}
+		}
+	}
 }
