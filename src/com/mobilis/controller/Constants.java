@@ -106,5 +106,6 @@ public class Constants {
 	public static final int MESSAGE_HISTORY_POST_CONNECTION_OK = 707;
 	public static final int MESSAGE_AUDIO_POST_OK = 708;
 	public static final int MESSAGE_TEXT_RESPONSE_OK = 709;
+	public static final int MESSAGE_IMAGE_CONNECION_FAILED = 710;
 
 }

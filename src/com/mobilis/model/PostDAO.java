@@ -1,11 +1,15 @@
 package com.mobilis.model;
 
+import java.io.File;
+import java.io.FilenameFilter;
 import java.util.ArrayList;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.util.Log;
+
+import com.mobilis.controller.Constants;
 
 public class PostDAO extends DBAdapter {
 
@@ -24,9 +28,10 @@ public class PostDAO extends DBAdapter {
 	}
 
 	public int getPostCount(int topic_id) {
-		Cursor cursor = getDatabase().rawQuery(
-				"SELECT count(_id) FROM posts WHERE discussion_id= " + topic_id,
-				null);
+		Cursor cursor = getDatabase()
+				.rawQuery(
+						"SELECT count(_id) FROM posts WHERE discussion_id= "
+								+ topic_id, null);
 		cursor.moveToFirst();
 		int count = cursor.getInt(0);
 		cursor.close();
@@ -106,4 +111,49 @@ public class PostDAO extends DBAdapter {
 		return values;
 	}
 
+	public String getAllUserIds() {
+		Cursor cursor = getDatabase().rawQuery(
+				"SELECT DISTINCT user_id FROM posts", null);
+		StringBuilder builder = new StringBuilder();
+		cursor.moveToFirst();
+
+		do {
+			builder.append(cursor.getInt(cursor.getColumnIndex("user_id")));
+			if (!cursor.isLast()) {
+				builder.append(",");
+			}
+		} while
+
+		(cursor.moveToNext());
+
+		String result = builder.toString();
+		cursor.close();
+		return result;
+	}
+
+	public String getUserIdsAbsentImage() {
+		StringBuilder builder = new StringBuilder();
+		File imageDirectory = new File(Constants.PATH_IMAGES);
+		File[] images = imageDirectory.listFiles();
+		Cursor cursor = getDatabase().rawQuery(
+				"SELECT DISTINCT user_id FROM posts", null);
+		cursor.moveToFirst();
+
+		do {
+			for (int i = 0; i < cursor.getCount(); i++) {
+				for (int y = 0; y < images.length; y++) {
+					if (cursor.getInt(cursor.getColumnIndex("user_id")) == Integer
+							.parseInt(images[i].getName().replace(".png", ""))) {
+						builder.append(cursor.getInt(cursor
+								.getColumnIndex("user_id")));
+						if (!cursor.isLast()) {
+							builder.append(",");
+						}
+					}
+				}
+			}
+		} while (cursor.moveToNext());
+		cursor.close();
+		return builder.toString();
+	}
 }

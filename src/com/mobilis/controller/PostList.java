@@ -402,6 +402,7 @@ public class PostList extends ListActivity implements OnClickListener,
 
 				ArrayList<ContentValues> temp = jsonParser.parsePosts(msg
 						.getData().getString("content"));
+				oldestPostDate = temp.get(temp.size()-1).getAsString("updated");
 				parsedValues.addAll(temp);
 				if (parsedValues.size() % 20 != 0) {
 

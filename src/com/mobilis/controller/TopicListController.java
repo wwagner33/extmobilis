@@ -1,5 +1,6 @@
 package com.mobilis.controller;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import android.app.ListActivity;
@@ -161,7 +162,10 @@ public class TopicListController extends ListActivity {
 
 	}
 
-	public void getImages(String idPosts) {
+	public void getImages(String url) {
+
+		connection.getImages(Constants.CONNECTION_GET_IMAGES, url,
+				settings.getString("token", null));
 
 	}
 
@@ -304,12 +308,47 @@ public class TopicListController extends ListActivity {
 				postDAO.open();
 				postDAO.addPosts(parsedValues,
 						settings.getInt("SelectedTopic", 0));
-				postDAO.close();
 
-				startActivity(intent);
+				File file = new File(Constants.PATH_IMAGES);
+
+				if (file.exists()) {
+
+					if (file.list().length > 0) {
+
+						String ids = postDAO.getUserIdsAbsentImage();
+
+						if (ids != null) {
+							getImages("images/" + ids + "/users");
+						}
+
+						else {
+							startActivity(intent);
+						}
+					}
+				}
+
+				else {
+					String ids = postDAO.getAllUserIds();
+					postDAO.close();
+					getImages("images/" + ids + "/users");
+				}
+
+				// postDAO.close();
+				// startActivity(intent);
 
 			}
+			if (msg.what == Constants.MESSAGE_IMAGE_CONNECTION_OK) {
 
+				zipManager.unzipFile();
+				intent = new Intent(getApplicationContext(), PostList.class);
+				startActivity(intent);
+			}
+			if (msg.what == Constants.MESSAGE_IMAGE_CONNECION_FAILED) {
+				Toast.makeText(getApplicationContext(), "Images Failed",
+						Toast.LENGTH_SHORT).show();
+				intent = new Intent(getApplicationContext(), PostList.class);
+				startActivity(intent);
+			}
 		}
 	}
 }

@@ -88,7 +88,12 @@ public class Connection {
 		startConnection();
 	}
 
-	public void getImageFromServer() {
+	public void getImages(int connectionId, String url, String token) {
+		connectionType = Constants.TYPE_CONNECTION_GET;
+		this.connectionId = connectionId;
+		this.url = url;
+		startConnection();
+
 	}
 
 	private void sendPositiveMessage(String result) {
@@ -125,6 +130,9 @@ public class Connection {
 		if (connectionId == Constants.CONNECTION_POST_TEXT_RESPONSE) {
 			message.what = Constants.MESSAGE_TEXT_RESPONSE_OK;
 		}
+		if (connectionId == Constants.CONNECTION_GET_IMAGES) {
+			message.what = Constants.MESSAGE_IMAGE_CONNECTION_OK;
+		}
 
 		bundle.putString("content", result);
 		message.setData(bundle);
@@ -132,7 +140,11 @@ public class Connection {
 	}
 
 	private void sendNegativeMessage() {
-		handler.sendEmptyMessage(Constants.MESSAGE_CONNECTION_FAILED);
+
+		if (connectionId == Constants.CONNECTION_GET_IMAGES) {
+			handler.sendEmptyMessage(Constants.MESSAGE_IMAGE_CONNECION_FAILED);
+		} else
+			handler.sendEmptyMessage(Constants.MESSAGE_CONNECTION_FAILED);
 	}
 
 	private Object[] executeGet(String URL, String authToken)
@@ -296,7 +308,7 @@ public class Connection {
 
 	}
 
-	public Object[] getZippedImages(String url, String token)
+	private Object[] getZippedImages(String url, String token)
 			throws ClientProtocolException, IOException {
 
 		Object[] resultSet = new Object[2];

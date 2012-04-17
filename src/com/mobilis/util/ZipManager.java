@@ -72,6 +72,8 @@ public class ZipManager {
 
 			}
 
+			file.delete();
+
 		} catch (ZipException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
