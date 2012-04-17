@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
 
+import org.apache.commons.io.FilenameUtils;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -143,7 +145,8 @@ public class PostDAO extends DBAdapter {
 			for (int i = 0; i < cursor.getCount(); i++) {
 				for (int y = 0; y < images.length; y++) {
 					if (cursor.getInt(cursor.getColumnIndex("user_id")) == Integer
-							.parseInt(images[i].getName().replace(".png", ""))) {
+							.parseInt(FilenameUtils.removeExtension(images[i]
+									.getName()))) {
 						builder.append(cursor.getInt(cursor
 								.getColumnIndex("user_id")));
 						if (!cursor.isLast()) {

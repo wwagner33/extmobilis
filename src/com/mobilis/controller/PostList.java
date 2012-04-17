@@ -1,5 +1,7 @@
 package com.mobilis.controller;
 
+import java.io.File;
+import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -10,6 +12,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -35,7 +39,7 @@ import com.mobilis.util.Time;
 import com.mobilis.ws.Connection;
 
 public class PostList extends ListActivity implements OnClickListener,
-		OnScrollListener {
+		OnScrollListener, FilenameFilter {
 
 	private boolean forceListToRedraw = true;
 	private static final long noParentId = 0;
@@ -48,6 +52,8 @@ public class PostList extends ListActivity implements OnClickListener,
 	private ImageView answerForum;
 	public SharedPreferences settings;
 	private Dialog dialog;
+
+	private String prefix;
 
 	private boolean stopLoadingMore = false;
 	private boolean loadingMore = false;
@@ -283,6 +289,31 @@ public class PostList extends ListActivity implements OnClickListener,
 					Log.w("POSTED TODAY", "FALSE");
 				}
 
+				prefix = String.valueOf(data.get(position).getAsInteger(
+						"user_id"));
+
+				File file = new File(Constants.PATH_IMAGES);
+
+				File[] image = file.listFiles(new FilenameFilter() {
+
+					@Override
+					public boolean accept(File dir, String filename) {
+						// TODO Auto-generated method stub
+						return filename.startsWith(prefix);
+					}
+				});
+
+				if (image.length == 1) {
+
+					ImageView avatar = (ImageView) convertView
+							.findViewById(R.id.avatar);
+
+					Bitmap myBitmap = BitmapFactory.decodeFile(image[0]
+							.getAbsolutePath());
+
+					avatar.setImageBitmap(myBitmap);
+				}
+
 				TextView postBody = (TextView) convertView
 						.findViewById(R.id.post_body);
 				postBody.setText(data.get(position)
@@ -402,7 +433,8 @@ public class PostList extends ListActivity implements OnClickListener,
 
 				ArrayList<ContentValues> temp = jsonParser.parsePosts(msg
 						.getData().getString("content"));
-				oldestPostDate = temp.get(temp.size()-1).getAsString("updated");
+				oldestPostDate = temp.get(temp.size() - 1).getAsString(
+						"updated");
 				parsedValues.addAll(temp);
 				if (parsedValues.size() % 20 != 0) {
 
@@ -416,8 +448,11 @@ public class PostList extends ListActivity implements OnClickListener,
 				forceListToRedraw = true;
 
 			}
-
 		}
 	}
 
+	@Override
+	public boolean accept(File dir, String filename) {
+		return filename.startsWith(prefix);
+	}
 }
