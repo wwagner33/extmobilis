@@ -134,38 +134,37 @@ public class ParseJSON {
 			JSONObject jsonObjects[] = new JSONObject[jsonArray.size()];
 
 			parsedValues = new ContentValues[jsonArray.size()];
+			Log.i("jsonArray", String.valueOf(jsonArray.size()));
 
 			for (int i = 0; i < jsonArray.size(); i++) {
 
 				jsonObjects[i] = (JSONObject) jsonArray.get(i);
 
-				Log.w("Object", jsonObjects[i].toJSONString());
-
-				JSONObject innerObject = (JSONObject) jsonObjects[i]
-						.get("discussion");
-
 				parsedValues[i] = new ContentValues();
 
 				parsedValues[i].put("allocation_tag_id",
-						(Long) innerObject.get("allocation_tag_id"));
+						(Long) jsonObjects[i].get("allocation_tag_id"));
 
 				parsedValues[i].put("description",
-						(String) innerObject.get("description"));
+						(String) jsonObjects[i].get("description"));
 
-				parsedValues[i].put("_id", (Long) innerObject.get("id"));
+				parsedValues[i].put("_id",
+						Long.parseLong((String) jsonObjects[i].get("id")));
 
-				parsedValues[i].put("name", (String) innerObject.get("name"));
+				parsedValues[i]
+						.put("name", (String) jsonObjects[i].get("name"));
 
 				parsedValues[i].put("schedule_id",
-						(Long) innerObject.get("schedule_id"));
+						(Long) jsonObjects[i].get("schedule_id"));
 
 				parsedValues[i].put("closed",
-						(String) innerObject.get("closed"));
+						(String) jsonObjects[i].get("closed"));
 
 				parsedValues[i].put("last_post_date",
-						(String) innerObject.get("last_post_date"));
+						(String) jsonObjects[i].get("last_post_date"));
 
 			}
+
 			return parsedValues;
 
 		}
@@ -198,19 +197,21 @@ public class ParseJSON {
 
 		parsedPostValues = new ArrayList<ContentValues>();
 
+		Log.i("JsonArray", String.valueOf(jsonArray.size()));
+
 		for (int i = 0; i < jsonArray.size(); i++) {
 
 			jsonObjects[i] = (JSONObject) jsonArray.get(i);
 
 			Log.w("Object", jsonObjects[i].toJSONString());
 
-			JSONObject innerObject = (JSONObject) jsonObjects[i]
-					.get("discussion_post");
+			// JSONObject innerObject = (JSONObject) jsonObjects[i]
+			// .get("discussion_post");
 
 			ContentValues rowItem = new ContentValues();
 
-			String contentFirst = (String) innerObject.get("content_first");
-			String contentLast = (String) innerObject.get("content_last");
+			String contentFirst = (String) jsonObjects[i].get("content_first");
+			String contentLast = (String) jsonObjects[i].get("content_last");
 
 			if (contentFirst != null) {
 				Spanned markUpFirst = Html.fromHtml(contentFirst);
@@ -226,16 +227,25 @@ public class ParseJSON {
 				rowItem.put("content_last", "");
 			}
 
-			rowItem.put("discussion_id",
-					(Long) innerObject.get("discussion_id"));
-			rowItem.put("_id", (Long) innerObject.get("id"));
+			rowItem.put("discussion_id", Long.parseLong((String) jsonObjects[i]
+					.get("discussion_id")));
+			rowItem.put("_id",
+					Long.parseLong((String) jsonObjects[i].get("id")));
 
-			rowItem.put("parent_id", (Long) innerObject.get("parent_id"));
-			rowItem.put("user_id", (Long) innerObject.get("user_id"));
-			rowItem.put("profile_id", (Long) innerObject.get("profile_id"));
-			rowItem.put("user_nick", (String) innerObject.get("user_nick"));
-			rowItem.put("updated", (String) innerObject.get("updated"));
-			parseDate(rowItem, (String) innerObject.get("updated"), i);
+			if ((String) jsonObjects[i].get("parent_id") != null) {
+				rowItem.put("parent_id", Long.parseLong((String) jsonObjects[i]
+						.get("parent_id")));
+			} else {
+				rowItem.putNull("parent_id");
+			}
+
+			rowItem.put("user_id",
+					Long.parseLong((String) jsonObjects[i].get("user_id")));
+			rowItem.put("profile_id",
+					Long.parseLong((String) jsonObjects[i].get("profile_id")));
+			rowItem.put("user_nick", (String) jsonObjects[i].get("user_nick"));
+			rowItem.put("updated", (String) jsonObjects[i].get("updated"));
+			parseDate(rowItem, (String) jsonObjects[i].get("updated"), i);
 			parsedPostValues.add(rowItem);
 		}
 
