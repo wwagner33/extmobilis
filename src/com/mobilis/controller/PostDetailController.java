@@ -3,10 +3,10 @@ package com.mobilis.controller;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.method.ScrollingMovementMethod;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
@@ -16,7 +16,7 @@ public class PostDetailController extends Activity implements OnClickListener {
 
 	private TextView body, userName, forumName;
 	private Bundle extras;
-	private ImageView response;
+	private ImageView response, avatar;
 	private String topicId;
 	private long parentId;
 	private SharedPreferences settings;
@@ -37,6 +37,8 @@ public class PostDetailController extends Activity implements OnClickListener {
 			response.setVisibility(View.GONE);
 		}
 
+		avatar = (ImageView) findViewById(R.id.avatar);
+
 		extras = getIntent().getExtras();
 		if (extras != null) {
 			body.setText(extras.getString("content"));
@@ -44,6 +46,9 @@ public class PostDetailController extends Activity implements OnClickListener {
 			userName.setText(extras.getString("username"));
 			topicId = extras.getString("topicId");
 			parentId = extras.getLong("parentId");
+			if (extras.get("image") != null) {
+				avatar.setImageBitmap((Bitmap) extras.get("image"));
+			}
 			// Log.w("ParentId on DETAILS", String.valueOf(parentId));
 		}
 

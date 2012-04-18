@@ -66,6 +66,8 @@ public class PostList extends ListActivity implements OnClickListener,
 	private PostHandler handler;
 	private Connection connection;
 
+	private Bitmap userImage = null;
+
 	// private RequestImage requestImage;
 	// private RequestNewPosts requestNewPosts;
 	// private RequestHistoryPosts requestHistoryPosts;
@@ -149,6 +151,9 @@ public class PostList extends ListActivity implements OnClickListener,
 			intent.putExtra("content", listValue.getAsString("content_first")
 					+ listValue.getAsString("content_last"));
 		}
+
+		if (userImage != null)
+			intent.putExtra("image", userImage);
 
 		intent.putExtra("topicId", settings.getInt("SelectedTopic", 0));
 
@@ -308,10 +313,11 @@ public class PostList extends ListActivity implements OnClickListener,
 					ImageView avatar = (ImageView) convertView
 							.findViewById(R.id.avatar);
 
-					Bitmap myBitmap = BitmapFactory.decodeFile(image[0]
+					Bitmap userImageLocal = BitmapFactory.decodeFile(image[0]
 							.getAbsolutePath());
+					userImage = userImageLocal;
 
-					avatar.setImageBitmap(myBitmap);
+					avatar.setImageBitmap(userImageLocal);
 				}
 
 				TextView postBody = (TextView) convertView

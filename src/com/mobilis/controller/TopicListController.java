@@ -305,6 +305,7 @@ public class TopicListController extends ListActivity {
 
 				ArrayList<ContentValues> parsedValues = jsonParser
 						.parsePosts(msg.getData().getString("content"));
+
 				postDAO.open();
 				postDAO.addPosts(parsedValues,
 						settings.getInt("SelectedTopic", 0));
@@ -333,10 +334,8 @@ public class TopicListController extends ListActivity {
 					getImages("images/" + ids + "/users");
 				}
 
-				// postDAO.close();
-				// startActivity(intent);
-
 			}
+
 			if (msg.what == Constants.MESSAGE_IMAGE_CONNECTION_OK) {
 
 				zipManager.unzipFile();
