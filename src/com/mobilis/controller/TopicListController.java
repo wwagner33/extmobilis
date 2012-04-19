@@ -65,7 +65,6 @@ public class TopicListController extends ListActivity {
 		zipManager = new ZipManager();
 		dialogMaker = new DialogMaker(this);
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
-		// adapter = new DBAdapter(this);
 		updateList();
 	}
 
@@ -77,13 +76,17 @@ public class TopicListController extends ListActivity {
 				dialog.dismiss();
 			}
 		}
-		if (postDAO != null) {
-			if (postDAO.isOpen())
-				postDAO.close();
+
+		try {
+			postDAO.close();
+		} catch (NullPointerException e) {
+
 		}
-		if (topicDAO != null) {
-			if (postDAO.isOpen())
-				topicDAO.close();
+
+		try {
+			topicDAO.close();
+		} catch (NullPointerException e) {
+
 		}
 
 	}
@@ -116,8 +119,6 @@ public class TopicListController extends ListActivity {
 		forumName = item.getAsString("name");
 
 		SharedPreferences.Editor editor = settings.edit();
-
-		Log.i("CLOSED", item.getAsString("closed"));
 
 		if (item.getAsString("closed").equals("t")) {
 			editor.putBoolean("isForumClosed", true);
@@ -303,37 +304,34 @@ public class TopicListController extends ListActivity {
 
 				intent = new Intent(getApplicationContext(), PostList.class);
 
-				ArrayList<ContentValues> parsedValues = jsonParser
-						.parsePosts(msg.getData().getString("content"));
-
-				postDAO.open();
-				postDAO.addPosts(parsedValues,
-						settings.getInt("SelectedTopic", 0));
-
-				File file = new File(Constants.PATH_IMAGES);
-
-				if (file.exists()) {
-
-					if (file.list().length > 0) {
-
-						String ids = postDAO.getUserIdsAbsentImage();
-
-						if (ids != null) {
-							getImages("images/" + ids + "/users");
-						}
-
-						else {
-							startActivity(intent);
-						}
-					}
+				if (msg.getData().getString("content").length() == 2) {
+					startActivity(intent);
 				}
 
 				else {
-					String ids = postDAO.getAllUserIds();
-					postDAO.close();
-					getImages("images/" + ids + "/users");
-				}
 
+					ArrayList<ContentValues> parsedValues = jsonParser
+							.parsePosts(msg.getData().getString("content"));
+
+					postDAO.open();
+					postDAO.addPosts(parsedValues,
+							settings.getInt("SelectedTopic", 0));
+
+					try {
+						String ids = postDAO.getUserIdsAbsentImage(settings
+								.getInt("SelectedTopic", 0));
+						getImages("images/" + ids + "/users");
+						Log.i("Alguns usuários não possuem imagens", "TRUE");
+					} catch (StringIndexOutOfBoundsException e) {
+						Log.i("Não precisa Baixar novas imagens", "TRUE");
+						startActivity(intent);
+					} catch (NullPointerException e) {
+						Log.i("Baixar todas as imagens", "TRUE");
+						String ids = postDAO.getAllUserIds();
+						postDAO.close();
+						getImages("images/" + ids + "/users");
+					}
+				}
 			}
 
 			if (msg.what == Constants.MESSAGE_IMAGE_CONNECTION_OK) {

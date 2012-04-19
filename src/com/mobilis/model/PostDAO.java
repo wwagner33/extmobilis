@@ -1,7 +1,6 @@
 package com.mobilis.model;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.util.ArrayList;
 
 import org.apache.commons.io.FilenameUtils;
@@ -133,30 +132,48 @@ public class PostDAO extends DBAdapter {
 		return result;
 	}
 
-	public String getUserIdsAbsentImage() {
+	public String getUserIdsAbsentImage(int discussion_id) {
 		StringBuilder builder = new StringBuilder();
 		File imageDirectory = new File(Constants.PATH_IMAGES);
-		File[] images = imageDirectory.listFiles();
+		File[] images = imageDirectory.listFiles(); // Joga NullPointerException
+													// se o diretório não
+													// existir
 		Cursor cursor = getDatabase().rawQuery(
-				"SELECT DISTINCT user_id FROM posts", null);
+				"SELECT DISTINCT user_id FROM posts WHERE discussion_id="
+						+ discussion_id, null);
 		cursor.moveToFirst();
 
 		do {
-			for (int i = 0; i < cursor.getCount(); i++) {
-				for (int y = 0; y < images.length; y++) {
-					if (cursor.getInt(cursor.getColumnIndex("user_id")) == Integer
-							.parseInt(FilenameUtils.removeExtension(images[i]
-									.getName()))) {
-						builder.append(cursor.getInt(cursor
-								.getColumnIndex("user_id")));
-						if (!cursor.isLast()) {
-							builder.append(",");
-						}
-					}
+
+			boolean append = true;
+
+			for (int y = 0; y < images.length; y++) {
+
+				if (cursor.getInt(cursor.getColumnIndex("user_id")) == Integer
+						.parseInt(FilenameUtils.removeExtension(images[y]
+								.getName()))) {
+					append = false;
 				}
 			}
+
+			if (append == true) {
+				builder.append(cursor.getInt(cursor.getColumnIndex("user_id")));
+				if (!cursor.isLast()) {
+					builder.append(",");
+				}
+
+			}
+
 		} while (cursor.moveToNext());
+
 		cursor.close();
-		return builder.toString();
+		String string = builder.toString();
+
+		if (string.charAt(string.length() - 1) == ',') {
+			// Joga StringIndexOutOfBoundsException se a lista for vazia
+			string = string.substring(0, string.length() - 1);
+		}
+		Log.i("Builder", string);
+		return string;
 	}
 }

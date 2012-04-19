@@ -32,14 +32,16 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.mobilis.dialog.DialogMaker;
 import com.mobilis.model.PostDAO;
 import com.mobilis.util.Time;
+import com.mobilis.util.ZipManager;
 import com.mobilis.ws.Connection;
 
 public class PostList extends ListActivity implements OnClickListener,
-		OnScrollListener, FilenameFilter {
+		OnScrollListener {
 
 	private boolean forceListToRedraw = true;
 	private static final long noParentId = 0;
@@ -67,10 +69,7 @@ public class PostList extends ListActivity implements OnClickListener,
 	private Connection connection;
 
 	private Bitmap userImage = null;
-
-	// private RequestImage requestImage;
-	// private RequestNewPosts requestNewPosts;
-	// private RequestHistoryPosts requestHistoryPosts;
+	private ZipManager zipManager;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +79,7 @@ public class PostList extends ListActivity implements OnClickListener,
 
 		handler = new PostHandler();
 		connection = new Connection(handler, this);
+		zipManager = new ZipManager();
 
 		dialogMaker = new DialogMaker(this);
 		postDAO = new PostDAO(this);
@@ -121,8 +121,12 @@ public class PostList extends ListActivity implements OnClickListener,
 	protected void onStop() {
 		// TODO Auto-generated method stub
 		super.onStop();
-		if (postDAO.isOpen())
+		try {
 			postDAO.close();
+		} catch (NullPointerException e) {
+
+		}
+
 	}
 
 	@Override
@@ -187,26 +191,28 @@ public class PostList extends ListActivity implements OnClickListener,
 
 	public void updateList(Cursor cursor) {
 
-		postDAO.open();
-		parsedValues = postDAO.cursorToContentValues(cursor);
-		postDAO.close();
+		if (cursor.getCount() > 0) {
 
-		if (parsedValues.size() > 0) {
-			oldestPostDate = parsedValues.get(parsedValues.size() - 1)
-					.getAsString("updated");
+			postDAO.open();
+			parsedValues = postDAO.cursorToContentValues(cursor);
+			postDAO.close();
+
+			if (parsedValues.size() > 0) {
+				oldestPostDate = parsedValues.get(parsedValues.size() - 1)
+						.getAsString("updated");
+			}
+
+			if (parsedValues.size() == 20) {
+
+				footerView = ((LayoutInflater) this
+						.getSystemService(Context.LAYOUT_INFLATER_SERVICE))
+						.inflate(R.layout.post_list_footer, null, false);
+				this.getListView().addFooterView(footerView);
+			}
+
+			listAdapter = new PostAdapter(this, parsedValues);
+			setListAdapter(listAdapter);
 		}
-
-		if (parsedValues.size() == 20) {
-
-			footerView = ((LayoutInflater) this
-					.getSystemService(Context.LAYOUT_INFLATER_SERVICE))
-					.inflate(R.layout.post_list_footer, null, false);
-			this.getListView().addFooterView(footerView);
-		}
-
-		listAdapter = new PostAdapter(this, parsedValues);
-		setListAdapter(listAdapter);
-
 	}
 
 	public boolean postedToday(int post_day, int post_month, int post_year) {
@@ -229,9 +235,10 @@ public class PostList extends ListActivity implements OnClickListener,
 
 	}
 
-	public void getImageFormServer() {
+	public void getImages(String url) {
 
-		// images/1/users"
+		connection.getImages(Constants.CONNECTION_GET_IMAGES, url,
+				settings.getString("token", null));
 
 	}
 
@@ -308,8 +315,7 @@ public class PostList extends ListActivity implements OnClickListener,
 					}
 				});
 
-				if (image.length == 1) {
-
+				try {
 					ImageView avatar = (ImageView) convertView
 							.findViewById(R.id.avatar);
 
@@ -318,6 +324,10 @@ public class PostList extends ListActivity implements OnClickListener,
 					userImage = userImageLocal;
 
 					avatar.setImageBitmap(userImageLocal);
+				} catch (NullPointerException e) {
+					// Não carrega a imagem
+				} catch (ArrayIndexOutOfBoundsException e) {
+					// Não carrega a imagem
 				}
 
 				TextView postBody = (TextView) convertView
@@ -410,7 +420,6 @@ public class PostList extends ListActivity implements OnClickListener,
 	private class PostHandler extends Handler {
 		@Override
 		public void handleMessage(Message msg) {
-			// TODO Auto-generated method stub
 			super.handleMessage(msg);
 
 			if (msg.what == Constants.MESSAGE_CONNECTION_FAILED) {
@@ -419,20 +428,43 @@ public class PostList extends ListActivity implements OnClickListener,
 
 			if (msg.what == Constants.MESSAGE_NEW_POST_CONNECTION_OK) {
 
-				postDAO.open();
-				postDAO.addPosts(jsonParser.parsePosts(msg.getData().getString(
-						"content")), settings.getInt("SelectedTopic", 0));
+				if (msg.getData().getString("content").length() > 2) {
 
-				Cursor cursor = postDAO.getPostsFromTopic(settings.getInt(
-						"SelectedTopic", 0));
+					postDAO.open();
+					postDAO.addPosts(
+							jsonParser.parsePosts(msg.getData().getString(
+									"content")),
+							settings.getInt("SelectedTopic", 0));
 
-				updateList(cursor);
-				postDAO.close();
+					cursor = postDAO.getPostsFromTopic(settings.getInt(
+							"SelectedTopic", 0));
 
-				loadingMore = false;
-				stopLoadingMore = false;
-				closeDialogIfItsVisible();
+					try {
+						String ids = postDAO.getUserIdsAbsentImage(settings
+								.getInt("SelectedTopic", 0));
+						postDAO.close();
+						getImages("images/" + ids + "/users");
+						Log.i("Alguns usuários não possuem imagens", "TRUE");
+					} catch (StringIndexOutOfBoundsException e) {
+						closeDialogIfItsVisible();
+						postDAO.close();
+						loadingMore = false;
+						stopLoadingMore = false;
+						updateList(cursor);
+						Log.i("Não é preciso Baixar novas imagens", "TRUE");
+					} catch (NullPointerException e) {
+						Log.i("É preciso baixar todas as imagens", "TRUE");
+						String ids = postDAO.getAllUserIds();
+						postDAO.close();
+						getImages("images/" + ids + "/users");
+					}
 
+				} else {
+					closeDialogIfItsVisible();
+					Toast.makeText(getApplicationContext(),
+							"Não existem posts novos", Toast.LENGTH_SHORT)
+							.show();
+				}
 			}
 
 			if (msg.what == Constants.MESSAGE_HISTORY_POST_CONNECTION_OK) {
@@ -454,11 +486,24 @@ public class PostList extends ListActivity implements OnClickListener,
 				forceListToRedraw = true;
 
 			}
-		}
-	}
 
-	@Override
-	public boolean accept(File dir, String filename) {
-		return filename.startsWith(prefix);
+			if (msg.what == Constants.MESSAGE_IMAGE_CONNECTION_OK) {
+				zipManager.unzipFile();
+				loadingMore = false;
+				stopLoadingMore = false;
+				closeDialogIfItsVisible();
+				updateList(cursor);
+
+			}
+			if (msg.what == Constants.MESSAGE_IMAGE_CONNECION_FAILED) {
+				Toast.makeText(getApplicationContext(), "FAIL",
+						Toast.LENGTH_SHORT).show();
+
+				loadingMore = false;
+				stopLoadingMore = false;
+				closeDialogIfItsVisible();
+				updateList(cursor);
+			}
+		}
 	}
 }

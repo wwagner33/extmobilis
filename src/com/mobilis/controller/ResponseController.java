@@ -77,7 +77,6 @@ public class ResponseController extends Activity implements OnClickListener,
 
 		setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
-		// handler = new ResponseControllerHandler(this);
 		handler = new ResponseHandler();
 		connection = new Connection(handler, this);
 
@@ -282,7 +281,11 @@ public class ResponseController extends Activity implements OnClickListener,
 
 		connection
 				.postToServer(Constants.CONNECTION_POST_AUDIO, url, audioFile);
+	}
 
+	public void getImages(String url) {
+		connection.getImages(Constants.CONNECTION_GET_IMAGES, url,
+				settings.getString("token", null));
 	}
 
 	@Override
@@ -407,10 +410,6 @@ public class ResponseController extends Activity implements OnClickListener,
 				resultFromServer = jsonParser
 						.parseJSON(msg.getData().getString("content"),
 								Constants.PARSE_TEXT_RESPONSE_ID);
-				Log.w("RESULTNEW",
-						String.valueOf(resultFromServer[0].get("result")));
-				Log.w("POST_IDNEW",
-						String.valueOf(resultFromServer[0].get("post_id")));
 
 				if (existsRecording) {
 
@@ -422,7 +421,6 @@ public class ResponseController extends Activity implements OnClickListener,
 					sendAudioPost(postURL, recorder.getAudioFile());
 
 				} else {
-					Log.w("getPosts", "TRUE");
 
 					getNewPosts("discussions/"
 							+ settings.getInt("SelectedTopic", 0) + "/posts/"

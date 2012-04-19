@@ -29,8 +29,8 @@ public class DBAdapter {
 		return db;
 	}
 
-	public boolean isOpen() {
-		return db.isOpen();
-	}
+	// public boolean isOpen() {
+	// return db.isOpen();
+	// }
 
 }
