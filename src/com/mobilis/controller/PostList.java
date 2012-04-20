@@ -35,6 +35,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mobilis.dialog.DialogMaker;
+import com.mobilis.exception.ImageFileNotFoundException;
 import com.mobilis.model.PostDAO;
 import com.mobilis.util.Time;
 import com.mobilis.util.ZipManager;
@@ -68,8 +69,10 @@ public class PostList extends ListActivity implements OnClickListener,
 	private PostHandler handler;
 	private Connection connection;
 
-	private Bitmap userImage = null;
+	// private Bitmap userImage = null;
 	private ZipManager zipManager;
+
+	private boolean newPosts = false, historyPosts = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -117,6 +120,32 @@ public class PostList extends ListActivity implements OnClickListener,
 
 	}
 
+	public Bitmap getUserImage(int user_id) throws ImageFileNotFoundException {
+
+		try {
+			prefix = String.valueOf(user_id);
+
+			File file = new File(Constants.PATH_IMAGES);
+
+			File[] image = file.listFiles(new FilenameFilter() {
+
+				@Override
+				public boolean accept(File dir, String filename) {
+					// TODO Auto-generated method stub
+					return filename.startsWith(prefix);
+				}
+			});
+
+			Bitmap userImage = BitmapFactory.decodeFile(image[0]
+					.getAbsolutePath());
+			return userImage;
+		} catch (NullPointerException e) {
+			throw new ImageFileNotFoundException();
+		} catch (ArrayIndexOutOfBoundsException e) {
+			throw new ImageFileNotFoundException();
+		}
+	}
+
 	@Override
 	protected void onStop() {
 		// TODO Auto-generated method stub
@@ -156,16 +185,19 @@ public class PostList extends ListActivity implements OnClickListener,
 					+ listValue.getAsString("content_last"));
 		}
 
-		if (userImage != null)
-			intent.putExtra("image", userImage);
-
 		intent.putExtra("topicId", settings.getInt("SelectedTopic", 0));
 
 		SharedPreferences.Editor editor = settings.edit();
 		editor.putLong("SelectedPost", listValue.getAsInteger("_id"));
 		editor.commit();
 
-		intent.putExtra("parentId", listValue.getAsLong("id"));
+		try {
+			Bitmap userImage = getUserImage(listValue.getAsInteger("user_id"));
+			intent.putExtra("image", userImage);
+		} catch (ImageFileNotFoundException e) {
+			// A lista de detalhes vai exibir a imagem padrão
+		}
+
 		startActivity(intent);
 
 	}
@@ -187,6 +219,15 @@ public class PostList extends ListActivity implements OnClickListener,
 					.inflate(R.layout.post_list_footer, null, false);
 			this.getListView().addFooterView(footerView);
 		}
+	}
+
+	public void refreshList() {
+
+		forceListToRedraw = false;
+		listAdapter.notifyDataSetChanged();
+		loadingMore = false;
+		forceListToRedraw = true;
+
 	}
 
 	public void updateList(Cursor cursor) {
@@ -248,10 +289,16 @@ public class PostList extends ListActivity implements OnClickListener,
 		ArrayList<ContentValues> data;
 		LayoutInflater inflater = null;
 
+		// static ImageView image;
+
 		public PostAdapter(Context context, ArrayList<ContentValues> data) {
 			this.context = context;
 			this.data = data;
 			inflater = LayoutInflater.from(context);
+		}
+
+		public void getPostImage() {
+
 		}
 
 		@Override
@@ -304,30 +351,14 @@ public class PostList extends ListActivity implements OnClickListener,
 				prefix = String.valueOf(data.get(position).getAsInteger(
 						"user_id"));
 
-				File file = new File(Constants.PATH_IMAGES);
-
-				File[] image = file.listFiles(new FilenameFilter() {
-
-					@Override
-					public boolean accept(File dir, String filename) {
-						// TODO Auto-generated method stub
-						return filename.startsWith(prefix);
-					}
-				});
+				ImageView avatar = (ImageView) convertView
+						.findViewById(R.id.avatar);
 
 				try {
-					ImageView avatar = (ImageView) convertView
-							.findViewById(R.id.avatar);
-
-					Bitmap userImageLocal = BitmapFactory.decodeFile(image[0]
-							.getAbsolutePath());
-					userImage = userImageLocal;
-
-					avatar.setImageBitmap(userImageLocal);
-				} catch (NullPointerException e) {
-					// Não carrega a imagem
-				} catch (ArrayIndexOutOfBoundsException e) {
-					// Não carrega a imagem
+					avatar.setImageBitmap(getUserImage(data.get(position)
+							.getAsInteger("user_id")));
+				} catch (ImageFileNotFoundException e) {
+					// Será exibido a imagem default
 				}
 
 				TextView postBody = (TextView) convertView
@@ -418,6 +449,7 @@ public class PostList extends ListActivity implements OnClickListener,
 	}
 
 	private class PostHandler extends Handler {
+
 		@Override
 		public void handleMessage(Message msg) {
 			super.handleMessage(msg);
@@ -427,6 +459,8 @@ public class PostList extends ListActivity implements OnClickListener,
 			}
 
 			if (msg.what == Constants.MESSAGE_NEW_POST_CONNECTION_OK) {
+
+				newPosts = true;
 
 				if (msg.getData().getString("content").length() > 2) {
 
@@ -474,16 +508,38 @@ public class PostList extends ListActivity implements OnClickListener,
 				oldestPostDate = temp.get(temp.size() - 1).getAsString(
 						"updated");
 				parsedValues.addAll(temp);
-				if (parsedValues.size() % 20 != 0) {
 
+				newPosts = false;
+
+				if (parsedValues.size() % 20 != 0) {
+					// Se vier menos de 20 posts do servidor eles são os
+					// ultimos.
 					getListView().removeFooterView(footerView);
 					stopLoadingMore = true;
 					loadingMore = true;
 				}
-				forceListToRedraw = false;
-				listAdapter.notifyDataSetChanged();
-				loadingMore = false;
-				forceListToRedraw = true;
+
+				try {
+					postDAO.open();
+					String ids = postDAO.getUserIdsAbsentImage(settings.getInt(
+							"SelectedTopic", 0));
+					postDAO.close();
+					getImages("images/" + ids + "/users");
+					Log.i("Alguns usuários não possuem imagens", "TRUE");
+				} catch (StringIndexOutOfBoundsException e) {
+					closeDialogIfItsVisible();
+					postDAO.close();
+					loadingMore = false;
+					// stopLoadingMore = false;
+					closeDialogIfItsVisible();
+					refreshList();
+					Log.i("Não é preciso Baixar novas imagens", "TRUE");
+				} catch (NullPointerException e) {
+					Log.i("É preciso baixar todas as imagens", "TRUE");
+					String ids = postDAO.getAllUserIds();
+					postDAO.close();
+					getImages("images/" + ids + "/users");
+				}
 
 			}
 
@@ -492,17 +548,22 @@ public class PostList extends ListActivity implements OnClickListener,
 				loadingMore = false;
 				stopLoadingMore = false;
 				closeDialogIfItsVisible();
-				updateList(cursor);
+
+				if (newPosts)
+					updateList(cursor);
+				else
+					refreshList();
 
 			}
 			if (msg.what == Constants.MESSAGE_IMAGE_CONNECION_FAILED) {
-				Toast.makeText(getApplicationContext(), "FAIL",
-						Toast.LENGTH_SHORT).show();
-
 				loadingMore = false;
 				stopLoadingMore = false;
 				closeDialogIfItsVisible();
-				updateList(cursor);
+
+				if (newPosts)
+					updateList(cursor);
+				else
+					refreshList();
 			}
 		}
 	}
