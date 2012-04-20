@@ -341,8 +341,6 @@ public class TopicListController extends ListActivity {
 				startActivity(intent);
 			}
 			if (msg.what == Constants.MESSAGE_IMAGE_CONNECION_FAILED) {
-				Toast.makeText(getApplicationContext(), "Images Failed",
-						Toast.LENGTH_SHORT).show();
 				intent = new Intent(getApplicationContext(), PostList.class);
 				startActivity(intent);
 			}

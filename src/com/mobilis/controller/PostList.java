@@ -69,10 +69,9 @@ public class PostList extends ListActivity implements OnClickListener,
 	private PostHandler handler;
 	private Connection connection;
 
-	// private Bitmap userImage = null;
 	private ZipManager zipManager;
 
-	private boolean newPosts = false, historyPosts = false;
+	private boolean newPosts = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

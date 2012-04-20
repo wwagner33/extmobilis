@@ -18,6 +18,7 @@ import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaRecorder;
 import android.media.MediaRecorder.OnInfoListener;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
@@ -41,6 +42,7 @@ import com.mobilis.audio.AudioRecorder;
 import com.mobilis.dialog.AudioDialog;
 import com.mobilis.dialog.DialogMaker;
 import com.mobilis.model.PostDAO;
+import com.mobilis.util.ZipManager;
 import com.mobilis.ws.Connection;
 
 public class ResponseController extends Activity implements OnClickListener,
@@ -67,6 +69,7 @@ public class ResponseController extends Activity implements OnClickListener,
 	private AudioPlayer player;
 	float toastTimer = 0;
 	private PostDAO postDAO;
+	private ZipManager zipManager;
 
 	private ResponseHandler handler;
 	private Connection connection;
@@ -75,6 +78,8 @@ public class ResponseController extends Activity implements OnClickListener,
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		setContentView(R.layout.response);
+		zipManager = new ZipManager();
 		setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
 		handler = new ResponseHandler();
@@ -82,7 +87,7 @@ public class ResponseController extends Activity implements OnClickListener,
 
 		dialogMaker = new DialogMaker(this);
 		postDAO = new PostDAO(this);
-		setContentView(R.layout.response);
+
 		dialog = dialogMaker
 				.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
 		submit = (Button) findViewById(R.id.criar_topico_submit);
@@ -362,7 +367,6 @@ public class ResponseController extends Activity implements OnClickListener,
 	@Override
 	public void beforeTextChanged(CharSequence s, int start, int count,
 			int after) {
-		Log.w("charSequenceOnBefore", s.toString());
 	}
 
 	@Override
@@ -445,12 +449,33 @@ public class ResponseController extends Activity implements OnClickListener,
 
 				postDAO.open();
 				postDAO.addPosts(values, settings.getInt("SelectedTopic", 0));
-				postDAO.close();
 
 				intent = new Intent(getApplicationContext(), PostList.class);
+
+				try {
+					String ids = postDAO.getUserIdsAbsentImage(settings.getInt(
+							"SelectedTopic", 0));
+					postDAO.close();
+					getImages("images/" + ids + "/users");
+					Log.i("Alguns usuários não possuem imagens", "TRUE");
+				} catch (StringIndexOutOfBoundsException e) {
+					closeDialogIfItsVisible();
+					postDAO.close();
+					intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+					startActivity(intent);
+					Log.i("Não é preciso Baixar novas imagens", "TRUE");
+				} catch (NullPointerException e) {
+					Log.i("É preciso baixar todas as imagens", "TRUE");
+					String ids = postDAO.getAllUserIds();
+					postDAO.close();
+					getImages("images/" + ids + "/users");
+				}
+			}
+
+			if (msg.what == Constants.MESSAGE_IMAGE_CONNECTION_OK) {
+				zipManager.unzipFile();
 				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				startActivity(intent);
-
 			}
 		}
 	}
