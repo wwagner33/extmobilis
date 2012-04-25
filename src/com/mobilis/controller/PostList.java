@@ -2,8 +2,11 @@ package com.mobilis.controller;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 
 import android.app.Dialog;
 import android.app.ListActivity;
@@ -40,6 +43,7 @@ import com.mobilis.model.PostDAO;
 import com.mobilis.util.Time;
 import com.mobilis.util.ZipManager;
 import com.mobilis.ws.Connection;
+import com.mobilis.util.DateUtils;
 
 public class PostList extends ListActivity implements OnClickListener,
 		OnScrollListener {
@@ -201,24 +205,25 @@ public class PostList extends ListActivity implements OnClickListener,
 
 	}
 
-	public void updateList(String source) {
-
-		jsonParser = new ParseJSON(this);
-		parsedValues = jsonParser.parsePosts(source);
-
-		if (parsedValues.size() > 1) {
-			oldestPostDate = parsedValues.get(parsedValues.size() - 1)
-					.getAsString("updated");
-		}
-
-		if (parsedValues.size() == 20) {
-
-			footerView = ((LayoutInflater) this
-					.getSystemService(Context.LAYOUT_INFLATER_SERVICE))
-					.inflate(R.layout.post_list_footer, null, false);
-			this.getListView().addFooterView(footerView);
-		}
-	}
+	//
+	// public void updateList(String source) {
+	//
+	// jsonParser = new ParseJSON(this);
+	// parsedValues = jsonParser.parsePosts(source);
+	//
+	// if (parsedValues.size() > 1) {
+	// oldestPostDate = parsedValues.get(parsedValues.size() - 1)
+	// .getAsString("updated");
+	// }
+	//
+	// if (parsedValues.size() == 20) {
+	//
+	// footerView = ((LayoutInflater) this
+	// .getSystemService(Context.LAYOUT_INFLATER_SERVICE))
+	// .inflate(R.layout.post_list_footer, null, false);
+	// this.getListView().addFooterView(footerView);
+	// }
+	// }
 
 	public void refreshList() {
 
@@ -231,15 +236,22 @@ public class PostList extends ListActivity implements OnClickListener,
 
 	public void updateList(Cursor cursor) {
 
+		Log.i("Cursor Count", String.valueOf(cursor.getCount()));
+
 		if (cursor.getCount() > 0) {
 
 			postDAO.open();
 			parsedValues = postDAO.cursorToContentValues(cursor);
+			Log.i("ParsedValuesSize", String.valueOf(parsedValues.size()));
 			postDAO.close();
 
 			if (parsedValues.size() > 0) {
-				oldestPostDate = parsedValues.get(parsedValues.size() - 1)
-						.getAsString("updated");
+				postDAO.open();
+				// oldestPostDate = parsedValues.get(parsedValues.size() - 1)
+				// .getAsString("updated");
+				oldestPostDate = postDAO.getOldestPost(settings.getInt(
+						"SelectedTopic", 0));
+				postDAO.close();
 			}
 
 			if (parsedValues.size() == 20) {
@@ -326,27 +338,51 @@ public class PostList extends ListActivity implements OnClickListener,
 				TextView postDate = (TextView) convertView
 						.findViewById(R.id.post_date);
 
-				if (postedToday(data.get(position).getAsInteger("post_day"),
-						data.get(position).getAsInteger("post_month"), data
-								.get(position).getAsInteger("post_year")))
+				SimpleDateFormat format = Time.getDbFormat();
+				try {
 
-				{
-					Log.w("POSTED TODAY", "TRUE");
-					postDate.setText(data.get(position).getAsInteger(
-							"post_hour")
-							+ ":"
-							+ data.get(position).getAsInteger("post_minute"));
+					Date date = format.parse(data.get(position).getAsString(
+							"updated"));
+					Calendar calendar = Calendar.getInstance();
+					calendar.setTime(date);
 
-				} else {
+					if (DateUtils.isToday(date)) {
 
-					postDate.setText(data.get(position)
-							.getAsInteger("post_day")
-							+ " "
-							+ Time.getMonthAsText(data.get(position)
-									.getAsInteger("post_month")));
-					Log.w("POSTED TODAY", "FALSE");
+						postDate.setText(DateUtils.getFormatedValue(calendar
+								.get(Calendar.HOUR))
+								+ ":"
+								+ DateUtils.getFormatedValue(calendar
+										.get(Calendar.MINUTE)));
+
+					} else {
+
+						postDate.setText(calendar.get(Calendar.DAY_OF_MONTH)
+								+ " "
+								+ Time.getMonthAsText(calendar
+										.get(Calendar.MONTH)));
+					}
+
+				} catch (ParseException e1) {
+					e1.printStackTrace();
 				}
-
+				/*
+				 * if (postDAO.postedToday(
+				 * data.get(position).getAsInteger("discussion_id"), data
+				 * .get(position).getAsInteger("_id"))) {
+				 * 
+				 * Log.w("POSTED TODAY", "TRUE");
+				 * postDate.setText(postDAO.getPostedTodayDateFormat(
+				 * (data.get(position).getAsInteger("discussion_id")),
+				 * data.get(position).getAsInteger("_id"))); postDAO.close();
+				 * 
+				 * }
+				 * 
+				 * else {
+				 * 
+				 * postDate.setText(postDAO.getPostedBeforeTodayDateFormat(
+				 * data.get(position).getAsInteger("discussion_id"),
+				 * data.get(position).getAsInteger("_id"))); postDAO.close(); }
+				 */
 				prefix = String.valueOf(data.get(position).getAsInteger(
 						"user_id"));
 
@@ -437,6 +473,7 @@ public class PostList extends ListActivity implements OnClickListener,
 
 			String url = "discussions/" + settings.getInt("SelectedTopic", 0)
 					+ "/posts/" + oldestPostDate + "/history.json";
+			Log.w("OLD-POSTS-URL", url);
 			obtainHistoryPosts(url);
 
 		}
@@ -504,8 +541,9 @@ public class PostList extends ListActivity implements OnClickListener,
 
 				ArrayList<ContentValues> temp = jsonParser.parsePosts(msg
 						.getData().getString("content"));
-				oldestPostDate = temp.get(temp.size() - 1).getAsString(
-						"updated");
+				// oldestPostDate = temp.get(temp.size() - 1).getAsString(
+				// "updated");
+
 				parsedValues.addAll(temp);
 
 				newPosts = false;

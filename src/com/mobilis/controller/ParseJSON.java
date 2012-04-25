@@ -1,8 +1,13 @@
 package com.mobilis.controller;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.LinkedHashMap;
 
+import org.apache.http.impl.cookie.DateParseException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -94,6 +99,7 @@ public class ParseJSON {
 
 				parsedValues[i]
 						.put("name", (String) jsonObjects[i].get("name"));
+
 			}
 
 			return parsedValues;
@@ -244,8 +250,25 @@ public class ParseJSON {
 			rowItem.put("profile_id",
 					Long.parseLong((String) jsonObjects[i].get("profile_id")));
 			rowItem.put("user_nick", (String) jsonObjects[i].get("user_nick"));
-			rowItem.put("updated", (String) jsonObjects[i].get("updated"));
-			parseDate(rowItem, (String) jsonObjects[i].get("updated"), i);
+			// rowItem.put("updated", (String) jsonObjects[i].get("updated"));
+
+			SimpleDateFormat systemFormat = new SimpleDateFormat(
+					"yyyy-MM-dd HH:mm:ss");
+			SimpleDateFormat dbFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+
+			try {
+				Date formatedDate = dbFormat.parse((String) jsonObjects[i]
+						.get("updated"));
+
+				String formatedDateString = systemFormat.format(formatedDate);
+				rowItem.put("updated", formatedDateString);
+				Log.i("FORMATED DATE", formatedDateString);
+			} catch (ParseException e) {
+				e.printStackTrace();
+				throw new RuntimeException();
+			}
+
+			// parseDate(rowItem, (String) jsonObjects[i].get("updated"), i);
 			parsedPostValues.add(rowItem);
 		}
 

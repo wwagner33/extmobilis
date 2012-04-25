@@ -11,6 +11,7 @@ import android.database.Cursor;
 import android.util.Log;
 
 import com.mobilis.controller.Constants;
+import com.mobilis.util.Time;
 
 public class PostDAO extends DBAdapter {
 
@@ -57,14 +58,12 @@ public class PostDAO extends DBAdapter {
 		return cursor;
 	}
 
-	public String getNewestPostDate() {
-		Cursor cursor = getDatabase().rawQuery(
-				"SELECT max(updated) FROM posts", null);
-		cursor.moveToFirst();
-		String date = cursor.getString(0);
-		cursor.close();
-		return date;
-	}
+	/*
+	 * public String getNewestPostDate() { Cursor cursor =
+	 * getDatabase().rawQuery( "SELECT max(updated) FROM posts", null);
+	 * cursor.moveToFirst(); String date = cursor.getString(0); cursor.close();
+	 * return date; }
+	 */
 
 	public ArrayList<ContentValues> cursorToContentValues(Cursor cursor) {
 
@@ -92,18 +91,6 @@ public class PostDAO extends DBAdapter {
 					cursor.getInt(cursor.getColumnIndex("parent_id")));
 			content.put("user_nick",
 					cursor.getString(cursor.getColumnIndex("user_nick")));
-			content.put("post_year",
-					cursor.getInt(cursor.getColumnIndex("post_year")));
-			content.put("post_month",
-					cursor.getInt(cursor.getColumnIndex("post_month")));
-			content.put("post_day",
-					cursor.getInt(cursor.getColumnIndex("post_day")));
-			content.put("post_hour",
-					cursor.getInt(cursor.getColumnIndex("post_hour")));
-			content.put("post_minute",
-					cursor.getInt(cursor.getColumnIndex("post_minute")));
-			content.put("post_second",
-					cursor.getInt(cursor.getColumnIndex("post_second")));
 			values.add(content);
 
 		} while (cursor.moveToPrevious());
@@ -176,4 +163,55 @@ public class PostDAO extends DBAdapter {
 		Log.i("Builder", string);
 		return string;
 	}
+
+	public boolean postedToday(int topicId, int postId) {
+		Cursor cursor = getDatabase().rawQuery(
+				"SELECT updated from posts WHERE discussion_id=" + topicId
+						+ " AND date(updated)=date(\'now\') AND _id=" + postId,
+				null);
+		cursor.moveToFirst();
+		int count = cursor.getCount();
+		cursor.close();
+		return (count > 0) ? true : false;
+	}
+
+	public String getPostedTodayDateFormat(int topicId, int postId) {
+		Cursor cursor = getDatabase().rawQuery(
+				"SELECT strftime(\'%H:%M\',updated) FROM posts WHERE discussion_id="
+						+ topicId + " AND _id=" + postId, null);
+		cursor.moveToFirst();
+		String date = cursor.getString(0);
+		cursor.close();
+		return date;
+	}
+
+	public String getPostedBeforeTodayDateFormat(int topicId, int postId) {
+		Cursor cursor = getDatabase().rawQuery(
+				"SELECT strftime(\'%d\',updated) FROM posts WHERE discussion_id="
+						+ topicId + " AND _id=" + postId, null);
+		cursor.moveToFirst();
+		String dateDay = cursor.getString(0);
+		// cursor.close();
+		cursor = getDatabase().rawQuery(
+				"SELECT strftime(\'%m\',updated) FROM posts WHERE discussion_id="
+						+ topicId + " AND _id=" + postId, null);
+		cursor.moveToFirst();
+		String dateMonth = cursor.getString(0);
+		cursor.close();
+		dateMonth = Time.getMonthAsText((Integer.parseInt(dateMonth) - 1));
+
+		return dateDay + " " + dateMonth;
+	}
+
+	public String getOldestPost(int topicId) {
+		Cursor cursor = getDatabase()
+				.rawQuery(
+						"SELECT MIN(strftime(\'%Y%m%d%H%M%S\',updated)) FROM posts WHERE discussion_id="
+								+ topicId, null);
+		cursor.moveToFirst();
+		String date = cursor.getString(0);
+		cursor.close();
+		return date;
+	}
+
 }

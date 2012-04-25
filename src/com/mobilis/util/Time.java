@@ -1,10 +1,13 @@
 package com.mobilis.util;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 public class Time {
 
 	public static String getMonthAsText(int postMonth) {
+
+		postMonth++;
 
 		if (postMonth == 1)
 			return "Jan";
@@ -65,5 +68,16 @@ public class Time {
 		builder.append(day);
 
 		return builder.toString();
+	}
+
+	public static SimpleDateFormat getDbFormat() {
+		SimpleDateFormat serverFormat = new SimpleDateFormat(
+				"yyyy-MM-dd HH:mm:ss");
+		return serverFormat;
+	}
+
+	public static SimpleDateFormat getServerFormat() {
+		SimpleDateFormat serverFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+		return serverFormat;
 	}
 }

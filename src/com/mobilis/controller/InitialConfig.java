@@ -78,7 +78,7 @@ public class InitialConfig extends Activity {
 	}
 
 	public void setConfigurations() {
-		// setting default preferences
+		// Preferências padrão
 		SharedPreferences.Editor editor = settings.edit();
 		editor.putBoolean("AutoLogin", true);
 		editor.commit();
