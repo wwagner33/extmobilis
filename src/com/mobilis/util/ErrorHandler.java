@@ -1,4 +1,6 @@
-package com.mobilis.controller;
+package com.mobilis.util;
+
+import com.mobilis.controller.Constants;
 
 import android.content.Context;
 import android.widget.Toast;
@@ -22,9 +24,9 @@ public class ErrorHandler {
 					.show();
 		}
 		if (errorId == Constants.ERROR_TOKEN_EXPIRED) {
-			
-//			Toast.makeText(context, "Token expirou", Toast.LENGTH_SHORT).show();
-			Toast.makeText(context, "Senha ou Login inválidos", Toast.LENGTH_SHORT).show();
+
+			Toast.makeText(context, "Senha ou Login inválidos",
+					Toast.LENGTH_SHORT).show();
 		}
 
 		if (errorId == Constants.ERROR_UNKNOWN) {

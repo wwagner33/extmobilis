@@ -1,4 +1,4 @@
-package com.mobilis.model;
+package com.mobilis.dao;
 
 import android.content.ContentValues;
 import android.content.Context;

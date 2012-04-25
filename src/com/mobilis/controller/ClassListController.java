@@ -23,9 +23,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.mobilis.dao.ClassDAO;
+import com.mobilis.dao.TopicDAO;
 import com.mobilis.dialog.DialogMaker;
-import com.mobilis.model.ClassDAO;
-import com.mobilis.model.TopicDAO;
+import com.mobilis.util.ParseJSON;
 import com.mobilis.ws.Connection;
 
 public class ClassListController extends ListActivity {
@@ -50,7 +51,7 @@ public class ClassListController extends ListActivity {
 		setContentView(R.layout.curriculum_units);
 		handler = new ClassHandler();
 		connection = new Connection(handler, this);
-		jsonParser = new ParseJSON(this);
+		jsonParser = new ParseJSON();
 		classDAO = new ClassDAO(this);
 		topicDAO = new TopicDAO(this);
 		dialogMaker = new DialogMaker(this);

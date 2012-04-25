@@ -25,7 +25,6 @@ import com.mobilis.util.DateUtils;
 public class AudioDialog extends Dialog implements OnSeekBarChangeListener,
 		android.view.View.OnClickListener {
 
-	private Context context;
 	private AudioPlayer player;
 	private TextView audioDuration, audioProgress, date;
 	private SeekBar playerBar;
@@ -37,22 +36,16 @@ public class AudioDialog extends Dialog implements OnSeekBarChangeListener,
 	private Thread seekbarThread;
 	private static final int teste = 5;
 	private AudioHandler audioHandler;
-	int i = 0;
 	private Message message;
 	private Bundle bundle;
-	private String durationString;
-
-	// PlayAudio auioPlayer;
 
 	public AudioDialog(Context context, AudioPlayer player,
 			Handler activityHandler) {
 		super(context);
 
 		this.activityHandler = activityHandler;
-		this.context = context;
 		this.player = player;
 		audioHandler = new AudioHandler();
-		// message = new Message();
 		message = Message.obtain();
 		bundle = new Bundle();
 
@@ -104,9 +97,7 @@ public class AudioDialog extends Dialog implements OnSeekBarChangeListener,
 		} else {
 
 			audioDuration.setText(formatProgress(duration));
-			durationString = audioDuration.getText().toString();
 		}
-
 	}
 
 	public String formatProgress(int duration) {
@@ -215,7 +206,7 @@ public class AudioDialog extends Dialog implements OnSeekBarChangeListener,
 				});
 
 				try {
-					
+
 					player.playOwnAudio();
 
 					seekbarThread.start();

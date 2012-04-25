@@ -12,7 +12,6 @@ public class AudioPlayer {
 	private MediaPlayer player;
 	private boolean isPrepared = false, isPaused = false;
 	public playOnBackgroundThread playerThread;
-	private volatile int progress = 0;
 	File recordedAudioPath = new File(Constants.PATH_RECORDINGS
 			+ Constants.RECORDING_FULLNAME);
 
@@ -21,9 +20,7 @@ public class AudioPlayer {
 
 		if (!isPrepared)
 			prepare();
-
 		play();
-
 	}
 
 	public void prepare() throws IllegalArgumentException,
@@ -132,12 +129,5 @@ public class AudioPlayer {
 			return null;
 
 		}
-
-		@Override
-		protected void onProgressUpdate(Integer... values) {
-			super.onProgressUpdate(values);
-			progress = values[0];
-		}
-
 	}
 }

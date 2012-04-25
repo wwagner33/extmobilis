@@ -10,7 +10,7 @@
  * in your installation folder.                                               *
  ******************************************************************************
  */
-package com.mobilis.model;
+package com.mobilis.dao;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;

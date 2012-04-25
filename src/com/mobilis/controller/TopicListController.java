@@ -1,6 +1,5 @@
 package com.mobilis.controller;
 
-import java.io.File;
 import java.util.ArrayList;
 
 import android.app.ListActivity;
@@ -26,11 +25,11 @@ import android.widget.CursorAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.mobilis.dao.PostDAO;
+import com.mobilis.dao.TopicDAO;
 import com.mobilis.dialog.DialogMaker;
-import com.mobilis.model.PostDAO;
-import com.mobilis.model.TopicDAO;
+import com.mobilis.util.ParseJSON;
 import com.mobilis.util.ZipManager;
 import com.mobilis.ws.Connection;
 
@@ -59,7 +58,7 @@ public class TopicListController extends ListActivity {
 
 		handler = new TopicHandler();
 		connection = new Connection(handler, this);
-		jsonParser = new ParseJSON(this);
+		jsonParser = new ParseJSON();
 		postDAO = new PostDAO(this);
 		topicDAO = new TopicDAO(this);
 		zipManager = new ZipManager();

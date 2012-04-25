@@ -48,7 +48,7 @@
             android:name="com.mobilis.controller.PostDetailController"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.mobilis.controller.Config"
+            android:name=".Config"
             android:screenOrientation="portrait" />
     </application>
 

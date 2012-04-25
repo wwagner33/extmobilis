@@ -66,12 +66,9 @@ public class Constants {
 	// Requests
 	public static final String REQUEST_FINISH_ACTIVITY_ON_RETURN_TEXT = "FinishActivity";
 	public static final String REQUEST_FINISH_ACTIVITY_ON_RETURN_VALUE = "YES";
-	// YYYYMMDDHH24MMSS
 
 	public static final String oldDateString = "2000101010241010";
 
-	// public static final int DIALOG_PROGRESS = 400;
-	// public static final int DIALOG_ALERT = 401;
 	// Texto
 	public static final int TEXT_MAX_CHARACTER_LENGHT = 400;
 	public static final int DIALOG_PROGRESS_STANDART = 401;

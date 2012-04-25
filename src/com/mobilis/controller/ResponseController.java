@@ -18,7 +18,6 @@ import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaRecorder;
 import android.media.MediaRecorder.OnInfoListener;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
@@ -39,9 +38,10 @@ import android.widget.Toast;
 
 import com.mobilis.audio.AudioPlayer;
 import com.mobilis.audio.AudioRecorder;
+import com.mobilis.dao.PostDAO;
 import com.mobilis.dialog.AudioDialog;
 import com.mobilis.dialog.DialogMaker;
-import com.mobilis.model.PostDAO;
+import com.mobilis.util.ParseJSON;
 import com.mobilis.util.ZipManager;
 import com.mobilis.ws.Connection;
 
@@ -109,7 +109,7 @@ public class ResponseController extends Activity implements OnClickListener,
 
 		charCount.setText("0/" + Constants.TEXT_MAX_CHARACTER_LENGHT);
 
-		jsonParser = new ParseJSON(this);
+		jsonParser = new ParseJSON();
 
 	}
 
@@ -409,8 +409,7 @@ public class ResponseController extends Activity implements OnClickListener,
 				Log.w("RESULT", msg.getData().getString("content"));
 
 				ContentValues[] resultFromServer;
-				jsonParser = new ParseJSON(getApplicationContext());
-
+				jsonParser = new ParseJSON();
 				resultFromServer = jsonParser
 						.parseJSON(msg.getData().getString("content"),
 								Constants.PARSE_TEXT_RESPONSE_ID);

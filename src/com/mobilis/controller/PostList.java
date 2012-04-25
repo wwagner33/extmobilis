@@ -37,10 +37,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.mobilis.dao.PostDAO;
 import com.mobilis.dialog.DialogMaker;
 import com.mobilis.exception.ImageFileNotFoundException;
-import com.mobilis.model.PostDAO;
 import com.mobilis.util.DateUtils;
+import com.mobilis.util.ParseJSON;
 import com.mobilis.util.ZipManager;
 import com.mobilis.ws.Connection;
 
@@ -88,7 +89,7 @@ public class PostList extends ListActivity implements OnClickListener,
 
 		dialogMaker = new DialogMaker(this);
 		postDAO = new PostDAO(this);
-		jsonParser = new ParseJSON(this);
+		jsonParser = new ParseJSON();
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
 
 		answerForum = (ImageView) findViewById(R.id.answer_topic_image);

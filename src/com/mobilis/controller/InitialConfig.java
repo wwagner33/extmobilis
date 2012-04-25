@@ -10,7 +10,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import com.mobilis.model.DatabaseHelper;
+import com.mobilis.dao.DatabaseHelper;
 
 public class InitialConfig extends Activity {
 	private Intent intent;
@@ -34,7 +34,6 @@ public class InitialConfig extends Activity {
 			extras = getIntent().getExtras();
 			if (extras
 					.getString(Constants.REQUEST_FINISH_ACTIVITY_ON_RETURN_TEXT) != null) {
-				Log.w("onFinish", "YES");
 				finish();
 			}
 		}

@@ -1,32 +1,26 @@
-package com.mobilis.controller;
+package com.mobilis.util;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedHashMap;
 
-import org.apache.http.impl.cookie.DateParseException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
+import com.mobilis.controller.Constants;
+
 import android.content.ContentValues;
-import android.content.Context;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.Log;
 
 public class ParseJSON {
 
-	private Context context;
 	private ContentValues[] parsedValues;
 	private ArrayList<ContentValues> parsedPostValues;
-
-	public ParseJSON(Context context) {
-		this.context = context;
-	}
 
 	public void parseDate(ContentValues container, String data, int position) {
 

@@ -1,4 +1,4 @@
-package com.mobilis.model;
+package com.mobilis.dao;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;

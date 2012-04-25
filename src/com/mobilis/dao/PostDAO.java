@@ -1,4 +1,4 @@
-package com.mobilis.model;
+package com.mobilis.dao;
 
 import java.io.File;
 import java.util.ArrayList;

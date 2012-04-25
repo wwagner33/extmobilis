@@ -21,11 +21,11 @@ import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.mobilis.dao.ClassDAO;
+import com.mobilis.dao.CourseDAO;
 import com.mobilis.dialog.DialogMaker;
-import com.mobilis.model.ClassDAO;
-import com.mobilis.model.CourseDAO;
+import com.mobilis.util.ParseJSON;
 import com.mobilis.ws.Connection;
 
 public class CourseListController extends ListActivity {
@@ -33,7 +33,6 @@ public class CourseListController extends ListActivity {
 	private Intent intent;
 	private ParseJSON jsonParser;
 	private ProgressDialog dialog;
-
 	private SharedPreferences settings;
 	private DialogMaker dialogMaker;
 	private LayoutInflater inflater;
@@ -41,7 +40,6 @@ public class CourseListController extends ListActivity {
 	private CourseDAO courseDAO;
 	private Cursor cursor;
 	private ClassDAO classDAO;
-
 	private Connection connection;
 	private CourseHandler handler;
 
@@ -55,7 +53,7 @@ public class CourseListController extends ListActivity {
 		courseDAO = new CourseDAO(this);
 		classDAO = new ClassDAO(this);
 		dialogMaker = new DialogMaker(this);
-		jsonParser = new ParseJSON(this);
+		jsonParser = new ParseJSON();
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
 		updateList();
 	}

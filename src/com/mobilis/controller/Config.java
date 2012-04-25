@@ -4,10 +4,9 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference;
-import android.preference.PreferenceManager;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceActivity;
-import android.widget.Toast;
+import android.preference.PreferenceManager;
 
 public class Config extends PreferenceActivity implements
 		OnPreferenceChangeListener {
@@ -32,7 +31,6 @@ public class Config extends PreferenceActivity implements
 
 	@Override
 	public boolean onPreferenceChange(Preference preference, Object value) {
-		// newValue = (Boolean) newValue;
 		boolean newValue = ((Boolean) value) ? true : false;
 
 		if (newValue == true) {
