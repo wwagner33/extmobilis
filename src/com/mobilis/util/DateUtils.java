@@ -1,5 +1,6 @@
 package com.mobilis.util;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -184,5 +185,46 @@ public class DateUtils {
 		} else {
 			return String.valueOf(value);
 		}
+	}
+
+	public static String getMonthAsText(int postMonth) {
+		if (postMonth > 11 || postMonth < 0)
+			return "";
+
+		String months[] = new String[] { "Jan", "Fev", "Mar", "Abr", "Mai",
+				"Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez" };
+		return months[postMonth];
+	}
+
+	public static String getCurrentDate() {
+		StringBuilder builder = new StringBuilder();
+		Calendar calendar = Calendar.getInstance();
+
+		String year;
+		String month;
+		String day;
+
+		year = String.valueOf(calendar.get(Calendar.YEAR));
+		month = String.valueOf(calendar.get(Calendar.MONTH));
+		day = String.valueOf(calendar.get(Calendar.DAY_OF_MONTH));
+
+		builder.append(year);
+		builder.append("/");
+		builder.append(month);
+		builder.append("/");
+		builder.append(day);
+
+		return builder.toString();
+	}
+
+	public static SimpleDateFormat getDbFormat() {
+		SimpleDateFormat serverFormat = new SimpleDateFormat(
+				"yyyy-MM-dd HH:mm:ss");
+		return serverFormat;
+	}
+
+	public static SimpleDateFormat getServerFormat() {
+		SimpleDateFormat serverFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+		return serverFormat;
 	}
 }

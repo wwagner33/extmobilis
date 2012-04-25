@@ -40,10 +40,9 @@ import android.widget.Toast;
 import com.mobilis.dialog.DialogMaker;
 import com.mobilis.exception.ImageFileNotFoundException;
 import com.mobilis.model.PostDAO;
-import com.mobilis.util.Time;
+import com.mobilis.util.DateUtils;
 import com.mobilis.util.ZipManager;
 import com.mobilis.ws.Connection;
-import com.mobilis.util.DateUtils;
 
 public class PostList extends ListActivity implements OnClickListener,
 		OnScrollListener {
@@ -338,7 +337,7 @@ public class PostList extends ListActivity implements OnClickListener,
 				TextView postDate = (TextView) convertView
 						.findViewById(R.id.post_date);
 
-				SimpleDateFormat format = Time.getDbFormat();
+				SimpleDateFormat format = DateUtils.getDbFormat();
 				try {
 
 					Date date = format.parse(data.get(position).getAsString(
@@ -358,7 +357,7 @@ public class PostList extends ListActivity implements OnClickListener,
 
 						postDate.setText(calendar.get(Calendar.DAY_OF_MONTH)
 								+ " "
-								+ Time.getMonthAsText(calendar
+								+ DateUtils.getMonthAsText(calendar
 										.get(Calendar.MONTH)));
 					}
 
