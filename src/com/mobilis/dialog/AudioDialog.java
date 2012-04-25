@@ -4,8 +4,6 @@ import java.io.IOException;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.media.AudioFormat;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -16,15 +14,13 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
-import android.widget.SlidingDrawer;
-import android.widget.Toast;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 
 import com.mobilis.audio.AudioPlayer;
 import com.mobilis.controller.Constants;
 import com.mobilis.controller.R;
-import com.mobilis.util.Time;
+import com.mobilis.util.DateUtils;
 
 public class AudioDialog extends Dialog implements OnSeekBarChangeListener,
 		android.view.View.OnClickListener {
@@ -78,7 +74,7 @@ public class AudioDialog extends Dialog implements OnSeekBarChangeListener,
 		this.setContentView(R.layout.dialog_audio);
 
 		date = (TextView) this.findViewById(R.id.recording_date);
-		date.setText(Time.getCurrentDate().toString());
+		date.setText(DateUtils.getCurrentDate().toString());
 
 		audioDuration = (TextView) this.findViewById(R.id.recording_duration);
 

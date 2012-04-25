@@ -11,7 +11,7 @@ import android.database.Cursor;
 import android.util.Log;
 
 import com.mobilis.controller.Constants;
-import com.mobilis.util.Time;
+import com.mobilis.util.DateUtils;
 
 public class PostDAO extends DBAdapter {
 
@@ -198,7 +198,7 @@ public class PostDAO extends DBAdapter {
 		cursor.moveToFirst();
 		String dateMonth = cursor.getString(0);
 		cursor.close();
-		dateMonth = Time.getMonthAsText((Integer.parseInt(dateMonth) - 1));
+		dateMonth = DateUtils.getMonthAsText((Integer.parseInt(dateMonth) - 1));
 
 		return dateDay + " " + dateMonth;
 	}
