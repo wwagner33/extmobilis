@@ -239,6 +239,17 @@ public class ClassListController extends ListActivity {
 							.getString("content"), Constants.PARSE_TOPICS_ID);
 
 					topicDAO.open();
+
+					for (int i = 0; i < values.length; i++) {
+						if (topicDAO.hasNewPosts(values[i].getAsInteger("_id"),
+								values[i].getAsString("last_post_date"))) {
+							Log.i("TAG", "Existem posts novos");
+							values[i].put("has_new_posts", true);
+						} else {
+							Log.v("TAG", "Não há posts novos");
+						}
+					}
+
 					topicDAO.addTopics(values,
 							settings.getInt("SelectedClass", 0));
 					topicDAO.close();

@@ -160,9 +160,25 @@ public class ParseJSON {
 				parsedValues[i].put("closed",
 						(String) jsonObjects[i].get("closed"));
 
-				parsedValues[i].put("last_post_date",
-						(String) jsonObjects[i].get("last_post_date"));
+				// parsedValues[i].put("has_new_posts", false);
 
+				SimpleDateFormat dbFormat = DateUtils.getDbFormat();
+				SimpleDateFormat serverFormat = DateUtils.getServerFormat();
+
+				try {
+					Date formatedDate = serverFormat
+							.parse((String) jsonObjects[i]
+									.get("last_post_date"));
+
+					String formatedDateString = dbFormat.format(formatedDate);
+					parsedValues[i].put("last_post_date", formatedDateString);
+					Log.i("FORMATED DATE", formatedDateString);
+				} catch (ParseException e) {
+					e.printStackTrace();
+					throw new RuntimeException();
+				} catch (NullPointerException e) {
+					parsedValues[i].putNull("last_post_date");
+				}
 			}
 
 			return parsedValues;
@@ -205,9 +221,6 @@ public class ParseJSON {
 
 			Log.w("Object", jsonObjects[i].toJSONString());
 
-			// JSONObject innerObject = (JSONObject) jsonObjects[i]
-			// .get("discussion_post");
-
 			ContentValues rowItem = new ContentValues();
 
 			String contentFirst = (String) jsonObjects[i].get("content_first");
@@ -244,17 +257,15 @@ public class ParseJSON {
 			rowItem.put("profile_id",
 					Long.parseLong((String) jsonObjects[i].get("profile_id")));
 			rowItem.put("user_nick", (String) jsonObjects[i].get("user_nick"));
-			// rowItem.put("updated", (String) jsonObjects[i].get("updated"));
 
-			SimpleDateFormat systemFormat = new SimpleDateFormat(
-					"yyyy-MM-dd HH:mm:ss");
-			SimpleDateFormat dbFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+			SimpleDateFormat dbFormat = DateUtils.getDbFormat();
+			SimpleDateFormat serverFormat = DateUtils.getServerFormat();
 
 			try {
-				Date formatedDate = dbFormat.parse((String) jsonObjects[i]
+				Date formatedDate = serverFormat.parse((String) jsonObjects[i]
 						.get("updated"));
 
-				String formatedDateString = systemFormat.format(formatedDate);
+				String formatedDateString = dbFormat.format(formatedDate);
 				rowItem.put("updated", formatedDateString);
 				Log.i("FORMATED DATE", formatedDateString);
 			} catch (ParseException e) {
@@ -262,7 +273,6 @@ public class ParseJSON {
 				throw new RuntimeException();
 			}
 
-			// parseDate(rowItem, (String) jsonObjects[i].get("updated"), i);
 			parsedPostValues.add(rowItem);
 		}
 

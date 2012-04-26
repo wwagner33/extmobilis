@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.graphics.drawable.StateListDrawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -25,6 +26,7 @@ import android.widget.CursorAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.mobilis.dao.PostDAO;
 import com.mobilis.dao.TopicDAO;
@@ -40,7 +42,6 @@ public class TopicListController extends ListActivity {
 	private String forumName;
 	private ProgressDialog dialog;
 	private SharedPreferences settings;
-
 	private ZipManager zipManager;
 	private DialogMaker dialogMaker;
 	private TopicDAO topicDAO;
@@ -70,24 +71,22 @@ public class TopicListController extends ListActivity {
 	@Override
 	protected void onStop() {
 		super.onStop();
-		if (dialog != null) {
-			if (dialog.isShowing()) {
-				dialog.dismiss();
-			}
-		}
 
+		try {
+			dialog.dismiss();
+		} catch (NullPointerException e) {
+
+		}
 		try {
 			postDAO.close();
 		} catch (NullPointerException e) {
 
 		}
-
 		try {
 			topicDAO.close();
 		} catch (NullPointerException e) {
 
 		}
-
 	}
 
 	public void closeDialogIfItsVisible() {
@@ -131,14 +130,17 @@ public class TopicListController extends ListActivity {
 		editor.commit();
 
 		postDAO.open();
-
-		if (postDAO.postExistsOnTopic(topicId)) {
+		topicDAO.open();
+		if (postDAO.postExistsOnTopic(topicId)
+				&& !topicDAO.hasNewPostsFlag(topicId)) {
 			postDAO.close();
+			topicDAO.close();
 			intent = new Intent(this, PostList.class);
 			startActivity(intent);
 
 		} else {
 			postDAO.close();
+			topicDAO.close();
 			dialog = dialogMaker
 					.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
 			dialog.show();
@@ -146,7 +148,6 @@ public class TopicListController extends ListActivity {
 					+ Constants.oldDateString + "/news.json";
 			obtainNewPosts(url);
 		}
-
 	}
 
 	public void obtainNewPosts(String url) {
@@ -166,7 +167,6 @@ public class TopicListController extends ListActivity {
 
 		connection.getImages(Constants.CONNECTION_GET_IMAGES, url,
 				settings.getString("token", null));
-
 	}
 
 	public class TopicAdapter extends CursorAdapter {
@@ -183,6 +183,9 @@ public class TopicListController extends ListActivity {
 
 			if (cursor != null) {
 
+				LinearLayout leftBar = (LinearLayout) convertView
+						.findViewById(R.id.left_bar);
+
 				if (cursor.getString(cursor.getColumnIndex("closed")).equals(
 						"t")) {
 
@@ -197,16 +200,24 @@ public class TopicListController extends ListActivity {
 							.findViewById(R.id.topic_name);
 					topicTitle.setTextColor(R.color.very_dark_gray);
 
-					LinearLayout teste = (LinearLayout) convertView
+					leftBar = (LinearLayout) convertView
 							.findViewById(R.id.left_bar);
-					teste.setBackgroundColor(R.color.very_dark_gray);
+					leftBar.setBackgroundColor(R.color.very_dark_gray);
 
 					topicTitle.setTextColor(R.color.very_dark_gray);
 					topicTitle.setText(cursor.getString(cursor
 							.getColumnIndex("name")));
 					Log.w("isClosed",
 							cursor.getString(cursor.getColumnIndex("closed")));
+				}
 
+				if (cursor.getInt(cursor.getColumnIndex("has_new_posts")) == 1
+						&& cursor.getString(cursor.getColumnIndex("closed"))
+								.equals("f")) {
+
+					Log.i("HASNEWPOSTS", "TRUE");
+
+					leftBar.setBackgroundColor(Color.YELLOW);
 				}
 
 				TextView topicTitle = (TextView) convertView
@@ -276,35 +287,61 @@ public class TopicListController extends ListActivity {
 
 	}
 
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		Log.w("OnActivityResult", "OK");
+		updateList();
+	}
+
 	private class TopicHandler extends Handler {
 		@Override
 		public void handleMessage(Message msg) {
-			// TODO Auto-generated method stub
 			super.handleMessage(msg);
 
-			if (msg.what == Constants.MESSAGE_CONNECTION_FAILED) {
-				closeDialogIfItsVisible();
-			}
+			switch (msg.what) {
 
-			if (msg.what == Constants.MESSAGE_TOPIC_CONNECTION_OK) {
+			case Constants.MESSAGE_CONNECTION_FAILED:
+				closeDialogIfItsVisible();
+				break;
+
+			case Constants.MESSAGE_TOPIC_CONNECTION_OK:
 
 				ContentValues[] values = jsonParser.parseJSON(msg.getData()
 						.getString("content"), Constants.PARSE_TOPICS_ID);
 
 				topicDAO.open();
+
+				for (int i = 0; i < values.length; i++) {
+					if (topicDAO.hasNewPosts(values[i].getAsInteger("_id"),
+							values[i].getAsString("last_post_date"))) {
+						Log.i("TAG", "Existem posts novos");
+						values[i].put("has_new_posts", true);
+					} else {
+						Log.v("TAG", "Não há posts novos");
+					}
+				}
+
 				topicDAO.addTopics(values, settings.getInt("SelectedClass", 0));
 				topicDAO.close();
 				updateList();
 				closeDialogIfItsVisible();
+				break;
 
-			}
+			case Constants.MESSAGE_NEW_POST_CONNECTION_OK:
 
-			if (msg.what == Constants.MESSAGE_NEW_POST_CONNECTION_OK) {
+				topicDAO.open();
+				if (topicDAO.hasNewPostsFlag(settings
+						.getInt("SelectedTopic", 0))) {
+					ContentValues newFlag = new ContentValues();
+					newFlag.put("has_new_posts", 0);
+					topicDAO.updateFlag(newFlag);
+				}
+				topicDAO.close();
 
 				intent = new Intent(getApplicationContext(), PostList.class);
 
 				if (msg.getData().getString("content").length() == 2) {
-					startActivity(intent);
+					startActivityForResult(intent, 1);
 				}
 
 				else {
@@ -319,11 +356,13 @@ public class TopicListController extends ListActivity {
 					try {
 						String ids = postDAO.getUserIdsAbsentImage(settings
 								.getInt("SelectedTopic", 0));
+						postDAO.close();
 						getImages("images/" + ids + "/users");
 						Log.i("Alguns usuários não possuem imagens", "TRUE");
 					} catch (StringIndexOutOfBoundsException e) {
+						postDAO.close();
 						Log.i("Não precisa Baixar novas imagens", "TRUE");
-						startActivity(intent);
+						startActivityForResult(intent, 1);
 					} catch (NullPointerException e) {
 						Log.i("Baixar todas as imagens", "TRUE");
 						String ids = postDAO.getAllUserIds();
@@ -331,17 +370,21 @@ public class TopicListController extends ListActivity {
 						getImages("images/" + ids + "/users");
 					}
 				}
-			}
+				break;
 
-			if (msg.what == Constants.MESSAGE_IMAGE_CONNECTION_OK) {
+			case Constants.MESSAGE_IMAGE_CONNECTION_OK:
 
 				zipManager.unzipFile();
 				intent = new Intent(getApplicationContext(), PostList.class);
-				startActivity(intent);
-			}
-			if (msg.what == Constants.MESSAGE_IMAGE_CONNECION_FAILED) {
+				startActivityForResult(intent, 1);
+				break;
+
+			case Constants.MESSAGE_IMAGE_CONNECION_FAILED:
+
 				intent = new Intent(getApplicationContext(), PostList.class);
-				startActivity(intent);
+				startActivityForResult(intent, 1);
+				break;
+
 			}
 		}
 	}
