@@ -3,6 +3,7 @@ package com.mobilis.util;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashMap;
 
@@ -83,13 +84,13 @@ public class ParseJSON {
 				parsedValues[i] = new ContentValues();
 
 				parsedValues[i].put("_id",
-						(String) jsonObjects[i].get("group_id"));
+						(String) jsonObjects[i].get("curriculum_unit_id"));
 
 				parsedValues[i].put("offer_id",
 						(String) jsonObjects[i].get("offer_id"));
 
-				parsedValues[i].put("curriculum_unit_id",
-						(String) jsonObjects[i].get("curriculum_unit_id"));
+				parsedValues[i].put("group_id",
+						(String) jsonObjects[i].get("group_id"));
 
 				parsedValues[i].put("semester",
 						(String) jsonObjects[i].get("semester"));
@@ -227,6 +228,10 @@ public class ParseJSON {
 		SharedPreferences.Editor editor = settings.edit();
 		editor.putString("after", after);
 		editor.putString("before", before);
+
+		if (jsonArray.size() == 1) {
+			return parsedPostValues;
+		}
 
 		for (int i = 1; i < jsonArray.size(); i++) {
 

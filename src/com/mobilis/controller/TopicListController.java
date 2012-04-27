@@ -184,11 +184,11 @@ public class TopicListController extends ListActivity {
 
 			if (cursor != null) {
 
-				LinearLayout leftBar = (LinearLayout) convertView
-						.findViewById(R.id.left_bar);
-
 				if (cursor.getString(cursor.getColumnIndex("closed")).equals(
 						"t")) {
+
+					LinearLayout leftBar = (LinearLayout) convertView
+							.findViewById(R.id.left_bar);
 
 					StateListDrawable states = new StateListDrawable();
 					states.addState(
@@ -215,6 +215,9 @@ public class TopicListController extends ListActivity {
 				if (cursor.getInt(cursor.getColumnIndex("has_new_posts")) == 1
 						&& cursor.getString(cursor.getColumnIndex("closed"))
 								.equals("f")) {
+
+					LinearLayout leftBar = (LinearLayout) convertView
+							.findViewById(R.id.left_bar);
 
 					Log.i("HASNEWPOSTS", "TRUE");
 
@@ -341,15 +344,18 @@ public class TopicListController extends ListActivity {
 
 				intent = new Intent(getApplicationContext(), PostList.class);
 
-				if (msg.getData().getString("content").length() == 2) {
+				ArrayList<ContentValues> parsedValues = jsonParser
+						.parsePosts(msg.getData().getString("content"));
+
+				if (parsedValues.size() == 0) {
 					startActivityForResult(intent, 1);
 				}
 
 				else {
 					Log.i("Content", msg.getData().getString("content"));
 
-					ArrayList<ContentValues> parsedValues = jsonParser
-							.parsePosts(msg.getData().getString("content"));
+					parsedValues = jsonParser.parsePosts(msg.getData()
+							.getString("content"));
 
 					postDAO.open();
 					postDAO.addPosts(parsedValues,
