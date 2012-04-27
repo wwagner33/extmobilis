@@ -53,7 +53,7 @@ public class CourseListController extends ListActivity {
 		courseDAO = new CourseDAO(this);
 		classDAO = new ClassDAO(this);
 		dialogMaker = new DialogMaker(this);
-		jsonParser = new ParseJSON();
+		jsonParser = new ParseJSON(this);
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
 		updateList();
 	}

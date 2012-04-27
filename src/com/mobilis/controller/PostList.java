@@ -64,7 +64,7 @@ public class PostList extends ListActivity implements OnClickListener,
 
 	private boolean stopLoadingMore = false;
 	private boolean loadingMore = false;
-	private String oldestPostDate;
+	private String oldestPostDate = Constants.oldDateString;
 	private View footerView;
 	private DialogMaker dialogMaker;
 	private PostDAO postDAO;
@@ -89,7 +89,7 @@ public class PostList extends ListActivity implements OnClickListener,
 
 		dialogMaker = new DialogMaker(this);
 		postDAO = new PostDAO(this);
-		jsonParser = new ParseJSON();
+		jsonParser = new ParseJSON(this);
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
 
 		answerForum = (ImageView) findViewById(R.id.answer_topic_image);
@@ -204,26 +204,6 @@ public class PostList extends ListActivity implements OnClickListener,
 		startActivity(intent);
 
 	}
-
-	//
-	// public void updateList(String source) {
-	//
-	// jsonParser = new ParseJSON(this);
-	// parsedValues = jsonParser.parsePosts(source);
-	//
-	// if (parsedValues.size() > 1) {
-	// oldestPostDate = parsedValues.get(parsedValues.size() - 1)
-	// .getAsString("updated");
-	// }
-	//
-	// if (parsedValues.size() == 20) {
-	//
-	// footerView = ((LayoutInflater) this
-	// .getSystemService(Context.LAYOUT_INFLATER_SERVICE))
-	// .inflate(R.layout.post_list_footer, null, false);
-	// this.getListView().addFooterView(footerView);
-	// }
-	// }
 
 	public void refreshList() {
 
@@ -508,6 +488,8 @@ public class PostList extends ListActivity implements OnClickListener,
 
 					cursor = postDAO.getPostsFromTopic(settings.getInt(
 							"SelectedTopic", 0));
+					oldestPostDate = postDAO.getOldestPost(settings.getInt(
+							"SelectedTopic", 0));
 
 					try {
 						String ids = postDAO.getUserIdsAbsentImage(settings
@@ -543,6 +525,12 @@ public class PostList extends ListActivity implements OnClickListener,
 						.getData().getString("content"));
 				// oldestPostDate = temp.get(temp.size() - 1).getAsString(
 				// "updated");
+				try {
+					oldestPostDate = DateUtils.convertDateToServerFormat(temp
+							.get(temp.size() - 1).getAsString("updated"));
+				} catch (ParseException e1) {
+					e1.printStackTrace();
+				}
 
 				parsedValues.addAll(temp);
 
@@ -567,7 +555,6 @@ public class PostList extends ListActivity implements OnClickListener,
 					closeDialogIfItsVisible();
 					postDAO.close();
 					loadingMore = false;
-					// stopLoadingMore = false;
 					closeDialogIfItsVisible();
 					refreshList();
 					Log.i("Não é preciso Baixar novas imagens", "TRUE");

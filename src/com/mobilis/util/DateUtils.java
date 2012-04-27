@@ -1,5 +1,6 @@
 package com.mobilis.util;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -227,4 +228,12 @@ public class DateUtils {
 		SimpleDateFormat serverFormat = new SimpleDateFormat("yyyyMMddHHmmss");
 		return serverFormat;
 	}
+
+	public static final String convertDateToServerFormat(String bankDate)
+			throws ParseException {
+		Date db = getDbFormat().parse(bankDate);
+		String serverFormat = getServerFormat().format(db);
+		return serverFormat;
+	}
+
 }

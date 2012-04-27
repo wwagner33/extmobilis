@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
@@ -19,6 +20,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
 import org.json.simple.parser.ParseException;
+
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -383,6 +385,8 @@ public class Connection {
 				return null;
 			} catch (ParseException e) {
 				return null;
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 
 			return null;
@@ -435,7 +439,6 @@ public class Connection {
 					return 0;
 				}
 			} catch (InterruptedException e) {
-				e.printStackTrace();
 				return 2;
 			}
 

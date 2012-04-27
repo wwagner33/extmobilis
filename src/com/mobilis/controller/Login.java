@@ -45,7 +45,7 @@ public class Login extends Activity implements OnClickListener {
 		handler = new LoginHandler();
 		connection = new Connection(handler, this);
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
-		jsonParser = new ParseJSON();
+		jsonParser = new ParseJSON(this);
 		courseDAO = new CourseDAO(this);
 		dialogMaker = new DialogMaker(this);
 		login = (EditText) findViewById(R.id.campo1);
@@ -131,7 +131,7 @@ public class Login extends Activity implements OnClickListener {
 
 			if (msg.what == Constants.MESSAGE_TOKEN_CONNECTION_OK) {
 
-				jsonParser = new ParseJSON();
+				jsonParser = new ParseJSON(getApplicationContext());
 				ContentValues[] tokenParsed = jsonParser.parseJSON(msg
 						.getData().getString("content"),
 						Constants.PARSE_TOKEN_ID);

@@ -51,7 +51,7 @@ public class ClassListController extends ListActivity {
 		setContentView(R.layout.curriculum_units);
 		handler = new ClassHandler();
 		connection = new Connection(handler, this);
-		jsonParser = new ParseJSON();
+		jsonParser = new ParseJSON(this);
 		classDAO = new ClassDAO(this);
 		topicDAO = new TopicDAO(this);
 		dialogMaker = new DialogMaker(this);

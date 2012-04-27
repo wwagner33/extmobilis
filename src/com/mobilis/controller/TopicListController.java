@@ -59,7 +59,7 @@ public class TopicListController extends ListActivity {
 
 		handler = new TopicHandler();
 		connection = new Connection(handler, this);
-		jsonParser = new ParseJSON();
+		jsonParser = new ParseJSON(this);
 		postDAO = new PostDAO(this);
 		topicDAO = new TopicDAO(this);
 		zipManager = new ZipManager();
@@ -345,6 +345,7 @@ public class TopicListController extends ListActivity {
 				}
 
 				else {
+					Log.i("Content", msg.getData().getString("content"));
 
 					ArrayList<ContentValues> parsedValues = jsonParser
 							.parsePosts(msg.getData().getString("content"));

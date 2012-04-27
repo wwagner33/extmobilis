@@ -10,17 +10,25 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
-import com.mobilis.controller.Constants;
-
 import android.content.ContentValues;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.Log;
+
+import com.mobilis.controller.Constants;
 
 public class ParseJSON {
 
 	private ContentValues[] parsedValues;
 	private ArrayList<ContentValues> parsedPostValues;
+	private SharedPreferences settings;
+
+	public ParseJSON(Context context) {
+		settings = PreferenceManager.getDefaultSharedPreferences(context);
+	}
 
 	public void parseDate(ContentValues container, String data, int position) {
 
@@ -215,7 +223,14 @@ public class ParseJSON {
 
 		Log.i("JsonArray", String.valueOf(jsonArray.size()));
 
-		for (int i = 0; i < jsonArray.size(); i++) {
+		JSONObject local = (JSONObject) jsonArray.get(0);
+		String after = (String) local.get("after");
+		String before = (String) local.get("before");
+		SharedPreferences.Editor editor = settings.edit();
+		editor.putString("after", after);
+		editor.putString("before", before);
+
+		for (int i = 1; i < jsonArray.size(); i++) {
 
 			jsonObjects[i] = (JSONObject) jsonArray.get(i);
 
@@ -245,7 +260,7 @@ public class ParseJSON {
 			rowItem.put("_id",
 					Long.parseLong((String) jsonObjects[i].get("id")));
 
-			if ((String) jsonObjects[i].get("parent_id") != null) {
+			if (!((String) jsonObjects[i].get("parent_id")).equals("")) {
 				rowItem.put("parent_id", Long.parseLong((String) jsonObjects[i]
 						.get("parent_id")));
 			} else {

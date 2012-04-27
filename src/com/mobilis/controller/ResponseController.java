@@ -109,7 +109,7 @@ public class ResponseController extends Activity implements OnClickListener,
 
 		charCount.setText("0/" + Constants.TEXT_MAX_CHARACTER_LENGHT);
 
-		jsonParser = new ParseJSON();
+		jsonParser = new ParseJSON(this);
 
 	}
 
@@ -409,7 +409,7 @@ public class ResponseController extends Activity implements OnClickListener,
 				Log.w("RESULT", msg.getData().getString("content"));
 
 				ContentValues[] resultFromServer;
-				jsonParser = new ParseJSON();
+				jsonParser = new ParseJSON(getApplicationContext());
 				resultFromServer = jsonParser
 						.parseJSON(msg.getData().getString("content"),
 								Constants.PARSE_TEXT_RESPONSE_ID);

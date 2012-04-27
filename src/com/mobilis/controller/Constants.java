@@ -46,7 +46,6 @@ public class Constants {
 	public static final int PARSE_NEW_POSTS_ID = 227;
 	public static final int PARSE_HISTORY_POSTS_ID = 228;
 
-	// Folder Paths
 	public static final String PATH_SD_CARD = Environment
 			.getExternalStorageDirectory().getAbsolutePath();
 	public static final String PATH_MAIN_FOLDER = PATH_SD_CARD + "/Mobilis/";
