@@ -14,6 +14,7 @@ public class Config extends PreferenceActivity implements
 	private CheckBoxPreference autoLogin;
 	private SharedPreferences settings;
 
+	@SuppressWarnings("deprecation")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub

@@ -136,6 +136,7 @@ public class ClassListController extends ListActivity {
 
 		LayoutInflater inflater;
 
+		@SuppressWarnings("deprecation")
 		public ClassAdapter(Context context, Cursor c) {
 			super(context, c);
 			inflater = LayoutInflater.from(context);

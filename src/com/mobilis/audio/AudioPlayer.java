@@ -6,7 +6,7 @@ import java.io.IOException;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
 
-import com.mobilis.controller.Constants;
+import com.mobilis.util.Constants;
 
 public class AudioPlayer {
 	private MediaPlayer player;

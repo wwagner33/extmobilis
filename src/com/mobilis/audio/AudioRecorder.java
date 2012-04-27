@@ -7,7 +7,7 @@ import android.media.MediaRecorder;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.mobilis.controller.Constants;
+import com.mobilis.util.Constants;
 
 public class AudioRecorder {
 

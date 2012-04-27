@@ -99,10 +99,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 		SQLiteDatabase checkDB = null;
 
-		int version = android.os.Build.VERSION.SDK_INT;
-
-		Log.i("TAG", "STEP2");
-
 		try {
 
 			checkDB = SQLiteDatabase.openDatabase(outFileName, null,
@@ -113,10 +109,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		}
 
 		if (checkDB != null) {
-			Log.i("TAG", "STEP3");
 			return true;
 		} else {
-			Log.i("TAG", "STEP4");
 			checkDB = this.getReadableDatabase();
 			checkDB.close();
 			return false;

@@ -173,6 +173,7 @@ public class TopicListController extends ListActivity {
 
 		LayoutInflater inflater;
 
+		@SuppressWarnings("deprecation")
 		public TopicAdapter(Context context, Cursor c) {
 			super(context, c);
 			inflater = LayoutInflater.from(context);

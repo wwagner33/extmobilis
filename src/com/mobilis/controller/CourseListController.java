@@ -150,6 +150,7 @@ public class CourseListController extends ListActivity {
 
 	private class CourseListAdapter extends CursorAdapter {
 
+		@SuppressWarnings("deprecation")
 		public CourseListAdapter(Context context, Cursor c) {
 			super(context, c);
 			inflater = LayoutInflater.from(context);
