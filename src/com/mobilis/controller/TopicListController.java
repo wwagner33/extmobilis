@@ -26,11 +26,11 @@ import android.widget.CursorAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.mobilis.dao.PostDAO;
 import com.mobilis.dao.TopicDAO;
 import com.mobilis.dialog.DialogMaker;
+import com.mobilis.util.Constants;
 import com.mobilis.util.ParseJSON;
 import com.mobilis.util.ZipManager;
 import com.mobilis.ws.Connection;

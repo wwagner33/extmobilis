@@ -10,7 +10,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.util.Log;
 
-import com.mobilis.controller.Constants;
+import com.mobilis.util.Constants;
 import com.mobilis.util.DateUtils;
 
 public class PostDAO extends DBAdapter {

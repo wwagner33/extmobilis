@@ -1,7 +1,5 @@
 package com.mobilis.util;
 
-import com.mobilis.controller.Constants;
-
 import android.content.Context;
 import android.widget.Toast;
 

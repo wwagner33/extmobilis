@@ -18,15 +18,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import com.mobilis.controller.Constants;
-
 import android.content.Context;
-import android.database.sqlite.SQLiteCantOpenDatabaseException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.os.Build.VERSION;
 import android.util.Log;
+
+import com.mobilis.util.Constants;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 

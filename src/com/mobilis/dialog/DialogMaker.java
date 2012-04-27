@@ -7,7 +7,7 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.os.Handler;
 
-import com.mobilis.controller.Constants;
+import com.mobilis.util.Constants;
 
 public class DialogMaker implements OnClickListener {
 

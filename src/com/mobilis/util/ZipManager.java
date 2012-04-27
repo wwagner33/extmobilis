@@ -12,8 +12,6 @@ import java.util.zip.ZipFile;
 
 import org.apache.commons.io.IOUtils;
 
-import com.mobilis.controller.Constants;
-
 public class ZipManager {
 
 	private void createDir(File dir) {

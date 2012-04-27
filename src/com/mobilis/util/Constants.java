@@ -1,4 +1,4 @@
-package com.mobilis.controller;
+package com.mobilis.util;
 
 import android.os.Environment;
 

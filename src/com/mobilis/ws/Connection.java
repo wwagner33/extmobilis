@@ -29,7 +29,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
-import com.mobilis.controller.Constants;
+import com.mobilis.util.Constants;
 import com.mobilis.util.ErrorHandler;
 
 public class Connection {

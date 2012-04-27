@@ -18,8 +18,6 @@ import android.text.Html;
 import android.text.Spanned;
 import android.util.Log;
 
-import com.mobilis.controller.Constants;
-
 public class ParseJSON {
 
 	private ContentValues[] parsedValues;

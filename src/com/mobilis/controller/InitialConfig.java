@@ -11,6 +11,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.mobilis.dao.DatabaseHelper;
+import com.mobilis.util.Constants;
 
 public class InitialConfig extends Activity {
 	private Intent intent;

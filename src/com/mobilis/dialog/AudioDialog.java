@@ -18,8 +18,8 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 
 import com.mobilis.audio.AudioPlayer;
-import com.mobilis.controller.Constants;
 import com.mobilis.controller.R;
+import com.mobilis.util.Constants;
 import com.mobilis.util.DateUtils;
 
 public class AudioDialog extends Dialog implements OnSeekBarChangeListener,
