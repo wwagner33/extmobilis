@@ -182,57 +182,54 @@ public class TopicListController extends ListActivity {
 		@Override
 		public void bindView(View convertView, Context context, Cursor cursor) {
 
-			if (cursor != null) {
+			// if (cursor != null) {
 
-				if (cursor.getString(cursor.getColumnIndex("closed")).equals(
-						"t")) {
+			if (cursor.getString(cursor.getColumnIndex("closed")).equals("t")) {
 
-					LinearLayout leftBar = (LinearLayout) convertView
-							.findViewById(R.id.left_bar);
+				LinearLayout leftBar = (LinearLayout) convertView
+						.findViewById(R.id.left_bar);
 
-					StateListDrawable states = new StateListDrawable();
-					states.addState(
-							new int[] {},
-							getResources().getDrawable(
-									R.drawable.course_list_closed_selector));
-					convertView.setBackgroundDrawable(states);
-
-					TextView topicTitle = (TextView) convertView
-							.findViewById(R.id.topic_name);
-					topicTitle.setTextColor(R.color.very_dark_gray);
-
-					leftBar = (LinearLayout) convertView
-							.findViewById(R.id.left_bar);
-					leftBar.setBackgroundColor(R.color.very_dark_gray);
-
-					topicTitle.setTextColor(R.color.very_dark_gray);
-					topicTitle.setText(cursor.getString(cursor
-							.getColumnIndex("name")));
-					Log.w("isClosed",
-							cursor.getString(cursor.getColumnIndex("closed")));
-				}
-
-				if (cursor.getInt(cursor.getColumnIndex("has_new_posts")) == 1
-						&& cursor.getString(cursor.getColumnIndex("closed"))
-								.equals("f")) {
-
-					LinearLayout leftBar = (LinearLayout) convertView
-							.findViewById(R.id.left_bar);
-
-					Log.i("HASNEWPOSTS", "TRUE");
-
-					leftBar.setBackgroundColor(Color.YELLOW);
-				}
+				StateListDrawable states = new StateListDrawable();
+				states.addState(
+						new int[] {},
+						getResources().getDrawable(
+								R.drawable.course_list_closed_selector));
+				convertView.setBackgroundDrawable(states);
 
 				TextView topicTitle = (TextView) convertView
 						.findViewById(R.id.topic_name);
+				topicTitle.setTextColor(R.color.very_dark_gray);
 
+				leftBar = (LinearLayout) convertView
+						.findViewById(R.id.left_bar);
+				leftBar.setBackgroundColor(R.color.very_dark_gray);
+
+				topicTitle.setTextColor(R.color.very_dark_gray);
 				topicTitle.setText(cursor.getString(cursor
 						.getColumnIndex("name")));
-
 				Log.w("isClosed",
 						cursor.getString(cursor.getColumnIndex("closed")));
 			}
+
+			if (cursor.getInt(cursor.getColumnIndex("has_new_posts")) == 1
+					&& cursor.getString(cursor.getColumnIndex("closed"))
+							.equals("f")) {
+
+				LinearLayout leftBar = (LinearLayout) convertView
+						.findViewById(R.id.left_bar);
+
+				Log.i("HASNEWPOSTS", "TRUE");
+
+				leftBar.setBackgroundColor(Color.YELLOW);
+			}
+
+			TextView topicTitle = (TextView) convertView
+					.findViewById(R.id.topic_name);
+
+			topicTitle.setText(cursor.getString(cursor.getColumnIndex("name")));
+
+			Log.w("isClosed", cursor.getString(cursor.getColumnIndex("closed")));
+			// }
 		}
 
 		@Override
@@ -338,7 +335,8 @@ public class TopicListController extends ListActivity {
 						.getInt("SelectedTopic", 0))) {
 					ContentValues newFlag = new ContentValues();
 					newFlag.put("has_new_posts", 0);
-					topicDAO.updateFlag(newFlag);
+					topicDAO.updateFlag(newFlag,
+							settings.getInt("SelectedTopic", 0));
 				}
 				topicDAO.close();
 

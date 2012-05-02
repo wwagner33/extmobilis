@@ -74,7 +74,7 @@ public class TopicDAO extends DBAdapter {
 
 	}
 
-	public void updateFlag(ContentValues newValue) {
-		getDatabase().update("topics", newValue, null, null);
+	public void updateFlag(ContentValues newValue, int topic_id) {
+		getDatabase().update("topics", newValue, "_id=" + topic_id, null);
 	}
 }
