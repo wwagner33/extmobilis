@@ -15,17 +15,6 @@
         android:layout_height="50dp"
         android:layout_below="@id/top_bar" >
 
-        <TextView
-            android:id="@+id/nome_forum"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_centerHorizontal="true"
-            android:layout_centerInParent="true"
-            android:layout_marginLeft="5dp"
-            android:textColor="@color/TextColor"
-            android:textSize="15dp" />
-
         <ImageView
             android:id="@+id/answer_topic_image"
             android:layout_width="wrap_content"
@@ -37,28 +26,40 @@
             android:clickable="true"
             android:contentDescription="@string/new_topic_image_description"
             android:src="@drawable/button_message_selector" />
+
+        <TextView
+            android:id="@+id/nome_forum"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerHorizontal="true"
+            android:layout_centerInParent="true"
+            android:layout_marginLeft="5dp"
+            android:layout_toLeftOf="@id/answer_topic_image"
+            android:textColor="@color/TextColor"
+            android:textSize="15dp" />
     </RelativeLayout>
 
     <RelativeLayout
-        android:layout_below="@id/middle_bar"
         style="@style/SolarTheme"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent" >
+        android:layout_height="fill_parent"
+        android:layout_below="@id/middle_bar" >
 
         <LinearLayout
-        android:id="@+id/highlight_bar"
-        android:layout_width="fill_parent"
-        android:layout_height="9dp"
-        android:layout_alignParentBottom="true"
-        android:background="@color/yellow_hightlight"
-        android:orientation="vertical" />
-        
+            android:id="@+id/highlight_bar"
+            android:layout_width="fill_parent"
+            android:layout_height="9dp"
+            android:layout_alignParentBottom="true"
+            android:background="@color/yellow_hightlight"
+            android:orientation="vertical" />
+
         <ListView
-           	android:layout_below="@id/middle_bar"
-           	android:layout_above="@id/highlight_bar"
             android:id="@android:id/list"
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent" />
+            android:layout_height="fill_parent"
+            android:layout_above="@id/highlight_bar"
+            android:layout_below="@id/middle_bar" />
 
         <TextView
             android:id="@android:id/empty"

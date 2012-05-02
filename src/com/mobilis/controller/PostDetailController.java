@@ -49,9 +49,7 @@ public class PostDetailController extends Activity implements OnClickListener {
 			if (extras.get("image") != null) {
 				avatar.setImageBitmap((Bitmap) extras.get("image"));
 			}
-			// Log.w("ParentId on DETAILS", String.valueOf(parentId));
 		}
-
 	}
 
 	@Override
