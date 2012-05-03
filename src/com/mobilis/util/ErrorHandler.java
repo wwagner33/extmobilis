@@ -17,31 +17,12 @@ public class ErrorHandler {
 					Toast.LENGTH_SHORT).show();
 		}
 
-		if (errorId == Constants.ERROR_SERVER_DOWN) {
-			Toast.makeText(context, "Servidor Indisponível", Toast.LENGTH_SHORT)
+	}
+
+	public static void handleStatusCode(Context context, int statusCode) {
+		if (statusCode == 401) {
+			Toast.makeText(context, "Falha de autenticação", Toast.LENGTH_SHORT)
 					.show();
 		}
-		if (errorId == Constants.ERROR_TOKEN_EXPIRED) {
-
-			Toast.makeText(context, "Senha ou Login inválidos",
-					Toast.LENGTH_SHORT).show();
-		}
-
-		if (errorId == Constants.ERROR_UNKNOWN) {
-
-			Toast.makeText(context, "Erro desconhecido", Toast.LENGTH_SHORT)
-					.show();
-		}
-
-		if (errorId == Constants.ERROR_PAGE_NOT_FOUND) {
-			Toast.makeText(context, "Página não encontrada", Toast.LENGTH_SHORT)
-					.show();
-		}
-
-		if (errorId == Constants.ERROR_CONNECTION_REFUSED) {
-			Toast.makeText(context, "Conexão recusada", Toast.LENGTH_SHORT)
-					.show();
-		}
-
 	}
 }

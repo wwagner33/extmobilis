@@ -17,7 +17,7 @@ public class PostDetailController extends Activity implements OnClickListener {
 	private TextView body, userName, forumName;
 	private Bundle extras;
 	private ImageView response, avatar;
-	private String topicId;
+	private int topicId;
 	private long parentId;
 	private SharedPreferences settings;
 
@@ -44,7 +44,7 @@ public class PostDetailController extends Activity implements OnClickListener {
 			body.setText(extras.getString("content"));
 			forumName.setText(settings.getString("CurrentForumName", null));
 			userName.setText(extras.getString("username"));
-			topicId = extras.getString("topicId");
+			topicId = extras.getInt("topicId");
 			parentId = extras.getLong("parentId");
 			if (extras.get("image") != null) {
 				avatar.setImageBitmap((Bitmap) extras.get("image"));

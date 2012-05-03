@@ -181,21 +181,10 @@ public class Connection {
 			resultSet[0] = builder.toString();
 			resultSet[1] = statusCode;
 			return resultSet;
-
-		}
-		if (statusCode == 500) {
-			resultSet[1] = Constants.ERROR_SERVER_DOWN;
+		} else {
+			resultSet[1] = statusCode;
 			return resultSet;
 		}
-
-		if (statusCode >= 400 && statusCode < 500) {
-			resultSet[1] = Constants.ERROR_TOKEN_EXPIRED;
-			return resultSet;
-		}
-
-		resultSet[1] = Constants.ERROR_UNKNOWN;
-		return resultSet;
-
 	}
 
 	private Object[] executePost(String jsonString, String URL)
@@ -406,7 +395,8 @@ public class Connection {
 				}
 
 				else {
-					// Não caiu em exceção mas o status não foi o desejado
+					// Não caiu em excelção mas o statuc não foi o correto
+					ErrorHandler.handleStatusCode(context, (Integer) result[1]);
 					sendNegativeMessage();
 				}
 

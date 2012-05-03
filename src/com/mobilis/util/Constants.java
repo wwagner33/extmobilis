@@ -22,13 +22,6 @@ public class Constants {
 	// Error ids
 	public static final int ERROR_CONNECTION_FAILED = 101;
 	public static final int ERROR_CONNECTION_TIMEOUT = 102;
-	public static final int ERROR_SERVER_DOWN = 103;
-	public static final int ERROR_TOKEN_EXPIRED = 104;
-	public static final int ERROR_UNKNOWN = 105;
-	public static final int ERROR_PAGE_NOT_FOUND = 106;
-	public static final int ERROR_CONNECTION_REFUSED = 107;
-	public static final int ERROR_AUDIO_RECORDING_FAILED = 108;
-	// public static final int BELOW_CHARACTER_LIMIT=2;
 
 	// Database
 	public static final String DATABASE_PATH = "/data/data/com.mobilis.controller/databases/";
