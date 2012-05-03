@@ -45,7 +45,9 @@ public class PostDAO extends DBAdapter {
 	}
 
 	public void clearPostsFromTopic(int topic_id) {
-		getDatabase().delete("posts", "discussion_id=" + topic_id, null);
+		int status = getDatabase().delete("posts", "discussion_id=" + topic_id,
+				null);
+		Log.w("Delete status", String.valueOf(status));
 	}
 
 	public Cursor getPostsFromTopic(int topic_id) {

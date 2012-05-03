@@ -6,7 +6,7 @@ public class Constants {
 
 	// URL
 	public static final String URL_LOCAL = "http://10.0.2.2:3000/";
-	public static final String URL_SERVER = "http://apolo11teste.virtual.ufc.br/ws_solar/";
+	public static final String URL_SERVER = "http://apolo11teste.virtual.ufc.br/wss/";
 	public static final String URL_TOKEN = "sessions";
 	public static final String URL_COURSES = "curriculum_units.json"; // suffix
 	public static final String URL_GROUPS_PREFIX = "groups/";

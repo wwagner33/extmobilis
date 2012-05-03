@@ -2,7 +2,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="300dp"
     android:layout_height="fill_parent"
-    android:background="@color/white"
     android:orientation="vertical" >
 
     <RelativeLayout
@@ -17,6 +16,7 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_alignParentLeft="true"
+            android:contentDescription="Imagem que indica que um áudio está sendo exibido"
             android:src="@drawable/ic_lock_silent_mode_off" />
 
         <TextView
@@ -84,6 +84,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:clickable="true"
+            android:contentDescription="Imagem do botão de pause"
             android:src="@drawable/button_pause_selector" />
 
         <ImageView
@@ -92,6 +93,7 @@
             android:layout_height="wrap_content"
             android:layout_toRightOf="@id/button_pause_blue"
             android:clickable="true"
+            android:contentDescription="Imagem do botão stop"
             android:src="@drawable/button_stop_selector" />
 
         <SeekBar

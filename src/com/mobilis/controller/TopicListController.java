@@ -198,13 +198,18 @@ public class TopicListController extends ListActivity {
 
 				TextView topicTitle = (TextView) convertView
 						.findViewById(R.id.topic_name);
-				topicTitle.setTextColor(R.color.very_dark_gray);
+				topicTitle.setTextColor(getResources().getColor(
+						R.color.very_dark_gray));
 
 				leftBar = (LinearLayout) convertView
 						.findViewById(R.id.left_bar);
-				leftBar.setBackgroundColor(R.color.very_dark_gray);
 
-				topicTitle.setTextColor(R.color.very_dark_gray);
+				leftBar.setBackgroundColor(getResources().getColor(
+						R.color.very_dark_gray));
+
+				topicTitle.setTextColor(getResources().getColor(
+						R.color.very_dark_gray));
+
 				topicTitle.setText(cursor.getString(cursor
 						.getColumnIndex("name")));
 				Log.w("isClosed",

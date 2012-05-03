@@ -2,7 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/post_id"
     android:layout_width="fill_parent"
-    android:layout_height="wrap_content" >
+    android:layout_height="wrap_content"
+    android:paddingBottom="7dp" >
 
     <ImageView
         android:id="@+id/avatar"
@@ -14,7 +15,8 @@
         android:layout_marginRight="5dp"
         android:layout_marginTop="5dp"
         android:padding="2dp"
-        android:src="@drawable/stock_person" />
+        android:src="@drawable/stock_person"
+        android:contentDescription="Imagem padrão para quando o usuário não possui foto" />
 
     <TextView
         android:id="@+id/post_title"
@@ -42,17 +44,5 @@
         android:layout_marginBottom="5dp"
         android:layout_marginRight="5dp"
         android:layout_toRightOf="@id/avatar" />
-
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="1dp"
-        android:layout_below="@id/post_body"
-        android:orientation="vertical" />
-
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="2dp"
-        android:layout_below="@id/avatar"
-        android:orientation="vertical" />
 
 </RelativeLayout>
