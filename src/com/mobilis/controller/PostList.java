@@ -479,8 +479,18 @@ public class PostList extends ListActivity implements OnClickListener,
 
 				newPosts = true;
 
-				if (msg.getData().getString("content").length() > 2) {
+				ArrayList<ContentValues> values = jsonParser.parsePosts(msg
+						.getData().getString("content"));
 
+				if (values.size() == 0) {
+
+					closeDialogIfItsVisible();
+					Toast.makeText(getApplicationContext(),
+							"Não existem posts novos", Toast.LENGTH_SHORT)
+							.show();
+				}
+
+				else {
 					postDAO.open();
 					postDAO.addPosts(
 							jsonParser.parsePosts(msg.getData().getString(
@@ -511,12 +521,6 @@ public class PostList extends ListActivity implements OnClickListener,
 						postDAO.close();
 						getImages("images/" + ids + "/users");
 					}
-
-				} else {
-					closeDialogIfItsVisible();
-					Toast.makeText(getApplicationContext(),
-							"Não existem posts novos", Toast.LENGTH_SHORT)
-							.show();
 				}
 			}
 
@@ -524,8 +528,6 @@ public class PostList extends ListActivity implements OnClickListener,
 
 				ArrayList<ContentValues> temp = jsonParser.parsePosts(msg
 						.getData().getString("content"));
-				// oldestPostDate = temp.get(temp.size() - 1).getAsString(
-				// "updated");
 				try {
 					oldestPostDate = DateUtils.convertDateToServerFormat(temp
 							.get(temp.size() - 1).getAsString("updated"));

@@ -58,13 +58,6 @@ public class PostDAO extends DBAdapter {
 		return cursor;
 	}
 
-	/*
-	 * public String getNewestPostDate() { Cursor cursor =
-	 * getDatabase().rawQuery( "SELECT max(updated) FROM posts", null);
-	 * cursor.moveToFirst(); String date = cursor.getString(0); cursor.close();
-	 * return date; }
-	 */
-
 	public ArrayList<ContentValues> cursorToContentValues(Cursor cursor) {
 
 		cursor.moveToLast();
