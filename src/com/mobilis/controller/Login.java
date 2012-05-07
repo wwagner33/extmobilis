@@ -7,6 +7,7 @@ import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -42,19 +43,24 @@ public class Login extends Activity implements OnClickListener {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		setContentView(R.layout.login);
+		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+			setContentView(R.layout.login);
+			handler = new LoginHandler();
+			connection = new Connection(handler, this);
+			settings = PreferenceManager.getDefaultSharedPreferences(this);
+			jsonParser = new ParseJSON(this);
+			courseDAO = new CourseDAO(this);
+			dialogMaker = new DialogMaker(this);
+			login = (EditText) findViewById(R.id.campo1);
+			password = (EditText) findViewById(R.id.campo2);
+			submit = (Button) findViewById(R.id.submit);
+			submit.setOnClickListener(this);
+			restoreDialog(savedInstanceState);
+		}
 
-		handler = new LoginHandler();
-		connection = new Connection(handler, this);
-		settings = PreferenceManager.getDefaultSharedPreferences(this);
-		jsonParser = new ParseJSON(this);
-		courseDAO = new CourseDAO(this);
-		dialogMaker = new DialogMaker(this);
-		login = (EditText) findViewById(R.id.campo1);
-		password = (EditText) findViewById(R.id.campo2);
-		submit = (Button) findViewById(R.id.submit);
-		submit.setOnClickListener(this);
-		restoreDialog(savedInstanceState);
+		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+			setContentView(R.layout.login_landscape);
+		}
 
 	}
 
