@@ -10,6 +10,7 @@ import java.util.Date;
 
 import android.app.Dialog;
 import android.app.ListActivity;
+import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -120,8 +121,33 @@ public class PostList extends ListActivity implements OnClickListener,
 		postDAO.open();
 		cursor = postDAO.getPostsFromTopic(settings.getInt("SelectedTopic", 0));
 		postDAO.close();
+
+		restoreDialog();
 		updateList(cursor);
 
+	}
+
+	@Override
+	public Object onRetainNonConfigurationInstance() {
+		Log.i("OnRetain", "True");
+		if (dialog != null) {
+			if (dialog.isShowing()) {
+				Log.i("OnRetain2", "True");
+				closeDialogIfItsVisible();
+				return dialog;
+			}
+		}
+		return null;
+	}
+
+	@SuppressWarnings("deprecation")
+	public void restoreDialog() {
+		Log.i("OnRestore", "TRUE");
+		if (getLastNonConfigurationInstance() != null) {
+			Log.i("OnRestore2", "TRUE");
+			dialog = (ProgressDialog) getLastNonConfigurationInstance();
+			dialog.show();
+		}
 	}
 
 	public Bitmap getUserImage(int user_id) throws ImageFileNotFoundException {
@@ -202,6 +228,7 @@ public class PostList extends ListActivity implements OnClickListener,
 			// A lista de detalhes vai exibir a imagem padrão
 		}
 
+		closeDialogIfItsVisible();
 		startActivity(intent);
 
 	}
@@ -399,6 +426,7 @@ public class PostList extends ListActivity implements OnClickListener,
 			intent = new Intent(this, ResponseController.class);
 			intent.putExtra("topicId", "");
 			intent.putExtra("parentId", noParentId);
+			closeDialogIfItsVisible();
 			startActivity(intent);
 
 		}
@@ -432,11 +460,13 @@ public class PostList extends ListActivity implements OnClickListener,
 			editor.commit();
 			intent = new Intent(this, Login.class);
 			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			closeDialogIfItsVisible();
 			startActivity(intent);
 
 		}
 		if (item.getItemId() == R.id.menu_config) {
 			intent = new Intent(this, Config.class);
+			closeDialogIfItsVisible();
 			startActivity(intent);
 		}
 		return true;

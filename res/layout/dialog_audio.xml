@@ -75,6 +75,7 @@
         android:id="@+id/playback_area"
         android:layout_width="fill_parent"
         android:layout_height="50dp"
+        android:background="@drawable/audio_dialog_item_selector"
         android:clickable="false"
         android:visibility="gone" >
 
@@ -109,7 +110,8 @@
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="1dp"
-        android:background="@color/courseListIdle" />
+        android:background="@color/courseListIdle"
+        android:contentDescription="Linha divisória" />
 
     <LinearLayout
         android:id="@+id/delete_area"

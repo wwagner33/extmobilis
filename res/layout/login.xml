@@ -114,7 +114,6 @@
         android:text="INSTITUTO UNIVERSIDADE VIRTUAL - 2012"
         android:textColor="@color/dark_gray" />
 
-
     <!-- android:text="@string/login_submit_button_text" -->
 
 </RelativeLayout>

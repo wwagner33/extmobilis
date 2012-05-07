@@ -57,19 +57,27 @@ public class ClassListController extends ListActivity {
 		topicDAO = new TopicDAO(this);
 		dialogMaker = new DialogMaker(this);
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
+		restoreDialog();
 		updateList();
 	}
 
+	@SuppressWarnings("deprecation")
+	public void restoreDialog() {
+		if (getLastNonConfigurationInstance() != null) {
+			dialog = (ProgressDialog) getLastNonConfigurationInstance();
+			dialog.show();
+		}
+	}
+
 	@Override
-	protected void onStop() {
-
-		super.onStop();
-
+	public Object onRetainNonConfigurationInstance() {
 		if (dialog != null) {
 			if (dialog.isShowing()) {
-				dialog.dismiss();
+				closeDialogIfItsVisible();
+				return dialog;
 			}
 		}
+		return null;
 	}
 
 	public void closeDialogIfItsVisible() {
@@ -192,12 +200,14 @@ public class ClassListController extends ListActivity {
 			editor.commit();
 			intent = new Intent(this, Login.class);
 			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			closeDialogIfItsVisible();
 			startActivity(intent);
 
 		}
 
 		if (item.getItemId() == R.id.menu_config) {
 			intent = new Intent(this, Config.class);
+			closeDialogIfItsVisible();
 			startActivity(intent);
 		}
 		return true;
@@ -258,6 +268,7 @@ public class ClassListController extends ListActivity {
 
 					intent = new Intent(getApplicationContext(),
 							TopicListController.class);
+					closeDialogIfItsVisible();
 					startActivity(intent);
 
 				}

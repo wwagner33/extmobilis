@@ -65,18 +65,37 @@ public class TopicListController extends ListActivity {
 		zipManager = new ZipManager();
 		dialogMaker = new DialogMaker(this);
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
+		restoreDialog();
 		updateList();
+	}
+
+	@SuppressWarnings("deprecation")
+	public void restoreDialog() {
+		Log.i("OnRestore", "TRUE");
+		if (getLastNonConfigurationInstance() != null) {
+			Log.i("OnRestore2", "TRUE");
+			dialog = (ProgressDialog) getLastNonConfigurationInstance();
+			dialog.show();
+		}
+	}
+
+	@Override
+	public Object onRetainNonConfigurationInstance() {
+		Log.i("OnRetain", "True");
+		if (dialog != null) {
+			if (dialog.isShowing()) {
+				Log.i("OnRetain2", "True");
+				closeDialogIfItsVisible();
+				return dialog;
+			}
+		}
+		return null;
 	}
 
 	@Override
 	protected void onStop() {
 		super.onStop();
 
-		try {
-			dialog.dismiss();
-		} catch (NullPointerException e) {
-
-		}
 		try {
 			postDAO.close();
 		} catch (NullPointerException e) {
@@ -136,6 +155,7 @@ public class TopicListController extends ListActivity {
 			postDAO.close();
 			topicDAO.close();
 			intent = new Intent(this, PostList.class);
+			closeDialogIfItsVisible();
 			startActivity(intent);
 
 		} else {
@@ -281,12 +301,14 @@ public class TopicListController extends ListActivity {
 			editor.commit();
 			intent = new Intent(this, Login.class);
 			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			closeDialogIfItsVisible();
 			startActivity(intent);
 
 		}
 
 		if (item.getItemId() == R.id.menu_config) {
 			intent = new Intent(this, Config.class);
+			closeDialogIfItsVisible();
 			startActivity(intent);
 		}
 		return true;
@@ -351,6 +373,7 @@ public class TopicListController extends ListActivity {
 						.parsePosts(msg.getData().getString("content"));
 
 				if (parsedValues.size() == 0) {
+					closeDialogIfItsVisible();
 					startActivityForResult(intent, 1);
 				}
 
@@ -373,6 +396,7 @@ public class TopicListController extends ListActivity {
 					} catch (StringIndexOutOfBoundsException e) {
 						postDAO.close();
 						Log.i("Não precisa Baixar novas imagens", "TRUE");
+						closeDialogIfItsVisible();
 						startActivityForResult(intent, 1);
 					} catch (NullPointerException e) {
 						Log.i("Baixar todas as imagens", "TRUE");
@@ -387,12 +411,14 @@ public class TopicListController extends ListActivity {
 
 				zipManager.unzipFile();
 				intent = new Intent(getApplicationContext(), PostList.class);
+				closeDialogIfItsVisible();
 				startActivityForResult(intent, 1);
 				break;
 
 			case Constants.MESSAGE_IMAGE_CONNECION_FAILED:
 
 				intent = new Intent(getApplicationContext(), PostList.class);
+				closeDialogIfItsVisible();
 				startActivityForResult(intent, 1);
 				break;
 

@@ -350,8 +350,9 @@ public class Connection {
 		@Override
 		protected Object[] doInBackground(Void... params) {
 
+		
 			try {
-
+				Thread.sleep(3000);
 				if (connectionType == Constants.TYPE_CONNECTION_GET) {
 
 					if (connectionId == Constants.CONNECTION_GET_IMAGES) {

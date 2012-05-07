@@ -56,12 +56,34 @@ public class CourseListController extends ListActivity {
 		dialogMaker = new DialogMaker(this);
 		jsonParser = new ParseJSON(this);
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
+		restoreDialog();
 		updateList();
 	}
 
+	@SuppressWarnings("deprecation")
+	public void restoreDialog() {
+		if (getLastNonConfigurationInstance() != null) {
+			dialog = (ProgressDialog) getLastNonConfigurationInstance();
+			dialog.show();
+		}
+	}
+
+	@Override
+	public Object onRetainNonConfigurationInstance() {
+		if (dialog != null) {
+			if (dialog.isShowing()) {
+				closeDialogIfItsVisible();
+				return dialog;
+			}
+		}
+		return null;
+	}
+
 	public void closeDialogIfItsVisible() {
-		if (dialog != null && dialog.isShowing())
+
+		if (dialog != null && dialog.isShowing()) {
 			dialog.dismiss();
+		}
 	}
 
 	@Override
@@ -78,18 +100,8 @@ public class CourseListController extends ListActivity {
 		Intent intent = new Intent(this, InitialConfig.class);
 		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		intent.putExtra("FinishActivity", "YES");
+		closeDialogIfItsVisible();
 		startActivity(intent);
-	}
-
-	@Override
-	protected void onStop() {
-		super.onStop();
-		if (dialog != null) {
-			if (dialog.isShowing()) {
-				dialog.dismiss();
-			}
-		}
-
 	}
 
 	public void updateList() {
@@ -121,6 +133,7 @@ public class CourseListController extends ListActivity {
 		if (classDAO.existClasses(settings.getInt("SelectedCourse", 0))) {
 			classDAO.close();
 			intent = new Intent(this, ClassListController.class);
+			closeDialogIfItsVisible();
 			startActivity(intent);
 		}
 
@@ -202,11 +215,13 @@ public class CourseListController extends ListActivity {
 			editor.commit();
 			intent = new Intent(this, Login.class);
 			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			closeDialogIfItsVisible();
 			startActivity(intent);
 
 		}
 		if (item.getItemId() == R.id.menu_config) {
 			intent = new Intent(this, Config.class);
+			closeDialogIfItsVisible();
 			startActivity(intent);
 		}
 		return true;
@@ -220,6 +235,7 @@ public class CourseListController extends ListActivity {
 
 			if (msg.what == Constants.MESSAGE_COURSE_CONNECTION_OK) {
 
+				Log.i("Teste", "Teste");
 				ContentValues[] values = jsonParser.parseJSON(msg.getData()
 						.getString("content"), Constants.PARSE_COURSES_ID);
 				courseDAO.open();
@@ -245,6 +261,7 @@ public class CourseListController extends ListActivity {
 
 				intent = new Intent(getApplicationContext(),
 						ClassListController.class);
+				closeDialogIfItsVisible();
 				startActivity(intent);
 			}
 

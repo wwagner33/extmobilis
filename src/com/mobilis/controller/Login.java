@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -53,14 +54,27 @@ public class Login extends Activity implements OnClickListener {
 		password = (EditText) findViewById(R.id.campo2);
 		submit = (Button) findViewById(R.id.submit);
 		submit.setOnClickListener(this);
+		restoreDialog(savedInstanceState);
+
+	}
+
+	public void restoreDialog(Bundle bundle) {
+		if (bundle != null) {
+			if (bundle.getBoolean("restoreDialog")) {
+				dialog = dialogMaker
+						.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
+				bundle.putBoolean("restoreDialog", false);
+				dialog.show();
+			}
+		}
 	}
 
 	@Override
-	protected void onResume() {
-		super.onResume();
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
 		if (dialog != null) {
 			if (dialog.isShowing()) {
-				dialog.dismiss();
+				outState.putBoolean("restoreDialog", true);
 			}
 		}
 	}

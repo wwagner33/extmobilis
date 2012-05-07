@@ -54,7 +54,7 @@ public class ResponseController extends Activity implements OnClickListener,
 	private Button submit;
 	private TextView timeUp, charCount;
 	private ImageButton record;
-	private ProgressDialog dialog;
+
 	private ParseJSON jsonParser;
 	private Intent intent;
 	private JSONObject postObject;
@@ -68,9 +68,13 @@ public class ResponseController extends Activity implements OnClickListener,
 	private Chronometer stopWatch;
 	private AudioRecorder recorder;
 	private AudioPlayer player;
-	float toastTimer = 0;
+	private float toastTimer = 0;
 	private PostDAO postDAO;
 	private ZipManager zipManager;
+
+	private AlertDialog warningDialog;
+	private ProgressDialog progressDialog;
+	private AudioDialog audioDialog;
 
 	private ResponseHandler handler;
 	private Connection connection;
@@ -82,14 +86,11 @@ public class ResponseController extends Activity implements OnClickListener,
 		setContentView(R.layout.response);
 		zipManager = new ZipManager();
 		setVolumeControlStream(AudioManager.STREAM_MUSIC);
-
 		handler = new ResponseHandler();
 		connection = new Connection(handler, this);
-
 		dialogMaker = new DialogMaker(this);
 		postDAO = new PostDAO(this);
-
-		dialog = dialogMaker
+		progressDialog = dialogMaker
 				.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
 		submit = (Button) findViewById(R.id.criar_topico_submit);
 		submit.setOnClickListener(this);
@@ -103,15 +104,62 @@ public class ResponseController extends Activity implements OnClickListener,
 		recordImage = (ImageView) findViewById(R.id.record_image);
 		recordImage.setOnClickListener(this);
 		player = new AudioPlayer();
-
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
-
 		charCount = (TextView) findViewById(R.id.char_number);
-
 		charCount.setText("0/" + Constants.TEXT_MAX_CHARACTER_LENGHT);
-
 		jsonParser = new ParseJSON(this);
+		restoreDialog();
 
+	}
+
+	@Override
+	public Object onRetainNonConfigurationInstance() {
+		Object dialogStorer[] = new Object[3];
+
+		if (progressDialog != null) {
+			if (progressDialog.isShowing()) {
+				closeDialogIfItsVisible();
+				dialogStorer[0] = progressDialog;
+			}
+		}
+		if (warningDialog != null) {
+			if (warningDialog.isShowing()) {
+				warningDialog.dismiss();
+				dialogStorer[1] = warningDialog;
+			}
+		}
+
+		if (audioDialog != null) {
+			if (audioDialog.isShowing()) {
+				audioDialog.dismiss();
+				dialogStorer[2] = audioDialog;
+			}
+		}
+		return dialogStorer;
+	}
+
+	@SuppressWarnings("deprecation")
+	public void restoreDialog() {
+		Log.i("OnRestore", "TRUE");
+		if (getLastNonConfigurationInstance() != null) {
+			Object restoredObjects[] = (Object[]) getLastNonConfigurationInstance();
+
+			if (restoredObjects[0] != null) {
+				progressDialog = (ProgressDialog) restoredObjects[0];
+				progressDialog.show();
+			}
+
+			if (restoredObjects[1] != null) {
+				warningDialog = (AlertDialog) restoredObjects[1];
+				warningDialog.show();
+			}
+
+			if (restoredObjects[2] != null) {
+				audioDialog = (AudioDialog) restoredObjects[2];
+				audioDialog.show();
+			}
+
+		}
 	}
 
 	@Override
@@ -123,33 +171,25 @@ public class ResponseController extends Activity implements OnClickListener,
 
 	@Override
 	protected void onStop() {
-
 		super.onStop();
-		if (dialog != null) {
-			if (dialog.isShowing()) {
-				dialog.dismiss();
-			}
-		}
 		if (recorder != null)
 			recorder.releaseRecording();
-
 	}
 
 	@Override
 	public void onBackPressed() {
-
 		if (message.length() > 0 || existsRecording) {
-			AlertDialog alertDialog = dialogMaker.makeAlertDialog(
+			warningDialog = dialogMaker.makeAlertDialog(
 					Constants.DIALOG_ALERT_DISCARD, handler);
-			alertDialog.show();
+			warningDialog.show();
 		} else {
 			super.onBackPressed();
 		}
 	}
 
 	public void closeDialogIfItsVisible() {
-		if (dialog != null && dialog.isShowing())
-			dialog.dismiss();
+		if (progressDialog != null && progressDialog.isShowing())
+			progressDialog.dismiss();
 
 	}
 
@@ -159,7 +199,7 @@ public class ResponseController extends Activity implements OnClickListener,
 		if (v.getId() == R.id.record_image) {
 
 			player = new AudioPlayer();
-			AudioDialog audioDialog = new AudioDialog(this, player, handler);
+			audioDialog = new AudioDialog(this, player, handler);
 			audioDialog.show();
 		}
 
@@ -265,7 +305,7 @@ public class ResponseController extends Activity implements OnClickListener,
 	}
 
 	public void sendPost(String jsonString) {
-		dialog.show();
+		progressDialog.show();
 		String token = settings.getString("token", null);
 
 		String url = "discussions/" + settings.getInt("SelectedTopic", 0)
@@ -462,6 +502,7 @@ public class ResponseController extends Activity implements OnClickListener,
 					closeDialogIfItsVisible();
 					postDAO.close();
 					intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+					closeDialogIfItsVisible();
 					startActivity(intent);
 					Log.i("Não é preciso Baixar novas imagens", "TRUE");
 				} catch (NullPointerException e) {
@@ -475,6 +516,7 @@ public class ResponseController extends Activity implements OnClickListener,
 			if (msg.what == Constants.MESSAGE_IMAGE_CONNECTION_OK) {
 				zipManager.unzipFile();
 				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				closeDialogIfItsVisible();
 				startActivity(intent);
 			}
 		}

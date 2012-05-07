@@ -34,7 +34,7 @@ public class AudioDialog extends Dialog implements OnSeekBarChangeListener,
 	private Handler activityHandler;
 	private ImageView pause, stop;
 	private Thread seekbarThread;
-	private static final int teste = 5;
+	private static final int updateLayout = 5;
 	private AudioHandler audioHandler;
 	private Message message;
 	private Bundle bundle;
@@ -175,7 +175,6 @@ public class AudioDialog extends Dialog implements OnSeekBarChangeListener,
 
 				activityHandler
 						.sendEmptyMessage(Constants.DIALOG_PLAYBACK_AREA_CLICKED);
-				// updater = new SeekBarUpdater();
 				seekbarThread = new Thread(new Runnable() {
 
 					@Override
@@ -200,7 +199,7 @@ public class AudioDialog extends Dialog implements OnSeekBarChangeListener,
 							}
 
 						}
-						audioHandler.sendEmptyMessage(teste);
+						audioHandler.sendEmptyMessage(updateLayout);
 
 					}
 				});
@@ -244,7 +243,7 @@ public class AudioDialog extends Dialog implements OnSeekBarChangeListener,
 						+ "/" + audioDuration.getText());
 			}
 
-			if (msg.what == teste) {
+			if (msg.what == updateLayout) {
 
 				audioProgress.setVisibility(View.GONE);
 				audioDuration.setVisibility(View.VISIBLE);
