@@ -33,6 +33,7 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -64,10 +65,12 @@ public class PostList extends ListActivity implements OnClickListener,
 
 	private String prefix;
 
-	private boolean stopLoadingMore = false;
-	private boolean loadingMore = false;
+	private boolean stopLoading = false;
+	private boolean isLoading = false;
+
+	private boolean loadingHasFailed = false;
+
 	private String oldestPostDate = Constants.oldDateString;
-	private View footerView;
 	private DialogMaker dialogMaker;
 	private PostDAO postDAO;
 	private Cursor cursor;
@@ -79,11 +82,28 @@ public class PostList extends ListActivity implements OnClickListener,
 
 	private boolean newPosts = false;
 
+	private View connectionFooterView;
+	private View warningFooterView;
+
+	private Button footerButton;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.post);
+
+		warningFooterView = ((LayoutInflater) this
+				.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(
+				R.layout.footer_no_connection, null, false);
+
+		connectionFooterView = ((LayoutInflater) this
+				.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(
+				R.layout.post_list_footer, null, false);
+
+		footerButton = (Button) warningFooterView
+				.findViewById(R.id.warning_button);
+		footerButton.setOnClickListener(this);
 
 		handler = new PostHandler();
 		connection = new Connection(handler, this);
@@ -122,32 +142,92 @@ public class PostList extends ListActivity implements OnClickListener,
 		cursor = postDAO.getPostsFromTopic(settings.getInt("SelectedTopic", 0));
 		postDAO.close();
 
-		restoreDialog();
-		updateList(cursor);
+		restoreActivitySettings(savedInstanceState);
+		restoreActivityObjects();
 
+	}
+
+	@SuppressWarnings({ "deprecation", "unchecked" })
+	public void restoreActivityObjects() {
+		if (getLastNonConfigurationInstance() != null) {
+			Object restoredObjects[] = (Object[]) getLastNonConfigurationInstance();
+			if (restoredObjects[0] != null) {
+				dialog = (ProgressDialog) restoredObjects[0];
+				dialog.show();
+			}
+
+			if (restoredObjects[1] == null) {
+				updateList(cursor);
+			}
+
+			if (restoredObjects[1] != null) {
+				// lembrar de atualizar o lastDate
+				parsedValues = ((ArrayList<ContentValues>) restoredObjects[1]);
+				updateList(parsedValues);
+			}
+		} else {
+			updateList(cursor);
+		}
+	}
+
+	public void restoreActivitySettings(Bundle bundle) {
+
+		if (bundle != null) {
+			if (bundle.getString("oldestPostDate") != null) {
+				oldestPostDate = bundle.getString("oldestPostDate");
+			}
+
+			if (bundle.getBoolean("loadingHasFailed")) {
+				loadingHasFailed = true;
+				stopLoading = true;
+				setListFooter(warningFooterView);
+			}
+
+			if (!bundle.getBoolean("loadingHasFailed")) {
+
+				Log.i("TAG", "LOADING NOT FAILED");
+
+				if (bundle.getBoolean("stopLoading")) {
+					stopLoading = true;
+					removeListFooter();
+					Log.i("TAG", "REMOVE ALL FOOTERS");
+				}
+
+				else {
+					setListFooter(connectionFooterView);
+					Log.i("TAG", "ADD CONNECTION FOOTER");
+				}
+			}
+
+		}
 	}
 
 	@Override
 	public Object onRetainNonConfigurationInstance() {
-		Log.i("OnRetain", "True");
+		Object values[] = new Object[2];
+
 		if (dialog != null) {
 			if (dialog.isShowing()) {
-				Log.i("OnRetain2", "True");
 				closeDialogIfItsVisible();
-				return dialog;
+				values[0] = dialog;
 			}
 		}
-		return null;
+
+		if (parsedValues != null) {
+			values[1] = parsedValues;
+		}
+
+		return values;
 	}
 
-	@SuppressWarnings("deprecation")
-	public void restoreDialog() {
-		Log.i("OnRestore", "TRUE");
-		if (getLastNonConfigurationInstance() != null) {
-			Log.i("OnRestore2", "TRUE");
-			dialog = (ProgressDialog) getLastNonConfigurationInstance();
-			dialog.show();
-		}
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+
+		outState.putString("oldestPostDate", oldestPostDate);
+		outState.putBoolean("stopLoading", stopLoading);
+		outState.putBoolean("loadingHasFailed", loadingHasFailed);
+
 	}
 
 	public Bitmap getUserImage(int user_id) throws ImageFileNotFoundException {
@@ -237,7 +317,7 @@ public class PostList extends ListActivity implements OnClickListener,
 
 		forceListToRedraw = false;
 		listAdapter.notifyDataSetChanged();
-		loadingMore = false;
+		isLoading = false;
 		forceListToRedraw = true;
 
 	}
@@ -255,23 +335,42 @@ public class PostList extends ListActivity implements OnClickListener,
 
 			if (parsedValues.size() > 0) {
 				postDAO.open();
-				// oldestPostDate = parsedValues.get(parsedValues.size() - 1)
-				// .getAsString("updated");
 				oldestPostDate = postDAO.getOldestPost(settings.getInt(
 						"SelectedTopic", 0));
 				postDAO.close();
 			}
 
 			if (parsedValues.size() == 20) {
-
-				footerView = ((LayoutInflater) this
-						.getSystemService(Context.LAYOUT_INFLATER_SERVICE))
-						.inflate(R.layout.post_list_footer, null, false);
-				this.getListView().addFooterView(footerView);
+				setListFooter(connectionFooterView);
 			}
+
+			// else {
+			// stopLoading==true
+			// }
 
 			listAdapter = new PostAdapter(this, parsedValues);
 			setListAdapter(listAdapter);
+		}
+	}
+
+	public void updateList(ArrayList<ContentValues> values) {
+		listAdapter = new PostAdapter(this, values);
+		setListAdapter(listAdapter);
+	}
+
+	public void setListFooter(View footer) {
+		removeListFooter();
+		if (getListView().getFooterViewsCount() < 1)
+			getListView().addFooterView(footer);
+	}
+
+	public void removeListFooter() {
+		if (this.getListView().getFooterViewsCount() > 0) {
+			if (warningFooterView != null)
+				this.getListView().removeFooterView(warningFooterView);
+			if (connectionFooterView != null) {
+				this.getListView().removeFooterView(connectionFooterView);
+			}
 		}
 	}
 
@@ -373,24 +472,7 @@ public class PostList extends ListActivity implements OnClickListener,
 				} catch (ParseException e1) {
 					e1.printStackTrace();
 				}
-				/*
-				 * if (postDAO.postedToday(
-				 * data.get(position).getAsInteger("discussion_id"), data
-				 * .get(position).getAsInteger("_id"))) {
-				 * 
-				 * Log.w("POSTED TODAY", "TRUE");
-				 * postDate.setText(postDAO.getPostedTodayDateFormat(
-				 * (data.get(position).getAsInteger("discussion_id")),
-				 * data.get(position).getAsInteger("_id"))); postDAO.close();
-				 * 
-				 * }
-				 * 
-				 * else {
-				 * 
-				 * postDate.setText(postDAO.getPostedBeforeTodayDateFormat(
-				 * data.get(position).getAsInteger("discussion_id"),
-				 * data.get(position).getAsInteger("_id"))); postDAO.close(); }
-				 */
+
 				prefix = String.valueOf(data.get(position).getAsInteger(
 						"user_id"));
 
@@ -429,6 +511,13 @@ public class PostList extends ListActivity implements OnClickListener,
 			closeDialogIfItsVisible();
 			startActivity(intent);
 
+		}
+
+		if (v.getId() == R.id.warning_button) {
+			Log.i("WarningButton", "Clicked");
+			loadingHasFailed = false;
+			stopLoading = false;
+			setListFooter(connectionFooterView);
 		}
 	}
 
@@ -478,9 +567,9 @@ public class PostList extends ListActivity implements OnClickListener,
 			int visibleItemCount, int totalItemCount) {
 
 		int lastInScreen = firstVisibleItem + visibleItemCount;
-		if ((lastInScreen == totalItemCount) && !(loadingMore)
-				&& getListView().getCount() >= 20 && !stopLoadingMore) {
-			loadingMore = true;
+		if ((lastInScreen == totalItemCount) && !(isLoading)
+				&& getListView().getCount() >= 20 && !stopLoading) {
+			isLoading = true;
 
 			String url = "discussions/" + settings.getInt("SelectedTopic", 0)
 					+ "/posts/" + oldestPostDate + "/history.json";
@@ -541,8 +630,8 @@ public class PostList extends ListActivity implements OnClickListener,
 					} catch (StringIndexOutOfBoundsException e) {
 						closeDialogIfItsVisible();
 						postDAO.close();
-						loadingMore = false;
-						stopLoadingMore = false;
+						isLoading = false;
+						stopLoading = false;
 						updateList(cursor);
 						Log.i("Não é preciso Baixar novas imagens", "TRUE");
 					} catch (NullPointerException e) {
@@ -556,6 +645,8 @@ public class PostList extends ListActivity implements OnClickListener,
 
 			if (msg.what == Constants.MESSAGE_HISTORY_POST_CONNECTION_OK) {
 
+				isLoading = false;
+
 				ArrayList<ContentValues> temp = jsonParser.parsePosts(msg
 						.getData().getString("content"));
 				try {
@@ -563,6 +654,8 @@ public class PostList extends ListActivity implements OnClickListener,
 							.get(temp.size() - 1).getAsString("updated"));
 				} catch (ParseException e1) {
 					e1.printStackTrace();
+				} catch (ArrayIndexOutOfBoundsException e) {
+					// não há posts
 				}
 
 				parsedValues.addAll(temp);
@@ -572,9 +665,11 @@ public class PostList extends ListActivity implements OnClickListener,
 				if (parsedValues.size() % 20 != 0) {
 					// Se vier menos de 20 posts do servidor eles são os
 					// ultimos.
-					getListView().removeFooterView(footerView);
-					stopLoadingMore = true;
-					loadingMore = true;
+					// getListView().removeFooterView(connectionFooterView);
+					removeListFooter();
+
+					stopLoading = true;
+					isLoading = false;
 				}
 
 				try {
@@ -587,7 +682,7 @@ public class PostList extends ListActivity implements OnClickListener,
 				} catch (StringIndexOutOfBoundsException e) {
 					closeDialogIfItsVisible();
 					postDAO.close();
-					loadingMore = false;
+					isLoading = false;
 					closeDialogIfItsVisible();
 					refreshList();
 					Log.i("Não é preciso Baixar novas imagens", "TRUE");
@@ -600,10 +695,18 @@ public class PostList extends ListActivity implements OnClickListener,
 
 			}
 
+			if (msg.what == Constants.MESSAGE_HISTORY_POST_CONNECTION_FAILED) {
+				Log.i("HistoryPosts", "FAILED");
+				loadingHasFailed = true;
+				isLoading = false;
+				stopLoading = true;
+				setListFooter(warningFooterView);
+			}
+
 			if (msg.what == Constants.MESSAGE_IMAGE_CONNECTION_OK) {
 				zipManager.unzipFile();
-				loadingMore = false;
-				stopLoadingMore = false;
+				isLoading = false;
+				stopLoading = false;
 				closeDialogIfItsVisible();
 
 				if (newPosts)
@@ -613,8 +716,8 @@ public class PostList extends ListActivity implements OnClickListener,
 
 			}
 			if (msg.what == Constants.MESSAGE_IMAGE_CONNECION_FAILED) {
-				loadingMore = false;
-				stopLoadingMore = false;
+				isLoading = false;
+				stopLoading = false;
 				closeDialogIfItsVisible();
 
 				if (newPosts)

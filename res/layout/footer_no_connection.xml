@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/warning_footer"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+
+    <!-- Barra de erro parecida com a do gmail -->
+
+    <ImageView
+        android:id="@+id/warning_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:src="@drawable/warning1" />
+
+    <TextView
+        android:id="@+id/warning_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@id/warning_image"
+        android:text="Sem conexão" >
+    </TextView>
+
+    <Button
+        android:id="@+id/warning_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:onClick="onClick"
+        android:text="Tentar novamente" />
+
+</RelativeLayout>

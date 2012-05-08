@@ -143,6 +143,10 @@ public class Connection {
 
 		if (connectionId == Constants.CONNECTION_GET_IMAGES) {
 			handler.sendEmptyMessage(Constants.MESSAGE_IMAGE_CONNECION_FAILED);
+		}
+
+		else if (connectionId == Constants.CONNECTION_GET_HISTORY_POSTS) {
+			handler.sendEmptyMessage(Constants.MESSAGE_HISTORY_POST_CONNECTION_FAILED);
 		} else
 			handler.sendEmptyMessage(Constants.MESSAGE_CONNECTION_FAILED);
 	}
@@ -350,7 +354,6 @@ public class Connection {
 		@Override
 		protected Object[] doInBackground(Void... params) {
 
-		
 			try {
 				Thread.sleep(3000);
 				if (connectionType == Constants.TYPE_CONNECTION_GET) {
