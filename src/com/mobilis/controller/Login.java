@@ -44,51 +44,50 @@ public class Login extends Activity implements OnClickListener {
 		super.onCreate(savedInstanceState);
 
 		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-			setContentView(R.layout.login);
-			handler = new LoginHandler();
-			connection = new Connection(handler, this);
-			settings = PreferenceManager.getDefaultSharedPreferences(this);
-			jsonParser = new ParseJSON(this);
-			courseDAO = new CourseDAO(this);
-			dialogMaker = new DialogMaker(this);
-			login = (EditText) findViewById(R.id.campo1);
-			password = (EditText) findViewById(R.id.campo2);
-			submit = (Button) findViewById(R.id.submit);
-			submit.setOnClickListener(this);
-			restoreDialog(savedInstanceState);
+			init(R.layout.login);
 		}
 
 		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-			setContentView(R.layout.login_landscape);
+			init(R.layout.login_landscape);
 		}
+	}
+
+	public void init(int layoutId) {
+
+		setContentView(layoutId);
+		handler = new LoginHandler();
+		connection = new Connection(handler, this);
+		settings = PreferenceManager.getDefaultSharedPreferences(this);
+		jsonParser = new ParseJSON(this);
+		courseDAO = new CourseDAO(this);
+		dialogMaker = new DialogMaker(this);
+		login = (EditText) findViewById(R.id.campo1);
+		password = (EditText) findViewById(R.id.campo2);
+		submit = (Button) findViewById(R.id.submit);
+		submit.setOnClickListener(this);
+		restoreDialog();
 
 	}
 
-	public void restoreDialog(Bundle bundle) {
-		if (bundle != null) {
-			if (bundle.getBoolean("restoreDialog")) {
-				dialog = dialogMaker
-						.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
-				bundle.putBoolean("restoreDialog", false);
-				dialog.show();
-			}
+	@SuppressWarnings("deprecation")
+	public void restoreDialog() {
+		if (getLastNonConfigurationInstance() != null) {
+
+			dialog = (ProgressDialog) getLastNonConfigurationInstance();
+			dialog.show();
 		}
 	}
 
 	@Override
-	protected void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
+	public Object onRetainNonConfigurationInstance() {
+		// TODO Auto-generated method stub
 		if (dialog != null) {
 			if (dialog.isShowing()) {
-				outState.putBoolean("restoreDialog", true);
+				closeDialogIfItsVisible();
+				return dialog;
 			}
 		}
-	}
-
-	@Override
-	protected void onStop() {
-		super.onStop();
-		closeDialogIfItsVisible();
+		return null;
 	}
 
 	@Override
