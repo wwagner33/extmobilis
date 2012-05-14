@@ -519,6 +519,10 @@ public class ResponseController extends Activity implements OnClickListener,
 				closeDialogIfItsVisible();
 				startActivity(intent);
 			}
+
+			if (msg.what == Constants.MESSAGE_IMAGE_CONNECION_FAILED) {
+				startActivity(intent);
+			}
 		}
 	}
 }
