@@ -521,6 +521,7 @@ public class ResponseController extends Activity implements OnClickListener,
 			}
 
 			if (msg.what == Constants.MESSAGE_IMAGE_CONNECION_FAILED) {
+				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				startActivity(intent);
 			}
 		}
