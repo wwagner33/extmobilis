@@ -92,22 +92,6 @@ public class TopicListController extends ListActivity {
 		return null;
 	}
 
-	@Override
-	protected void onStop() {
-		super.onStop();
-
-		try {
-			postDAO.close();
-		} catch (NullPointerException e) {
-
-		}
-		try {
-			topicDAO.close();
-		} catch (NullPointerException e) {
-
-		}
-	}
-
 	public void closeDialogIfItsVisible() {
 		if (dialog != null && dialog.isShowing())
 			dialog.dismiss();
@@ -150,6 +134,7 @@ public class TopicListController extends ListActivity {
 
 		postDAO.open();
 		topicDAO.open();
+
 		if (postDAO.postExistsOnTopic(topicId)
 				&& !topicDAO.hasNewPostsFlag(topicId)) {
 			postDAO.close();

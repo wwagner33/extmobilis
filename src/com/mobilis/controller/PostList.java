@@ -257,18 +257,6 @@ public class PostList extends ListActivity implements OnClickListener,
 	}
 
 	@Override
-	protected void onStop() {
-		// TODO Auto-generated method stub
-		super.onStop();
-		try {
-			postDAO.close();
-		} catch (NullPointerException e) {
-
-		}
-
-	}
-
-	@Override
 	protected void onResume() {
 		super.onResume();
 	}
