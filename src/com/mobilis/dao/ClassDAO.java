@@ -22,13 +22,19 @@ public class ClassDAO extends DBAdapter {
 	}
 
 	public boolean existClasses(int course_id) {
-		Cursor cursor = getDatabase().rawQuery(
-				"SELECT count(_id) FROM classes WHERE course_id=" + course_id,
-				null);
-		cursor.moveToFirst();
-		int count = cursor.getInt(0);
-		cursor.close();
-		return (count > 0) ? true : false;
+
+		Cursor cursor = getDatabase().query("classes",
+				new String[] { "course_id" }, "course_id=" + course_id, null,
+				null, null, "1");
+
+		try {
+			cursor.moveToFirst();
+			int count = cursor.getInt(0);
+			cursor.close();
+			return (count != 0) ? true : false;
+		} catch (Exception e) {
+			return false;
+		}
 	}
 
 	public void clearClasses(int course_id) {
