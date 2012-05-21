@@ -6,6 +6,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -22,6 +27,7 @@ import org.apache.http.protocol.HTTP;
 import org.json.simple.parser.ParseException;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
@@ -40,13 +46,14 @@ public class Connection {
 	private int connectionType;
 	private Handler handler;
 	private ExecuteConnection executeConnection;
-	private WaitForConnection waitConnection;
+	private ConnectionWatcher connectionWatcher;
 	private int connectionId;
 	private String url;
 	private File file;
 	private String token;
 	private Context context;
 	private String jsonString;
+	private int statusCode = 0;
 
 	public Connection(Handler handler, Context context) {
 		this.handler = handler;
@@ -57,8 +64,8 @@ public class Connection {
 	public void startConnection() {
 		executeConnection = new ExecuteConnection();
 		executeConnection.execute();
-		waitConnection = new WaitForConnection();
-		waitConnection.execute();
+		connectionWatcher = new ConnectionWatcher();
+		connectionWatcher.execute();
 	}
 
 	public void getFromServer(int connectionId, String url, String token) {
@@ -151,12 +158,11 @@ public class Connection {
 			handler.sendEmptyMessage(Constants.MESSAGE_CONNECTION_FAILED);
 	}
 
-	private Object[] executeGet(String URL, String authToken)
+	private Object executeGet(String URL, String authToken)
 			throws ClientProtocolException, IOException
 
 	{
 
-		Object[] resultSet = new Object[2];
 		StringBuilder builder = new StringBuilder();
 		DefaultHttpClient client = new DefaultHttpClient();
 
@@ -182,26 +188,22 @@ public class Connection {
 
 			Log.w("resultFromServer", builder.toString());
 
-			resultSet[0] = builder.toString();
-			resultSet[1] = statusCode;
-			return resultSet;
+			this.statusCode = statusCode;
+			return builder.toString();
 		} else {
-			resultSet[1] = statusCode;
-			return resultSet;
+			this.statusCode = statusCode;
+			return null;
 		}
 	}
 
-	private Object[] executePost(String jsonString, String URL)
+	private Object executePost(String jsonString, String URL)
 			throws ClientProtocolException, IOException, ParseException {
-
-		Object[] resultSet = new Object[2];
 
 		StringBuilder builder = new StringBuilder();
 		DefaultHttpClient client = new DefaultHttpClient();
 
 		post = new HttpPost(Constants.URL_SERVER + URL);
 
-		// StringEntity se = new StringEntity(jsonString);
 		StringEntity se = new StringEntity(jsonString, "UTF-8");
 		se.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE,
 				"application/json"));
@@ -231,18 +233,18 @@ public class Connection {
 
 			Log.w("resultFromServer", builder.toString());
 
-			resultSet[0] = builder.toString();
-			resultSet[1] = statusCode;
-			return resultSet;
+			this.statusCode = statusCode;
+			return builder.toString();
 
 		}
 
-		resultSet[1] = statusCode;
-		return resultSet;
-
+		else {
+			this.statusCode = statusCode;
+			return null;
+		}
 	}
 
-	private Object[] executeAudioPost(String URL, File audioFile)
+	private Object executeAudioPost(String URL, File audioFile)
 			throws IllegalStateException, IOException {
 
 		if (audioFile == null) {
@@ -251,8 +253,6 @@ public class Connection {
 		}
 
 		DefaultHttpClient client = new DefaultHttpClient();
-
-		Object[] resultSet = new Object[2];
 
 		StringBuilder builder = new StringBuilder();
 
@@ -290,21 +290,18 @@ public class Connection {
 
 			Log.w("resultFromServer", builder.toString());
 
-			resultSet[0] = builder.toString();
-			resultSet[1] = statusCode;
-			return resultSet;
-
+			this.statusCode = statusCode;
+			return builder.toString();
 		}
 
-		resultSet[1] = statusCode;
-		return resultSet;
-
+		else {
+			this.statusCode = statusCode;
+			return null;
+		}
 	}
 
-	private Object[] getZippedImages(String url, String token)
+	private Object getZippedImages(String url, String token)
 			throws ClientProtocolException, IOException {
-
-		Object[] resultSet = new Object[2];
 
 		FileOutputStream fileOutputStream = null;
 		DefaultHttpClient client = new DefaultHttpClient();
@@ -331,13 +328,12 @@ public class Connection {
 			fileOutputStream.flush();
 			fileOutputStream.close();
 
-			resultSet[1] = statusCode;
-			resultSet[0] = "stub";
-			return resultSet;
+			this.statusCode = statusCode;
+			return new String();
 
 		} else {
-			resultSet[1] = statusCode;
-			return resultSet;
+			this.statusCode = statusCode;
+			return null;
 		}
 
 	}
@@ -349,13 +345,12 @@ public class Connection {
 			post.abort();
 	}
 
-	private class ExecuteConnection extends AsyncTask<Void, Void, Object[]> {
+	private class ExecuteConnection extends AsyncTask<Void, Void, Object> {
 
 		@Override
-		protected Object[] doInBackground(Void... params) {
+		protected Object doInBackground(Void... params) {
 
 			try {
-				Thread.sleep(3000);
 				if (connectionType == Constants.TYPE_CONNECTION_GET) {
 
 					if (connectionId == Constants.CONNECTION_GET_IMAGES) {
@@ -386,24 +381,19 @@ public class Connection {
 		}
 
 		@Override
-		protected void onPostExecute(Object[] result) {
+		protected void onPostExecute(Object result) {
 
-			waitConnection.cancel(true);
+			connectionWatcher.cancel(true);
 
 			if (result != null) {
+				// Conexão bem sucedida
+				sendPositiveMessage((String) result);
+			}
 
-				if (result[0] != null) {
-					// Conexão bem sucedida
-					sendPositiveMessage((String) result[0]);
-
-				}
-
-				else {
-					// Não caiu em excelção mas o statuc não foi o correto
-					ErrorHandler.handleStatusCode(context, (Integer) result[1]);
-					sendNegativeMessage();
-				}
-
+			else if (result == null && statusCode != 0) {
+				// Não caiu em exceção mas o status não foi o correto
+				ErrorHandler.handleStatusCode(context, statusCode);
+				sendNegativeMessage();
 			}
 
 			else {
@@ -418,14 +408,13 @@ public class Connection {
 		}
 	}
 
-	private class WaitForConnection extends AsyncTask<Void, Void, Integer> {
+	private class ConnectionWatcher extends AsyncTask<Void, Void, Integer> {
 
 		@Override
 		protected Integer doInBackground(Void... params) {
 			// TODO Auto-generated method stub
 			try {
-				Thread.sleep(20000);
-
+				executeConnection.get(15, TimeUnit.SECONDS);
 				if (executeConnection.getStatus() == AsyncTask.Status.RUNNING) {
 					abortConnection();
 					return 1;
@@ -434,8 +423,13 @@ public class Connection {
 				}
 			} catch (InterruptedException e) {
 				return 2;
+			} catch (ExecutionException e) {
+				e.printStackTrace();
+				return 2;
+			} catch (TimeoutException e) {
+				e.printStackTrace();
+				return 2;
 			}
-
 		}
 
 		@Override
