@@ -1,6 +1,5 @@
 package com.mobilis.controller;
 
-import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
@@ -10,12 +9,8 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
@@ -25,17 +20,15 @@ import android.widget.TextView;
 import com.mobilis.dao.ClassDAO;
 import com.mobilis.dao.CourseDAO;
 import com.mobilis.dialog.DialogMaker;
+import com.mobilis.interfaces.MobilisListActivity;
 import com.mobilis.util.Constants;
 import com.mobilis.util.ParseJSON;
 import com.mobilis.ws.Connection;
 
-public class CourseListController extends ListActivity {
+public class CourseListController extends MobilisListActivity {
 
 	private Intent intent;
 	private ParseJSON jsonParser;
-	private ProgressDialog dialog;
-	private SharedPreferences settings;
-	private DialogMaker dialogMaker;
 	private LayoutInflater inflater;
 	private CourseListAdapter listAdapter;
 	private CourseDAO courseDAO;
@@ -43,47 +36,41 @@ public class CourseListController extends ListActivity {
 	private ClassDAO classDAO;
 	private Connection connection;
 	private CourseHandler handler;
+	private ProgressDialog progressDialog;
+	private DialogMaker dialogMaker;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.course);
+		dialogMaker = new DialogMaker(this);
+		progressDialog = dialogMaker
+				.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
 		handler = new CourseHandler();
 		connection = new Connection(handler, this);
 		courseDAO = new CourseDAO(this);
 		classDAO = new ClassDAO(this);
-		dialogMaker = new DialogMaker(this);
 		jsonParser = new ParseJSON(this);
-		settings = PreferenceManager.getDefaultSharedPreferences(this);
-		restoreDialog();
+		restoreActivityState();
 		updateList();
 	}
 
 	@SuppressWarnings("deprecation")
-	public void restoreDialog() {
+	public void restoreActivityState() {
 		if (getLastNonConfigurationInstance() != null) {
-			dialog = (ProgressDialog) getLastNonConfigurationInstance();
-			dialog.show();
+			progressDialog = ((ProgressDialog) getLastNonConfigurationInstance());
+			progressDialog.show();
 		}
 	}
 
 	@Override
 	public Object onRetainNonConfigurationInstance() {
-		if (dialog != null) {
-			if (dialog.isShowing()) {
-				closeDialogIfItsVisible();
-				return dialog;
-			}
+		if (progressDialog.isShowing()) {
+			closeDialog(progressDialog);
+			return progressDialog;
 		}
 		return null;
-	}
-
-	public void closeDialogIfItsVisible() {
-
-		if (dialog != null && dialog.isShowing()) {
-			dialog.dismiss();
-		}
 	}
 
 	@Override
@@ -91,16 +78,9 @@ public class CourseListController extends ListActivity {
 
 		super.onBackPressed();
 
-		if (dialog != null) {
-			if (dialog.isShowing()) {
-				dialog.dismiss();
-			}
-		}
-
 		Intent intent = new Intent(this, InitialConfig.class);
 		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		intent.putExtra("FinishActivity", "YES");
-		closeDialogIfItsVisible();
 		startActivity(intent);
 	}
 
@@ -114,34 +94,31 @@ public class CourseListController extends ListActivity {
 	}
 
 	@Override
-	protected void onListItemClick(ListView l, View v, int position, long id) {
+	protected void onListItemClick(ListView listView, View view, int position,
+			long id) {
 
-		super.onListItemClick(l, v, position, id);
+		super.onListItemClick(listView, view, position, id);
 
-		Object courseItem = l.getAdapter().getItem(position);
+		Object courseItem = listView.getAdapter().getItem(position);
 		int courseId = (Integer) courseItem;
 
-		settings = PreferenceManager.getDefaultSharedPreferences(this);
-		SharedPreferences.Editor editor = settings.edit();
+		SharedPreferences.Editor editor = getPreferences().edit();
 		editor.putInt("SelectedCourse", courseId);
-		editor.commit();
 
-		Log.w("GroupID", String.valueOf(courseId));
+		commit(editor);
 
 		classDAO.open();
 
-		if (classDAO.existClasses(settings.getInt("SelectedCourse", 0))) {
+		if (classDAO.existClasses(getPreferences().getInt("SelectedCourse", 0))) {
 			classDAO.close();
 			intent = new Intent(this, ClassListController.class);
-			closeDialogIfItsVisible();
+			closeDialog(progressDialog);
 			startActivity(intent);
 		}
 
 		else {
 			classDAO.close();
-			dialog = dialogMaker
-					.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
-			dialog.show();
+			progressDialog.show();
 			obtainCurriculumUnits(Constants.URL_CURRICULUM_UNITS_PREFIX
 					+ courseId + Constants.URL_GROUPS_SUFFIX);
 		}
@@ -150,15 +127,22 @@ public class CourseListController extends ListActivity {
 	public void obtainCurriculumUnits(String url) {
 
 		connection.getFromServer(Constants.CONNECTION_GET_CLASSES, url,
-				settings.getString("token", null));
+				getPreferences().getString("token", null));
 
 	}
 
 	public void obtainCourses(String url) {
 
 		connection.getFromServer(Constants.CONNECTION_GET_COURSES,
-				Constants.URL_COURSES, settings.getString("token", null));
+				Constants.URL_COURSES, getPreferences()
+						.getString("token", null));
 
+	}
+
+	@Override
+	public void menuRefreshItemSelected() {
+		progressDialog.show();
+		obtainCourses(Constants.URL_COURSES);
 	}
 
 	private class CourseListAdapter extends CursorAdapter {
@@ -193,40 +177,6 @@ public class CourseListController extends ListActivity {
 		}
 	}
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.options_menu, menu);
-		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		if (item.getItemId() == R.id.menu_refresh) {
-			dialog = dialogMaker
-					.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
-			dialog.show();
-			obtainCourses(Constants.URL_COURSES);
-		}
-		if (item.getItemId() == R.id.menu_logout) {
-
-			SharedPreferences.Editor editor = settings.edit();
-			editor.putString("token", null);
-			editor.commit();
-			intent = new Intent(this, Login.class);
-			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			closeDialogIfItsVisible();
-			startActivity(intent);
-
-		}
-		if (item.getItemId() == R.id.menu_config) {
-			intent = new Intent(this, Config.class);
-			closeDialogIfItsVisible();
-			startActivity(intent);
-		}
-		return true;
-	}
-
 	private class CourseHandler extends Handler {
 		@Override
 		public void handleMessage(Message msg) {
@@ -242,7 +192,7 @@ public class CourseListController extends ListActivity {
 				courseDAO.addCourses(values);
 				courseDAO.close();
 				updateList();
-				closeDialogIfItsVisible();
+				closeDialog(progressDialog);
 
 			}
 
@@ -256,17 +206,17 @@ public class CourseListController extends ListActivity {
 				classDAO.open();
 
 				classDAO.addClasses(values,
-						settings.getInt("SelectedCourse", 0));
+						getPreferences().getInt("SelectedCourse", 0));
 				classDAO.close();
 
 				intent = new Intent(getApplicationContext(),
 						ClassListController.class);
-				closeDialogIfItsVisible();
+				closeDialog(progressDialog);
 				startActivity(intent);
 			}
 
 			if (msg.what == Constants.MESSAGE_CONNECTION_FAILED) {
-				closeDialogIfItsVisible();
+				closeDialog(progressDialog);
 			}
 		}
 	}

@@ -23,25 +23,30 @@ public class PostDAO extends DBAdapter {
 
 		clearPostsFromTopic(topic_id);
 
-		for (int i = 0; i < values.size(); i++) {
-			ContentValues newPost = values.get(i);
-			getDatabase().insert("posts", null, newPost);
+		// for (int i = 0; i < values.size(); i++) {
+		// ContentValues newPost = values.get(i);
+		// getDatabase().insert("posts", null, newPost);
+		// }
+		getDatabase().beginTransaction();
+		for (ContentValues i : values) {
+			getDatabase().insert("posts", null, i);
 		}
-	}
-
-	public int getPostCount(int topic_id) {
-		Cursor cursor = getDatabase()
-				.rawQuery(
-						"SELECT count(_id) FROM posts WHERE discussion_id= "
-								+ topic_id, null);
-		cursor.moveToFirst();
-		int count = cursor.getInt(0);
-		cursor.close();
-		return count;
+		getDatabase().setTransactionSuccessful();
+		getDatabase().endTransaction();
 	}
 
 	public boolean postExistsOnTopic(int topic_id) {
-		return (getPostCount(topic_id) > 0) ? true : false;
+		Cursor cursor = getDatabase().query("posts", new String[] { "_id" },
+				"discussion_id=" + topic_id, null, null, null, null, "1");
+
+		cursor.moveToFirst();
+		try {
+			int count = cursor.getInt(0);
+			cursor.close();
+			return (count > 0) ? true : false;
+		} catch (Exception e) {
+			return false;
+		}
 	}
 
 	public void clearPostsFromTopic(int topic_id) {
@@ -50,11 +55,11 @@ public class PostDAO extends DBAdapter {
 		Log.w("Delete status", String.valueOf(status));
 	}
 
-	public Cursor getPostsFromTopic(int topic_id) {
+	public Cursor getPostsFromTopic(int topic_id) { // Pegar apenas o necessário
 		Log.i("TOPIC_ID", String.valueOf(topic_id));
 
 		Cursor cursor = getDatabase().rawQuery(
-				"SELECT * FROM posts WHERE discussion_id =" + topic_id, null);
+				"SELECT * FROM posts WHERE discussion_id =" + topic_id + " ORDER BY updated ASC", null);
 		cursor.moveToFirst();
 		Log.i("CURSOR_SIZE", String.valueOf(cursor.getCount()));
 		return cursor;

@@ -2,7 +2,6 @@ package com.mobilis.controller;
 
 import org.json.simple.JSONObject;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Intent;
@@ -11,7 +10,6 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -20,11 +18,12 @@ import android.widget.Toast;
 
 import com.mobilis.dao.CourseDAO;
 import com.mobilis.dialog.DialogMaker;
+import com.mobilis.interfaces.MobilisActivity;
 import com.mobilis.util.Constants;
 import com.mobilis.util.ParseJSON;
 import com.mobilis.ws.Connection;
 
-public class Login extends Activity implements OnClickListener {
+public class Login extends MobilisActivity implements OnClickListener {
 
 	private EditText login, password;
 	private Button submit;
@@ -33,7 +32,6 @@ public class Login extends Activity implements OnClickListener {
 	private ParseJSON jsonParser;
 	private DialogMaker dialogMaker;
 	private CourseDAO courseDAO;
-	private SharedPreferences settings;
 
 	private Connection connection;
 	private LoginHandler handler;
@@ -56,7 +54,6 @@ public class Login extends Activity implements OnClickListener {
 		setContentView(layoutId);
 		handler = new LoginHandler();
 		connection = new Connection(handler, this);
-		settings = PreferenceManager.getDefaultSharedPreferences(this);
 		jsonParser = new ParseJSON(this);
 		courseDAO = new CourseDAO(this);
 		dialogMaker = new DialogMaker(this);
@@ -82,7 +79,7 @@ public class Login extends Activity implements OnClickListener {
 		// TODO Auto-generated method stub
 		if (dialog != null) {
 			if (dialog.isShowing()) {
-				closeDialogIfItsVisible();
+				closeDialog(dialog);
 				return dialog;
 			}
 		}
@@ -94,7 +91,8 @@ public class Login extends Activity implements OnClickListener {
 
 		if (v.equals(submit)) {
 
-			if (!(login.getText().length() == 0 || password.getText().length() == 0)) {
+			if (!(login.getText().toString().trim().length() == 0 || password
+					.getText().toString().length() == 0)) {
 				dialog = dialogMaker
 						.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
 				dialog.show();
@@ -108,26 +106,21 @@ public class Login extends Activity implements OnClickListener {
 		}
 	}
 
-	public void closeDialogIfItsVisible() {
-		if (dialog != null && dialog.isShowing())
-			dialog.dismiss();
-
-	}
-
 	public void requestToken() {
 
 		JSONObject jsonObject = jsonParser.buildTokenObject(login.getText()
-				.toString(), password.getText().toString());
+				.toString().trim(), password.getText().toString());
 
-		connection.postToServer(Constants.CONNECTION_POST_TOKEN,
-				jsonObject.toString(), Constants.URL_TOKEN);
+		connection.postToServer(Constants.CONNECTION_POST_TOKEN, jsonObject
+				.toString().trim(), Constants.URL_TOKEN);
 
 	}
 
 	public void getCourseList(String token) {
 
 		connection.getFromServer(Constants.CONNECTION_GET_COURSES,
-				Constants.URL_COURSES, settings.getString("token", null));
+				Constants.URL_COURSES, getPreferences()
+						.getString("token", null));
 
 	}
 
@@ -142,6 +135,13 @@ public class Login extends Activity implements OnClickListener {
 		startActivity(intent);
 	}
 
+	@Override
+	protected void onStop() {
+		// TODO Auto-generated method stub
+		super.onStop();
+		closeDialog(dialog);
+	}
+
 	private class LoginHandler extends Handler {
 		@Override
 		public void handleMessage(Message msg) {
@@ -154,11 +154,10 @@ public class Login extends Activity implements OnClickListener {
 				ContentValues[] tokenParsed = jsonParser.parseJSON(msg
 						.getData().getString("content"),
 						Constants.PARSE_TOKEN_ID);
-				SharedPreferences.Editor editor = settings.edit();
+				SharedPreferences.Editor editor = getPreferences().edit();
 				editor.putString("token", tokenParsed[0].getAsString("token"));
-				editor.commit();
-
-				String token = settings.getString("token", null);
+				commit(editor);
+				String token = getPreferences().getString("token", null);
 				getCourseList(token);
 
 			}
@@ -179,7 +178,7 @@ public class Login extends Activity implements OnClickListener {
 			}
 
 			if (msg.what == Constants.MESSAGE_CONNECTION_FAILED) {
-				closeDialogIfItsVisible();
+				closeDialog(dialog);
 			}
 		}
 	}

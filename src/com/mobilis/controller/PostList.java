@@ -9,7 +9,6 @@ import java.util.Calendar;
 import java.util.Date;
 
 import android.app.Dialog;
-import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
@@ -21,12 +20,8 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -42,13 +37,14 @@ import android.widget.Toast;
 import com.mobilis.dao.PostDAO;
 import com.mobilis.dialog.DialogMaker;
 import com.mobilis.exception.ImageFileNotFoundException;
+import com.mobilis.interfaces.MobilisListActivity;
 import com.mobilis.util.Constants;
 import com.mobilis.util.DateUtils;
 import com.mobilis.util.ParseJSON;
 import com.mobilis.util.ZipManager;
 import com.mobilis.ws.Connection;
 
-public class PostList extends ListActivity implements OnClickListener,
+public class PostList extends MobilisListActivity implements OnClickListener,
 		OnScrollListener {
 
 	private boolean forceListToRedraw = true;
@@ -60,7 +56,6 @@ public class PostList extends ListActivity implements OnClickListener,
 	private int currentDay, currentMonth, currentYear;
 	private Intent intent;
 	private ImageView answerForum;
-	public SharedPreferences settings;
 	private Dialog dialog;
 
 	private String prefix;
@@ -71,7 +66,6 @@ public class PostList extends ListActivity implements OnClickListener,
 	private boolean loadingHasFailed = false;
 
 	private String oldestPostDate = Constants.oldDateString;
-	private DialogMaker dialogMaker;
 	private PostDAO postDAO;
 	private Cursor cursor;
 
@@ -86,12 +80,15 @@ public class PostList extends ListActivity implements OnClickListener,
 	private View warningFooterView;
 
 	private Button footerButton;
+	private DialogMaker dialogMaker;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.post);
+
+		dialogMaker = new DialogMaker(this);
 
 		warningFooterView = ((LayoutInflater) this
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(
@@ -109,16 +106,14 @@ public class PostList extends ListActivity implements OnClickListener,
 		connection = new Connection(handler, this);
 		zipManager = new ZipManager();
 
-		dialogMaker = new DialogMaker(this);
 		postDAO = new PostDAO(this);
 		jsonParser = new ParseJSON(this);
-		settings = PreferenceManager.getDefaultSharedPreferences(this);
 
 		answerForum = (ImageView) findViewById(R.id.answer_topic_image);
 		answerForum.setOnClickListener(this);
 		answerForum.setClickable(true);
 
-		if (settings.getBoolean("isForumClosed", false) == true) {
+		if (getPreferences().getBoolean("isForumClosed", false) == true) {
 			answerForum.setVisibility(View.GONE);
 		}
 
@@ -134,12 +129,13 @@ public class PostList extends ListActivity implements OnClickListener,
 
 		textName = (TextView) findViewById(R.id.nome_forum);
 
-		textName.setText(settings.getString("CurrentForumName", null));
+		textName.setText(getPreferences().getString("CurrentForumName", null));
 
 		getListView().setOnScrollListener(this);
 
 		postDAO.open();
-		cursor = postDAO.getPostsFromTopic(settings.getInt("SelectedTopic", 0));
+		cursor = postDAO.getPostsFromTopic(getPreferences().getInt(
+				"SelectedTopic", 0));
 		postDAO.close();
 
 		restoreActivitySettings(savedInstanceState);
@@ -283,11 +279,11 @@ public class PostList extends ListActivity implements OnClickListener,
 					+ listValue.getAsString("content_last"));
 		}
 
-		intent.putExtra("topicId", settings.getInt("SelectedTopic", 0));
+		intent.putExtra("topicId", getPreferences().getInt("SelectedTopic", 0));
 
-		SharedPreferences.Editor editor = settings.edit();
+		SharedPreferences.Editor editor = getPreferences().edit();
 		editor.putLong("SelectedPost", listValue.getAsInteger("_id"));
-		editor.commit();
+		commit(editor);
 
 		try {
 			Bitmap userImage = getUserImage(listValue.getAsInteger("user_id"));
@@ -323,7 +319,7 @@ public class PostList extends ListActivity implements OnClickListener,
 
 			if (parsedValues.size() > 0) {
 				postDAO.open();
-				oldestPostDate = postDAO.getOldestPost(settings.getInt(
+				oldestPostDate = postDAO.getOldestPost(getPreferences().getInt(
 						"SelectedTopic", 0));
 				postDAO.close();
 			}
@@ -371,21 +367,21 @@ public class PostList extends ListActivity implements OnClickListener,
 	public void obtainHistoryPosts(String url) {
 
 		connection.getFromServer(Constants.CONNECTION_GET_HISTORY_POSTS, url,
-				settings.getString("token", null));
+				getPreferences().getString("token", null));
 
 	}
 
 	public void obtainNewPosts(String url) {
 
 		connection.getFromServer(Constants.CONNECTION_GET_NEW_POSTS, url,
-				settings.getString("token", null));
+				getPreferences().getString("token", null));
 
 	}
 
 	public void getImages(String url) {
 
 		connection.getImages(Constants.CONNECTION_GET_IMAGES, url,
-				settings.getString("token", null));
+				getPreferences().getString("token", null));
 
 	}
 
@@ -510,47 +506,6 @@ public class PostList extends ListActivity implements OnClickListener,
 	}
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.options_menu, menu);
-		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		if (item.getItemId() == R.id.menu_refresh) {
-
-			dialog = dialogMaker
-					.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
-			dialog.show();
-			String url = "discussions/" + settings.getInt("SelectedTopic", 0)
-					+ "/posts/" + Constants.oldDateString + "/news.json";
-
-			obtainNewPosts(url);
-
-		}
-
-		if (item.getItemId() == R.id.menu_logout) {
-
-			SharedPreferences.Editor editor = settings.edit();
-			editor.putString("token", null);
-			editor.commit();
-			intent = new Intent(this, Login.class);
-			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			closeDialogIfItsVisible();
-			startActivity(intent);
-
-		}
-		if (item.getItemId() == R.id.menu_config) {
-			intent = new Intent(this, Config.class);
-			closeDialogIfItsVisible();
-			startActivity(intent);
-		}
-		return true;
-
-	}
-
-	@Override
 	public void onScroll(AbsListView view, int firstVisibleItem,
 			int visibleItemCount, int totalItemCount) {
 
@@ -559,8 +514,9 @@ public class PostList extends ListActivity implements OnClickListener,
 				&& getListView().getCount() >= 20 && !stopLoading) {
 			isLoading = true;
 
-			String url = "discussions/" + settings.getInt("SelectedTopic", 0)
-					+ "/posts/" + oldestPostDate + "/history.json";
+			String url = "discussions/"
+					+ getPreferences().getInt("SelectedTopic", 0) + "/posts/"
+					+ oldestPostDate + "/history.json";
 			Log.w("OLD-POSTS-URL", url);
 			obtainHistoryPosts(url);
 
@@ -602,16 +558,17 @@ public class PostList extends ListActivity implements OnClickListener,
 					postDAO.addPosts(
 							jsonParser.parsePosts(msg.getData().getString(
 									"content")),
-							settings.getInt("SelectedTopic", 0));
+							getPreferences().getInt("SelectedTopic", 0));
 
-					cursor = postDAO.getPostsFromTopic(settings.getInt(
+					cursor = postDAO.getPostsFromTopic(getPreferences().getInt(
 							"SelectedTopic", 0));
-					oldestPostDate = postDAO.getOldestPost(settings.getInt(
-							"SelectedTopic", 0));
+					oldestPostDate = postDAO.getOldestPost(getPreferences()
+							.getInt("SelectedTopic", 0));
 
 					try {
-						String ids = postDAO.getUserIdsAbsentImage(settings
-								.getInt("SelectedTopic", 0));
+						String ids = postDAO
+								.getUserIdsAbsentImage(getPreferences().getInt(
+										"SelectedTopic", 0));
 						postDAO.close();
 						getImages("images/" + ids + "/users");
 						Log.i("Alguns usuários não possuem imagens", "TRUE");
@@ -651,9 +608,6 @@ public class PostList extends ListActivity implements OnClickListener,
 				newPosts = false;
 
 				if (parsedValues.size() % 20 != 0) {
-					// Se vier menos de 20 posts do servidor eles são os
-					// ultimos.
-					// getListView().removeFooterView(connectionFooterView);
 					removeListFooter();
 
 					stopLoading = true;
@@ -662,8 +616,8 @@ public class PostList extends ListActivity implements OnClickListener,
 
 				try {
 					postDAO.open();
-					String ids = postDAO.getUserIdsAbsentImage(settings.getInt(
-							"SelectedTopic", 0));
+					String ids = postDAO.getUserIdsAbsentImage(getPreferences()
+							.getInt("SelectedTopic", 0));
 					postDAO.close();
 					getImages("images/" + ids + "/users");
 					Log.i("Alguns usuários não possuem imagens", "TRUE");
@@ -714,5 +668,17 @@ public class PostList extends ListActivity implements OnClickListener,
 					refreshList();
 			}
 		}
+	}
+
+	@Override
+	public void menuRefreshItemSelected() {
+		dialog = dialogMaker
+				.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
+		dialog.show();
+		String url = "discussions/"
+				+ getPreferences().getInt("SelectedTopic", 0) + "/posts/"
+				+ Constants.oldDateString + "/news.json";
+		obtainNewPosts(url);
+
 	}
 }

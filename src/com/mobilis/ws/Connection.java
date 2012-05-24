@@ -6,8 +6,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -27,7 +25,6 @@ import org.apache.http.protocol.HTTP;
 import org.json.simple.parser.ParseException;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
@@ -338,11 +335,57 @@ public class Connection {
 
 	}
 
+	// private Object getImageFromServer(String url, String authToken)
+	// throws ClientProtocolException, IOException {
+	//
+	// // Object[] resultSet = new Object[2];
+	//
+	// FileOutputStream fileOutputStream = null;
+	// DefaultHttpClient client = new DefaultHttpClient();
+	// get = new HttpGet(Constants.URL_SERVER + url + "?auth_token="
+	// + authToken);
+	//
+	// Log.w("IMAGE URL", get.getURI().toString());
+	//
+	// HttpResponse response = client.execute(get);
+	// StatusLine statusLine = response.getStatusLine();
+	// int statusCode = statusLine.getStatusCode();
+	//
+	// Log.w("statusCode", String.valueOf(statusCode));
+	//
+	// if (statusCode == 200) {
+	//
+	// BitmapFactory.Options options = new BitmapFactory.Options();
+	// options.inSampleSize = 5;
+	// Bitmap myImage = BitmapFactory.decodeStream(response.getEntity()
+	// .getContent());
+	// fileOutputStream = new FileOutputStream(Environment
+	// .getExternalStorageDirectory().getAbsolutePath()
+	// + "/Mobilis/Recordings/" + "url" + ".png");
+	//
+	// BufferedOutputStream bos = new BufferedOutputStream(
+	// fileOutputStream);
+	//
+	// myImage.compress(CompressFormat.PNG, 0, fileOutputStream);
+	//
+	// bos.flush();
+	// bos.close();
+	//
+	// this.statusCode = statusCode;
+	// return new String();
+	// } else
+	// this.statusCode = statusCode;
+	// return null;
+	// }
+
 	private void abortConnection() {
-		if (connectionType == Constants.TYPE_CONNECTION_GET)
-			get.abort();
-		else
-			post.abort();
+		if (connectionType == Constants.TYPE_CONNECTION_GET) {
+			if (get != null)
+				get.abort();
+		} else if (connectionType == Constants.TYPE_CONNECTION_POST) {
+			if (post != null)
+				post.abort();
+		}
 	}
 
 	private class ExecuteConnection extends AsyncTask<Void, Void, Object> {
@@ -375,8 +418,8 @@ public class Connection {
 				return null;
 			} catch (Exception e) {
 				e.printStackTrace();
+				return null;
 			}
-
 			return null;
 		}
 
@@ -414,21 +457,22 @@ public class Connection {
 		protected Integer doInBackground(Void... params) {
 			// TODO Auto-generated method stub
 			try {
+
 				executeConnection.get(15, TimeUnit.SECONDS);
-				if (executeConnection.getStatus() == AsyncTask.Status.RUNNING) {
-					abortConnection();
-					return 1;
-				} else {
-					return 0;
-				}
+				return 0;
 			} catch (InterruptedException e) {
+				Log.w("Exception", "InterruptedException");
 				return 2;
 			} catch (ExecutionException e) {
+				abortConnection();
+				Log.w("Exception", "ExecutionException");
 				e.printStackTrace();
-				return 2;
+				return 1;
 			} catch (TimeoutException e) {
+				Log.w("Exception", "TimeoutException");
+				abortConnection();
 				e.printStackTrace();
-				return 2;
+				return 1;
 			}
 		}
 
@@ -436,11 +480,10 @@ public class Connection {
 		protected void onPostExecute(Integer result) {
 			// TODO Auto-generated method stub
 			super.onPostExecute(result);
-			if (result != 0 && result != 2) {
+			if (result == 1) {
 				ErrorHandler.handleError(context,
 						Constants.ERROR_CONNECTION_TIMEOUT);
 			}
 		}
 	}
-
 }

@@ -6,12 +6,10 @@ import java.util.ArrayList;
 
 import org.json.simple.JSONObject;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
@@ -20,7 +18,6 @@ import android.media.MediaRecorder.OnInfoListener;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -41,14 +38,15 @@ import com.mobilis.audio.AudioRecorder;
 import com.mobilis.dao.PostDAO;
 import com.mobilis.dialog.AudioDialog;
 import com.mobilis.dialog.DialogMaker;
+import com.mobilis.interfaces.MobilisActivity;
 import com.mobilis.util.Constants;
 import com.mobilis.util.ParseJSON;
 import com.mobilis.util.ZipManager;
 import com.mobilis.ws.Connection;
 
-public class ResponseController extends Activity implements OnClickListener,
-		OnChronometerTickListener, OnCompletionListener, TextWatcher,
-		OnInfoListener {
+public class ResponseController extends MobilisActivity implements
+		OnClickListener, OnChronometerTickListener, OnCompletionListener,
+		TextWatcher, OnInfoListener {
 
 	private EditText message;
 	private Button submit;
@@ -59,7 +57,6 @@ public class ResponseController extends Activity implements OnClickListener,
 	private Intent intent;
 	private JSONObject postObject;
 	private boolean existsRecording = false;
-	public SharedPreferences settings;
 	private String charSequenceAfter;
 	private DialogMaker dialogMaker;
 	private ImageView recordImage;
@@ -104,7 +101,6 @@ public class ResponseController extends Activity implements OnClickListener,
 		recordImage = (ImageView) findViewById(R.id.record_image);
 		recordImage.setOnClickListener(this);
 		player = new AudioPlayer();
-		settings = PreferenceManager.getDefaultSharedPreferences(this);
 		charCount = (TextView) findViewById(R.id.char_number);
 		charCount.setText("0/" + Constants.TEXT_MAX_CHARACTER_LENGHT);
 		jsonParser = new ParseJSON(this);
@@ -214,11 +210,11 @@ public class ResponseController extends Activity implements OnClickListener,
 
 			else {
 
-				if (settings.getLong("SelectedPost", 0) > 0) {
+				if (getPreferences().getLong("SelectedPost", 0) > 0) {
 
 					postObject = jsonParser.buildTextResponseWithParentObject(
-							message.getText().toString(),
-							settings.getLong("SelectedPost", 0));
+							message.getText().toString(), getPreferences()
+									.getLong("SelectedPost", 0));
 
 				} else {
 					postObject = jsonParser
@@ -306,9 +302,10 @@ public class ResponseController extends Activity implements OnClickListener,
 
 	public void sendPost(String jsonString) {
 		progressDialog.show();
-		String token = settings.getString("token", null);
+		String token = getPreferences().getString("token", null);
 
-		String url = "discussions/" + settings.getInt("SelectedTopic", 0)
+		String url = "discussions/"
+				+ getPreferences().getInt("SelectedTopic", 0)
 				+ "/posts?auth_token=" + token;
 
 		connection.postToServer(Constants.CONNECTION_POST_TEXT_RESPONSE,
@@ -319,7 +316,7 @@ public class ResponseController extends Activity implements OnClickListener,
 	public void getNewPosts(String url) {
 
 		connection.getFromServer(Constants.CONNECTION_GET_NEW_POSTS, url,
-				settings.getString("token", null));
+				getPreferences().getString("token", null));
 
 	}
 
@@ -331,7 +328,7 @@ public class ResponseController extends Activity implements OnClickListener,
 
 	public void getImages(String url) {
 		connection.getImages(Constants.CONNECTION_GET_IMAGES, url,
-				settings.getString("token", null));
+				getPreferences().getString("token", null));
 	}
 
 	@Override
@@ -460,15 +457,16 @@ public class ResponseController extends Activity implements OnClickListener,
 					String postURL = "posts/"
 							+ String.valueOf(resultFromServer[0].get("post_id"))
 							+ "/attach_file?auth_token="
-							+ settings.getString("token", null);
+							+ getPreferences().getString("token", null);
 					Log.w("PostURL", postURL);
 					sendAudioPost(postURL, recorder.getAudioFile());
 
 				} else {
 
 					getNewPosts("discussions/"
-							+ settings.getInt("SelectedTopic", 0) + "/posts/"
-							+ Constants.oldDateString + "/news.json");
+							+ getPreferences().getInt("SelectedTopic", 0)
+							+ "/posts/" + Constants.oldDateString
+							+ "/news.json");
 				}
 
 			}
@@ -476,8 +474,8 @@ public class ResponseController extends Activity implements OnClickListener,
 			if (msg.what == Constants.MESSAGE_AUDIO_POST_OK) {
 
 				getNewPosts("discussions/"
-						+ settings.getInt("SelectedTopic", 0) + "/posts/"
-						+ Constants.oldDateString + "/news.json");
+						+ getPreferences().getInt("SelectedTopic", 0)
+						+ "/posts/" + Constants.oldDateString + "/news.json");
 				closeDialogIfItsVisible();
 
 			}
@@ -488,13 +486,14 @@ public class ResponseController extends Activity implements OnClickListener,
 						.getData().getString("content"));
 
 				postDAO.open();
-				postDAO.addPosts(values, settings.getInt("SelectedTopic", 0));
+				postDAO.addPosts(values,
+						getPreferences().getInt("SelectedTopic", 0));
 
 				intent = new Intent(getApplicationContext(), PostList.class);
 
 				try {
-					String ids = postDAO.getUserIdsAbsentImage(settings.getInt(
-							"SelectedTopic", 0));
+					String ids = postDAO.getUserIdsAbsentImage(getPreferences()
+							.getInt("SelectedTopic", 0));
 					postDAO.close();
 					getImages("images/" + ids + "/users");
 					Log.i("Alguns usuários não possuem imagens", "TRUE");

@@ -2,7 +2,6 @@ package com.mobilis.controller;
 
 import java.util.ArrayList;
 
-import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
@@ -14,12 +13,8 @@ import android.graphics.drawable.StateListDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
@@ -30,18 +25,18 @@ import android.widget.TextView;
 import com.mobilis.dao.PostDAO;
 import com.mobilis.dao.TopicDAO;
 import com.mobilis.dialog.DialogMaker;
+import com.mobilis.interfaces.MobilisListActivity;
 import com.mobilis.util.Constants;
 import com.mobilis.util.ParseJSON;
 import com.mobilis.util.ZipManager;
 import com.mobilis.ws.Connection;
 
-public class TopicListController extends ListActivity {
+public class TopicListController extends MobilisListActivity {
 
 	private Intent intent;
 	private ParseJSON jsonParser;
 	private String forumName;
 	private ProgressDialog dialog;
-	private SharedPreferences settings;
 	private ZipManager zipManager;
 	private DialogMaker dialogMaker;
 	private TopicDAO topicDAO;
@@ -64,7 +59,6 @@ public class TopicListController extends ListActivity {
 		topicDAO = new TopicDAO(this);
 		zipManager = new ZipManager();
 		dialogMaker = new DialogMaker(this);
-		settings = PreferenceManager.getDefaultSharedPreferences(this);
 		restoreDialog();
 		updateList();
 	}
@@ -101,8 +95,8 @@ public class TopicListController extends ListActivity {
 	public void updateList() {
 
 		topicDAO.open();
-		cursor = topicDAO.getTopicsFromClass(settings
-				.getInt("SelectedClass", 0));
+		cursor = topicDAO.getTopicsFromClass(getPreferences().getInt(
+				"SelectedClass", 0));
 		topicDAO.close();
 		listAdapter = new TopicAdapter(this, cursor);
 		setListAdapter(listAdapter);
@@ -119,7 +113,7 @@ public class TopicListController extends ListActivity {
 		int topicId = item.getAsInteger("_id");
 		forumName = item.getAsString("name");
 
-		SharedPreferences.Editor editor = settings.edit();
+		SharedPreferences.Editor editor = getPreferences().edit();
 
 		if (item.getAsString("closed").equals("t")) {
 			editor.putBoolean("isForumClosed", true);
@@ -130,7 +124,7 @@ public class TopicListController extends ListActivity {
 
 		editor.putInt("SelectedTopic", topicId);
 		editor.putString("CurrentForumName", forumName);
-		editor.commit();
+		commit(editor);
 
 		postDAO.open();
 		topicDAO.open();
@@ -158,20 +152,20 @@ public class TopicListController extends ListActivity {
 	public void obtainNewPosts(String url) {
 
 		connection.getFromServer(Constants.CONNECTION_GET_NEW_POSTS, url,
-				settings.getString("token", null));
+				getPreferences().getString("token", null));
 	}
 
 	public void obtainTopics(String url) {
 
 		connection.getFromServer(Constants.CONNECTION_GET_TOPICS, url,
-				settings.getString("token", null));
+				getPreferences().getString("token", null));
 
 	}
 
 	public void getImages(String url) {
 
 		connection.getImages(Constants.CONNECTION_GET_IMAGES, url,
-				settings.getString("token", null));
+				getPreferences().getString("token", null));
 	}
 
 	public class TopicAdapter extends CursorAdapter {
@@ -186,8 +180,6 @@ public class TopicListController extends ListActivity {
 
 		@Override
 		public void bindView(View convertView, Context context, Cursor cursor) {
-
-			// if (cursor != null) {
 
 			if (cursor.getString(cursor.getColumnIndex("closed")).equals("t")) {
 
@@ -261,46 +253,6 @@ public class TopicListController extends ListActivity {
 	}
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.options_menu, menu);
-		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-
-		if (item.getItemId() == R.id.menu_refresh) {
-
-			int currentClass = settings.getInt("SelectedClass", 0);
-			dialog = dialogMaker
-					.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
-			dialog.show();
-			obtainTopics(Constants.URL_GROUPS_PREFIX + currentClass
-					+ Constants.URL_DISCUSSION_SUFFIX);
-		}
-		if (item.getItemId() == R.id.menu_logout) {
-
-			SharedPreferences.Editor editor = settings.edit();
-			editor.putString("token", null);
-			editor.commit();
-			intent = new Intent(this, Login.class);
-			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			closeDialogIfItsVisible();
-			startActivity(intent);
-
-		}
-
-		if (item.getItemId() == R.id.menu_config) {
-			intent = new Intent(this, Config.class);
-			closeDialogIfItsVisible();
-			startActivity(intent);
-		}
-		return true;
-
-	}
-
-	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		Log.w("OnActivityResult", "OK");
 		updateList();
@@ -334,7 +286,8 @@ public class TopicListController extends ListActivity {
 					}
 				}
 
-				topicDAO.addTopics(values, settings.getInt("SelectedClass", 0));
+				topicDAO.addTopics(values,
+						getPreferences().getInt("SelectedClass", 0));
 				topicDAO.close();
 				updateList();
 				closeDialogIfItsVisible();
@@ -343,12 +296,12 @@ public class TopicListController extends ListActivity {
 			case Constants.MESSAGE_NEW_POST_CONNECTION_OK:
 
 				topicDAO.open();
-				if (topicDAO.hasNewPostsFlag(settings
-						.getInt("SelectedTopic", 0))) {
+				if (topicDAO.hasNewPostsFlag(getPreferences().getInt(
+						"SelectedTopic", 0))) {
 					ContentValues newFlag = new ContentValues();
 					newFlag.put("has_new_posts", 0);
 					topicDAO.updateFlag(newFlag,
-							settings.getInt("SelectedTopic", 0));
+							getPreferences().getInt("SelectedTopic", 0));
 				}
 				topicDAO.close();
 
@@ -370,11 +323,12 @@ public class TopicListController extends ListActivity {
 
 					postDAO.open();
 					postDAO.addPosts(parsedValues,
-							settings.getInt("SelectedTopic", 0));
+							getPreferences().getInt("SelectedTopic", 0));
 
 					try {
-						String ids = postDAO.getUserIdsAbsentImage(settings
-								.getInt("SelectedTopic", 0));
+						String ids = postDAO
+								.getUserIdsAbsentImage(getPreferences().getInt(
+										"SelectedTopic", 0));
 						postDAO.close();
 						getImages("images/" + ids + "/users");
 						Log.i("Alguns usuários não possuem imagens", "TRUE");
@@ -409,5 +363,15 @@ public class TopicListController extends ListActivity {
 
 			}
 		}
+	}
+
+	@Override
+	public void menuRefreshItemSelected() {
+		int currentClass = getPreferences().getInt("SelectedClass", 0);
+		dialog = dialogMaker
+				.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
+		dialog.show();
+		obtainTopics(Constants.URL_GROUPS_PREFIX + currentClass
+				+ Constants.URL_DISCUSSION_SUFFIX);
 	}
 }

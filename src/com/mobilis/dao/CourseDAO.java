@@ -8,7 +8,6 @@ public class CourseDAO extends DBAdapter {
 
 	public CourseDAO(Context context) {
 		super(context);
-		// TODO Auto-generated constructor stub
 	}
 
 	public void addCourses(ContentValues[] values) {
@@ -17,28 +16,36 @@ public class CourseDAO extends DBAdapter {
 			clearCourses();
 		}
 
+		getDatabase().beginTransaction();
 		for (int i = 0; i < values.length; i++) {
 			getDatabase().insert("courses", null, values[i]);
 		}
+		getDatabase().setTransactionSuccessful();
+		getDatabase().endTransaction();
 	}
 
 	public boolean existCourses() {
 
-		Cursor cursor = getDatabase().rawQuery(
-				"SELECT count(_id) FROM courses", null);
+		Cursor cursor = getDatabase().query("courses", new String[] { "_id" },
+				null, null, null, null, null, "1");
 		cursor.moveToFirst();
-		int count = cursor.getInt(0);
-		cursor.close();
-
-		return (count > 0) ? true : false;
+		try {
+			int count = cursor.getInt(0);
+			cursor.close();
+			return (count != 0) ? true : false;
+		} catch (Exception e) {
+			return false;
+		}
 	}
 
 	public void clearCourses() {
 		getDatabase().delete("courses", null, null);
 	}
 
-	public Cursor getAllCourses() {
-		Cursor cursor = getDatabase().rawQuery("SELECT * FROM courses", null);
+	public Cursor getAllCourses() { // Pegar só as colunas necessárias
+
+		Cursor cursor = getDatabase().query("courses", null, null, null, null,
+				null, null, null);
 		cursor.moveToFirst();
 		return cursor;
 	}

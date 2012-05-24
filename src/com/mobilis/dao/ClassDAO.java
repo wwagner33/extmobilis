@@ -15,10 +15,13 @@ public class ClassDAO extends DBAdapter {
 			clearClasses(course_id);
 		}
 
+		getDatabase().beginTransaction();
 		for (int i = 0; i < values.length; i++) {
 			values[i].put("course_id", course_id);
 			getDatabase().insert("classes", null, values[i]);
 		}
+		getDatabase().setTransactionSuccessful();
+		getDatabase().endTransaction();
 	}
 
 	public boolean existClasses(int course_id) {
@@ -41,9 +44,10 @@ public class ClassDAO extends DBAdapter {
 		getDatabase().delete("classes", "course_id=" + course_id, null);
 	}
 
-	public Cursor getClasses(int course_id) {
-		Cursor cursor = getDatabase().rawQuery(
-				"SELECT * FROM classes WHERE course_id=" + course_id, null);
+	public Cursor getClasses(int course_id) { // Pegar apenas as colunas
+												// necessárias;
+		Cursor cursor = getDatabase().query("classes", null, null, null, null,
+				null, null);
 		cursor.moveToFirst();
 		return cursor;
 	}

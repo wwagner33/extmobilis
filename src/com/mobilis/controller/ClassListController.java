@@ -1,6 +1,5 @@
 package com.mobilis.controller;
 
-import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
@@ -10,12 +9,8 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
@@ -26,17 +21,17 @@ import android.widget.Toast;
 import com.mobilis.dao.ClassDAO;
 import com.mobilis.dao.TopicDAO;
 import com.mobilis.dialog.DialogMaker;
+import com.mobilis.interfaces.MobilisListActivity;
 import com.mobilis.util.Constants;
 import com.mobilis.util.ParseJSON;
 import com.mobilis.ws.Connection;
 
-public class ClassListController extends ListActivity {
+public class ClassListController extends MobilisListActivity {
 
 	private ParseJSON jsonParser;
 	private ProgressDialog dialog;
 	private Intent intent;
 
-	private SharedPreferences settings;
 	private DialogMaker dialogMaker;
 	private ClassDAO classDAO;
 	private Cursor cursor;
@@ -56,7 +51,6 @@ public class ClassListController extends ListActivity {
 		classDAO = new ClassDAO(this);
 		topicDAO = new TopicDAO(this);
 		dialogMaker = new DialogMaker(this);
-		settings = PreferenceManager.getDefaultSharedPreferences(this);
 		restoreDialog();
 		updateList();
 	}
@@ -73,36 +67,31 @@ public class ClassListController extends ListActivity {
 	public Object onRetainNonConfigurationInstance() {
 		if (dialog != null) {
 			if (dialog.isShowing()) {
-				closeDialogIfItsVisible();
+				closeDialog(dialog);
 				return dialog;
 			}
 		}
 		return null;
 	}
 
-	public void closeDialogIfItsVisible() {
-		if (dialog != null && dialog.isShowing())
-			dialog.dismiss();
-
-	}
-
 	public void obtainTopics(String url) {
 
 		connection.getFromServer(Constants.CONNECTION_GET_TOPICS, url,
-				settings.getString("token", null));
+				getPreferences().getString("token", null));
 	}
 
 	public void obtainClasses(String url) {
 
 		connection.getFromServer(Constants.CONNECTION_GET_CLASSES, url,
-				settings.getString("token", null));
+				getPreferences().getString("token", null));
 
 	}
 
 	public void updateList() {
 
 		classDAO.open();
-		cursor = classDAO.getClasses(settings.getInt("SelectedCourse", 0));
+		cursor = classDAO.getClasses(getPreferences().getInt("SelectedCourse",
+				0));
 		classDAO.close();
 		listAdapter = new ClassAdapter(this, cursor);
 		setListAdapter(listAdapter);
@@ -117,9 +106,9 @@ public class ClassListController extends ListActivity {
 
 		Log.i("SelectedClass", String.valueOf(classId));
 
-		SharedPreferences.Editor editor = settings.edit();
+		SharedPreferences.Editor editor = getPreferences().edit();
 		editor.putInt("SelectedClass", classId);
-		editor.commit();
+		commit(editor);
 
 		topicDAO.open();
 
@@ -173,53 +162,13 @@ public class ClassListController extends ListActivity {
 		}
 	}
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.options_menu, menu);
-		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		if (item.getItemId() == R.id.menu_refresh) {
-
-			int selectedCourse = settings.getInt("SelectedCourse", 0);
-			dialog = dialogMaker
-					.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
-			dialog.show();
-			obtainClasses(Constants.URL_CURRICULUM_UNITS_PREFIX
-					+ selectedCourse + Constants.URL_GROUPS_SUFFIX);
-
-		}
-
-		if (item.getItemId() == R.id.menu_logout) {
-
-			SharedPreferences.Editor editor = settings.edit();
-			editor.putString("token", null);
-			editor.commit();
-			intent = new Intent(this, Login.class);
-			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			closeDialogIfItsVisible();
-			startActivity(intent);
-
-		}
-
-		if (item.getItemId() == R.id.menu_config) {
-			intent = new Intent(this, Config.class);
-			closeDialogIfItsVisible();
-			startActivity(intent);
-		}
-		return true;
-	}
-
 	private class ClassHandler extends Handler {
 		@Override
 		public void handleMessage(Message msg) {
 			super.handleMessage(msg);
 
 			if (msg.what == Constants.MESSAGE_CONNECTION_FAILED) {
-				closeDialogIfItsVisible();
+				closeDialog(dialog);
 			}
 
 			if (msg.what == Constants.MESSAGE_CLASS_CONNECTION_OK) {
@@ -227,10 +176,11 @@ public class ClassListController extends ListActivity {
 				ContentValues[] values = jsonParser.parseJSON(msg.getData()
 						.getString("content"), Constants.PARSE_CLASSES_ID);
 				classDAO.open();
-				classDAO.addClasses(values, settings.getInt("SelectedClass", 0));
+				classDAO.addClasses(values,
+						getPreferences().getInt("SelectedClass", 0));
 				classDAO.close();
 				listAdapter.notifyDataSetChanged();
-				closeDialogIfItsVisible();
+				closeDialog(dialog);
 
 			}
 
@@ -242,7 +192,7 @@ public class ClassListController extends ListActivity {
 
 					Toast.makeText(getApplicationContext(), "Fórum Vazio",
 							Toast.LENGTH_SHORT).show();
-					closeDialogIfItsVisible();
+					closeDialog(dialog);
 				}
 
 				else {
@@ -263,16 +213,27 @@ public class ClassListController extends ListActivity {
 					}
 
 					topicDAO.addTopics(values,
-							settings.getInt("SelectedClass", 0));
+							getPreferences().getInt("SelectedClass", 0));
 					topicDAO.close();
 
 					intent = new Intent(getApplicationContext(),
 							TopicListController.class);
-					closeDialogIfItsVisible();
+					closeDialog(dialog);
 					startActivity(intent);
 
 				}
 			}
 		}
+	}
+
+	@Override
+	public void menuRefreshItemSelected() {
+		int selectedCourse = getPreferences().getInt("SelectedCourse", 0);
+		dialog = dialogMaker
+				.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
+		dialog.show();
+		obtainClasses(Constants.URL_CURRICULUM_UNITS_PREFIX + selectedCourse
+				+ Constants.URL_GROUPS_SUFFIX);
+
 	}
 }
