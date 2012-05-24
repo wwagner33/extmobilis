@@ -46,8 +46,8 @@ public class ClassDAO extends DBAdapter {
 
 	public Cursor getClasses(int course_id) { // Pegar apenas as colunas
 												// necessárias;
-		Cursor cursor = getDatabase().query("classes", null, null, null, null,
-				null, null);
+		Cursor cursor = getDatabase().query("classes", null,
+				"course_id=" + course_id, null, null, null, null);
 		cursor.moveToFirst();
 		return cursor;
 	}
