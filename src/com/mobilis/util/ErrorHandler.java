@@ -19,5 +19,20 @@ public class ErrorHandler {
 			Toast.makeText(context, "Tempo limite de conexão atingido",
 					Toast.LENGTH_SHORT).show();
 		}
+
+		if (statusCode == 400) {
+			Toast.makeText(context, "Erro desconhecido", Toast.LENGTH_SHORT)
+					.show();
+		}
+
+		if (statusCode == 500) {
+			Toast.makeText(context, "Servidor indisponível", Toast.LENGTH_SHORT)
+					.show();
+		}
+
+		if (statusCode == 404) {
+			Toast.makeText(context, "Endereço não encontrado",
+					Toast.LENGTH_SHORT);
+		}
 	}
 }

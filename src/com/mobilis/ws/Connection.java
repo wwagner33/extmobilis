@@ -487,6 +487,7 @@ public class Connection {
 				e.printStackTrace();
 				return 1;
 			} catch (NullPointerException e) {
+				// error no abortConnection
 				toWatch.statusCode = 699;
 				return 1;
 			}
