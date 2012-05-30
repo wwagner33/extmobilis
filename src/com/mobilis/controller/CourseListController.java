@@ -104,8 +104,9 @@ public class CourseListController extends MobilisListActivity {
 
 		SharedPreferences.Editor editor = getPreferences().edit();
 		editor.putInt("SelectedCourse", courseId);
-
 		commit(editor);
+
+		Log.w("COURSE_ID", "" + courseId);
 
 		classDAO.open();
 

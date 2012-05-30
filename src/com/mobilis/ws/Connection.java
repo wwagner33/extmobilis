@@ -1,11 +1,13 @@
 package com.mobilis.ws;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -25,6 +27,9 @@ import org.apache.http.protocol.HTTP;
 import org.json.simple.parser.ParseException;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Bitmap.CompressFormat;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
@@ -33,78 +38,86 @@ import android.os.Message;
 import android.util.Log;
 
 import com.mobilis.util.Constants;
-import com.mobilis.util.ErrorHandler;
 
 public class Connection {
 
-	private HttpResponse response;
-	private HttpPost post;
-	private HttpGet get;
-	private int connectionType;
 	private Handler handler;
-	private ExecuteConnection executeConnection;
-	private ConnectionWatcher connectionWatcher;
-	private int connectionId;
-	private String url;
-	private File file;
-	private String token;
-	private Context context;
-	private String jsonString;
-	private int statusCode = 0;
 
 	public Connection(Handler handler, Context context) {
 		this.handler = handler;
-		this.context = context;
 
-	}
-
-	public void startConnection() {
-		executeConnection = new ExecuteConnection();
-		executeConnection.execute();
-		connectionWatcher = new ConnectionWatcher();
-		connectionWatcher.execute();
 	}
 
 	public void getFromServer(int connectionId, String url, String token) {
-		connectionType = Constants.TYPE_CONNECTION_GET;
-		this.connectionId = connectionId;
-		this.url = url;
-		this.token = token;
-		startConnection();
+		ExecuteConnection connection = new ExecuteConnection();
+		ConnectionWatcher watcher = new ConnectionWatcher();
+
+		connection.connectionType = Constants.TYPE_CONNECTION_GET;
+		connection.connectionId = connectionId;
+		connection.url = url;
+		connection.token = token;
+
+		connection.execute();
+		watcher.execute(connection);
 
 	}
 
 	public void postToServer(int connectionId, String jsonString, String url) {
-		connectionType = Constants.TYPE_CONNECTION_POST;
-		this.connectionId = connectionId;
-		this.url = url;
-		this.jsonString = jsonString;
-		startConnection();
+		ExecuteConnection connection = new ExecuteConnection();
+		ConnectionWatcher watcher = new ConnectionWatcher();
 
+		connection.connectionType = Constants.TYPE_CONNECTION_POST;
+		connection.connectionId = connectionId;
+		connection.url = url;
+		connection.jsonString = jsonString;
+
+		connection.execute();
+		watcher.execute(connection);
 	}
 
-	public void postToServer(int connectionId, String url, File audioFile) {
-		// Audio Post
-		connectionType = Constants.TYPE_CONNECTION_POST;
-		this.connectionId = connectionId;
-		this.url = url;
-		file = audioFile;
-		startConnection();
+	public void postToServer(int connectionId, String url, File audioFile,
+			String token) {
+		ExecuteConnection connection = new ExecuteConnection();
+		ConnectionWatcher watcher = new ConnectionWatcher();
+
+		connection.connectionType = Constants.TYPE_CONNECTION_POST;
+		connection.connectionId = connectionId;
+		connection.url = url;
+		connection.token = token;
+		connection.file = audioFile;
+
+		connection.execute();
+		watcher.execute(connection);
 	}
 
-	public void getImages(int connectionId, String url, String token) {
-		connectionType = Constants.TYPE_CONNECTION_GET;
-		this.connectionId = connectionId;
-		this.url = url;
-		startConnection();
+	public void getImages(ArrayList<Integer> userIds, String token) {
+		int count = userIds.size();
 
+		for (int i = 0; i < count; i++) {
+			ExecuteConnection imageConnection = makeImageConnection(
+					userIds.get(i), token);
+			ConnectionWatcher connectionWatcher = new ConnectionWatcher();
+			imageConnection.execute();
+			connectionWatcher.execute(imageConnection);
+		}
 	}
 
-	private void sendPositiveMessage(String result) {
+	private ExecuteConnection makeImageConnection(int userId, String token) {
+		ExecuteConnection imageConnection = new ExecuteConnection();
+		imageConnection.url = Constants.getImageURL(userId);
+		imageConnection.connectionType = Constants.TYPE_CONNECTION_GET;
+		imageConnection.connectionId = Constants.CONNECTION_GET_IMAGES;
+		imageConnection.user_id = userId;
+		imageConnection.token = token;
+		return imageConnection;
+	}
+
+	private void sendPositiveMessage(String result, int connectionId) {
 		Message message = Message.obtain();
 		Bundle bundle = new Bundle();
 
 		if (connectionId == Constants.CONNECTION_POST_TOKEN) {
+			Log.i("TESTE", "TESTE");
 			message.what = Constants.MESSAGE_TOKEN_CONNECTION_OK;
 		}
 
@@ -143,7 +156,7 @@ public class Connection {
 		handler.sendMessage(message);
 	}
 
-	private void sendNegativeMessage() {
+	private void sendNegativeMessage(int connectionId) {
 
 		if (connectionId == Constants.CONNECTION_GET_IMAGES) {
 			handler.sendEmptyMessage(Constants.MESSAGE_IMAGE_CONNECION_FAILED);
@@ -151,14 +164,22 @@ public class Connection {
 
 		else if (connectionId == Constants.CONNECTION_GET_HISTORY_POSTS) {
 			handler.sendEmptyMessage(Constants.MESSAGE_HISTORY_POST_CONNECTION_FAILED);
-		} else
+		}
+
+		else if (connectionId == Constants.CONNECTION_POST_AUDIO) {
+			handler.sendEmptyMessage(Constants.MESSAGE_AUDIO_POST_FAILED);
+		}
+
+		else
 			handler.sendEmptyMessage(Constants.MESSAGE_CONNECTION_FAILED);
 	}
 
-	private Object executeGet(String URL, String authToken)
+	private Object[] executeGet(String URL, String authToken, HttpGet get)
 			throws ClientProtocolException, IOException
 
 	{
+
+		Object resultSet[] = new Object[2];
 
 		StringBuilder builder = new StringBuilder();
 		DefaultHttpClient client = new DefaultHttpClient();
@@ -184,17 +205,20 @@ public class Connection {
 			}
 
 			Log.w("resultFromServer", builder.toString());
-
-			this.statusCode = statusCode;
-			return builder.toString();
+			resultSet[0] = builder.toString();
+			resultSet[1] = statusCode;
+			return resultSet;
 		} else {
-			this.statusCode = statusCode;
+			resultSet[0] = null;
+			resultSet[1] = statusCode;
 			return null;
 		}
 	}
 
-	private Object executePost(String jsonString, String URL)
+	private Object[] executePost(String jsonString, String URL, HttpPost post)
 			throws ClientProtocolException, IOException, ParseException {
+
+		Object resultSet[] = new Object[2];
 
 		StringBuilder builder = new StringBuilder();
 		DefaultHttpClient client = new DefaultHttpClient();
@@ -211,7 +235,7 @@ public class Connection {
 
 		Log.w("URL", String.valueOf(post.getURI()));
 
-		response = client.execute(post);
+		HttpResponse response = client.execute(post);
 		StatusLine statusLine = response.getStatusLine();
 		int statusCode = statusLine.getStatusCode();
 
@@ -230,38 +254,43 @@ public class Connection {
 
 			Log.w("resultFromServer", builder.toString());
 
-			this.statusCode = statusCode;
-			return builder.toString();
-
+			resultSet[0] = builder.toString();
+			resultSet[1] = statusCode;
+			return resultSet;
 		}
 
 		else {
-			this.statusCode = statusCode;
-			return null;
+			resultSet[0] = null;
+			resultSet[1] = statusCode;
+			return resultSet;
 		}
 	}
 
-	private Object executeAudioPost(String URL, File audioFile)
-			throws IllegalStateException, IOException {
+	private Object[] executeAudioPost(String URL, File audioFile,
+			HttpPost post, String token) throws IllegalStateException,
+			IOException {
+
+		Object resultSet[] = new Object[2];
 
 		if (audioFile == null) {
 
 			Log.w("AUDIONULL", "YES");
 		}
 
+		Log.i("ENVIANDO ÁUDIO", "TRUE");
+
 		DefaultHttpClient client = new DefaultHttpClient();
 
 		StringBuilder builder = new StringBuilder();
 
-		HttpPost post = new HttpPost(Constants.URL_SERVER + URL);
+		post = new HttpPost(Constants.URL_SERVER + URL + "?auth_token=" + token);
 
 		MultipartEntity entity = new MultipartEntity();
 
-		File teste2 = new File(Environment.getExternalStorageDirectory()
+		File file = new File(Environment.getExternalStorageDirectory()
 				.getAbsolutePath() + "/Mobilis/Recordings/recording.3gp");
 
-		entity.addPart("attachment",
-				new FileBody(teste2, "audio/3gpp", "UTF-8"));
+		entity.addPart("post_file", new FileBody(file, "audio/3gpp", "UTF-8"));
 
 		post.setEntity(entity);
 
@@ -285,20 +314,24 @@ public class Connection {
 
 			}
 
-			Log.w("resultFromServer", builder.toString());
+			Log.w("AUDIORESULT", builder.toString());
 
-			this.statusCode = statusCode;
-			return builder.toString();
+			resultSet[0] = builder.toString();
+			resultSet[1] = statusCode;
+			return resultSet;
 		}
 
 		else {
-			this.statusCode = statusCode;
-			return null;
+			resultSet[0] = null;
+			resultSet[1] = statusCode;
+			return resultSet;
 		}
 	}
 
-	private Object getZippedImages(String url, String token)
+	private Object[] getImage(HttpGet get, String token, String url, int userId)
 			throws ClientProtocolException, IOException {
+
+		Object resultSet[] = new Object[2];
 
 		FileOutputStream fileOutputStream = null;
 		DefaultHttpClient client = new DefaultHttpClient();
@@ -314,101 +347,76 @@ public class Connection {
 
 		if (statusCode == 200) {
 
-			InputStream content = response.getEntity().getContent();
-			fileOutputStream = new FileOutputStream(Constants.PATH_IMAGESZIP);
-
-			byte[] buffer = new byte[4096];
-			int bytesRead = -1;
-			while ((bytesRead = content.read(buffer)) != -1) {
-				fileOutputStream.write(buffer, 0, bytesRead);
+			File imagesPath = new File(Constants.PATH_IMAGES);
+			if (!imagesPath.exists()) {
+				imagesPath.mkdir();
 			}
-			fileOutputStream.flush();
-			fileOutputStream.close();
 
-			this.statusCode = statusCode;
-			return new String();
+			BitmapFactory.Options options = new BitmapFactory.Options();
+			options.inSampleSize = 5;
+			Bitmap myImage = BitmapFactory.decodeStream(response.getEntity()
+					.getContent());
+			fileOutputStream = new FileOutputStream(Constants.PATH_IMAGES
+					+ userId + ".png");
 
-		} else {
-			this.statusCode = statusCode;
-			return null;
-		}
+			BufferedOutputStream bos = new BufferedOutputStream(
+					fileOutputStream);
 
+			myImage.compress(CompressFormat.PNG, 0, fileOutputStream);
+
+			bos.flush();
+			bos.close();
+
+			resultSet[0] = new String();
+			resultSet[1] = statusCode;
+			return resultSet;
+		} else
+			resultSet[0] = null;
+		resultSet[1] = statusCode;
+		return resultSet;
 	}
 
-	// private Object getImageFromServer(String url, String authToken)
-	// throws ClientProtocolException, IOException {
-	//
-	// // Object[] resultSet = new Object[2];
-	//
-	// FileOutputStream fileOutputStream = null;
-	// DefaultHttpClient client = new DefaultHttpClient();
-	// get = new HttpGet(Constants.URL_SERVER + url + "?auth_token="
-	// + authToken);
-	//
-	// Log.w("IMAGE URL", get.getURI().toString());
-	//
-	// HttpResponse response = client.execute(get);
-	// StatusLine statusLine = response.getStatusLine();
-	// int statusCode = statusLine.getStatusCode();
-	//
-	// Log.w("statusCode", String.valueOf(statusCode));
-	//
-	// if (statusCode == 200) {
-	//
-	// BitmapFactory.Options options = new BitmapFactory.Options();
-	// options.inSampleSize = 5;
-	// Bitmap myImage = BitmapFactory.decodeStream(response.getEntity()
-	// .getContent());
-	// fileOutputStream = new FileOutputStream(Environment
-	// .getExternalStorageDirectory().getAbsolutePath()
-	// + "/Mobilis/Recordings/" + "url" + ".png");
-	//
-	// BufferedOutputStream bos = new BufferedOutputStream(
-	// fileOutputStream);
-	//
-	// myImage.compress(CompressFormat.PNG, 0, fileOutputStream);
-	//
-	// bos.flush();
-	// bos.close();
-	//
-	// this.statusCode = statusCode;
-	// return new String();
-	// } else
-	// this.statusCode = statusCode;
-	// return null;
-	// }
-
-	private void abortConnection() {
-		if (connectionType == Constants.TYPE_CONNECTION_GET) {
-			if (get != null)
-				get.abort();
-		} else if (connectionType == Constants.TYPE_CONNECTION_POST) {
-			if (post != null)
-				post.abort();
+	private void abortConnection(ExecuteConnection conn) {
+		if (conn.connectionType == Constants.TYPE_CONNECTION_GET) {
+			if (conn.get != null)
+				conn.get.abort();
+		} else if (conn.connectionType == Constants.TYPE_CONNECTION_POST) {
+			if (conn != null)
+				conn.post.abort();
 		}
 	}
 
-	private class ExecuteConnection extends AsyncTask<Void, Void, Object> {
+	private class ExecuteConnection extends AsyncTask<Void, Void, Object[]> {
+
+		public int connectionId;
+		public HttpGet get = null;
+		public HttpPost post = null;
+		public int connectionType;
+		public String url = null;
+		public String token = null;
+		public File file = null;
+		public String jsonString = null;
+		public int user_id;
 
 		@Override
-		protected Object doInBackground(Void... params) {
+		protected Object[] doInBackground(Void... params) {
 
 			try {
 				if (connectionType == Constants.TYPE_CONNECTION_GET) {
 
 					if (connectionId == Constants.CONNECTION_GET_IMAGES) {
-						return getZippedImages(url, token);
+						return getImage(get, token, url, user_id);
 					} else
-						return executeGet(url, token);
+						return executeGet(url, token, get);
 				}
 
 				if (connectionType == Constants.TYPE_CONNECTION_POST) {
 
 					if (connectionId == Constants.CONNECTION_POST_AUDIO) {
-						return executeAudioPost(url, file);
+						return executeAudioPost(url, file, post, token);
 
 					} else
-						return executePost(jsonString, url);
+						return executePost(jsonString, url, post);
 				}
 			} catch (ClientProtocolException e) {
 				return null;
@@ -424,26 +432,29 @@ public class Connection {
 		}
 
 		@Override
-		protected void onPostExecute(Object result) {
+		protected void onPostExecute(Object[] result) {
 
-			connectionWatcher.cancel(true);
+			// connectionWatcher.cancel(true);
+			int statusCode = (Integer) result[1];
+			Log.i("POSTEXECUTE", "TOP");
 
-			if (result != null) {
+			if (result[0] != null) {
 				// Conexão bem sucedida
-				sendPositiveMessage((String) result);
+				Log.i("POSTEXECUTE", "OK");
+				sendPositiveMessage((String) result[0], connectionId);
 			}
 
-			else if (result == null && statusCode != 0) {
+			else if (result[0] == null && statusCode != 0) {
 				// Não caiu em exceção mas o status não foi o correto
-				ErrorHandler.handleStatusCode(context, statusCode);
-				sendNegativeMessage();
+				// ErrorHandler.handleStatusCode(context, statusCode);
+				sendNegativeMessage(connectionId);
 			}
 
 			else {
 				// Caiu em alguma Exception
-				ErrorHandler.handleError(context,
-						Constants.ERROR_CONNECTION_FAILED);
-				sendNegativeMessage();
+				// ErrorHandler.handleError(context,
+				// Constants.ERROR_CONNECTION_FAILED);
+				sendNegativeMessage(connectionId);
 			}
 
 			super.onPostExecute(result);
@@ -451,26 +462,25 @@ public class Connection {
 		}
 	}
 
-	private class ConnectionWatcher extends AsyncTask<Void, Void, Integer> {
+	private class ConnectionWatcher extends AsyncTask<Object, Void, Integer> {
+
+		private ExecuteConnection toWatch = null;
 
 		@Override
-		protected Integer doInBackground(Void... params) {
+		protected Integer doInBackground(Object... params) {
 			// TODO Auto-generated method stub
 			try {
-
-				executeConnection.get(15, TimeUnit.SECONDS);
+				toWatch = (ExecuteConnection) params[0];
+				toWatch.get(15, TimeUnit.SECONDS);
 				return 0;
 			} catch (InterruptedException e) {
-				Log.w("Exception", "InterruptedException");
 				return 2;
 			} catch (ExecutionException e) {
-				abortConnection();
-				Log.w("Exception", "ExecutionException");
+				abortConnection(toWatch);
 				e.printStackTrace();
 				return 1;
 			} catch (TimeoutException e) {
-				Log.w("Exception", "TimeoutException");
-				abortConnection();
+				abortConnection(toWatch);
 				e.printStackTrace();
 				return 1;
 			}
@@ -481,8 +491,8 @@ public class Connection {
 			// TODO Auto-generated method stub
 			super.onPostExecute(result);
 			if (result == 1) {
-				ErrorHandler.handleError(context,
-						Constants.ERROR_CONNECTION_TIMEOUT);
+				// ErrorHandler.handleError(context,
+				// Constants.ERROR_CONNECTION_TIMEOUT);
 			}
 		}
 	}

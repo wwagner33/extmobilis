@@ -6,9 +6,11 @@ public class Constants {
 
 	// URL
 	public static final String URL_LOCAL = "http://10.0.2.2:3000/";
-	public static final String URL_SERVER = "http://apolo11teste.virtual.ufc.br/ws_solar/";
 	// public static final String URL_SERVER =
-	// "http://apolo11.virtual.ufc.br/ws_solar/";
+	// "http://apolo11teste.virtual.ufc.br/ws_solar/";
+	// public static final String URL_SERVER =
+	// "http://apolo11.virtual.ufc.br/solar/";
+	public static final String URL_SERVER = "http://apolo11teste.virtual.ufc.br/solar/";
 	public static final String URL_TOKEN = "sessions";
 	public static final String URL_COURSES = "curriculum_units.json"; // suffix
 	public static final String URL_GROUPS_PREFIX = "groups/";
@@ -17,6 +19,27 @@ public class Constants {
 	public static final String URL_DISCUSSION_PREFIX = "discussions/";
 	public static final String URL_CURRICULUM_UNITS_PREFIX = "curriculum_units/";
 	public static final String URL_POSTS_SUFFIX = "/posts.json";
+
+	public static String generateHistoryPostURL(int topicId, String date) {
+		String url = "discussions/" + topicId + "/posts/" + "history/" + date
+				+ ".json";
+		return url;
+	}
+
+	public static String generateNewPostsURL(int topicId) {
+		String url = "discussions/" + topicId + "/posts/" + "news/"
+				+ oldDateString + ".json";
+		return url;
+	}
+
+	public static String generateAudioResponseURL(int postId) {
+		String url = "posts/" + postId + "/post_files";
+		return url;
+	}
+
+	public static String getImageURL(int postId) {
+		return "users/" + postId + "/photo";
+	}
 
 	// Dialogs
 	public static final String TEXT_PROGRESS_DIALOG = "Carregando";
@@ -99,5 +122,6 @@ public class Constants {
 	public static final int MESSAGE_TEXT_RESPONSE_OK = 709;
 	public static final int MESSAGE_IMAGE_CONNECION_FAILED = 710;
 	public static final int MESSAGE_HISTORY_POST_CONNECTION_FAILED = 711;
+	public static final int MESSAGE_AUDIO_POST_FAILED = 721;
 
 }

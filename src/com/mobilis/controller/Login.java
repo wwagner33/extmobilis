@@ -10,6 +10,7 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -150,6 +151,8 @@ public class Login extends MobilisActivity implements OnClickListener {
 
 			if (msg.what == Constants.MESSAGE_TOKEN_CONNECTION_OK) {
 
+				Log.w("Token Connection", "OK");
+
 				jsonParser = new ParseJSON(getApplicationContext());
 				ContentValues[] tokenParsed = jsonParser.parseJSON(msg
 						.getData().getString("content"),
@@ -178,6 +181,7 @@ public class Login extends MobilisActivity implements OnClickListener {
 			}
 
 			if (msg.what == Constants.MESSAGE_CONNECTION_FAILED) {
+				Log.w("Token Connection", "FAIL");
 				closeDialog(dialog);
 			}
 		}

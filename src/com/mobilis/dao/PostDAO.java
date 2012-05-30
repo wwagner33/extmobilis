@@ -22,11 +22,6 @@ public class PostDAO extends DBAdapter {
 	public void addPosts(ArrayList<ContentValues> values, int topic_id) {
 
 		clearPostsFromTopic(topic_id);
-
-		// for (int i = 0; i < values.size(); i++) {
-		// ContentValues newPost = values.get(i);
-		// getDatabase().insert("posts", null, newPost);
-		// }
 		getDatabase().beginTransaction();
 		for (ContentValues i : values) {
 			getDatabase().insert("posts", null, i);
@@ -59,7 +54,8 @@ public class PostDAO extends DBAdapter {
 		Log.i("TOPIC_ID", String.valueOf(topic_id));
 
 		Cursor cursor = getDatabase().rawQuery(
-				"SELECT * FROM posts WHERE discussion_id =" + topic_id + " ORDER BY updated ASC", null);
+				"SELECT * FROM posts WHERE discussion_id =" + topic_id
+						+ " ORDER BY updated_at ASC", null);
 		cursor.moveToFirst();
 		Log.i("CURSOR_SIZE", String.valueOf(cursor.getCount()));
 		return cursor;
@@ -77,12 +73,10 @@ public class PostDAO extends DBAdapter {
 			content.put("_id", cursor.getInt(cursor.getColumnIndex("_id")));
 			content.put("profile_id",
 					cursor.getInt(cursor.getColumnIndex("profile_id")));
-			content.put("content_first",
-					cursor.getString(cursor.getColumnIndex("content_first")));
-			content.put("content_last",
-					cursor.getString(cursor.getColumnIndex("content_last")));
-			content.put("updated",
-					cursor.getString(cursor.getColumnIndex("updated")));
+			content.put("content",
+					cursor.getString(cursor.getColumnIndex("content")));
+			content.put("updated_at",
+					cursor.getString(cursor.getColumnIndex("updated_at")));
 			content.put("user_id",
 					cursor.getInt(cursor.getColumnIndex("user_id")));
 			content.put("discussion_id",
@@ -99,69 +93,51 @@ public class PostDAO extends DBAdapter {
 		return values;
 	}
 
-	public String getAllUserIds() {
+	public ArrayList<Integer> getAllUserIds() {
 		Cursor cursor = getDatabase().rawQuery(
 				"SELECT DISTINCT user_id FROM posts", null);
-		StringBuilder builder = new StringBuilder();
 		cursor.moveToFirst();
-
+		ArrayList<Integer> ids = new ArrayList<Integer>();
 		do {
-			builder.append(cursor.getInt(cursor.getColumnIndex("user_id")));
-			if (!cursor.isLast()) {
-				builder.append(",");
-			}
+			ids.add(cursor.getInt(cursor.getColumnIndex("user_id")));
 		} while
 
 		(cursor.moveToNext());
-
-		String result = builder.toString();
 		cursor.close();
-		return result;
+		return ids;
 	}
 
-	public String getUserIdsAbsentImage(int discussion_id) {
-		StringBuilder builder = new StringBuilder();
+	public ArrayList<Integer> getUserIdsAbsentImage(int discussion_id) {
 		File imageDirectory = new File(Constants.PATH_IMAGES);
-		File[] images = imageDirectory.listFiles(); // Joga NullPointerException
-													// se o diretório não
-													// existir
+		File[] images = imageDirectory.listFiles();
 		Cursor cursor = getDatabase().rawQuery(
 				"SELECT DISTINCT user_id FROM posts WHERE discussion_id="
 						+ discussion_id, null);
 		cursor.moveToFirst();
+		Log.i("CURSOR SIZE", "" + cursor.getCount());
+		Log.i("IMAGE NUMBER", "" + images.length);
+
+		ArrayList<Integer> list = new ArrayList<Integer>();
 
 		do {
 
-			boolean append = true;
-
 			for (int y = 0; y < images.length; y++) {
+				Log.i("USER_ID",
+						"" + cursor.getInt(cursor.getColumnIndex("user_id")));
+				Log.i("IMAGE_NAME",
+						FilenameUtils.removeExtension(images[y].getName()));
 
-				if (cursor.getInt(cursor.getColumnIndex("user_id")) == Integer
+				if (cursor.getInt(cursor.getColumnIndex("user_id")) != Integer
 						.parseInt(FilenameUtils.removeExtension(images[y]
 								.getName()))) {
-					append = false;
+					list.add(cursor.getInt(cursor.getColumnIndex("user_id")));
 				}
-			}
-
-			if (append == true) {
-				builder.append(cursor.getInt(cursor.getColumnIndex("user_id")));
-				if (!cursor.isLast()) {
-					builder.append(",");
-				}
-
 			}
 
 		} while (cursor.moveToNext());
 
 		cursor.close();
-		String string = builder.toString();
-
-		if (string.charAt(string.length() - 1) == ',') {
-			// Joga StringIndexOutOfBoundsException se a lista for vazia
-			string = string.substring(0, string.length() - 1);
-		}
-		Log.i("Builder", string);
-		return string;
+		return list;
 	}
 
 	public boolean postedToday(int topicId, int postId) {
@@ -206,7 +182,7 @@ public class PostDAO extends DBAdapter {
 	public String getOldestPost(int topicId) {
 		Cursor cursor = getDatabase()
 				.rawQuery(
-						"SELECT MIN(strftime(\'%Y%m%d%H%M%S\',updated)) FROM posts WHERE discussion_id="
+						"SELECT MIN(strftime(\'%Y%m%d%H%M%S\',updated_at)) FROM posts WHERE discussion_id="
 								+ topicId, null);
 		cursor.moveToFirst();
 		String date = cursor.getString(0);

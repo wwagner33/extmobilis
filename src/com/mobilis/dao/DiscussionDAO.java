@@ -5,28 +5,29 @@ import android.content.Context;
 import android.database.Cursor;
 import android.util.Log;
 
-public class TopicDAO extends DBAdapter {
+public class DiscussionDAO extends DBAdapter {
 
-	public TopicDAO(Context context) {
+	public DiscussionDAO(Context context) {
 		super(context);
 	}
 
-	public void addTopics(ContentValues[] values, int classId) {
-		if (existsTopic(classId)) {
-			clearTopics(classId);
+	public void addDiscussions(ContentValues[] values, int classId) {
+		if (existsDiscussion(classId)) {
+			clearDiscussions(classId);
 		}
 		getDatabase().beginTransaction();
 		for (int i = 0; i < values.length; i++) {
 			values[i].put("class_id", classId);
-			getDatabase().insert("topics", null, values[i]);
+			getDatabase().insert("discussions", null, values[i]);
 		}
 		getDatabase().setTransactionSuccessful();
 		getDatabase().endTransaction();
 	}
 
-	public boolean existsTopic(int classId) {
-		Cursor cursor = getDatabase().query("topics", new String[] { "_id" },
-				"class_id=" + classId, null, null, null, null, "1");
+	public boolean existsDiscussion(int classId) {
+		Cursor cursor = getDatabase().query("discussions",
+				new String[] { "_id" }, "class_id=" + classId, null, null,
+				null, null, "1");
 		cursor.moveToFirst();
 		try {
 			int count = cursor.getInt(0);
@@ -37,18 +38,19 @@ public class TopicDAO extends DBAdapter {
 		}
 	}
 
-	public void clearTopics(int classId) {
-		getDatabase().delete("topics", "class_id=" + classId, null);
+	public void clearDiscussions(int classId) {
+		getDatabase().delete("discussions", "class_id=" + classId, null);
 	}
 
-	public Cursor getTopicsFromClass(int classId) { // Pegar apenas o necessário
-		Cursor cursor = getDatabase().query("topics", null, null, null, null,
-				null, null);
+	public Cursor getDiscussionsFromClass(int classId) { // Pegar apenas o
+															// necessário
+		Cursor cursor = getDatabase().query("discussions", null, null, null,
+				null, null, null);
 		cursor.moveToFirst();
 		return cursor;
 	}
 
-	public boolean hasNewPosts(int topicId, String date) {
+	public boolean hasNewPosts(int discussionId, String date) {
 
 		if (date == null) {
 			return false;
@@ -61,9 +63,9 @@ public class TopicDAO extends DBAdapter {
 		// Cursor cursor = getDatabase().rawQuery(sqlQuery, null);
 
 		Cursor cursor = getDatabase().query("posts",
-				new String[] { "count(updated)" },
-				"updated=\'" + date + "\' AND discussion_id=" + topicId, null,
-				null, null, null);
+				new String[] { "count(updated_at)" },
+				"updated_at=\'" + date + "\' AND discussion_id=" + discussionId,
+				null, null, null, null);
 
 		cursor.moveToFirst();
 		int count = cursor.getInt(0);
@@ -72,12 +74,12 @@ public class TopicDAO extends DBAdapter {
 		return (count == 0) ? true : false;
 	}
 
-	public boolean hasNewPostsFlag(int topicId) {
+	public boolean hasNewPostsFlag(int discussionId) {
 		// Cursor cursor = getDatabase().rawQuery(
 		// "SELECT has_new_posts from topics WHERE _id =" + topicId, null);
-		Cursor cursor = getDatabase().query("topics",
-				new String[] { "has_new_posts" }, "_id=" + topicId, null, null,
-				null, null);
+		Cursor cursor = getDatabase().query("discussions",
+				new String[] { "has_new_posts" }, "_id=" + discussionId, null,
+				null, null, null);
 		cursor.moveToFirst();
 		int result = cursor.getInt(0);
 		cursor.close();
@@ -85,7 +87,8 @@ public class TopicDAO extends DBAdapter {
 
 	}
 
-	public void updateFlag(ContentValues newValue, int topic_id) {
-		getDatabase().update("topics", newValue, "_id=" + topic_id, null);
+	public void updateFlag(ContentValues newValue, int discussionId) {
+		getDatabase().update("discussions", newValue, "_id=" + discussionId,
+				null);
 	}
 }

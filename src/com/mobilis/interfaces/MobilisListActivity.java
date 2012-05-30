@@ -32,7 +32,7 @@ public abstract class MobilisListActivity extends ListActivity {
 		if (android.os.Build.VERSION.SDK_INT <= 8)
 			editor.commit();
 		else
-			editor.apply();
+			editor.commit();
 	}
 
 	public void closeDialog(Dialog dialog) {

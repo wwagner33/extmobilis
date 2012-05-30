@@ -40,15 +40,14 @@ import com.mobilis.exception.ImageFileNotFoundException;
 import com.mobilis.interfaces.MobilisListActivity;
 import com.mobilis.util.Constants;
 import com.mobilis.util.DateUtils;
+import com.mobilis.util.MobilisStatus;
 import com.mobilis.util.ParseJSON;
-import com.mobilis.util.ZipManager;
 import com.mobilis.ws.Connection;
 
 public class PostList extends MobilisListActivity implements OnClickListener,
 		OnScrollListener {
 
 	private boolean forceListToRedraw = true;
-	private static final long noParentId = 0;
 	private PostAdapter listAdapter;
 	private ArrayList<ContentValues> parsedValues;
 	private ParseJSON jsonParser;
@@ -72,9 +71,7 @@ public class PostList extends MobilisListActivity implements OnClickListener,
 	private PostHandler handler;
 	private Connection connection;
 
-	private ZipManager zipManager;
-
-	private boolean newPosts = false;
+	// private boolean newPosts = false;
 
 	private View connectionFooterView;
 	private View warningFooterView;
@@ -104,7 +101,6 @@ public class PostList extends MobilisListActivity implements OnClickListener,
 
 		handler = new PostHandler();
 		connection = new Connection(handler, this);
-		zipManager = new ZipManager();
 
 		postDAO = new PostDAO(this);
 		jsonParser = new ParseJSON(this);
@@ -115,6 +111,14 @@ public class PostList extends MobilisListActivity implements OnClickListener,
 
 		if (getPreferences().getBoolean("isForumClosed", false) == true) {
 			answerForum.setVisibility(View.GONE);
+		}
+
+		MobilisStatus status = MobilisStatus.getInstance();
+		if (status.ids != null) {
+			ArrayList<Integer> ids = status.ids;
+			status.ids = null;
+			connection
+					.getImages(ids, getPreferences().getString("token", null));
 		}
 
 		Calendar calendar = Calendar.getInstance();
@@ -237,7 +241,6 @@ public class PostList extends MobilisListActivity implements OnClickListener,
 
 				@Override
 				public boolean accept(File dir, String filename) {
-					// TODO Auto-generated method stub
 					return filename.startsWith(prefix);
 				}
 			});
@@ -272,13 +275,7 @@ public class PostList extends MobilisListActivity implements OnClickListener,
 		Intent intent = new Intent(this, PostDetailController.class);
 		intent.putExtra("username", listValue.getAsString("user_nick"));
 
-		if (listValue.getAsString("content_last").equals("")) {
-			intent.putExtra("content", listValue.getAsString("content_first"));
-		} else {
-			intent.putExtra("content", listValue.getAsString("content_first")
-					+ listValue.getAsString("content_last"));
-		}
-
+		intent.putExtra("content", listValue.getAsString("content"));
 		intent.putExtra("topicId", getPreferences().getInt("SelectedTopic", 0));
 
 		SharedPreferences.Editor editor = getPreferences().edit();
@@ -294,7 +291,6 @@ public class PostList extends MobilisListActivity implements OnClickListener,
 
 		closeDialogIfItsVisible();
 		startActivity(intent);
-
 	}
 
 	public void refreshList() {
@@ -324,13 +320,9 @@ public class PostList extends MobilisListActivity implements OnClickListener,
 				postDAO.close();
 			}
 
-			if (parsedValues.size() == 20) {
+			if (parsedValues.size() == 30) {
 				setListFooter(connectionFooterView);
 			}
-
-			// else {
-			// stopLoading==true
-			// }
 
 			listAdapter = new PostAdapter(this, parsedValues);
 			setListAdapter(listAdapter);
@@ -378,20 +370,11 @@ public class PostList extends MobilisListActivity implements OnClickListener,
 
 	}
 
-	public void getImages(String url) {
-
-		connection.getImages(Constants.CONNECTION_GET_IMAGES, url,
-				getPreferences().getString("token", null));
-
-	}
-
 	public class PostAdapter extends BaseAdapter {
 
 		Context context;
 		ArrayList<ContentValues> data;
 		LayoutInflater inflater = null;
-
-		// static ImageView image;
 
 		public PostAdapter(Context context, ArrayList<ContentValues> data) {
 			this.context = context;
@@ -433,7 +416,7 @@ public class PostList extends MobilisListActivity implements OnClickListener,
 				try {
 
 					Date date = format.parse(data.get(position).getAsString(
-							"updated"));
+							"updated_at"));
 					Calendar calendar = Calendar.getInstance();
 					calendar.setTime(date);
 
@@ -472,8 +455,17 @@ public class PostList extends MobilisListActivity implements OnClickListener,
 
 				TextView postBody = (TextView) convertView
 						.findViewById(R.id.post_body);
-				postBody.setText(data.get(position)
-						.getAsString("content_first"));
+
+				// Tratar aqui se o texto for muito grande
+				String content = data.get(position).getAsString("content")
+						.trim();
+				if (content.length() > 150) {
+					postBody.setText(content.substring(0, 150) + "...");
+				}
+
+				else {
+					postBody.setText(content);
+				}
 
 				TextView userName = (TextView) convertView
 						.findViewById(R.id.post_title);
@@ -490,8 +482,12 @@ public class PostList extends MobilisListActivity implements OnClickListener,
 		if (v.getId() == R.id.answer_topic_image) {
 
 			intent = new Intent(this, ResponseController.class);
-			intent.putExtra("topicId", "");
-			intent.putExtra("parentId", noParentId);
+			SharedPreferences.Editor editor = getPreferences().edit(); // mover
+																		// para
+																		// o
+																		// singleton
+			editor.putLong("SelectedPost", 0);
+			commit(editor);
 			closeDialogIfItsVisible();
 			startActivity(intent);
 
@@ -511,15 +507,13 @@ public class PostList extends MobilisListActivity implements OnClickListener,
 
 		int lastInScreen = firstVisibleItem + visibleItemCount;
 		if ((lastInScreen == totalItemCount) && !(isLoading)
-				&& getListView().getCount() >= 20 && !stopLoading) {
+				&& getListView().getCount() >= 30 && !stopLoading) {
 			isLoading = true;
 
-			String url = "discussions/"
-					+ getPreferences().getInt("SelectedTopic", 0) + "/posts/"
-					+ oldestPostDate + "/history.json";
-			Log.w("OLD-POSTS-URL", url);
-			obtainHistoryPosts(url);
-
+			obtainHistoryPosts(Constants
+					.generateHistoryPostURL(
+							getPreferences().getInt("SelectedTopic", 0),
+							oldestPostDate));
 		}
 	}
 
@@ -540,10 +534,10 @@ public class PostList extends MobilisListActivity implements OnClickListener,
 
 			if (msg.what == Constants.MESSAGE_NEW_POST_CONNECTION_OK) {
 
-				newPosts = true;
-
 				ArrayList<ContentValues> values = jsonParser.parsePosts(msg
 						.getData().getString("content"));
+
+				Log.w("NUMERO DE POSTS", "" + values.size());
 
 				if (values.size() == 0) {
 
@@ -564,27 +558,11 @@ public class PostList extends MobilisListActivity implements OnClickListener,
 							"SelectedTopic", 0));
 					oldestPostDate = postDAO.getOldestPost(getPreferences()
 							.getInt("SelectedTopic", 0));
+					postDAO.close();
 
-					try {
-						String ids = postDAO
-								.getUserIdsAbsentImage(getPreferences().getInt(
-										"SelectedTopic", 0));
-						postDAO.close();
-						getImages("images/" + ids + "/users");
-						Log.i("Alguns usuários não possuem imagens", "TRUE");
-					} catch (StringIndexOutOfBoundsException e) {
-						closeDialogIfItsVisible();
-						postDAO.close();
-						isLoading = false;
-						stopLoading = false;
-						updateList(cursor);
-						Log.i("Não é preciso Baixar novas imagens", "TRUE");
-					} catch (NullPointerException e) {
-						Log.i("É preciso baixar todas as imagens", "TRUE");
-						String ids = postDAO.getAllUserIds();
-						postDAO.close();
-						getImages("images/" + ids + "/users");
-					}
+					closeDialog(dialog);
+					updateList(cursor);
+					downloadImages();
 				}
 			}
 
@@ -596,7 +574,7 @@ public class PostList extends MobilisListActivity implements OnClickListener,
 						.getData().getString("content"));
 				try {
 					oldestPostDate = DateUtils.convertDateToServerFormat(temp
-							.get(temp.size() - 1).getAsString("updated"));
+							.get(temp.size() - 1).getAsString("updated_at"));
 				} catch (ParseException e1) {
 					e1.printStackTrace();
 				} catch (ArrayIndexOutOfBoundsException e) {
@@ -605,35 +583,14 @@ public class PostList extends MobilisListActivity implements OnClickListener,
 
 				parsedValues.addAll(temp);
 
-				newPosts = false;
-
-				if (parsedValues.size() % 20 != 0) {
+				if (parsedValues.size() % 30 != 0) {
 					removeListFooter();
-
 					stopLoading = true;
 					isLoading = false;
 				}
 
-				try {
-					postDAO.open();
-					String ids = postDAO.getUserIdsAbsentImage(getPreferences()
-							.getInt("SelectedTopic", 0));
-					postDAO.close();
-					getImages("images/" + ids + "/users");
-					Log.i("Alguns usuários não possuem imagens", "TRUE");
-				} catch (StringIndexOutOfBoundsException e) {
-					closeDialogIfItsVisible();
-					postDAO.close();
-					isLoading = false;
-					closeDialogIfItsVisible();
-					refreshList();
-					Log.i("Não é preciso Baixar novas imagens", "TRUE");
-				} catch (NullPointerException e) {
-					Log.i("É preciso baixar todas as imagens", "TRUE");
-					String ids = postDAO.getAllUserIds();
-					postDAO.close();
-					getImages("images/" + ids + "/users");
-				}
+				refreshList();
+				downloadImages();
 
 			}
 
@@ -646,28 +603,48 @@ public class PostList extends MobilisListActivity implements OnClickListener,
 			}
 
 			if (msg.what == Constants.MESSAGE_IMAGE_CONNECTION_OK) {
-				zipManager.unzipFile();
-				isLoading = false;
-				stopLoading = false;
-				closeDialogIfItsVisible();
-
-				if (newPosts)
-					updateList(cursor);
-				else
-					refreshList();
+				Log.w("IMAGE CONNECTION", "OK");
+				refreshList();
 
 			}
 			if (msg.what == Constants.MESSAGE_IMAGE_CONNECION_FAILED) {
-				isLoading = false;
-				stopLoading = false;
-				closeDialogIfItsVisible();
-
-				if (newPosts)
-					updateList(cursor);
-				else
-					refreshList();
+				Log.w("IMAGE CONNECTION", "FAILED");
+				// NADA
 			}
 		}
+	}
+
+	public void downloadImages() {
+
+		ArrayList<Integer> ids = null;
+		File imageDirectory = new File(Constants.PATH_IMAGES);
+		int numberOfImages = imageDirectory.listFiles().length;
+
+		postDAO.open();
+
+		if (imageDirectory.exists()) {
+			if (numberOfImages > 0) {
+				Log.i("BAIXAR ALGUMAS", "SIM");
+				ids = postDAO.getUserIdsAbsentImage(getPreferences().getInt(
+						"SelectedTopic", 0));
+			} else {
+				Log.i("BAIXAR TUDO 1", "SIM");
+				ids = postDAO.getAllUserIds();
+			}
+		}
+
+		else {
+			Log.i("BAIXAR TUDO 2", "SIM");
+			imageDirectory.mkdir();
+			ids = postDAO.getAllUserIds();
+		}
+
+		if (ids.size() > 0) {
+			connection
+					.getImages(ids, getPreferences().getString("token", null));
+		}
+		postDAO.close();
+
 	}
 
 	@Override
@@ -675,10 +652,8 @@ public class PostList extends MobilisListActivity implements OnClickListener,
 		dialog = dialogMaker
 				.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
 		dialog.show();
-		String url = "discussions/"
-				+ getPreferences().getInt("SelectedTopic", 0) + "/posts/"
-				+ Constants.oldDateString + "/news.json";
-		obtainNewPosts(url);
+		obtainNewPosts(Constants.generateNewPostsURL(getPreferences().getInt(
+				"SelectedTopic", 0)));
 
 	}
 }

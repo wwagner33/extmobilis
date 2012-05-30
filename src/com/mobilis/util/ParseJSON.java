@@ -82,8 +82,7 @@ public class ParseJSON {
 
 				parsedValues[i] = new ContentValues();
 
-				parsedValues[i].put("_id",
-						(String) jsonObjects[i].get("curriculum_unit_id"));
+				parsedValues[i].put("_id", (String) jsonObjects[i].get("id"));
 
 				parsedValues[i].put("offer_id",
 						(String) jsonObjects[i].get("offer_id"));
@@ -119,7 +118,7 @@ public class ParseJSON {
 
 				parsedValues[i] = new ContentValues();
 
-				parsedValues[i].put("_id", (String) jsonObjects[i].get("id"));
+				parsedValues[i].put("_id", (Long) jsonObjects[i].get("id"));
 
 				parsedValues[i]
 						.put("code", (String) jsonObjects[i].get("code"));
@@ -154,8 +153,7 @@ public class ParseJSON {
 				parsedValues[i].put("description",
 						(String) jsonObjects[i].get("description"));
 
-				parsedValues[i].put("_id",
-						Long.parseLong((String) jsonObjects[i].get("id")));
+				parsedValues[i].put("_id", (Long) jsonObjects[i].get("id"));
 
 				parsedValues[i]
 						.put("name", (String) jsonObjects[i].get("name"));
@@ -163,8 +161,8 @@ public class ParseJSON {
 				parsedValues[i].put("schedule_id",
 						(Long) jsonObjects[i].get("schedule_id"));
 
-				parsedValues[i].put("closed",
-						(String) jsonObjects[i].get("closed"));
+				parsedValues[i].put("status",
+						(String) jsonObjects[i].get("status"));
 
 				// parsedValues[i].put("has_new_posts", false);
 
@@ -203,8 +201,6 @@ public class ParseJSON {
 					String.valueOf(parsedValues[0].getAsInteger("result")));
 
 			parsedValues[0].put("post_id", (Long) jsonObject.get("post_id"));
-			Log.w("POSTIDONPARSER",
-					String.valueOf(parsedValues[0].getAsInteger("post_id")));
 			return parsedValues;
 		}
 
@@ -221,7 +217,7 @@ public class ParseJSON {
 
 		Log.i("JsonArray", String.valueOf(jsonArray.size()));
 
-		JSONObject local = (JSONObject) jsonArray.get(0);
+		JSONObject local = (JSONObject) jsonArray.get(0); // Joga exception
 		String after = (String) local.get("after");
 		String before = (String) local.get("before");
 		SharedPreferences.Editor editor = settings.edit();
@@ -240,51 +236,40 @@ public class ParseJSON {
 
 			ContentValues rowItem = new ContentValues();
 
-			String contentFirst = (String) jsonObjects[i].get("content_first");
-			String contentLast = (String) jsonObjects[i].get("content_last");
+			String content = (String) jsonObjects[i].get("content");
 
-			if (contentFirst != null) {
-				Spanned markUpFirst = Html.fromHtml(contentFirst);
-				rowItem.put("content_first", markUpFirst.toString());
+			if (!content.equals("")) {
+				Spanned markUpFirst = Html.fromHtml(content);
+				rowItem.put("content", markUpFirst.toString());
 			} else {
-				rowItem.put("content_first", "");
+				rowItem.put("content", "");
 			}
 
-			if (contentLast != null) {
-				Spanned markUpLast = Html.fromHtml(contentLast);
-				rowItem.put("content_last", markUpLast.toString());
-			} else {
-				rowItem.put("content_last", "");
-			}
-
-			rowItem.put("discussion_id", Long.parseLong((String) jsonObjects[i]
-					.get("discussion_id")));
-			rowItem.put("_id",
-					Long.parseLong((String) jsonObjects[i].get("id")));
-
-			if (!((String) jsonObjects[i].get("parent_id")).equals("")) {
-				rowItem.put("parent_id", Long.parseLong((String) jsonObjects[i]
-						.get("parent_id")));
-			} else {
-				rowItem.putNull("parent_id");
-			}
-
-			rowItem.put("user_id",
-					Long.parseLong((String) jsonObjects[i].get("user_id")));
-			rowItem.put("profile_id",
-					Long.parseLong((String) jsonObjects[i].get("profile_id")));
 			rowItem.put("user_nick", (String) jsonObjects[i].get("user_nick"));
+
+			rowItem.put("discussion_id",
+					(Long) jsonObjects[i].get("discussion_id"));
+			rowItem.put("_id", (Long) jsonObjects[i].get("id"));
+
+			if (jsonObjects[i].get("parent_id") != null) {
+				rowItem.put("parent_id", (Long) jsonObjects[i].get("parent_id"));
+			}
+
+			rowItem.put("profile_id", (Long) jsonObjects[i].get("profile_id"));
+			rowItem.put("user_id", (Long) jsonObjects[i].get("user_id"));
+			rowItem.put("level", (Long) jsonObjects[i].get("level"));
 
 			SimpleDateFormat dbFormat = DateUtils.getDbFormat();
 			SimpleDateFormat serverFormat = DateUtils.getServerFormat();
 
 			try {
-				Date formatedDate = serverFormat.parse((String) jsonObjects[i]
-						.get("updated"));
-
+				String dateFromServer = (String) jsonObjects[i]
+						.get("updated_at");
+				dateFromServer = dateFromServer.substring(0, 19).replace("T",
+						"");
+				Date formatedDate = serverFormat.parse(dateFromServer);
 				String formatedDateString = dbFormat.format(formatedDate);
-				rowItem.put("updated", formatedDateString);
-				Log.i("FORMATED DATE", formatedDateString);
+				rowItem.put("updated_at", formatedDateString);
 			} catch (ParseException e) {
 				e.printStackTrace();
 				throw new RuntimeException();
@@ -297,10 +282,10 @@ public class ParseJSON {
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public JSONObject buildTokenObject(String username, String password) {
+	public JSONObject buildTokenObject(String login, String password) {
 		JSONObject jsonObject = new JSONObject();
 		LinkedHashMap jsonMap = new LinkedHashMap<String, String>();
-		jsonMap.put("username", username);
+		jsonMap.put("login", login);
 		jsonMap.put("password", password);
 		jsonObject.put("user", jsonMap);
 		return jsonObject;

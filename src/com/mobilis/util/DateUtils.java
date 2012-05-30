@@ -225,15 +225,21 @@ public class DateUtils {
 	}
 
 	public static SimpleDateFormat getServerFormat() {
-		SimpleDateFormat serverFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+		SimpleDateFormat serverFormat = new SimpleDateFormat(
+				"yyyy-MM-ddHH:mm:ss");
 		return serverFormat;
+	}
+
+	public static SimpleDateFormat getURLFormat() {
+		SimpleDateFormat urlFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+		return urlFormat;
 	}
 
 	public static final String convertDateToServerFormat(String bankDate)
 			throws ParseException {
 		Date db = getDbFormat().parse(bankDate);
-		String serverFormat = getServerFormat().format(db);
-		return serverFormat;
+		String urlFormat = getURLFormat().format(db);
+		return urlFormat;
 	}
 
 }

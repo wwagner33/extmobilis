@@ -3,6 +3,7 @@ package com.mobilis.dao;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.util.Log;
 
 public class ClassDAO extends DBAdapter {
 
@@ -11,12 +12,15 @@ public class ClassDAO extends DBAdapter {
 	}
 
 	public void addClasses(ContentValues[] values, int course_id) {
+		Log.i("COURSE_ID", "" + course_id);
+
 		if (existClasses(course_id)) {
 			clearClasses(course_id);
 		}
 
 		getDatabase().beginTransaction();
 		for (int i = 0; i < values.length; i++) {
+			Log.i("INSERT", "INSERT");
 			values[i].put("course_id", course_id);
 			getDatabase().insert("classes", null, values[i]);
 		}

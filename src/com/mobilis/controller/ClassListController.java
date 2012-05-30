@@ -19,7 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mobilis.dao.ClassDAO;
-import com.mobilis.dao.TopicDAO;
+import com.mobilis.dao.DiscussionDAO;
 import com.mobilis.dialog.DialogMaker;
 import com.mobilis.interfaces.MobilisListActivity;
 import com.mobilis.util.Constants;
@@ -36,7 +36,7 @@ public class ClassListController extends MobilisListActivity {
 	private ClassDAO classDAO;
 	private Cursor cursor;
 	private ClassAdapter listAdapter;
-	private TopicDAO topicDAO;
+	private DiscussionDAO topicDAO;
 	private ClassHandler handler;
 	private Connection connection;
 
@@ -49,7 +49,7 @@ public class ClassListController extends MobilisListActivity {
 		connection = new Connection(handler, this);
 		jsonParser = new ParseJSON(this);
 		classDAO = new ClassDAO(this);
-		topicDAO = new TopicDAO(this);
+		topicDAO = new DiscussionDAO(this);
 		dialogMaker = new DialogMaker(this);
 		restoreDialog();
 		updateList();
@@ -112,9 +112,9 @@ public class ClassListController extends MobilisListActivity {
 
 		topicDAO.open();
 
-		if (topicDAO.existsTopic(classId)) {
+		if (topicDAO.existsDiscussion(classId)) {
 			topicDAO.close();
-			intent = new Intent(this, TopicListController.class);
+			intent = new Intent(this, DiscussionListController.class);
 			startActivity(intent);
 
 		}
@@ -176,8 +176,10 @@ public class ClassListController extends MobilisListActivity {
 				ContentValues[] values = jsonParser.parseJSON(msg.getData()
 						.getString("content"), Constants.PARSE_CLASSES_ID);
 				classDAO.open();
+//				classDAO.addClasses(values,
+//						getPreferences().getInt("SelectedClass", 0));
 				classDAO.addClasses(values,
-						getPreferences().getInt("SelectedClass", 0));
+						getPreferences().getInt("SelectedCourse", 0));
 				classDAO.close();
 				listAdapter.notifyDataSetChanged();
 				closeDialog(dialog);
@@ -212,12 +214,12 @@ public class ClassListController extends MobilisListActivity {
 						}
 					}
 
-					topicDAO.addTopics(values,
+					topicDAO.addDiscussions(values,
 							getPreferences().getInt("SelectedClass", 0));
 					topicDAO.close();
 
 					intent = new Intent(getApplicationContext(),
-							TopicListController.class);
+							DiscussionListController.class);
 					closeDialog(dialog);
 					startActivity(intent);
 

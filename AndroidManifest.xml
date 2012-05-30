@@ -32,7 +32,7 @@
         <activity android:name=".CourseListController" />
         <activity android:name=".PostList" />
         <activity android:name=".ClassListController" />
-        <activity android:name=".TopicListController" />
+        <activity android:name=".DiscussionListController" />
         <activity
             android:name=".ResponseController"
             android:windowSoftInputMode="stateHidden|adjustResize" />

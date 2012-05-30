@@ -1,5 +1,6 @@
 package com.mobilis.controller;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import android.app.ProgressDialog;
@@ -22,41 +23,42 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.mobilis.dao.DiscussionDAO;
 import com.mobilis.dao.PostDAO;
-import com.mobilis.dao.TopicDAO;
 import com.mobilis.dialog.DialogMaker;
 import com.mobilis.interfaces.MobilisListActivity;
 import com.mobilis.util.Constants;
+import com.mobilis.util.MobilisStatus;
 import com.mobilis.util.ParseJSON;
 import com.mobilis.util.ZipManager;
 import com.mobilis.ws.Connection;
 
-public class TopicListController extends MobilisListActivity {
+public class DiscussionListController extends MobilisListActivity {
 
 	private Intent intent;
 	private ParseJSON jsonParser;
 	private String forumName;
-	private ProgressDialog dialog;
+	private ProgressDialog progressDialog;
 	private ZipManager zipManager;
 	private DialogMaker dialogMaker;
-	private TopicDAO topicDAO;
+	private DiscussionDAO discussionDAO;
 	private PostDAO postDAO;
 	private Cursor cursor;
-	private TopicAdapter listAdapter;
-	private TopicHandler handler;
+	private DiscussionsAdapter listAdapter;
+	private DiscussionHandler handler;
 	private Connection connection;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		setContentView(R.layout.topic);
+		setContentView(R.layout.discussion);
 
-		handler = new TopicHandler();
+		handler = new DiscussionHandler();
 		connection = new Connection(handler, this);
 		jsonParser = new ParseJSON(this);
 		postDAO = new PostDAO(this);
-		topicDAO = new TopicDAO(this);
+		discussionDAO = new DiscussionDAO(this);
 		zipManager = new ZipManager();
 		dialogMaker = new DialogMaker(this);
 		restoreDialog();
@@ -68,37 +70,31 @@ public class TopicListController extends MobilisListActivity {
 		Log.i("OnRestore", "TRUE");
 		if (getLastNonConfigurationInstance() != null) {
 			Log.i("OnRestore2", "TRUE");
-			dialog = (ProgressDialog) getLastNonConfigurationInstance();
-			dialog.show();
+			progressDialog = (ProgressDialog) getLastNonConfigurationInstance();
+			progressDialog.show();
 		}
 	}
 
 	@Override
 	public Object onRetainNonConfigurationInstance() {
 		Log.i("OnRetain", "True");
-		if (dialog != null) {
-			if (dialog.isShowing()) {
+		if (progressDialog != null) {
+			if (progressDialog.isShowing()) {
 				Log.i("OnRetain2", "True");
-				closeDialogIfItsVisible();
-				return dialog;
+				closeDialog(progressDialog);
+				return progressDialog;
 			}
 		}
 		return null;
 	}
 
-	public void closeDialogIfItsVisible() {
-		if (dialog != null && dialog.isShowing())
-			dialog.dismiss();
-
-	}
-
 	public void updateList() {
 
-		topicDAO.open();
-		cursor = topicDAO.getTopicsFromClass(getPreferences().getInt(
+		discussionDAO.open();
+		cursor = discussionDAO.getDiscussionsFromClass(getPreferences().getInt(
 				"SelectedClass", 0));
-		topicDAO.close();
-		listAdapter = new TopicAdapter(this, cursor);
+		discussionDAO.close();
+		listAdapter = new DiscussionsAdapter(this, cursor);
 		setListAdapter(listAdapter);
 
 	}
@@ -115,7 +111,8 @@ public class TopicListController extends MobilisListActivity {
 
 		SharedPreferences.Editor editor = getPreferences().edit();
 
-		if (item.getAsString("closed").equals("t")) {
+		if (item.getAsString("status").equals("0")
+				|| item.getAsString("status").equals("2")) {
 			editor.putBoolean("isForumClosed", true);
 
 		} else {
@@ -127,25 +124,27 @@ public class TopicListController extends MobilisListActivity {
 		commit(editor);
 
 		postDAO.open();
-		topicDAO.open();
+		discussionDAO.open();
+
+		Log.w("TopicId", "" + topicId);
 
 		if (postDAO.postExistsOnTopic(topicId)
-				&& !topicDAO.hasNewPostsFlag(topicId)) {
+				&& !discussionDAO.hasNewPostsFlag(topicId)) {
+			Log.w("Não Existem posts no banco", " ");
 			postDAO.close();
-			topicDAO.close();
+			discussionDAO.close();
 			intent = new Intent(this, PostList.class);
-			closeDialogIfItsVisible();
+			closeDialog(progressDialog);
 			startActivity(intent);
 
 		} else {
+			Log.w("Não Existem posts no banco", " ");
 			postDAO.close();
-			topicDAO.close();
-			dialog = dialogMaker
+			discussionDAO.close();
+			progressDialog = dialogMaker
 					.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
-			dialog.show();
-			String url = "discussions/" + topicId + "/posts/"
-					+ Constants.oldDateString + "/news.json";
-			obtainNewPosts(url);
+			progressDialog.show();
+			obtainNewPosts(Constants.generateNewPostsURL(topicId));
 		}
 	}
 
@@ -164,16 +163,16 @@ public class TopicListController extends MobilisListActivity {
 
 	public void getImages(String url) {
 
-		connection.getImages(Constants.CONNECTION_GET_IMAGES, url,
-				getPreferences().getString("token", null));
+		// connection.getImages(Constants.CONNECTION_GET_IMAGES, url,
+		// getPreferences().getString("token", null));
 	}
 
-	public class TopicAdapter extends CursorAdapter {
+	public class DiscussionsAdapter extends CursorAdapter {
 
 		LayoutInflater inflater;
 
 		@SuppressWarnings("deprecation")
-		public TopicAdapter(Context context, Cursor c) {
+		public DiscussionsAdapter(Context context, Cursor c) {
 			super(context, c);
 			inflater = LayoutInflater.from(context);
 		}
@@ -181,7 +180,9 @@ public class TopicListController extends MobilisListActivity {
 		@Override
 		public void bindView(View convertView, Context context, Cursor cursor) {
 
-			if (cursor.getString(cursor.getColumnIndex("closed")).equals("t")) {
+			if (cursor.getString(cursor.getColumnIndex("status")).equals("0")
+					|| cursor.getString(cursor.getColumnIndex("status"))
+							.equals("2")) {
 
 				LinearLayout leftBar = (LinearLayout) convertView
 						.findViewById(R.id.left_bar);
@@ -209,13 +210,11 @@ public class TopicListController extends MobilisListActivity {
 
 				topicTitle.setText(cursor.getString(cursor
 						.getColumnIndex("name")));
-				Log.w("isClosed",
-						cursor.getString(cursor.getColumnIndex("closed")));
 			}
 
 			if (cursor.getInt(cursor.getColumnIndex("has_new_posts")) == 1
-					&& cursor.getString(cursor.getColumnIndex("closed"))
-							.equals("f")) {
+					&& cursor.getString(cursor.getColumnIndex("status"))
+							.equals("1")) {
 
 				LinearLayout leftBar = (LinearLayout) convertView
 						.findViewById(R.id.left_bar);
@@ -229,21 +228,18 @@ public class TopicListController extends MobilisListActivity {
 					.findViewById(R.id.topic_name);
 
 			topicTitle.setText(cursor.getString(cursor.getColumnIndex("name")));
-
-			Log.w("isClosed", cursor.getString(cursor.getColumnIndex("closed")));
-			// }
 		}
 
 		@Override
 		public View newView(Context context, Cursor cursor, ViewGroup parent) {
-			return inflater.inflate(R.layout.topicitem, parent, false);
+			return inflater.inflate(R.layout.discussion_item, parent, false);
 		}
 
 		@Override
 		public Object getItem(int position) {
 			ContentValues item = new ContentValues();
-			item.put("closed",
-					getCursor().getString(getCursor().getColumnIndex("closed")));
+			item.put("status",
+					getCursor().getString(getCursor().getColumnIndex("status")));
 			item.put("_id",
 					getCursor().getInt(getCursor().getColumnIndex("_id")));
 			item.put("name",
@@ -258,7 +254,7 @@ public class TopicListController extends MobilisListActivity {
 		updateList();
 	}
 
-	private class TopicHandler extends Handler {
+	private class DiscussionHandler extends Handler {
 		@Override
 		public void handleMessage(Message msg) {
 			super.handleMessage(msg);
@@ -266,7 +262,7 @@ public class TopicListController extends MobilisListActivity {
 			switch (msg.what) {
 
 			case Constants.MESSAGE_CONNECTION_FAILED:
-				closeDialogIfItsVisible();
+				closeDialog(progressDialog);
 				break;
 
 			case Constants.MESSAGE_TOPIC_CONNECTION_OK:
@@ -274,10 +270,11 @@ public class TopicListController extends MobilisListActivity {
 				ContentValues[] values = jsonParser.parseJSON(msg.getData()
 						.getString("content"), Constants.PARSE_TOPICS_ID);
 
-				topicDAO.open();
+				discussionDAO.open();
 
 				for (int i = 0; i < values.length; i++) {
-					if (topicDAO.hasNewPosts(values[i].getAsInteger("_id"),
+					if (discussionDAO.hasNewPosts(
+							values[i].getAsInteger("_id"),
 							values[i].getAsString("last_post_date"))) {
 						Log.i("TAG", "Existem posts novos");
 						values[i].put("has_new_posts", true);
@@ -286,24 +283,24 @@ public class TopicListController extends MobilisListActivity {
 					}
 				}
 
-				topicDAO.addTopics(values,
+				discussionDAO.addDiscussions(values,
 						getPreferences().getInt("SelectedClass", 0));
-				topicDAO.close();
+				discussionDAO.close();
 				updateList();
-				closeDialogIfItsVisible();
+				closeDialog(progressDialog);
 				break;
 
 			case Constants.MESSAGE_NEW_POST_CONNECTION_OK:
 
-				topicDAO.open();
-				if (topicDAO.hasNewPostsFlag(getPreferences().getInt(
+				discussionDAO.open();
+				if (discussionDAO.hasNewPostsFlag(getPreferences().getInt(
 						"SelectedTopic", 0))) {
 					ContentValues newFlag = new ContentValues();
 					newFlag.put("has_new_posts", 0);
-					topicDAO.updateFlag(newFlag,
+					discussionDAO.updateFlag(newFlag,
 							getPreferences().getInt("SelectedTopic", 0));
 				}
-				topicDAO.close();
+				discussionDAO.close();
 
 				intent = new Intent(getApplicationContext(), PostList.class);
 
@@ -311,7 +308,7 @@ public class TopicListController extends MobilisListActivity {
 						.parsePosts(msg.getData().getString("content"));
 
 				if (parsedValues.size() == 0) {
-					closeDialogIfItsVisible();
+					closeDialog(progressDialog);
 					startActivityForResult(intent, 1);
 				}
 
@@ -325,24 +322,33 @@ public class TopicListController extends MobilisListActivity {
 					postDAO.addPosts(parsedValues,
 							getPreferences().getInt("SelectedTopic", 0));
 
-					try {
-						String ids = postDAO
-								.getUserIdsAbsentImage(getPreferences().getInt(
-										"SelectedTopic", 0));
-						postDAO.close();
-						getImages("images/" + ids + "/users");
-						Log.i("Alguns usuários não possuem imagens", "TRUE");
-					} catch (StringIndexOutOfBoundsException e) {
-						postDAO.close();
-						Log.i("Não precisa Baixar novas imagens", "TRUE");
-						closeDialogIfItsVisible();
-						startActivityForResult(intent, 1);
-					} catch (NullPointerException e) {
-						Log.i("Baixar todas as imagens", "TRUE");
-						String ids = postDAO.getAllUserIds();
-						postDAO.close();
-						getImages("images/" + ids + "/users");
+					ArrayList<Integer> ids = null;
+
+					File imageDirectory = new File(Constants.PATH_IMAGES);
+					int numberOfImages = imageDirectory.listFiles().length;
+
+					if (imageDirectory.exists()) {
+						if (numberOfImages > 0) {
+							ids = postDAO
+									.getUserIdsAbsentImage(getPreferences()
+											.getInt("SelectedTopic", 0));
+						} else {
+							ids = postDAO.getAllUserIds();
+						}
 					}
+
+					else {
+						imageDirectory.mkdir();
+						ids = postDAO.getAllUserIds();
+
+					}
+
+					closeDialog(progressDialog);
+					Log.i("USER IDS", "" + ids.size());
+					postDAO.close();
+					MobilisStatus status = MobilisStatus.getInstance();
+					status.ids = ids;
+					startActivityForResult(intent, 1);
 				}
 				break;
 
@@ -350,14 +356,14 @@ public class TopicListController extends MobilisListActivity {
 
 				zipManager.unzipFile();
 				intent = new Intent(getApplicationContext(), PostList.class);
-				closeDialogIfItsVisible();
+				closeDialog(progressDialog);
 				startActivityForResult(intent, 1);
 				break;
 
 			case Constants.MESSAGE_IMAGE_CONNECION_FAILED:
 
 				intent = new Intent(getApplicationContext(), PostList.class);
-				closeDialogIfItsVisible();
+				closeDialog(progressDialog);
 				startActivityForResult(intent, 1);
 				break;
 
@@ -368,9 +374,9 @@ public class TopicListController extends MobilisListActivity {
 	@Override
 	public void menuRefreshItemSelected() {
 		int currentClass = getPreferences().getInt("SelectedClass", 0);
-		dialog = dialogMaker
+		progressDialog = dialogMaker
 				.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
-		dialog.show();
+		progressDialog.show();
 		obtainTopics(Constants.URL_GROUPS_PREFIX + currentClass
 				+ Constants.URL_DISCUSSION_SUFFIX);
 	}

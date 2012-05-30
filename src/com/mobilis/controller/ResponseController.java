@@ -40,6 +40,7 @@ import com.mobilis.dialog.AudioDialog;
 import com.mobilis.dialog.DialogMaker;
 import com.mobilis.interfaces.MobilisActivity;
 import com.mobilis.util.Constants;
+import com.mobilis.util.MobilisStatus;
 import com.mobilis.util.ParseJSON;
 import com.mobilis.util.ZipManager;
 import com.mobilis.ws.Connection;
@@ -114,7 +115,7 @@ public class ResponseController extends MobilisActivity implements
 
 		if (progressDialog != null) {
 			if (progressDialog.isShowing()) {
-				closeDialogIfItsVisible();
+				closeDialog(progressDialog);
 				dialogStorer[0] = progressDialog;
 			}
 		}
@@ -183,12 +184,6 @@ public class ResponseController extends MobilisActivity implements
 		}
 	}
 
-	public void closeDialogIfItsVisible() {
-		if (progressDialog != null && progressDialog.isShowing())
-			progressDialog.dismiss();
-
-	}
-
 	@Override
 	public void onClick(View v) {
 
@@ -209,14 +204,14 @@ public class ResponseController extends MobilisActivity implements
 			}
 
 			else {
-
 				if (getPreferences().getLong("SelectedPost", 0) > 0) {
-
+					Log.w("Teste2", "Teste2");
 					postObject = jsonParser.buildTextResponseWithParentObject(
 							message.getText().toString(), getPreferences()
 									.getLong("SelectedPost", 0));
 
 				} else {
+					Log.w("Teste1", "Teste1");
 					postObject = jsonParser
 							.buildTextResponseWithoutParent(message.getText()
 									.toString());
@@ -320,16 +315,16 @@ public class ResponseController extends MobilisActivity implements
 
 	}
 
-	public void sendAudioPost(String url, File audioFile) {
+	public void sendAudioPost(String url, File audioFile, String token) {
 
-		connection
-				.postToServer(Constants.CONNECTION_POST_AUDIO, url, audioFile);
+		connection.postToServer(Constants.CONNECTION_POST_AUDIO, url,
+				audioFile, token);
 	}
 
-	public void getImages(String url) {
-		connection.getImages(Constants.CONNECTION_GET_IMAGES, url,
-				getPreferences().getString("token", null));
-	}
+	// public void getImages(String url) {
+	// // connection.getImages(Constants.CONNECTION_GET_IMAGES, url,
+	// // getPreferences().getString("token", null));
+	// }
 
 	@Override
 	public void onChronometerTick(Chronometer chronometer) {
@@ -439,12 +434,13 @@ public class ResponseController extends MobilisActivity implements
 			}
 
 			if (msg.what == Constants.MESSAGE_CONNECTION_FAILED) {
-				closeDialogIfItsVisible();
+				closeDialog(progressDialog);
 			}
 
 			if (msg.what == Constants.MESSAGE_TEXT_RESPONSE_OK) {
 
-				Log.w("RESULT", msg.getData().getString("content"));
+				Log.w("TEXT RESPONSE RESULT", msg.getData()
+						.getString("content"));
 
 				ContentValues[] resultFromServer;
 				jsonParser = new ParseJSON(getApplicationContext());
@@ -453,31 +449,31 @@ public class ResponseController extends MobilisActivity implements
 								Constants.PARSE_TEXT_RESPONSE_ID);
 
 				if (existsRecording) {
-
-					String postURL = "posts/"
-							+ String.valueOf(resultFromServer[0].get("post_id"))
-							+ "/attach_file?auth_token="
-							+ getPreferences().getString("token", null);
-					Log.w("PostURL", postURL);
-					sendAudioPost(postURL, recorder.getAudioFile());
+					long postId = (Long) resultFromServer[0].get("post_id");
+					sendAudioPost(
+							Constants.generateAudioResponseURL((int) postId),
+							recorder.getAudioFile(), getPreferences()
+									.getString("token", null));
 
 				} else {
 
-					getNewPosts("discussions/"
-							+ getPreferences().getInt("SelectedTopic", 0)
-							+ "/posts/" + Constants.oldDateString
-							+ "/news.json");
+					getNewPosts(Constants.generateNewPostsURL(getPreferences()
+							.getInt("SelectedTopic", 0)));
 				}
-
 			}
 
 			if (msg.what == Constants.MESSAGE_AUDIO_POST_OK) {
 
-				getNewPosts("discussions/"
-						+ getPreferences().getInt("SelectedTopic", 0)
-						+ "/posts/" + Constants.oldDateString + "/news.json");
-				closeDialogIfItsVisible();
+				getNewPosts(Constants.generateNewPostsURL(getPreferences()
+						.getInt("SelectedTopic", 0)));
+				closeDialog(progressDialog);
 
+			}
+
+			if (msg.what == Constants.MESSAGE_AUDIO_POST_FAILED) {
+				// Mandar mensagem de erro.
+				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				startActivity(intent);
 			}
 
 			if (msg.what == Constants.MESSAGE_NEW_POST_CONNECTION_OK) {
@@ -491,35 +487,32 @@ public class ResponseController extends MobilisActivity implements
 
 				intent = new Intent(getApplicationContext(), PostList.class);
 
-				try {
-					String ids = postDAO.getUserIdsAbsentImage(getPreferences()
-							.getInt("SelectedTopic", 0));
-					postDAO.close();
-					getImages("images/" + ids + "/users");
-					Log.i("Alguns usuários não possuem imagens", "TRUE");
-				} catch (StringIndexOutOfBoundsException e) {
-					closeDialogIfItsVisible();
-					postDAO.close();
-					intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-					closeDialogIfItsVisible();
-					startActivity(intent);
-					Log.i("Não é preciso Baixar novas imagens", "TRUE");
-				} catch (NullPointerException e) {
-					Log.i("É preciso baixar todas as imagens", "TRUE");
-					String ids = postDAO.getAllUserIds();
-					postDAO.close();
-					getImages("images/" + ids + "/users");
+				// Images
+				ArrayList<Integer> ids = null;
+
+				File imageDirectory = new File(Constants.PATH_IMAGES);
+				int numberOfImages = imageDirectory.listFiles().length;
+
+				if (imageDirectory.exists()) {
+					if (numberOfImages > 0) {
+						ids = postDAO.getUserIdsAbsentImage(getPreferences()
+								.getInt("SelectedTopic", 0));
+					} else {
+						ids = postDAO.getAllUserIds();
+					}
 				}
-			}
 
-			if (msg.what == Constants.MESSAGE_IMAGE_CONNECTION_OK) {
-				zipManager.unzipFile();
-				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				closeDialogIfItsVisible();
-				startActivity(intent);
-			}
+				else {
+					imageDirectory.mkdir();
+					ids = postDAO.getAllUserIds();
 
-			if (msg.what == Constants.MESSAGE_IMAGE_CONNECION_FAILED) {
+				}
+
+				closeDialog(progressDialog);
+				Log.i("USER IDS", "" + ids.size());
+				postDAO.close();
+				MobilisStatus status = MobilisStatus.getInstance();
+				status.ids = ids;
 				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				startActivity(intent);
 			}
