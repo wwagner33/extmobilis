@@ -117,7 +117,6 @@ public class Connection {
 		Bundle bundle = new Bundle();
 
 		if (connectionId == Constants.CONNECTION_POST_TOKEN) {
-			Log.i("TESTE", "TESTE");
 			message.what = Constants.MESSAGE_TOKEN_CONNECTION_OK;
 		}
 
@@ -156,7 +155,10 @@ public class Connection {
 		handler.sendMessage(message);
 	}
 
-	private void sendNegativeMessage(int connectionId) {
+	private void sendNegativeMessage(int connectionId, int statusCode) {
+
+		Message message = Message.obtain();
+		Bundle bundle = new Bundle();
 
 		if (connectionId == Constants.CONNECTION_GET_IMAGES) {
 			handler.sendEmptyMessage(Constants.MESSAGE_IMAGE_CONNECION_FAILED);
@@ -170,8 +172,12 @@ public class Connection {
 			handler.sendEmptyMessage(Constants.MESSAGE_AUDIO_POST_FAILED);
 		}
 
-		else
-			handler.sendEmptyMessage(Constants.MESSAGE_CONNECTION_FAILED);
+		else {
+			message.what = Constants.MESSAGE_CONNECTION_FAILED;
+			bundle.putInt("statusCode", statusCode);
+			message.setData(bundle);
+			handler.sendMessage(message);
+		}
 	}
 
 	private Object[] executeGet(String URL, String authToken, HttpGet get)
@@ -211,7 +217,7 @@ public class Connection {
 		} else {
 			resultSet[0] = null;
 			resultSet[1] = statusCode;
-			return null;
+			return resultSet;
 		}
 	}
 
@@ -274,10 +280,7 @@ public class Connection {
 
 		if (audioFile == null) {
 
-			Log.w("AUDIONULL", "YES");
 		}
-
-		Log.i("ENVIANDO ÁUDIO", "TRUE");
 
 		DefaultHttpClient client = new DefaultHttpClient();
 
@@ -397,6 +400,7 @@ public class Connection {
 		public File file = null;
 		public String jsonString = null;
 		public int user_id;
+		public int statusCode = 0;
 
 		@Override
 		protected Object[] doInBackground(Void... params) {
@@ -434,27 +438,24 @@ public class Connection {
 		@Override
 		protected void onPostExecute(Object[] result) {
 
-			// connectionWatcher.cancel(true);
-			int statusCode = (Integer) result[1];
-			Log.i("POSTEXECUTE", "TOP");
+			if (statusCode != 699)
+				statusCode = (Integer) result[1];
 
 			if (result[0] != null) {
 				// Conexão bem sucedida
-				Log.i("POSTEXECUTE", "OK");
 				sendPositiveMessage((String) result[0], connectionId);
 			}
 
 			else if (result[0] == null && statusCode != 0) {
-				// Não caiu em exceção mas o status não foi o correto
-				// ErrorHandler.handleStatusCode(context, statusCode);
-				sendNegativeMessage(connectionId);
+				sendNegativeMessage(connectionId, statusCode);
 			}
 
 			else {
-				// Caiu em alguma Exception
-				// ErrorHandler.handleError(context,
-				// Constants.ERROR_CONNECTION_FAILED);
-				sendNegativeMessage(connectionId);
+
+				if (connectionId != Constants.CONNECTION_GET_IMAGES) {
+					sendNegativeMessage(connectionId, statusCode);
+				}
+
 			}
 
 			super.onPostExecute(result);
@@ -476,14 +477,20 @@ public class Connection {
 			} catch (InterruptedException e) {
 				return 2;
 			} catch (ExecutionException e) {
+				toWatch.statusCode = 699;
 				abortConnection(toWatch);
 				e.printStackTrace();
 				return 1;
 			} catch (TimeoutException e) {
+				toWatch.statusCode = 699;
 				abortConnection(toWatch);
 				e.printStackTrace();
 				return 1;
+			} catch (NullPointerException e) {
+				toWatch.statusCode = 699;
+				return 1;
 			}
+
 		}
 
 		@Override
@@ -491,8 +498,6 @@ public class Connection {
 			// TODO Auto-generated method stub
 			super.onPostExecute(result);
 			if (result == 1) {
-				// ErrorHandler.handleError(context,
-				// Constants.ERROR_CONNECTION_TIMEOUT);
 			}
 		}
 	}

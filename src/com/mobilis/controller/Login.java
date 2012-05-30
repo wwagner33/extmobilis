@@ -21,6 +21,7 @@ import com.mobilis.dao.CourseDAO;
 import com.mobilis.dialog.DialogMaker;
 import com.mobilis.interfaces.MobilisActivity;
 import com.mobilis.util.Constants;
+import com.mobilis.util.ErrorHandler;
 import com.mobilis.util.ParseJSON;
 import com.mobilis.ws.Connection;
 
@@ -181,7 +182,9 @@ public class Login extends MobilisActivity implements OnClickListener {
 			}
 
 			if (msg.what == Constants.MESSAGE_CONNECTION_FAILED) {
-				Log.w("Token Connection", "FAIL");
+				int statusCode = msg.getData().getInt("statusCode");
+				ErrorHandler.handleStatusCode(getApplicationContext(),
+						statusCode);
 				closeDialog(dialog);
 			}
 		}
