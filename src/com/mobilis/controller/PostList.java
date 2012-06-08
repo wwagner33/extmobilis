@@ -100,7 +100,7 @@ public class PostList extends MobilisListActivity implements OnClickListener,
 		footerButton.setOnClickListener(this);
 
 		handler = new PostHandler();
-		connection = new Connection(handler, this);
+		connection = new Connection(handler);
 
 		postDAO = new PostDAO(this);
 		jsonParser = new ParseJSON(this);

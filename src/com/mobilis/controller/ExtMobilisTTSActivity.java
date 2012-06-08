@@ -59,12 +59,9 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 	private PostManagerHandler handlerPostManager = new PostManagerHandler();
 	private DialogMaker dialogMaker;
 	private ProgressDialog dialog;
-
 	private int previous;
 
-	// posts anteriores que serão mandados para a nova activity quando
-	// o estado mudar
-	// Será modificado aprenas se forem carregadas postagens anteriores a estas
+	private boolean headerTeste = false;
 
 	@SuppressWarnings("deprecation")
 	public void onCreate(Bundle savedInstanceState) {
@@ -76,7 +73,7 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 		discussionDAO = new DiscussionDAO(this);
 		discussionPosts = new ArrayList<DiscussionPost>();
 		postHandler = new PostHandler();
-		wsSolar = new Connection(postHandler, this);
+		wsSolar = new Connection(postHandler);
 
 		discussionDAO.open();
 		discussion = discussionDAO.getDiscussion(getPreferences().getInt(
@@ -97,16 +94,12 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 
 		header = inflater.inflate(R.layout.load_available_posts_item,
 				expandableListView, false);
+
 		footerFuturePosts = inflater.inflate(
 				R.layout.load_available_posts_item, expandableListView, false);
 
 		footerRefresh = inflater.inflate(R.layout.refresh_discussion_list_item,
 				expandableListView, false);
-
-		// getExpandableListView().addFooterView(footerFuturePosts);
-		// getExpandableListView().addFooterView(footerRefresh);
-		// footerRefresh.setVisibility(View.GONE);
-		// getExpandableListView().addHeaderView(header);
 
 		play = (ImageButton) findViewById(R.id.button_play);
 		play.setOnClickListener(this);
@@ -126,11 +119,8 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 	@SuppressWarnings({ "unchecked", "deprecation" })
 	public void loadPostsFromRetainedState() {
 		Object[] retainedState = (Object[]) getLastNonConfigurationInstance();
-		// ArrayList<DiscussionPost> retainedPosts;
-		// DiscussionPost retainedDiscussion;
 
 		if (retainedState[0] != null) {
-			// Dialog estava ativado na hora da rotação
 			dialog = (ProgressDialog) retainedState[0];
 			dialog.show();
 		}
@@ -147,7 +137,6 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 			previous = discussion.getPreviousPosts();
 		}
 
-		// pega os posts do banco e mostra na lista
 		discussionPostAdapter = new DiscussionPostAdapter(
 				getApplicationContext(), discussionPosts,
 				ExtMobilisTTSActivity.this);
@@ -283,7 +272,6 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 		discussion = discussionDAO.getDiscussion(discussion.getId());
 		previous = discussion.getPreviousPosts();
 		discussionDAO.close();
-		// pega os posts do banco e mostra na lista
 		postDAO.open();
 		discussionPosts = new ArrayList<DiscussionPost>(Arrays.asList(postDAO
 				.getAllPosts(discussion.getId())));
@@ -292,9 +280,7 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 				getApplicationContext(), discussionPosts,
 				ExtMobilisTTSActivity.this);
 
-		// pega o total de previous posts e seta o header
 		setHeader();
-		// pega o total de future posts e seta o footer
 		setFooter();
 		setListAdapter(discussionPostAdapter);
 	}
@@ -315,7 +301,9 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 
 	private void showHeader() {
 
-		getExpandableListView().addHeaderView(header);
+		if (!headerTeste)
+			getExpandableListView().addHeaderView(header);
+		headerTeste = true;
 
 		((TextView) header.findViewById(R.id.load_available_posts))
 				.setText(discussion.getPreviousPosts()
@@ -337,7 +325,7 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 
 	private void hideHeader() {
 		expandableListView.removeHeaderView(header);
-		// header.setVisibility(View.GONE);
+		headerTeste = false;
 	}
 
 	private void setFooter() {
@@ -363,8 +351,7 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 			return;
 		}
 		if (footerId == REFRESH_ID) {
-			// expandableListView.removeFooterView(footerRefresh);
-			// footerRefresh.setVisibility(View.GONE);
+			expandableListView.removeFooterView(footerRefresh);
 		}
 
 		expandableListView.addFooterView(footerFuturePosts, null, true);
@@ -418,7 +405,6 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 
 	private void loadFuturePosts() {
 		int discussionSize = discussionPosts.size();
-		// pega a data do post mais novo que está sendo mostrado
 		String date;
 		if (discussionSize == 0) {
 			date = "19800217111000"; // se possível mudar para a data de início
@@ -518,7 +504,6 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 				discussionDAO.setPreviousPosts(discussion.getId(),
 						discussion.getPreviousPosts());
 				discussionDAO.close();
-
 				setListAdapter(discussionPostAdapter);
 			} else {
 				if (headerClicked) {
@@ -528,7 +513,15 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 					ArrayList<DiscussionPost> invertedLoadedPosts = jsonParser
 							.parseInvertedPosts(content);
 
-					discussion.setPreviousPosts(beforeAfter[beforeIndex]);
+					if (discussion.getPreviousPosts() % 20 != 0) {
+						discussion.setPreviousPosts(discussion
+								.getPreviousPosts()
+								- invertedLoadedPosts.size());
+					}
+
+					else {
+						discussion.setPreviousPosts(beforeAfter[beforeIndex]);
+					}
 
 					if (discussion.getPreviousPosts() < previous) {
 						previous = discussion.getPreviousPosts();
@@ -556,23 +549,8 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 						return;
 					}
 
-					// pega o total de future posts e seta o footer
-
-					Log.i("POSTS AFTER", "" + beforeAfter[afterIndex]);
-					Log.i("POSTS BEFORE", "" + beforeAfter[beforeIndex]);
-
-					Log.i("DISCUSSION_ID", "" + discussion.getId());
-					Log.i("DISCUSSION_ID_2",
-							"" + getPreferences().getInt("SelectedTopic", 0));
-
-					// atualiza o valor de next_posts no banco
-
-					// coloca os posts no final da lista
 					discussionPosts.addAll(loadedposts);
-					// salva os posts no banco apagando os excedentes
-
 					postDAO.open();
-
 					ArrayList<DiscussionPost> postsFromDB = new ArrayList<DiscussionPost>(
 							Arrays.asList(postDAO.getAllPosts(discussion
 									.getId())));

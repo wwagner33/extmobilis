@@ -46,7 +46,7 @@ public class ClassListController extends MobilisListActivity {
 
 		setContentView(R.layout.curriculum_units);
 		handler = new ClassHandler();
-		connection = new Connection(handler, this);
+		connection = new Connection(handler);
 		jsonParser = new ParseJSON(this);
 		classDAO = new ClassDAO(this);
 		topicDAO = new DiscussionDAO(this);
@@ -176,8 +176,8 @@ public class ClassListController extends MobilisListActivity {
 				ContentValues[] values = jsonParser.parseJSON(msg.getData()
 						.getString("content"), Constants.PARSE_CLASSES_ID);
 				classDAO.open();
-//				classDAO.addClasses(values,
-//						getPreferences().getInt("SelectedClass", 0));
+				// classDAO.addClasses(values,
+				// getPreferences().getInt("SelectedClass", 0));
 				classDAO.addClasses(values,
 						getPreferences().getInt("SelectedCourse", 0));
 				classDAO.close();

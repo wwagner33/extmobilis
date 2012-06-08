@@ -85,7 +85,7 @@ public class ResponseController extends MobilisActivity implements
 		zipManager = new ZipManager();
 		setVolumeControlStream(AudioManager.STREAM_MUSIC);
 		handler = new ResponseHandler();
-		connection = new Connection(handler, this);
+		connection = new Connection(handler);
 		dialogMaker = new DialogMaker(this);
 		postDAO = new PostDAO(this);
 		progressDialog = dialogMaker

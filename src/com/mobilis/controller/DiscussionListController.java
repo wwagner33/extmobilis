@@ -56,7 +56,7 @@ public class DiscussionListController extends MobilisListActivity {
 		setContentView(R.layout.discussion);
 
 		handler = new DiscussionHandler();
-		connection = new Connection(handler, this);
+		connection = new Connection(handler);
 		jsonParser = new ParseJSON(this);
 		postDAO = new PostDAO(this);
 		discussionDAO = new DiscussionDAO(this);

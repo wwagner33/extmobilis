@@ -48,7 +48,7 @@ public class CourseListController extends MobilisListActivity {
 		progressDialog = dialogMaker
 				.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
 		handler = new CourseHandler();
-		connection = new Connection(handler, this);
+		connection = new Connection(handler);
 		courseDAO = new CourseDAO(this);
 		classDAO = new ClassDAO(this);
 		jsonParser = new ParseJSON(this);
