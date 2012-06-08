@@ -60,6 +60,13 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 	private DialogMaker dialogMaker;
 	private ProgressDialog dialog;
 
+	private int previous;
+
+	// posts anteriores que serão mandados para a nova activity quando
+	// o estado mudar
+	// Será modificado aprenas se forem carregadas postagens anteriores a estas
+
+	@SuppressWarnings("deprecation")
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.posts_new);
@@ -110,7 +117,70 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 		next = (ImageButton) findViewById(R.id.button_next);
 		next.setOnClickListener(this);
 
-		loadPostsFromDatabase();
+		if (getLastNonConfigurationInstance() != null) {
+			loadPostsFromRetainedState();
+		} else
+			loadPostsFromDatabase();
+	}
+
+	@SuppressWarnings({ "unchecked", "deprecation" })
+	public void loadPostsFromRetainedState() {
+		Object[] retainedState = (Object[]) getLastNonConfigurationInstance();
+		// ArrayList<DiscussionPost> retainedPosts;
+		// DiscussionPost retainedDiscussion;
+
+		if (retainedState[0] != null) {
+			// Dialog estava ativado na hora da rotação
+			dialog = (ProgressDialog) retainedState[0];
+			dialog.show();
+		}
+		if (retainedState[1] != null) {
+			discussionPosts = (ArrayList<DiscussionPost>) retainedState[1];
+		}
+
+		if (retainedState[2] != null) {
+			discussion = (Discussion) retainedState[2];
+		}
+
+		if (retainedState[3] != null) {
+			discussion.setPreviousPosts((Integer) retainedState[3]);
+			previous = discussion.getPreviousPosts();
+		}
+
+		// pega os posts do banco e mostra na lista
+		discussionPostAdapter = new DiscussionPostAdapter(
+				getApplicationContext(), discussionPosts,
+				ExtMobilisTTSActivity.this);
+
+		setHeader();
+		setFooter();
+		setListAdapter(discussionPostAdapter);
+
+	}
+
+	@Override
+	public Object onRetainNonConfigurationInstance() {
+
+		Object[] retainedObjects = new Object[4];
+
+		if (dialog != null) {
+			if (dialog.isShowing()) {
+				closeDialog(dialog);
+				retainedObjects[0] = dialog;
+			}
+		}
+
+		if (discussionPosts != null) {
+			retainedObjects[1] = discussionPosts;
+		}
+
+		if (discussion != null) {
+			retainedObjects[2] = discussion;
+		}
+
+		retainedObjects[3] = previous;
+
+		return retainedObjects;
 	}
 
 	private void play(int position) {
@@ -211,6 +281,7 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 	private void loadPostsFromDatabase() {
 		discussionDAO.open();
 		discussion = discussionDAO.getDiscussion(discussion.getId());
+		previous = discussion.getPreviousPosts();
 		discussionDAO.close();
 		// pega os posts do banco e mostra na lista
 		postDAO.open();
@@ -458,6 +529,11 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 							.parseInvertedPosts(content);
 
 					discussion.setPreviousPosts(beforeAfter[beforeIndex]);
+
+					if (discussion.getPreviousPosts() < previous) {
+						previous = discussion.getPreviousPosts();
+					}
+
 					discussionPosts.addAll(0, invertedLoadedPosts);
 					discussionPostAdapter = new DiscussionPostAdapter(
 							getApplicationContext(), discussionPosts,
