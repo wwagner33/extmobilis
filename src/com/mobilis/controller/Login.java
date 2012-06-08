@@ -19,13 +19,14 @@ import android.widget.Toast;
 
 import com.mobilis.dao.CourseDAO;
 import com.mobilis.dialog.DialogMaker;
+import com.mobilis.interfaces.ConnectionCallback;
 import com.mobilis.interfaces.MobilisActivity;
 import com.mobilis.util.Constants;
 import com.mobilis.util.ErrorHandler;
 import com.mobilis.util.ParseJSON;
 import com.mobilis.ws.Connection;
 
-public class Login extends MobilisActivity implements OnClickListener {
+public class Login extends MobilisActivity implements OnClickListener,ConnectionCallback {
 
 	private EditText login, password;
 	private Button submit;
@@ -188,6 +189,12 @@ public class Login extends MobilisActivity implements OnClickListener {
 				closeDialog(dialog);
 			}
 		}
+	}
+
+	@Override
+	public void resultFromConnection(int connectionId, String result) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

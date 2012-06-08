@@ -26,7 +26,6 @@ import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
 import org.json.simple.parser.ParseException;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
@@ -36,17 +35,22 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-import android.widget.Toast;
 
+import com.mobilis.interfaces.ConnectionCallback;
 import com.mobilis.util.Constants;
 
 public class Connection {
 
 	private Handler handler;
+	private ConnectionCallback callback;
 
-	public Connection(Handler handler, Context context) {
+	public Connection(Handler handler) {
 		this.handler = handler;
+	}
 
+	public Connection(Handler handler, ConnectionCallback callback) {
+		this.callback = callback;
+		this.handler = handler;
 	}
 
 	public void getFromServer(int connectionId, String url, String token) {
@@ -57,10 +61,8 @@ public class Connection {
 		connection.connectionId = connectionId;
 		connection.url = url;
 		connection.token = token;
-
 		connection.execute();
 		watcher.execute(connection);
-
 	}
 
 	public void postToServer(int connectionId, String jsonString, String url) {
