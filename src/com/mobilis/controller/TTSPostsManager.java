@@ -21,6 +21,7 @@ public class TTSPostsManager implements Runnable {
 	private ArrayList<DiscussionPost> posts;
 	private BlockQueue blocks;
 	private int currentPostIndex;
+	private int playlistIndex;
 	private PostPlayer postPlayer;
 	private Thread threadPlayer;
 	private WebServiceBing webServiceBing;
@@ -73,7 +74,6 @@ public class TTSPostsManager implements Runnable {
 		blocks = new BlockQueue();
 		generateHeader(index);
 		String content = posts.get(index).getContent();
-		// String content = ""; // MUDAR ISSO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		int end = content.length();
 
 		while (end > 0) {

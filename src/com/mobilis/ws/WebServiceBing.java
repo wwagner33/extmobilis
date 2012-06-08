@@ -17,8 +17,6 @@ import com.mobilis.model.DiscussionPost;
 import com.mobilis.util.Constants;
 
 import android.util.Log;
-//import br.iuvi.model.DiscussionPost;
-//import br.iuvi.util.Constants;
 
 public class WebServiceBing {
 
