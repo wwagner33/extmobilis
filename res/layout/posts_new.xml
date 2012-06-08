@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@android:color/darker_gray" >
+
+    <LinearLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/main_header_bg"
+        android:padding="@dimen/small_space" >
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/temp_description"
+            android:src="@drawable/solar_logo" />
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/body"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/header"
+        android:background="@android:color/white" >
+
+        <ImageView
+            android:id="@+id/topic_arrow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/temp_description"
+            android:src="@drawable/topic_arrow" />
+
+        <TextView
+            android:id="@+id/discussion_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/topic_arrow"
+            android:text="@string/discussion_name"
+            android:textColor="@color/discussion_name" />
+
+        <ImageView
+            android:id="@+id/reply_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:contentDescription="@string/temp_description"
+            android:src="@drawable/reply_button" />
+
+        <ExpandableListView
+            android:id="@android:id/list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/footer"
+            android:layout_below="@+id/reply_button"
+            android:cacheColorHint="@android:color/white"
+            android:divider="@color/list_divider"
+            android:groupIndicator="@null" >
+        </ExpandableListView>
+
+        
+
+        <RelativeLayout
+            android:id="@+id/footer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:layout_alignParentBottom="true"
+            android:background="@android:color/darker_gray" >
+
+            <ImageButton
+                android:id="@+id/button_prev"
+                android:contentDescription="@string/prev"
+                android:background="@android:color/transparent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:src="@drawable/playback_prev"
+                android:visibility="gone" />
+
+            <ImageButton
+                android:id="@+id/button_play"
+                android:contentDescription="@string/play"
+                android:background="@android:color/transparent"
+                android:src="@drawable/playback_play"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:visibility="gone" />
+
+            <ImageButton
+                android:id="@+id/button_next"
+                android:contentDescription="@string/next"
+                android:background="@android:color/transparent"
+                android:src="@drawable/playback_next"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:layout_alignParentRight="true" />
+        </RelativeLayout>
+    </RelativeLayout>
+
+</RelativeLayout>

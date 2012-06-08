@@ -36,6 +36,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.mobilis.util.Constants;
 
@@ -384,7 +385,7 @@ public class Connection {
 			if (conn.get != null)
 				conn.get.abort();
 		} else if (conn.connectionType == Constants.TYPE_CONNECTION_POST) {
-			if (conn != null)
+			if (conn.post != null)
 				conn.post.abort();
 		}
 	}
@@ -441,23 +442,25 @@ public class Connection {
 			if (statusCode != 699)
 				statusCode = (Integer) result[1];
 
-			if (result[0] != null) {
-				// Conexão bem sucedida
-				sendPositiveMessage((String) result[0], connectionId);
-			}
+			if (result != null) {
+				if (result[0] != null)
+					sendPositiveMessage((String) result[0], connectionId);
 
-			else if (result[0] == null && statusCode != 0) {
-				sendNegativeMessage(connectionId, statusCode);
-			}
-
-			else {
-
-				if (connectionId != Constants.CONNECTION_GET_IMAGES) {
+				else if (result[0] == null && statusCode != 0) {
 					sendNegativeMessage(connectionId, statusCode);
 				}
 
+				else {
+
+					if (connectionId != Constants.CONNECTION_GET_IMAGES) {
+						sendNegativeMessage(connectionId, statusCode);
+					}
+
+				}
 			}
 
+			else
+				sendNegativeMessage(connectionId, statusCode);
 			super.onPostExecute(result);
 
 		}

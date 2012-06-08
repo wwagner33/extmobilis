@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:gravity="center_horizontal"
+    android:orientation="horizontal" >
+
+    <ImageView
+        android:id="@+id/reply"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/temp_description"
+        android:padding="@dimen/small_space"
+        android:paddingLeft="@dimen/medium_space"
+        android:src="@drawable/post_menu_reply_button" />
+
+    <ImageView
+        android:id="@+id/mark"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/reply"
+        android:contentDescription="@string/temp_description"
+        android:padding="@dimen/small_space"
+        android:src="@drawable/post_menu_mark_button" />
+
+    <ImageView
+        android:id="@+id/expand"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/mark"
+        android:contentDescription="@string/temp_description"
+        android:padding="@dimen/small_space"
+        android:src="@drawable/post_menu_expand_button" />
+
+    <ImageView
+        android:id="@+id/play"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/expand"
+        android:contentDescription="@string/temp_description"
+        android:padding="@dimen/small_space"
+        android:src="@drawable/post_menu_play_button" />
+
+    <ImageView
+        android:id="@+id/details"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/play"
+        android:contentDescription="@string/temp_description"
+        android:padding="@dimen/small_space"
+        android:paddingRight="@dimen/medium_space"
+        android:src="@drawable/post_menu_details_button" />
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/blue_line_height"
+        android:layout_alignLeft="@+id/reply"
+        android:layout_alignRight="@+id/details"
+        android:background="@color/list_divider"
+        android:layout_alignParentTop="true"
+        android:contentDescription="@string/temp_description" />
+
+</RelativeLayout>

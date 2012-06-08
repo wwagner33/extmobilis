@@ -10,6 +10,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.util.Log;
 
+import com.mobilis.model.DiscussionPost;
 import com.mobilis.util.Constants;
 import com.mobilis.util.DateUtils;
 
@@ -188,6 +189,172 @@ public class PostDAO extends DBAdapter {
 		String date = cursor.getString(0);
 		cursor.close();
 		return date;
+	}
+
+	// TTS
+
+	public void clearPostsTable() {
+		getDatabase().delete("posts", null, null);
+	}
+
+	public void clearPostsFromDiscussion(long discussionId) {
+		getDatabase().delete("posts", "posts.discussion_id = ?",
+				new String[] { Long.toString(discussionId) });
+	}
+
+	public void insertPostsToDB(DiscussionPost[] posts) {
+		for (DiscussionPost post : posts) {
+			insertSinglePostToDB(post);
+		}
+
+		// int discussionId = (int) posts[0].getDiscussionId();
+		// int totalPosts = totalDiscussionPosts(discussionId);
+		// int totalPostsToDelete = totalPosts - 20;
+		//
+		// if (totalPosts > 20) {
+		// // deleta os posts excedentes
+		// deleteNPosts(discussionId, totalPostsToDelete);
+		// // atualiza o valor de previous_posts
+		// DiscussionDAO discussionDAO = new DiscussionDAO(getContext());
+		// discussionDAO.open();
+		// discussionDAO.setPreviousPosts(discussionId,
+		// discussionDAO.getPreviousPosts(discussionId)
+		// + totalPostsToDelete);
+		// discussionDAO.close();
+		// }
+	}
+
+	public void insertPostsToDB(ArrayList<DiscussionPost> posts,
+			int discussionId) {
+		DiscussionPost[] discussionPosts = posts
+				.toArray(new DiscussionPost[posts.size()]);
+		clearPostsFromDiscussion(discussionId);
+		insertPostsToDB(discussionPosts);
+	}
+
+	public void deleteNPosts(int discussionId, int n) {
+		Cursor cursor = getDatabase().query("posts",
+				new String[] { "_id", "date" },
+				"discussion_id = " + discussionId, null, null, null, "date",
+				"" + n);
+		cursor.moveToFirst();
+		do {
+			int colIndex = cursor.getColumnIndex("_id");
+			Log.d("cursor", "id >> " + colIndex);
+			int _id = cursor.getInt(colIndex);
+			Log.d("cursor", "id >> " + _id);
+			deleteSinglePostFromDB(_id);
+		} while (cursor.moveToNext());
+		cursor.close();
+	}
+
+	public void deleteSinglePostFromDB(int id) {
+		getDatabase().delete("posts", "_id=" + id, null);
+	}
+
+	public void insertSinglePostToDB(DiscussionPost post) {
+		if (post == null)
+			return;
+		ContentValues values = getValues(post);
+		getDatabase().insert("posts", null, values);
+	}
+
+	public boolean discussionHasPosts(long discussionId) {
+
+		int count = totalDiscussionPosts(discussionId);
+
+		if (count > 0)
+			return true;
+		else
+			return false;
+	}
+
+	public int totalDiscussionPosts(long discussionId) {
+		Cursor cursor = getDatabase().query("posts",
+				new String[] { "count(_id)" },
+				"discussion_id = " + discussionId, null, null, null, null);
+		cursor.moveToFirst();
+		int total = cursor.getInt(0);
+		cursor.close();
+		return total;
+	}
+
+	public boolean postExists(long postId) {
+		Cursor cursor = getDatabase().query("posts",
+				new String[] { "count(_id)" }, "_id = " + postId, null, null,
+				null, null);
+		cursor.moveToFirst();
+		int count = cursor.getInt(0);
+		cursor.close();
+		if (count > 0)
+			return true;
+		else
+			return false;
+	}
+
+	public DiscussionPost[] getAllPosts(int discussionId) {
+		Cursor cursor = getDatabase().rawQuery(
+				"SELECT * FROM posts WHERE discussion_id = " + discussionId
+						+ " ORDER BY date ASC", null);
+		DiscussionPost[] discussionPosts = new DiscussionPost[cursor.getCount()];
+
+		while (cursor.moveToNext()) {
+			int i = cursor.getPosition();
+			discussionPosts[i] = cursorToPost(cursor);
+		}
+
+		cursor.close();
+		return discussionPosts;
+	}
+
+	private DiscussionPost cursorToPost(Cursor cursor) {
+		final DiscussionPost post = new DiscussionPost();
+		post.setId(cursor.getLong(cursor.getColumnIndex("_id")));
+		post.setUserId(cursor.getLong(cursor.getColumnIndex("user_id")));
+		post.setDiscussionId(cursor.getLong(cursor
+				.getColumnIndex("discussion_id")));
+		post.setDate(cursor.getString(cursor.getColumnIndex("date")));
+		post.setParentId(cursor.getLong(cursor.getColumnIndex("parent_id")));
+		post.setProfileId(cursor.getLong(cursor.getColumnIndex("profile_id")));
+		post.setMarked(cursor.getInt(cursor.getColumnIndex("is_marked")) == 1);
+		post.setUserNick(cursor.getString(cursor.getColumnIndex("user_nick")));
+		post.setContent(cursor.getString(cursor.getColumnIndex("content")));
+		// post.setContentLast(cursor.getString(cursor
+		// .getColumnIndex("content_last")));
+		return post;
+	}
+
+	private ContentValues getValues(DiscussionPost post) {
+		if (post == null)
+			return null;
+
+		ContentValues values = new ContentValues();
+		values.put("_id", post.getId());
+		values.put("user_id", post.getUserId());
+		values.put("discussion_id", post.getDiscussionId());
+		values.put("date", post.getDate());
+		values.put("parent_id", post.getParentId());
+		values.put("profile_id", post.getProfileId());
+		values.put("is_marked", post.isMarked());
+		values.put("user_nick", post.getUserNick());
+		values.put("content", post.getContent());
+		// values.put("content_last", post.getContentLast());
+
+		return values;
+	}
+
+	public void setMarked(int postId, boolean isMarked) {
+		ContentValues contentValues = new ContentValues();
+		contentValues.put("is_marked", isMarked ? 1 : 0);
+		getDatabase().update("posts", contentValues, "_id=" + postId, null);
+	}
+
+	public void deletePost(DiscussionPost post) {
+		getDatabase().delete("post", "_id =" + post.getId(), null);
+	}
+
+	public void close() {
+		getDatabase().close();
 	}
 
 }

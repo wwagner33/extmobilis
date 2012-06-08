@@ -3,12 +3,15 @@ package com.mobilis.util;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedHashMap;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+
+import com.mobilis.model.DiscussionPost;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -23,6 +26,7 @@ public class ParseJSON {
 	private ContentValues[] parsedValues;
 	private ArrayList<ContentValues> parsedPostValues;
 	private SharedPreferences settings;
+	private ArrayList<DiscussionPost> discussionPosts; // TTS
 
 	public ParseJSON(Context context) {
 		settings = PreferenceManager.getDefaultSharedPreferences(context);
@@ -311,6 +315,110 @@ public class ParseJSON {
 		jsonMap.put("parent_id", Constants.noParentString);
 		responseJSON.put("discussion_post", jsonMap);
 		return responseJSON;
+	}
+
+	// TTS
+
+	public int[] parseBeforeAndAfter(String source) {
+		int[] result = new int[2];
+		Object object = JSONValue.parse(source);
+		JSONArray jsonArray = (JSONArray) object;
+		JSONObject jsonObject = (JSONObject) jsonArray.get(0);
+
+		Long before = (Long) jsonObject.get("before");
+		Long after = (Long) jsonObject.get("after");
+		result[0] = before.intValue();
+		result[1] = after.intValue();
+
+		return result;
+	}
+
+	private DiscussionPost parsePost(JSONObject jsonObject) {
+		Log.w("Object", jsonObject.toJSONString());
+
+		DiscussionPost discussionPost = new DiscussionPost();
+
+		String content = (String) jsonObject.get("content");
+		if (content != null) {
+			Spanned markUpFirst = Html.fromHtml(content);
+			content = markUpFirst.toString();
+		}
+		discussionPost.setContent(content);
+
+		// String contentLast = (String) jsonObject.get("content_last");
+		// if (contentLast != null) {
+		// Spanned markUpLast = Html.fromHtml(contentLast);
+		// contentLast = markUpLast.toString();
+		// }
+		// discussionPost.setContentLast(contentLast);
+
+		long discussionId = (Long) jsonObject.get("discussion_id");
+		discussionPost.setDiscussionId(discussionId);
+
+		long _id = (Long) jsonObject.get("id");
+		discussionPost.setId(_id);
+
+		long parentId = 0;
+		if (jsonObject.get("parent_id") != null) {
+			parentId = (Long) jsonObject.get("parent_id");
+		}
+		discussionPost.setParentId(parentId);
+
+		long userId = (Long) jsonObject.get("user_id");
+		discussionPost.setUserId(userId);
+
+		String userNick = (String) jsonObject.get("user_nick");
+		discussionPost.setUserNick(userNick);
+
+		try {
+			// Formatar a data.
+			String date = (String) jsonObject.get("updated_at");
+			date = date.substring(0, 19).replace("T", "");
+
+			SimpleDateFormat serverFormat = DateUtils.getServerFormat();
+			Date formatedDate = serverFormat.parse(date);
+
+			Calendar calendar = Calendar.getInstance();
+			calendar.setTime(formatedDate);
+			discussionPost.setDate(calendar);
+		} catch (ParseException e) {
+			e.printStackTrace();
+			throw new RuntimeException();
+		}
+
+		return discussionPost;
+	}
+
+	public ArrayList<DiscussionPost> parsePostsTTS(String source) {
+
+		JSONArray jsonPosts = (JSONArray) JSONValue.parse(source);
+
+		discussionPosts = new ArrayList<DiscussionPost>();
+
+		Log.i("JsonArray", String.valueOf(jsonPosts.size()));
+		for (int i = 1; i < jsonPosts.size(); i++) {
+			DiscussionPost discussionPost = parsePost((JSONObject) jsonPosts
+					.get(i));
+			discussionPosts.add(discussionPost);
+		}
+		return discussionPosts;
+	}
+
+	public ArrayList<DiscussionPost> parseInvertedPosts(String source) {
+
+		JSONArray jsonPosts = (JSONArray) JSONValue.parse(source);
+
+		discussionPosts = new ArrayList<DiscussionPost>();
+
+		Log.i("JsonArray", String.valueOf(jsonPosts.size()));
+		int i = jsonPosts.size() - 1;
+		while (i > 0) {
+			DiscussionPost discussionPost = parsePost((JSONObject) jsonPosts
+					.get(i));
+			discussionPosts.add(discussionPost);
+			i--;
+		}
+		return discussionPosts;
 	}
 
 }

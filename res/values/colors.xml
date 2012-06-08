@@ -11,5 +11,13 @@
     <color name="black">#000000</color>
     <color name="disabled">#EFEFEF</color>
     <color name="yellow_hightlight">#FFFF00</color>
+    
+    <color name="main_header_bg">#ff122e92</color>
+    <color name="discussion_name">#FF122E92</color>
+    <color name="list_divider">#FF122E92</color>
+    <color name="not_loaded_post_count">#FF666666</color>
+    <color name="main_footer">#FFF9EC00</color>
+    <color name="user_post_text">#FF000000</color>
+    <color name="user_post_date_text">#FFCCCCCC</color>
 
 </resources>

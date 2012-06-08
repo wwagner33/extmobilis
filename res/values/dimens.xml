@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <dimen name="tiny_space">2dip</dimen>
+    <dimen name="small_space">5dip</dimen>
+    <dimen name="medium_space">10dip</dimen>
+    <dimen name="large_space">20dip</dimen>
+    <dimen name="extra_large_space">40dip</dimen>
+    <dimen name="blue_line_height">2dip</dimen>
+    <dimen name="user_name_text_size">16sp</dimen>
+    <dimen name="user_post_text_size">10sp</dimen>
+    <dimen name="user_post_date_text_size">10sp</dimen>
+    <dimen name="not_loaded_posts_text_size">12sp</dimen>
+
+</resources>

@@ -27,6 +27,7 @@ import com.mobilis.dao.DiscussionDAO;
 import com.mobilis.dao.PostDAO;
 import com.mobilis.dialog.DialogMaker;
 import com.mobilis.interfaces.MobilisListActivity;
+import com.mobilis.model.DiscussionPost;
 import com.mobilis.util.Constants;
 import com.mobilis.util.MobilisStatus;
 import com.mobilis.util.ParseJSON;
@@ -130,10 +131,9 @@ public class DiscussionListController extends MobilisListActivity {
 
 		if (postDAO.postExistsOnTopic(topicId)
 				&& !discussionDAO.hasNewPostsFlag(topicId)) {
-			Log.w("Não Existem posts no banco", " ");
 			postDAO.close();
 			discussionDAO.close();
-			intent = new Intent(this, PostList.class);
+			intent = new Intent(this, ExtMobilisTTSActivity.class);
 			closeDialog(progressDialog);
 			startActivity(intent);
 
@@ -144,7 +144,9 @@ public class DiscussionListController extends MobilisListActivity {
 			progressDialog = dialogMaker
 					.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
 			progressDialog.show();
-			obtainNewPosts(Constants.generateNewPostsURL(topicId));
+			// obtainNewPosts(Constants.generateNewPostsURL(topicId)); // OLD
+			obtainNewPosts(Constants.generateNewPostsTTSURL(topicId,
+					Constants.oldDateString));
 		}
 	}
 
@@ -292,6 +294,8 @@ public class DiscussionListController extends MobilisListActivity {
 
 			case Constants.MESSAGE_NEW_POST_CONNECTION_OK:
 
+				closeDialog(progressDialog);
+
 				discussionDAO.open();
 				if (discussionDAO.hasNewPostsFlag(getPreferences().getInt(
 						"SelectedTopic", 0))) {
@@ -302,54 +306,84 @@ public class DiscussionListController extends MobilisListActivity {
 				}
 				discussionDAO.close();
 
-				intent = new Intent(getApplicationContext(), PostList.class);
+				int[] beforeAfter = new int[2];
+				final int beforeIndex = 0;
+				final int afterIndex = 1;
 
-				ArrayList<ContentValues> parsedValues = jsonParser
-						.parsePosts(msg.getData().getString("content"));
+				beforeAfter = jsonParser.parseBeforeAndAfter(msg.getData()
+						.getString("content"));
 
-				if (parsedValues.size() == 0) {
-					closeDialog(progressDialog);
-					startActivityForResult(intent, 1);
-				}
+				Log.i("PostsBefore", "" + beforeAfter[beforeIndex]);
+				Log.i("PostsAfter", "" + beforeAfter[afterIndex]);
 
-				else {
-					Log.i("Content", msg.getData().getString("content"));
+				discussionDAO.open();
+				discussionDAO.updateBeforeAndAfter(
+						getPreferences().getInt("SelectedTopic", 0),
+						beforeAfter);
+				discussionDAO.close();
 
-					parsedValues = jsonParser.parsePosts(msg.getData()
-							.getString("content"));
+				ArrayList<DiscussionPost> loadedPosts = jsonParser
+						.parsePostsTTS(msg.getData().getString("content"));
 
-					postDAO.open();
-					postDAO.addPosts(parsedValues,
-							getPreferences().getInt("SelectedTopic", 0));
+				postDAO.open();
+				postDAO.insertPostsToDB(loadedPosts,
+						getPreferences().getInt("SelectedTopic", 0));
+				postDAO.close();
 
-					ArrayList<Integer> ids = null;
+				Log.w("LOADED POSTS", "" + loadedPosts.size());
 
-					File imageDirectory = new File(Constants.PATH_IMAGES);
-					int numberOfImages = imageDirectory.listFiles().length;
+				intent = new Intent(getApplicationContext(),
+						ExtMobilisTTSActivity.class);
+				startActivity(intent);
 
-					if (imageDirectory.exists()) {
-						if (numberOfImages > 0) {
-							ids = postDAO
-									.getUserIdsAbsentImage(getPreferences()
-											.getInt("SelectedTopic", 0));
-						} else {
-							ids = postDAO.getAllUserIds();
-						}
-					}
-
-					else {
-						imageDirectory.mkdir();
-						ids = postDAO.getAllUserIds();
-
-					}
-
-					closeDialog(progressDialog);
-					Log.i("USER IDS", "" + ids.size());
-					postDAO.close();
-					MobilisStatus status = MobilisStatus.getInstance();
-					status.ids = ids;
-					startActivityForResult(intent, 1);
-				}
+				// intent = new Intent(getApplicationContext(), PostList.class);
+				//
+				// ArrayList<ContentValues> parsedValues = jsonParser
+				// .parsePosts(msg.getData().getString("content"));
+				//
+				// if (parsedValues.size() == 0) {
+				// closeDialog(progressDialog);
+				// startActivityForResult(intent, 1);
+				// }
+				//
+				// else {
+				// Log.i("Content", msg.getData().getString("content"));
+				//
+				// parsedValues = jsonParser.parsePosts(msg.getData()
+				// .getString("content"));
+				//
+				// postDAO.open();
+				// postDAO.addPosts(parsedValues,
+				// getPreferences().getInt("SelectedTopic", 0));
+				//
+				// ArrayList<Integer> ids = null;
+				//
+				// File imageDirectory = new File(Constants.PATH_IMAGES);
+				// int numberOfImages = imageDirectory.listFiles().length;
+				//
+				// if (imageDirectory.exists()) {
+				// if (numberOfImages > 0) {
+				// ids = postDAO
+				// .getUserIdsAbsentImage(getPreferences()
+				// .getInt("SelectedTopic", 0));
+				// } else {
+				// ids = postDAO.getAllUserIds();
+				// }
+				// }
+				//
+				// else {
+				// imageDirectory.mkdir();
+				// ids = postDAO.getAllUserIds();
+				//
+				// }
+				//
+				// closeDialog(progressDialog);
+				// Log.i("USER IDS", "" + ids.size());
+				// postDAO.close();
+				// MobilisStatus status = MobilisStatus.getInstance();
+				// status.ids = ids;
+				// startActivityForResult(intent, 1);
+				// }
 				break;
 
 			case Constants.MESSAGE_IMAGE_CONNECTION_OK:
@@ -366,7 +400,6 @@ public class DiscussionListController extends MobilisListActivity {
 				closeDialog(progressDialog);
 				startActivityForResult(intent, 1);
 				break;
-
 			}
 		}
 	}

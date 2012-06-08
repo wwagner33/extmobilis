@@ -26,6 +26,19 @@ public class Constants {
 		return url;
 	}
 
+	public static String generateHistoryPostTTSURL(int topicId, String date) {
+
+		String url = "discussions/" + topicId + "/posts/history/" + date
+				+ "/order/desc" + "/limit/" + TOTAL_POSTS_TO_LOAD + ".json";
+		return url;
+	}
+
+	public static String generateNewPostsTTSURL(int topicId, String date) {
+		String url = "discussions/" + topicId + "/posts/news/" + date
+				+ "/order/asc" + "/limit/" + TOTAL_POSTS_TO_LOAD + ".json";
+		return url;
+	}
+
 	public static String generateNewPostsURL(int topicId) {
 		String url = "discussions/" + topicId + "/posts/" + "news/"
 				+ oldDateString + ".json";
@@ -123,5 +136,20 @@ public class Constants {
 	public static final int MESSAGE_IMAGE_CONNECION_FAILED = 710;
 	public static final int MESSAGE_HISTORY_POST_CONNECTION_FAILED = 711;
 	public static final int MESSAGE_AUDIO_POST_FAILED = 721;
+
+	// TTS
+	public static final String DATABASE_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+	public static final String WSCALL_DATE_FORMAT = "yyyyMMddHHmmss";
+	public static final String AUDIO_DEFAULT_PATH = Environment
+			.getExternalStorageDirectory().getAbsolutePath()
+			+ "/Mobilis/TTS/audios/";
+	public static final int MAX_TIME_TO_SLEEP = 1800;
+	public static final int PLAY_NEXT_POST = 0;
+	public static final int STOP_AUDIO = 1;
+	public static final int ERROR_PLAYING = -1;
+	public static final int CONNECTION_ERROR = -2;
+	public static final int MIN_BLOCK_LENGTH = 100;
+	public static final int MAX_BLOCK_LENGTH = 150;
+	public static final int TOTAL_POSTS_TO_LOAD = 20;
 
 }

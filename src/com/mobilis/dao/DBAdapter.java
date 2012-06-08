@@ -27,4 +27,8 @@ public class DBAdapter {
 	public SQLiteDatabase getDatabase() {
 		return db;
 	}
+
+	public Context getContext() {
+		return context;
+	}
 }
