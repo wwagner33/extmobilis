@@ -556,20 +556,26 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 									.getId())));
 					postDAO.close();
 					if (postsFromDB.size() - loadedposts.size() != 0) {
-						for (int i = 0; i < loadedposts.size(); i++) {
-							postsFromDB
-									.remove((postsFromDB.size() - loadedposts
-											.size()) + i);
-							postsFromDB.add(loadedposts.get(i));
+
+						ArrayList<DiscussionPost> postsToRemain = new ArrayList<DiscussionPost>();
+
+						for (int i = loadedposts.size(); i < postsFromDB.size(); i++) {
+							postsToRemain.add(postsFromDB.get(i));
 						}
+
+						for (DiscussionPost disc : loadedposts) {
+							postsToRemain.add(disc);
+						}
+
+						Log.i("SIZE", "" + postsToRemain.size());
 						discussionDAO.open();
 						discussionDAO.setPreviousPosts(
 								discussion.getId(),
 								discussion.getPreviousPosts()
 										+ loadedposts.size());
 						discussionDAO.close();
+						loadedposts = postsToRemain;
 					} else {
-
 						discussion.setPreviousPosts(beforeAfter[beforeIndex]);
 						discussionDAO.open();
 
