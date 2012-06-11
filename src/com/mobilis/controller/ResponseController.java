@@ -35,10 +35,12 @@ import android.widget.Toast;
 
 import com.mobilis.audio.AudioPlayer;
 import com.mobilis.audio.AudioRecorder;
+import com.mobilis.dao.DiscussionDAO;
 import com.mobilis.dao.PostDAO;
 import com.mobilis.dialog.AudioDialog;
 import com.mobilis.dialog.DialogMaker;
 import com.mobilis.interfaces.MobilisActivity;
+import com.mobilis.model.Discussion;
 import com.mobilis.util.Constants;
 import com.mobilis.util.MobilisStatus;
 import com.mobilis.util.ParseJSON;
@@ -55,7 +57,6 @@ public class ResponseController extends MobilisActivity implements
 	private ImageButton record;
 
 	private ParseJSON jsonParser;
-	private Intent intent;
 	private JSONObject postObject;
 	private boolean existsRecording = false;
 	private String charSequenceAfter;
@@ -67,13 +68,9 @@ public class ResponseController extends MobilisActivity implements
 	private AudioRecorder recorder;
 	private AudioPlayer player;
 	private float toastTimer = 0;
-	private PostDAO postDAO;
-	private ZipManager zipManager;
-
 	private AlertDialog warningDialog;
 	private ProgressDialog progressDialog;
 	private AudioDialog audioDialog;
-
 	private ResponseHandler handler;
 	private Connection connection;
 
@@ -82,12 +79,10 @@ public class ResponseController extends MobilisActivity implements
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.response);
-		zipManager = new ZipManager();
 		setVolumeControlStream(AudioManager.STREAM_MUSIC);
 		handler = new ResponseHandler();
 		connection = new Connection(handler);
 		dialogMaker = new DialogMaker(this);
-		postDAO = new PostDAO(this);
 		progressDialog = dialogMaker
 				.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
 		submit = (Button) findViewById(R.id.criar_topico_submit);
@@ -205,13 +200,11 @@ public class ResponseController extends MobilisActivity implements
 
 			else {
 				if (getPreferences().getLong("SelectedPost", 0) > 0) {
-					Log.w("Teste2", "Teste2");
 					postObject = jsonParser.buildTextResponseWithParentObject(
 							message.getText().toString(), getPreferences()
 									.getLong("SelectedPost", 0));
 
 				} else {
-					Log.w("Teste1", "Teste1");
 					postObject = jsonParser
 							.buildTextResponseWithoutParent(message.getText()
 									.toString());
@@ -320,11 +313,6 @@ public class ResponseController extends MobilisActivity implements
 		connection.postToServer(Constants.CONNECTION_POST_AUDIO, url,
 				audioFile, token);
 	}
-
-	// public void getImages(String url) {
-	// // connection.getImages(Constants.CONNECTION_GET_IMAGES, url,
-	// // getPreferences().getString("token", null));
-	// }
 
 	@Override
 	public void onChronometerTick(Chronometer chronometer) {
@@ -456,63 +444,49 @@ public class ResponseController extends MobilisActivity implements
 									.getString("token", null));
 
 				} else {
+					DiscussionDAO discussionDAO = new DiscussionDAO(
+							getApplicationContext());
+					discussionDAO.open();
+					Discussion currentDiscussion = discussionDAO
+							.getDiscussion(getPreferences().getInt(
+									"SelectedTopic", 0));
 
-					getNewPosts(Constants.generateNewPostsURL(getPreferences()
-							.getInt("SelectedTopic", 0)));
+					discussionDAO.setNextPosts(
+							getPreferences().getInt("SelectedTopic", 0),
+							(currentDiscussion.getNextPosts() + 1));
+					discussionDAO.close();
+					Intent intent = new Intent(getApplicationContext(),
+							ExtMobilisTTSActivity.class);
+					intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+					startActivity(intent);
 				}
 			}
 
 			if (msg.what == Constants.MESSAGE_AUDIO_POST_OK) {
 
-				getNewPosts(Constants.generateNewPostsURL(getPreferences()
-						.getInt("SelectedTopic", 0)));
-				closeDialog(progressDialog);
+				DiscussionDAO discussionDAO = new DiscussionDAO(
+						getApplicationContext());
+				discussionDAO.open();
+				Discussion currentDiscussion = discussionDAO
+						.getDiscussion(getPreferences().getInt("SelectedTopic",
+								0));
+
+				discussionDAO.setNextPosts(
+						getPreferences().getInt("SelectedTopic", 0),
+						(currentDiscussion.getNextPosts() + 1));
+				discussionDAO.close();
+				Intent intent = new Intent(getApplicationContext(),
+						ExtMobilisTTSActivity.class);
+				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				startActivity(intent);
 
 			}
 
 			if (msg.what == Constants.MESSAGE_AUDIO_POST_FAILED) {
-				// Mandar mensagem de erro.
-				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				startActivity(intent);
-			}
-
-			if (msg.what == Constants.MESSAGE_NEW_POST_CONNECTION_OK) {
-
-				ArrayList<ContentValues> values = jsonParser.parsePosts(msg
-						.getData().getString("content"));
-
-				postDAO.open();
-				postDAO.addPosts(values,
-						getPreferences().getInt("SelectedTopic", 0));
-
-				intent = new Intent(getApplicationContext(), PostList.class);
-
-				// Images
-				ArrayList<Integer> ids = null;
-
-				File imageDirectory = new File(Constants.PATH_IMAGES);
-				int numberOfImages = imageDirectory.listFiles().length;
-
-				if (imageDirectory.exists()) {
-					if (numberOfImages > 0) {
-						ids = postDAO.getUserIdsAbsentImage(getPreferences()
-								.getInt("SelectedTopic", 0));
-					} else {
-						ids = postDAO.getAllUserIds();
-					}
-				}
-
-				else {
-					imageDirectory.mkdir();
-					ids = postDAO.getAllUserIds();
-
-				}
-
-				closeDialog(progressDialog);
-				Log.i("USER IDS", "" + ids.size());
-				postDAO.close();
-				MobilisStatus status = MobilisStatus.getInstance();
-				status.ids = ids;
+				Toast.makeText(getApplicationContext(),
+						"Erro no envio de áudio", Toast.LENGTH_SHORT).show();
+				Intent intent = new Intent(getApplicationContext(),
+						ExtMobilisTTSActivity.class);
 				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				startActivity(intent);
 			}
