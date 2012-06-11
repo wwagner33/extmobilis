@@ -13,10 +13,9 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
+import android.util.Log;
 import com.mobilis.model.DiscussionPost;
 import com.mobilis.util.Constants;
-
-import android.util.Log;
 
 public class WebServiceBing {
 

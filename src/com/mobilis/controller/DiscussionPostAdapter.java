@@ -5,10 +5,8 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
-import com.mobilis.dao.PostDAO;
-import com.mobilis.model.DiscussionPost;
-
 import android.content.Context;
+import android.graphics.drawable.TransitionDrawable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +14,9 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.TextView;
+
+import com.mobilis.dao.PostDAO;
+import com.mobilis.model.DiscussionPost;
 
 public class DiscussionPostAdapter extends BaseExpandableListAdapter implements
 		OnClickListener {
@@ -118,8 +119,6 @@ public class DiscussionPostAdapter extends BaseExpandableListAdapter implements
 				postDate.setText(post.getDate());
 			}
 			if (postContent != null) {
-				// SETAR AQUI O TAMANHO DO CONTENT
-				// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 				String content = post.getContent();
 				if (content.length() <= 150)
 					postContent.setText(content);
@@ -135,6 +134,13 @@ public class DiscussionPostAdapter extends BaseExpandableListAdapter implements
 					postContent.setMaxLines(3);
 				}
 			}
+			
+			if (post.isJustLoaded()){// highlight
+				convertView.setBackgroundResource(R.drawable.highlight_transition);
+				((TransitionDrawable)convertView.getBackground()).startTransition(750);
+				((TransitionDrawable)convertView.getBackground()).reverseTransition(750);
+				post.setJustLoaded(false);
+			} else 
 
 			if (post.isMarked()) {
 				convertView.setBackgroundColor(0x6600FFFF);

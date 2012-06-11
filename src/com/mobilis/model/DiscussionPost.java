@@ -8,16 +8,13 @@ import java.util.Date;
 import com.mobilis.util.Constants;
 import com.mobilis.util.DateUtils;
 
-//import br.iuvi.util.Constants;
-//import br.iuvi.util.DateUtils;
-
 public class DiscussionPost {
 	private long _id;
 	private long parentId;
 	private long userId;
 	private long discussionId;
 	private long profileId;
-	private boolean isMarked, isPlaying;
+	private boolean isMarked, isPlaying, isJustLoaded = false;
 	private String userNick;
 	private String content;
 	private Calendar date;
@@ -139,5 +136,13 @@ public class DiscussionPost {
 
 	public void setPlaying(boolean isPlaying) {
 		this.isPlaying = isPlaying;
+	}
+
+	public boolean isJustLoaded() {
+		return isJustLoaded;
+	}
+
+	public void setJustLoaded(boolean isJustLoaded) {
+		this.isJustLoaded = isJustLoaded;
 	}
 }

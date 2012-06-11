@@ -20,6 +20,7 @@ public class PostPlayer implements Runnable, OnCompletionListener {
 	private int blocksNumber;
 	private boolean isPaused = false;
 	private Handler handler;
+	private boolean isLastPost;
 
 	String getBlockAtIndex(int index) {
 		if (index == 0)
@@ -29,8 +30,9 @@ public class PostPlayer implements Runnable, OnCompletionListener {
 	}
 
 	public PostPlayer(int numberOfBlocks, Handler handler, DiscussionPost post,
-			Context context) {
+			Context context, boolean isLastPost) {
 		super();
+		this.isLastPost = isLastPost;
 		this.context = context;
 		this.handler = handler;
 		this.post = post;
@@ -77,10 +79,13 @@ public class PostPlayer implements Runnable, OnCompletionListener {
 	}
 
 	void stop() {
-		if (mediaPlayer.isPlaying())
-			mediaPlayer.stop();
-		currentBlockIndex = 0;
-		lastAvailableBlockIndex = -1;
+		try {
+			if (mediaPlayer.isPlaying())
+				mediaPlayer.stop();
+			currentBlockIndex = 0;
+			lastAvailableBlockIndex = -1;
+		} catch (IllegalStateException e) {
+		}
 	}
 
 	void pause() {
@@ -108,16 +113,20 @@ public class PostPlayer implements Runnable, OnCompletionListener {
 				}
 			}
 		}
-		if (lastAvailableBlockIndex != -1) {
-			playSoundEffect();
+		if (lastAvailableBlockIndex != -1 && !Thread.interrupted()) {
 			handler.sendEmptyMessage(Constants.PLAY_NEXT_POST);
 		} else
 			handler.sendEmptyMessage(Constants.STOP_AUDIO);
 	}
 
-	private void playSoundEffect() {
-		mediaPlayer = MediaPlayer.create(context, R.raw.proxpost);
-		mediaPlayer.start();
+	public void playSoundEffect() {
+		if (isLastPost) {
+			mediaPlayer = MediaPlayer.create(context, R.raw.fimdalista);
+			mediaPlayer.start();
+		} else {
+			mediaPlayer = MediaPlayer.create(context, R.raw.proxpost);
+			mediaPlayer.start();
+		}
 	}
 
 	@Override

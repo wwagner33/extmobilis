@@ -5,6 +5,8 @@ import java.util.Arrays;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnCompletionListener;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -60,8 +62,6 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 	private DialogMaker dialogMaker;
 	private ProgressDialog dialog;
 	private int previous;
-
-	private boolean headerTeste = false;
 
 	@SuppressWarnings("deprecation")
 	public void onCreate(Bundle savedInstanceState) {
@@ -189,13 +189,23 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 	}
 
 	protected void generateError(int what) {
+
+		MediaPlayer mp = MediaPlayer.create(getApplicationContext(),
+				R.raw.errodeconexao);
+		mp.start();
+		mp.setOnCompletionListener(new OnCompletionListener() {
+			@Override
+			public void onCompletion(MediaPlayer mp) {
+				mp.release();
+			}
+		});
+
 		switch (what) {
 		case Constants.CONNECTION_ERROR:
 			Toast.makeText(getApplicationContext(),
 					getResources().getString(R.string.error_connection_failed),
 					Toast.LENGTH_SHORT).show();
-			ttsPostsManager.stop();
-			ttsPostsManager = null;
+
 			play.setContentDescription(getResources().getString(R.string.play));
 			play.setImageResource(R.drawable.playback_play);
 			break;
@@ -203,8 +213,6 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 			Toast.makeText(getApplicationContext(),
 					getResources().getString(R.string.error_playing),
 					Toast.LENGTH_SHORT).show();
-			ttsPostsManager.stop();
-			ttsPostsManager = null;
 			play.setContentDescription(getResources().getString(R.string.play));
 			play.setImageResource(R.drawable.playback_play);
 			break;
@@ -221,47 +229,43 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 
 		case R.id.button_next:
 			synchronized (this) {
+
 				if (ttsPostsManager != null) {
 					int position = ttsPostsManager.getCurrentPostIndex();
 					if (position < ttsPostsManager.getPostsSize() - 1) {
-						play.setContentDescription(getResources().getString(
-								R.string.pause));
-						play.setImageResource(R.drawable.playback_pause);
 						stop();
 						play(position + 1);
 					}
 				}
+				break;
 			}
-			break;
 
 		case R.id.button_prev:
 			synchronized (this) {
 				if (ttsPostsManager != null) {
 					int position = ttsPostsManager.getCurrentPostIndex();
 					if (position > 0) {
-						play.setContentDescription(getResources().getString(
-								R.string.pause));
-						play.setImageResource(R.drawable.playback_pause);
 						stop();
 						play(position - 1);
 					}
 				}
+				break;
 			}
-			break;
 
 		case R.id.button_play:
-			if (play.getContentDescription().toString()
-					.equals(getResources().getString(R.string.play))) {
-				play(positionExpanded);
-			} else if (play.getContentDescription().toString()
-					.equals(getResources().getString(R.string.pause))) {
-				play.setContentDescription(getResources().getString(
-						R.string.play));
-				play.setImageResource(R.drawable.playback_play);
-				ttsPostsManager.pause();
+			synchronized (this) {
+				if (play.getContentDescription().toString()
+						.equals(getResources().getString(R.string.play))) {
+					play(positionExpanded);
+				} else if (play.getContentDescription().toString()
+						.equals(getResources().getString(R.string.pause))) {
+					play.setContentDescription(getResources().getString(
+							R.string.play));
+					play.setImageResource(R.drawable.playback_play);
+					ttsPostsManager.pause();
+				}
+				break;
 			}
-			break;
-
 		default:
 			break;
 		}
@@ -301,9 +305,15 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 
 	private void showHeader() {
 
-		if (!headerTeste)
-			getExpandableListView().addHeaderView(header);
-		headerTeste = true;
+		if (expandableListView.getHeaderViewsCount() > 0) {
+			((TextView) header.findViewById(R.id.load_available_posts))
+					.setText(discussion.getPreviousPosts()
+							+ " "
+							+ getApplicationContext().getResources().getString(
+									R.string.not_loaded_posts_count));
+			return;
+		}
+		getExpandableListView().addHeaderView(header);
 
 		((TextView) header.findViewById(R.id.load_available_posts))
 				.setText(discussion.getPreviousPosts()
@@ -325,7 +335,6 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 
 	private void hideHeader() {
 		expandableListView.removeHeaderView(header);
-		headerTeste = false;
 	}
 
 	private void setFooter() {
@@ -620,12 +629,13 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 	}
 
 	private void stop() {
-		if (threadTTSPostsManager != null) {
-			threadTTSPostsManager.interrupt();
-			threadTTSPostsManager = null;
-			ttsPostsManager.stop();
+		Log.i("Stop", "Stopped");
+		if (threadTTSPostsManager != null && ttsPostsManager != null) {
 			discussionPostAdapter.untogglePostPlayingStatus(ttsPostsManager
 					.getCurrentPostIndex());
+			threadTTSPostsManager.interrupt();
+			ttsPostsManager.stop();
+			threadTTSPostsManager = null;
 			ttsPostsManager = null;
 			playAfterStop = false;
 			Log.w("playAfterStop", "FALSE");
@@ -636,6 +646,8 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 		@Override
 		public void handleMessage(Message msg) {
 			super.handleMessage(msg);
+			untogglePostPlayingStatus(ttsPostsManager.getCurrentPostIndex());
+			removePlayControll();
 			if (msg.what < 0)
 				generateError(msg.what);
 		}
@@ -650,6 +662,14 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 
 		public void playedAllPosts() {
 			removePlayControll();
+		}
+
+		public void playNext() {
+			int position = ttsPostsManager.getCurrentPostIndex();
+			if (position < ttsPostsManager.getPostsSize() - 1) {
+				stop();
+				play(position + 1);
+			}
 		}
 	}
 }

@@ -34,12 +34,14 @@ public class TTSPostsManager implements Runnable {
 			super.handleMessage(msg);
 			switch (msg.what) {
 			case Constants.PLAY_NEXT_POST:
-				threadPlayer.interrupt();
+				postPlayer.playSoundEffect();
+				while (postPlayer.isPlaying()) {
+				}
+				if (threadPlayer != null)
+					threadPlayer.interrupt();
 				comWithActivity.untogglePostPlayingStatus(currentPostIndex);
-				currentPostIndex++;
-				if (currentPostIndex < posts.size()) {
-					play(currentPostIndex);
-					run();
+				if (currentPostIndex < posts.size() - 1) {
+					comWithActivity.playNext();
 				} else {
 					deleteDir(new File(Constants.AUDIO_DEFAULT_PATH));
 					currentPostIndex = posts.size() - 1;
@@ -215,9 +217,10 @@ public class TTSPostsManager implements Runnable {
 
 	@Override
 	public void run() {
+		boolean isLastPost = currentPostIndex == (posts.size() - 1);
 		webServiceBing = new WebServiceBing(posts.get(currentPostIndex));
 		postPlayer = new PostPlayer(blocks.getNumberOfBlocks(), playAllPosts,
-				posts.get(currentPostIndex), context);
+				posts.get(currentPostIndex), context, isLastPost);
 		threadPlayer = new Thread(postPlayer);
 		threadPlayer.start();
 
