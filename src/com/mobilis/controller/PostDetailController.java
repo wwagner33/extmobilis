@@ -62,7 +62,6 @@ public class PostDetailController extends MobilisActivity implements
 		body.setText(post.getContent());
 		userName.setText(post.getUserNick());
 		forumName.setText(discussion.getName());
-
 	}
 
 	@Override

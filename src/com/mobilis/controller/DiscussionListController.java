@@ -334,56 +334,35 @@ public class DiscussionListController extends MobilisListActivity {
 
 				intent = new Intent(getApplicationContext(),
 						ExtMobilisTTSActivity.class);
-				startActivity(intent);
 
-				// intent = new Intent(getApplicationContext(), PostList.class);
-				//
-				// ArrayList<ContentValues> parsedValues = jsonParser
-				// .parsePosts(msg.getData().getString("content"));
-				//
-				// if (parsedValues.size() == 0) {
-				// closeDialog(progressDialog);
-				// startActivityForResult(intent, 1);
-				// }
-				//
-				// else {
-				// Log.i("Content", msg.getData().getString("content"));
-				//
-				// parsedValues = jsonParser.parsePosts(msg.getData()
-				// .getString("content"));
-				//
-				// postDAO.open();
-				// postDAO.addPosts(parsedValues,
-				// getPreferences().getInt("SelectedTopic", 0));
-				//
-				// ArrayList<Integer> ids = null;
-				//
-				// File imageDirectory = new File(Constants.PATH_IMAGES);
-				// int numberOfImages = imageDirectory.listFiles().length;
-				//
-				// if (imageDirectory.exists()) {
-				// if (numberOfImages > 0) {
-				// ids = postDAO
-				// .getUserIdsAbsentImage(getPreferences()
-				// .getInt("SelectedTopic", 0));
-				// } else {
-				// ids = postDAO.getAllUserIds();
-				// }
-				// }
-				//
-				// else {
-				// imageDirectory.mkdir();
-				// ids = postDAO.getAllUserIds();
-				//
-				// }
-				//
-				// closeDialog(progressDialog);
-				// Log.i("USER IDS", "" + ids.size());
-				// postDAO.close();
-				// MobilisStatus status = MobilisStatus.getInstance();
-				// status.ids = ids;
-				// startActivityForResult(intent, 1);
-				// }
+				ArrayList<Integer> ids = null;
+
+				File imageDirectory = new File(Constants.PATH_IMAGES);
+
+				postDAO.open();
+				if (imageDirectory.exists()) {
+					int numberOfImages = imageDirectory.listFiles().length;
+					if (numberOfImages > 0) {
+						ids = postDAO.getUserIdsAbsentImage(getPreferences()
+								.getInt("SelectedTopic", 0));
+					} else {
+						ids = postDAO.getAllUserIds();
+					}
+				}
+
+				else {
+					imageDirectory.mkdir();
+					ids = postDAO.getAllUserIds();
+
+				}
+				postDAO.close();
+
+				closeDialog(progressDialog);
+				Log.i("USER IDS", "" + ids.size());
+				postDAO.close();
+				MobilisStatus status = MobilisStatus.getInstance();
+				status.ids = ids;
+				startActivity(intent);
 				break;
 
 			case Constants.MESSAGE_IMAGE_CONNECTION_OK:

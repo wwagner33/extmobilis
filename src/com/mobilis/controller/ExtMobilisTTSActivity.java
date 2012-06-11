@@ -29,6 +29,7 @@ import com.mobilis.interfaces.MobilisExpandableListActivity;
 import com.mobilis.model.Discussion;
 import com.mobilis.model.DiscussionPost;
 import com.mobilis.util.Constants;
+import com.mobilis.util.MobilisStatus;
 import com.mobilis.util.ParseJSON;
 import com.mobilis.ws.Connection;
 
@@ -69,6 +70,15 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.posts_new);
+		postHandler = new PostHandler();
+		wsSolar = new Connection(postHandler);
+		MobilisStatus status = MobilisStatus.getInstance();
+
+		if (status.ids != null) {
+			ArrayList<Integer> ids = status.ids;
+			status.ids = null;
+			wsSolar.getImages(ids, getPreferences().getString("token", null));
+		}
 
 		setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
@@ -76,8 +86,6 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 		postDAO = new PostDAO(this);
 		discussionDAO = new DiscussionDAO(this);
 		discussionPosts = new ArrayList<DiscussionPost>();
-		postHandler = new PostHandler();
-		wsSolar = new Connection(postHandler);
 
 		discussionDAO.open();
 		discussion = discussionDAO.getDiscussion(getPreferences().getInt(
@@ -499,6 +507,9 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 				parsePosts(message.getData().getString("content"));
 				Log.w("History POSTS", "OK");
 				break;
+
+			case Constants.MESSAGE_IMAGE_CONNECTION_OK:
+				discussionPostAdapter.notifyDataSetChanged();
 			default:
 				break;
 			}

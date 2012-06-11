@@ -80,7 +80,6 @@ public class Login extends MobilisActivity implements OnClickListener,
 
 	@Override
 	public Object onRetainNonConfigurationInstance() {
-		// TODO Auto-generated method stub
 		if (dialog != null) {
 			if (dialog.isShowing()) {
 				closeDialog(dialog);
@@ -141,7 +140,6 @@ public class Login extends MobilisActivity implements OnClickListener,
 
 	@Override
 	protected void onStop() {
-		// TODO Auto-generated method stub
 		super.onStop();
 		closeDialog(dialog);
 	}
@@ -149,7 +147,6 @@ public class Login extends MobilisActivity implements OnClickListener,
 	private class LoginHandler extends Handler {
 		@Override
 		public void handleMessage(Message msg) {
-			// TODO Auto-generated method stub
 			super.handleMessage(msg);
 
 			if (msg.what == Constants.MESSAGE_TOKEN_CONNECTION_OK) {
@@ -193,9 +190,14 @@ public class Login extends MobilisActivity implements OnClickListener,
 	}
 
 	@Override
-	public void resultFromConnection(int connectionId, String result) {
-		// TODO Auto-generated method stub
-
+	public void resultFromConnection(int connectionId, String result,
+			int statusCode) {
+		if (statusCode != 200 || statusCode != 201) {
+			// handleError(statusCode)
+		} else {
+			switch (connectionId) {
+			// TODO
+			}
+		}
 	}
-
 }

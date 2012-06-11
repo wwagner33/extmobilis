@@ -441,10 +441,13 @@ public class Connection {
 		@Override
 		protected void onPostExecute(Object[] result) {
 
-			if (statusCode != 699)
-				statusCode = (Integer) result[1];
-
 			if (result != null) {
+
+				if (result[1] != null) {
+					if (statusCode != 699)
+						statusCode = (Integer) result[1];
+				}
+
 				if (result[0] != null)
 					sendPositiveMessage((String) result[0], connectionId);
 

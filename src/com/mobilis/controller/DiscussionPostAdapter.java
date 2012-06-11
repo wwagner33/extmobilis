@@ -1,20 +1,28 @@
 package com.mobilis.controller;
 
+import java.io.File;
+import java.io.FilenameFilter;
 import java.text.DateFormatSymbols;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.TransitionDrawable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.mobilis.dao.PostDAO;
+import com.mobilis.exception.ImageFileNotFoundException;
 import com.mobilis.model.DiscussionPost;
+import com.mobilis.util.Constants;
 
 public class DiscussionPostAdapter extends BaseExpandableListAdapter {
 
@@ -94,10 +102,19 @@ public class DiscussionPostAdapter extends BaseExpandableListAdapter {
 	public View getGroupView(int groupPosition, boolean isExpanded,
 			View convertView, ViewGroup parent) {
 
-		if (convertView == null) {
-			LayoutInflater inflater = (LayoutInflater) activity
-					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			convertView = inflater.inflate(R.layout.discussion_list_item, null);
+		LayoutInflater inflater = (LayoutInflater) activity
+				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		convertView = inflater.inflate(R.layout.discussion_list_item, null);
+
+		ImageView userPhoto = (ImageView) convertView
+				.findViewById(R.id.user_photo);
+
+		try {
+			userPhoto.setImageBitmap(getUserImage((int) posts
+					.get(groupPosition).getUserId()));
+			Log.i("USER NAME", "" + posts.get(groupPosition).getUserNick());
+		} catch (ImageFileNotFoundException e) {
+			// Será exibido a imagem default
 		}
 
 		DiscussionPost post = posts.get(groupPosition);
@@ -248,5 +265,30 @@ public class DiscussionPostAdapter extends BaseExpandableListAdapter {
 
 	public boolean getPlayExpanded() {
 		return isPlayExpanded;
+	}
+
+	public Bitmap getUserImage(int userId) throws ImageFileNotFoundException {
+
+		try {
+			final String prefix = String.valueOf(userId);
+
+			File file = new File(Constants.PATH_IMAGES);
+
+			File[] image = file.listFiles(new FilenameFilter() {
+
+				@Override
+				public boolean accept(File dir, String filename) {
+					return filename.startsWith(prefix);
+				}
+			});
+
+			Bitmap userImage = BitmapFactory.decodeFile(image[0]
+					.getAbsolutePath());
+			return userImage;
+		} catch (NullPointerException e) {
+			throw new ImageFileNotFoundException();
+		} catch (ArrayIndexOutOfBoundsException e) {
+			throw new ImageFileNotFoundException();
+		}
 	}
 }
