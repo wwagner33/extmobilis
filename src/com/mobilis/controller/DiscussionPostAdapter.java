@@ -19,7 +19,7 @@ import com.mobilis.model.DiscussionPost;
 public class DiscussionPostAdapter extends BaseExpandableListAdapter {
 
 	private List<DiscussionPost> posts;
-	private View expandButton, play, markButton, reply;
+	private View expandButton, play, markButton, reply, details;
 	private ExtMobilisTTSActivity activity;
 	private boolean isPlayExpanded = false;
 
@@ -63,6 +63,9 @@ public class DiscussionPostAdapter extends BaseExpandableListAdapter {
 
 		reply = convertView.findViewById(R.id.reply);
 		reply.setOnClickListener(activity);
+
+		details = convertView.findViewById(R.id.details);
+		details.setOnClickListener(activity);
 
 		return convertView;
 	}

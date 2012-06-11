@@ -21,6 +21,13 @@ public abstract class MobilisExpandableListActivity extends
 		return settings;
 	}
 
+	public void commit(SharedPreferences.Editor editor) {
+		if (android.os.Build.VERSION.SDK_INT <= 8)
+			editor.commit();
+		else
+			editor.apply();
+	}
+
 	public void closeDialog(Dialog dialog) {
 		if (dialog != null) {
 			if (dialog.isShowing()) {

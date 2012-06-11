@@ -5,6 +5,8 @@ import java.util.Arrays;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.os.Bundle;
@@ -68,6 +70,8 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.posts_new);
 
+		setVolumeControlStream(AudioManager.STREAM_MUSIC);
+
 		dialogMaker = new DialogMaker(this);
 		postDAO = new PostDAO(this);
 		discussionDAO = new DiscussionDAO(this);
@@ -116,7 +120,6 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 			loadPostsFromDatabase();
 	}
 
-	@SuppressWarnings({ "unchecked", "deprecation" })
 	public void loadPostsFromRetainedState() {
 		Object[] retainedState = (Object[]) getLastNonConfigurationInstance();
 
@@ -283,6 +286,11 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 			startActivity(intent);
 			break;
 
+		case R.id.details:
+
+			intent = new Intent(this, PostDetailController.class);
+			startActivity(intent);
+			break;
 		default:
 			break;
 		}
@@ -447,12 +455,6 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 				getPreferences().getString("token", null));
 	}
 
-	public boolean onChildClick(ExpandableListView parent, View v,
-			int groupPosition, int childPosition, long id) {
-		Log.w("Post n", "" + groupPosition);
-		return super.onChildClick(parent, v, groupPosition, childPosition, id);
-	}
-
 	public void onGroupCollapse(int groupPosition) {
 		super.onGroupCollapse(groupPosition);
 		positionExpanded = -1;
@@ -465,6 +467,11 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 		}
 		positionExpanded = groupPosition;
 		Log.w("Posição expandida: ", "" + positionExpanded);
+		SharedPreferences.Editor editor = getPreferences().edit();
+		editor.putLong("SelectedPost", discussionPosts.get(groupPosition)
+				.getId());
+		commit(editor);
+		Log.i("POST ID", "" + discussionPosts.get(groupPosition).getId());
 	}
 
 	private boolean hasPositionExpanded() {

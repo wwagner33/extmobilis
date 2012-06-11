@@ -193,6 +193,21 @@ public class PostDAO extends DBAdapter {
 
 	// TTS
 
+	public DiscussionPost getPost(int postId) {
+		Log.i("PostId", "" + postId);
+		Cursor cursor = getDatabase().query("posts",
+				new String[] { "content", "parent_id", "user_nick" },
+				"_id=" + postId, null, null, null, null);
+		Log.i("Cursor Count = ", "" + cursor.getCount());
+		cursor.moveToFirst();
+		DiscussionPost post = new DiscussionPost();
+		post.setContent(cursor.getString(cursor.getColumnIndex("content")));
+		post.setParentId(cursor.getInt(cursor.getColumnIndex("parent_id")));
+		post.setUserNick(cursor.getString(cursor.getColumnIndex("user_nick")));
+		cursor.close();
+		return post;
+	}
+
 	public void clearPostsTable() {
 		getDatabase().delete("posts", null, null);
 	}
@@ -206,22 +221,6 @@ public class PostDAO extends DBAdapter {
 		for (DiscussionPost post : posts) {
 			insertSinglePostToDB(post);
 		}
-
-		// int discussionId = (int) posts[0].getDiscussionId();
-		// int totalPosts = totalDiscussionPosts(discussionId);
-		// int totalPostsToDelete = totalPosts - 20;
-		//
-		// if (totalPosts > 20) {
-		// // deleta os posts excedentes
-		// deleteNPosts(discussionId, totalPostsToDelete);
-		// // atualiza o valor de previous_posts
-		// DiscussionDAO discussionDAO = new DiscussionDAO(getContext());
-		// discussionDAO.open();
-		// discussionDAO.setPreviousPosts(discussionId,
-		// discussionDAO.getPreviousPosts(discussionId)
-		// + totalPostsToDelete);
-		// discussionDAO.close();
-		// }
 	}
 
 	public void insertPostsToDB(ArrayList<DiscussionPost> posts,

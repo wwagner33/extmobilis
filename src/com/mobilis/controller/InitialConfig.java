@@ -8,6 +8,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.mobilis.dao.CourseDAO;
 import com.mobilis.dao.DatabaseHelper;
 import com.mobilis.interfaces.MobilisActivity;
 import com.mobilis.util.Constants;
@@ -41,25 +42,25 @@ public class InitialConfig extends MobilisActivity {
 
 				if (getPreferences().getString("token", null) != null) {
 
-					if (getPreferences().getBoolean("AutoLogin", true)) {
-						Log.w("TOKEN TESTE", "TOKEN OK");
+					CourseDAO courseDAO = new CourseDAO(this);
+					courseDAO.open();
+					boolean existCourses = courseDAO.existCourses();
+					courseDAO.close();
+
+					if (getPreferences().getBoolean("AutoLogin", true)
+							&& existCourses) {
 						intent = new Intent(this, CourseListController.class);
 						startActivity(intent);
 					} else {
-						Log.w("AutoLogin", "FALSE");
 						intent = new Intent(this, Login.class);
 						startActivity(intent);
 
 					}
 				} else {
-
 					setConfigurations();
-					Log.w("TOKEN TESTE", "NO TOKEN");
 					Intent intent = new Intent(this, Login.class);
-
 					startActivity(intent);
 				}
-
 			}
 
 			else {
@@ -68,9 +69,7 @@ public class InitialConfig extends MobilisActivity {
 				intent = new Intent(this, Login.class);
 				startActivity(intent);
 			}
-
 		}
-
 	}
 
 	public void setConfigurations() {
@@ -78,7 +77,6 @@ public class InitialConfig extends MobilisActivity {
 		SharedPreferences.Editor editor = getPreferences().edit();
 		editor.putBoolean("AutoLogin", true);
 		commit(editor);
-
 	}
 
 	@Override

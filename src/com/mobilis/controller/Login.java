@@ -26,7 +26,8 @@ import com.mobilis.util.ErrorHandler;
 import com.mobilis.util.ParseJSON;
 import com.mobilis.ws.Connection;
 
-public class Login extends MobilisActivity implements OnClickListener,ConnectionCallback {
+public class Login extends MobilisActivity implements OnClickListener,
+		ConnectionCallback {
 
 	private EditText login, password;
 	private Button submit;
@@ -194,7 +195,7 @@ public class Login extends MobilisActivity implements OnClickListener,Connection
 	@Override
 	public void resultFromConnection(int connectionId, String result) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }
