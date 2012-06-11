@@ -7,10 +7,8 @@ import java.util.Locale;
 
 import android.content.Context;
 import android.graphics.drawable.TransitionDrawable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.TextView;
@@ -18,22 +16,17 @@ import android.widget.TextView;
 import com.mobilis.dao.PostDAO;
 import com.mobilis.model.DiscussionPost;
 
-public class DiscussionPostAdapter extends BaseExpandableListAdapter implements
-		OnClickListener {
+public class DiscussionPostAdapter extends BaseExpandableListAdapter {
 
-	private Context context;
 	private List<DiscussionPost> posts;
-	private View expandButton;
-	private View play;
-	private ExtMobilisTTSActivity extMobilisTTSActivity;
-	private View markButton;
+	private View expandButton, play, markButton, reply;
+	private ExtMobilisTTSActivity activity;
 	private boolean isPlayExpanded = false;
 
-	public DiscussionPostAdapter(Context context, List<DiscussionPost> posts,
+	public DiscussionPostAdapter(List<DiscussionPost> posts,
 			ExtMobilisTTSActivity extMobilisTTSActivity) {
-		this.context = context;
 		this.posts = posts;
-		this.extMobilisTTSActivity = extMobilisTTSActivity;
+		activity = extMobilisTTSActivity;
 	}
 
 	public void setPosts(List<DiscussionPost> newPosts) {
@@ -52,7 +45,7 @@ public class DiscussionPostAdapter extends BaseExpandableListAdapter implements
 			boolean isLastChild, View convertView, ViewGroup parent) {
 
 		if (convertView == null) {
-			LayoutInflater inflater = (LayoutInflater) context
+			LayoutInflater inflater = (LayoutInflater) activity
 					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			convertView = inflater.inflate(R.layout.discussion_list_item_menu,
 					null);
@@ -60,13 +53,16 @@ public class DiscussionPostAdapter extends BaseExpandableListAdapter implements
 		// TODO Adicionar Eventos dos botões da Child
 
 		expandButton = convertView.findViewById(R.id.expand);
-		expandButton.setOnClickListener(this);
+		expandButton.setOnClickListener(activity);
 
 		markButton = convertView.findViewById(R.id.mark);
-		markButton.setOnClickListener(this);
+		markButton.setOnClickListener(activity);
 
 		play = convertView.findViewById(R.id.play);
-		play.setOnClickListener(this);
+		play.setOnClickListener(activity);
+
+		reply = convertView.findViewById(R.id.reply);
+		reply.setOnClickListener(activity);
 
 		return convertView;
 	}
@@ -96,7 +92,7 @@ public class DiscussionPostAdapter extends BaseExpandableListAdapter implements
 			View convertView, ViewGroup parent) {
 
 		if (convertView == null) {
-			LayoutInflater inflater = (LayoutInflater) extMobilisTTSActivity
+			LayoutInflater inflater = (LayoutInflater) activity
 					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			convertView = inflater.inflate(R.layout.discussion_list_item, null);
 		}
@@ -125,8 +121,8 @@ public class DiscussionPostAdapter extends BaseExpandableListAdapter implements
 				else
 					postContent.setText(content.substring(0, 149));
 
-				if (groupPosition == extMobilisTTSActivity.positionExpanded
-						&& extMobilisTTSActivity.contentPostIsExpanded) {
+				if (groupPosition == activity.positionExpanded
+						&& activity.contentPostIsExpanded) {
 					postContent.setMaxLines(500);
 					if (content.length() > 150)
 						postContent.append(content.substring(150));
@@ -134,13 +130,16 @@ public class DiscussionPostAdapter extends BaseExpandableListAdapter implements
 					postContent.setMaxLines(3);
 				}
 			}
-			
-			if (post.isJustLoaded()){// highlight
-				convertView.setBackgroundResource(R.drawable.highlight_transition);
-				((TransitionDrawable)convertView.getBackground()).startTransition(750);
-				((TransitionDrawable)convertView.getBackground()).reverseTransition(750);
+
+			if (post.isJustLoaded()) {// highlight
+				convertView
+						.setBackgroundResource(R.drawable.highlight_transition);
+				((TransitionDrawable) convertView.getBackground())
+						.startTransition(750);
+				((TransitionDrawable) convertView.getBackground())
+						.reverseTransition(750);
 				post.setJustLoaded(false);
-			} else 
+			} else
 
 			if (post.isMarked()) {
 				convertView.setBackgroundColor(0x6600FFFF);
@@ -164,41 +163,21 @@ public class DiscussionPostAdapter extends BaseExpandableListAdapter implements
 		return true;
 	}
 
-	@Override
-	public void onClick(View v) {
-		switch (v.getId()) {
-		case R.id.expand:
-			extMobilisTTSActivity.contentPostIsExpanded = !extMobilisTTSActivity.contentPostIsExpanded;
-			notifyDataSetChanged();
-			break;
-		case R.id.mark:
-			Log.i("Mark", "ok");
-			toggleExpandedPostMarkedStatus();
-			notifyDataSetChanged();
-			break;
-		case R.id.play:
-			includeOrRemovePlayController();
-			break;
-		default:
-			break;
-		}
-	}
-
-	private void includeOrRemovePlayController() {
+	public void includeOrRemovePlayController() {
 		if (isPlayExpanded) {
-			extMobilisTTSActivity.removePlayControll();
+			activity.removePlayControll();
 			setPlayExpanded(false);
 		} else {
-			extMobilisTTSActivity.includePlayControll();
+			activity.includePlayControll();
 			setPlayExpanded(true);
 		}
 	}
 
-	private void toggleExpandedPostMarkedStatus() {
-		DiscussionPost post = posts.get(extMobilisTTSActivity.positionExpanded);
+	public void toggleExpandedPostMarkedStatus() {
+		DiscussionPost post = posts.get(activity.positionExpanded);
 		post.setMarked(!post.isMarked());
 		// atualizar post no banco
-		PostDAO postDAO = new PostDAO(context);
+		PostDAO postDAO = new PostDAO(activity);
 		postDAO.open();
 		postDAO.setMarked((int) post.getId(), post.isMarked());
 		postDAO.close();

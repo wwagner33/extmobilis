@@ -137,8 +137,7 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 			previous = discussion.getPreviousPosts();
 		}
 
-		discussionPostAdapter = new DiscussionPostAdapter(
-				getApplicationContext(), discussionPosts,
+		discussionPostAdapter = new DiscussionPostAdapter(discussionPosts,
 				ExtMobilisTTSActivity.this);
 
 		setHeader();
@@ -266,6 +265,24 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 				}
 				break;
 			}
+
+		case R.id.expand:
+			contentPostIsExpanded = !contentPostIsExpanded;
+			discussionPostAdapter.notifyDataSetChanged();
+			break;
+		case R.id.mark:
+			discussionPostAdapter.toggleExpandedPostMarkedStatus();
+			discussionPostAdapter.notifyDataSetChanged();
+			break;
+		case R.id.play:
+			discussionPostAdapter.includeOrRemovePlayController();
+			break;
+
+		case R.id.reply:
+			intent = new Intent(this, ResponseController.class);
+			startActivity(intent);
+			break;
+
 		default:
 			break;
 		}
@@ -280,8 +297,7 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 		discussionPosts = new ArrayList<DiscussionPost>(Arrays.asList(postDAO
 				.getAllPosts(discussion.getId())));
 		postDAO.close();
-		discussionPostAdapter = new DiscussionPostAdapter(
-				getApplicationContext(), discussionPosts,
+		discussionPostAdapter = new DiscussionPostAdapter(discussionPosts,
 				ExtMobilisTTSActivity.this);
 
 		setHeader();
@@ -493,12 +509,9 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 
 			if (!(headerClicked || footerClicked)) {
 
-				Log.i("MARK 1", "MARK 1");
-
 				discussionPosts = loadedposts;
 				discussionPostAdapter = new DiscussionPostAdapter(
-						getApplicationContext(), discussionPosts,
-						ExtMobilisTTSActivity.this);
+						discussionPosts, ExtMobilisTTSActivity.this);
 				postDAO.open();
 				postDAO.insertPostsToDB(loadedposts,
 						getPreferences().getInt("SelectedTopic", 0));
@@ -516,8 +529,6 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 				setListAdapter(discussionPostAdapter);
 			} else {
 				if (headerClicked) {
-
-					Log.i("MARK 2", "MARK 2");
 
 					ArrayList<DiscussionPost> invertedLoadedPosts = jsonParser
 							.parseInvertedPosts(content);
@@ -538,8 +549,7 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 
 					discussionPosts.addAll(0, invertedLoadedPosts);
 					discussionPostAdapter = new DiscussionPostAdapter(
-							getApplicationContext(), discussionPosts,
-							ExtMobilisTTSActivity.this);
+							discussionPosts, ExtMobilisTTSActivity.this);
 					setHeader();
 					headerClicked = false;
 					setListAdapter(discussionPostAdapter);
