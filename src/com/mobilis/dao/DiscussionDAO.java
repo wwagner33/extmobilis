@@ -1,11 +1,10 @@
 package com.mobilis.dao;
 
-import com.mobilis.model.Discussion;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.util.Log;
+
+import com.mobilis.model.Discussion;
 
 public class DiscussionDAO extends DBAdapter {
 
@@ -66,7 +65,6 @@ public class DiscussionDAO extends DBAdapter {
 		cursor.moveToFirst();
 		int count = cursor.getInt(0);
 		cursor.close();
-		Log.i("COUNT", String.valueOf(count));
 		return (count == 0) ? true : false;
 	}
 

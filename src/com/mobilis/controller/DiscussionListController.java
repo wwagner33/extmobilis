@@ -1,6 +1,5 @@
 package com.mobilis.controller;
 
-import java.io.File;
 import java.util.ArrayList;
 
 import android.app.ProgressDialog;
@@ -129,13 +128,15 @@ public class DiscussionListController extends MobilisListActivity {
 
 		Log.w("TopicId", "" + topicId);
 
-		if (postDAO.postExistsOnTopic(topicId)
-				&& !discussionDAO.hasNewPostsFlag(topicId)) {
+		// if (postDAO.postExistsOnTopic(topicId)
+		// && !discussionDAO.hasNewPostsFlag(topicId)) {
+
+		if (postDAO.postExistsOnTopic(topicId)) {
 			postDAO.close();
 			discussionDAO.close();
 			intent = new Intent(this, ExtMobilisTTSActivity.class);
 			closeDialog(progressDialog);
-			startActivity(intent);
+			startActivityForResult(intent, 0);
 
 		} else {
 			Log.w("Não Existem posts no banco", " ");
@@ -144,7 +145,6 @@ public class DiscussionListController extends MobilisListActivity {
 			progressDialog = dialogMaker
 					.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
 			progressDialog.show();
-			// obtainNewPosts(Constants.generateNewPostsURL(topicId)); // OLD
 			obtainNewPosts(Constants.generateNewPostsTTSURL(topicId,
 					Constants.oldDateString));
 		}
@@ -161,12 +161,6 @@ public class DiscussionListController extends MobilisListActivity {
 		connection.getFromServer(Constants.CONNECTION_GET_TOPICS, url,
 				getPreferences().getString("token", null));
 
-	}
-
-	public void getImages(String url) {
-
-		// connection.getImages(Constants.CONNECTION_GET_IMAGES, url,
-		// getPreferences().getString("token", null));
 	}
 
 	public class DiscussionsAdapter extends CursorAdapter {
@@ -296,16 +290,6 @@ public class DiscussionListController extends MobilisListActivity {
 
 				closeDialog(progressDialog);
 
-				discussionDAO.open();
-				if (discussionDAO.hasNewPostsFlag(getPreferences().getInt(
-						"SelectedTopic", 0))) {
-					ContentValues newFlag = new ContentValues();
-					newFlag.put("has_new_posts", 0);
-					discussionDAO.updateFlag(newFlag,
-							getPreferences().getInt("SelectedTopic", 0));
-				}
-				discussionDAO.close();
-
 				int[] beforeAfter = new int[2];
 				final int beforeIndex = 0;
 				final int afterIndex = 1;
@@ -346,22 +330,10 @@ public class DiscussionListController extends MobilisListActivity {
 				postDAO.close();
 				MobilisStatus status = MobilisStatus.getInstance();
 				status.ids = ids;
-				startActivity(intent);
+				startActivityForResult(intent, 0);
 				break;
 
-			case Constants.MESSAGE_IMAGE_CONNECTION_OK:
-
-				zipManager.unzipFile();
-				intent = new Intent(getApplicationContext(), PostList.class);
-				closeDialog(progressDialog);
-				startActivityForResult(intent, 1);
-				break;
-
-			case Constants.MESSAGE_IMAGE_CONNECION_FAILED:
-
-				intent = new Intent(getApplicationContext(), PostList.class);
-				closeDialog(progressDialog);
-				startActivityForResult(intent, 1);
+			default:
 				break;
 			}
 		}

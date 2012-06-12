@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import android.app.ProgressDialog;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
@@ -578,6 +579,18 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 					setListAdapter(discussionPostAdapter);
 
 				} else if (footerClicked) {
+
+					if (beforeAfter[afterIndex] == 0) {
+						discussionDAO.open();
+						if (discussionDAO.hasNewPostsFlag(getPreferences()
+								.getInt("SelectedTopic", 0))) {
+							ContentValues newFlag = new ContentValues();
+							newFlag.put("has_new_posts", 0);
+							discussionDAO.updateFlag(newFlag, getPreferences()
+									.getInt("SelectedTopic", 0));
+						}
+						discussionDAO.close();
+					}
 
 					Log.i("MARK 3", "MARK 3");
 
