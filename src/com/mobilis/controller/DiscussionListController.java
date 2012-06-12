@@ -336,25 +336,9 @@ public class DiscussionListController extends MobilisListActivity {
 						ExtMobilisTTSActivity.class);
 
 				ArrayList<Integer> ids = null;
-
-				File imageDirectory = new File(Constants.PATH_IMAGES);
-
 				postDAO.open();
-				if (imageDirectory.exists()) {
-					int numberOfImages = imageDirectory.listFiles().length;
-					if (numberOfImages > 0) {
-						ids = postDAO.getUserIdsAbsentImage(getPreferences()
-								.getInt("SelectedTopic", 0));
-					} else {
-						ids = postDAO.getAllUserIds();
-					}
-				}
-
-				else {
-					imageDirectory.mkdir();
-					ids = postDAO.getAllUserIds();
-
-				}
+				ids = postDAO.getIdsOfPostsWithoutImage(getPreferences()
+						.getInt("SelectedTopic", 0));
 				postDAO.close();
 
 				closeDialog(progressDialog);

@@ -435,16 +435,13 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 
 	private void loadPreviousPosts() {
 		String date = discussionPosts.get(0).getDateToString();
-		loadPreviousPosts(date);
-	}
-
-	private void loadPreviousPosts(String date) {
 		wsSolar.getFromServer(Constants.CONNECTION_GET_HISTORY_POSTS,
 				Constants.generateHistoryPostTTSURL(discussion.getId(), date),
 				getPreferences().getString("token", null));
 	}
 
 	private void loadFuturePosts() {
+
 		int discussionSize = discussionPosts.size();
 		String date;
 		if (discussionSize == 0) {
@@ -454,10 +451,7 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 			date = discussionPosts.get(discussionSize - 1).getDateToString();
 		}
 		// faz a chamada dos posts posteriores a essa data
-		loadFuturePosts(date);
-	}
 
-	private void loadFuturePosts(String date) {
 		wsSolar.getFromServer(Constants.CONNECTION_GET_NEW_POSTS,
 				Constants.generateNewPostsTTSURL(discussion.getId(), date),
 				getPreferences().getString("token", null));
@@ -486,6 +480,15 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 		return expandableListView.isGroupExpanded(positionExpanded);
 	}
 
+	public void downloadImages() {
+		postDAO.open();
+		wsSolar.getImages(
+				postDAO.getIdsOfPostsWithoutImage(getPreferences().getInt(
+						"SelectedTopic", 0)),
+				getPreferences().getString("token", null));
+		postDAO.close();
+	}
+
 	private class PostHandler extends Handler {
 		ParseJSON jsonParser = new ParseJSON(getApplicationContext());
 
@@ -498,11 +501,13 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 				closeDialog(dialog);
 				break;
 			case Constants.MESSAGE_NEW_POST_CONNECTION_OK:
+				downloadImages();
 				closeDialog(dialog);
 				parsePosts(message.getData().getString("content"));
 				Log.w("Deu", "certo");
 				break;
 			case Constants.MESSAGE_HISTORY_POST_CONNECTION_OK:
+				downloadImages();
 				closeDialog(dialog);
 				parsePosts(message.getData().getString("content"));
 				Log.w("History POSTS", "OK");

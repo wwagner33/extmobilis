@@ -86,7 +86,7 @@ public class ParseJSON {
 
 				parsedValues[i] = new ContentValues();
 
-				parsedValues[i].put("_id", (Long) jsonObjects[i].get("id"));
+				parsedValues[i].put("_id", (Long) jsonObjects[i].get("id")); // LONG
 
 				parsedValues[i].put("offer_id",
 						(String) jsonObjects[i].get("offer_id"));

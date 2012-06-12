@@ -356,4 +356,22 @@ public class PostDAO extends DBAdapter {
 		getDatabase().close();
 	}
 
+	public ArrayList<Integer> getIdsOfPostsWithoutImage(int discussionId) {
+		ArrayList<Integer> ids = null;
+		File imageDirectory = new File(Constants.PATH_IMAGES);
+		if (imageDirectory.exists()) {
+			int numberOfImages = imageDirectory.listFiles().length;
+			if (numberOfImages > 0) {
+				ids = getUserIdsAbsentImage(discussionId);
+			} else {
+				ids = getAllUserIds();
+			}
+		}
+
+		else {
+			imageDirectory.mkdir();
+			ids = getAllUserIds();
+		}
+		return ids;
+	}
 }

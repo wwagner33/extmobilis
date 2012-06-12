@@ -73,12 +73,14 @@ public class ResponseController extends MobilisActivity implements
 	private AudioDialog audioDialog;
 	private ResponseHandler handler;
 	private Connection connection;
+	private PostDAO postDAO;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.response);
+		postDAO = new PostDAO(this);
 		setVolumeControlStream(AudioManager.STREAM_MUSIC);
 		handler = new ResponseHandler();
 		connection = new Connection(handler);
@@ -458,6 +460,7 @@ public class ResponseController extends MobilisActivity implements
 					Intent intent = new Intent(getApplicationContext(),
 							ExtMobilisTTSActivity.class);
 					intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
 					startActivity(intent);
 				}
 			}
@@ -478,6 +481,12 @@ public class ResponseController extends MobilisActivity implements
 				Intent intent = new Intent(getApplicationContext(),
 						ExtMobilisTTSActivity.class);
 				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+				MobilisStatus status = MobilisStatus.getInstance();
+				postDAO.open();
+				status.ids = postDAO.getIdsOfPostsWithoutImage(getPreferences()
+						.getInt("SelectedTopic", 0));
+				postDAO.close();
 				startActivity(intent);
 
 			}
@@ -488,6 +497,11 @@ public class ResponseController extends MobilisActivity implements
 				Intent intent = new Intent(getApplicationContext(),
 						ExtMobilisTTSActivity.class);
 				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				MobilisStatus status = MobilisStatus.getInstance();
+				postDAO.open();
+				status.ids = postDAO.getIdsOfPostsWithoutImage(getPreferences()
+						.getInt("SelectedTopic", 0));
+				postDAO.close();
 				startActivity(intent);
 			}
 		}
