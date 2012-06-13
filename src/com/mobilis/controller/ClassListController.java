@@ -2,7 +2,6 @@ package com.mobilis.controller;
 
 import android.app.ProgressDialog;
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -10,12 +9,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.CursorAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
+import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
 import com.mobilis.dao.ClassDAO;
@@ -23,6 +19,7 @@ import com.mobilis.dao.DiscussionDAO;
 import com.mobilis.dialog.DialogMaker;
 import com.mobilis.interfaces.MobilisListActivity;
 import com.mobilis.util.Constants;
+import com.mobilis.util.MobilisStatus;
 import com.mobilis.util.ParseJSON;
 import com.mobilis.ws.Connection;
 
@@ -31,20 +28,21 @@ public class ClassListController extends MobilisListActivity {
 	private ParseJSON jsonParser;
 	private ProgressDialog dialog;
 	private Intent intent;
-
 	private DialogMaker dialogMaker;
 	private ClassDAO classDAO;
 	private Cursor cursor;
-	private ClassAdapter listAdapter;
 	private DiscussionDAO topicDAO;
 	private ClassHandler handler;
 	private Connection connection;
+	private MobilisStatus appState;
+	private SimpleCursorAdapter simpleAdapter;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.curriculum_units);
+		appState = MobilisStatus.getInstance();
 		handler = new ClassHandler();
 		connection = new Connection(handler);
 		jsonParser = new ParseJSON(this);
@@ -87,14 +85,16 @@ public class ClassListController extends MobilisListActivity {
 
 	}
 
+	@SuppressWarnings("deprecation")
 	public void updateList() {
 
 		classDAO.open();
-		cursor = classDAO.getClasses(getPreferences().getInt("SelectedCourse",
-				0));
+		cursor = classDAO.getClasses(appState.selectedCourse);
 		classDAO.close();
-		listAdapter = new ClassAdapter(this, cursor);
-		setListAdapter(listAdapter);
+		simpleAdapter = new SimpleCursorAdapter(this,
+				R.layout.curriculum_units_item, cursor,
+				new String[] { "code" }, new int[] { R.id.turmas_item });
+		setListAdapter(simpleAdapter);
 	}
 
 	@Override
@@ -102,10 +102,10 @@ public class ClassListController extends MobilisListActivity {
 
 		super.onListItemClick(l, v, position, id);
 
-		int classId = (Integer) l.getAdapter().getItem(position);
+		Cursor itemCursor = (Cursor) l.getAdapter().getItem(position);
+		int classId = itemCursor.getInt(itemCursor.getColumnIndex("_id"));
 
 		Log.i("SelectedClass", String.valueOf(classId));
-
 		SharedPreferences.Editor editor = getPreferences().edit();
 		editor.putInt("SelectedClass", classId);
 		commit(editor);
@@ -129,39 +129,6 @@ public class ClassListController extends MobilisListActivity {
 		}
 	}
 
-	private class ClassAdapter extends CursorAdapter {
-
-		LayoutInflater inflater;
-
-		@SuppressWarnings("deprecation")
-		public ClassAdapter(Context context, Cursor c) {
-			super(context, c);
-			inflater = LayoutInflater.from(context);
-		}
-
-		@Override
-		public void bindView(View convertView, Context context, Cursor cursor) {
-			if (cursor != null) {
-
-				TextView courseName = (TextView) convertView
-						.findViewById(R.id.turmas_item);
-				courseName.setText(cursor.getString(cursor
-						.getColumnIndex("code")));
-			}
-		}
-
-		@Override
-		public View newView(Context context, Cursor cursor, ViewGroup parent) {
-			return inflater.inflate(R.layout.curriculum_units_item, parent,
-					false);
-		}
-
-		@Override
-		public Object getItem(int position) {
-			return getCursor().getInt(getCursor().getColumnIndex("_id"));
-		}
-	}
-
 	private class ClassHandler extends Handler {
 		@Override
 		public void handleMessage(Message msg) {
@@ -178,10 +145,9 @@ public class ClassListController extends MobilisListActivity {
 				classDAO.open();
 				// classDAO.addClasses(values,
 				// getPreferences().getInt("SelectedClass", 0));
-				classDAO.addClasses(values,
-						getPreferences().getInt("SelectedCourse", 0));
+				classDAO.addClasses(values, appState.selectedCourse);
 				classDAO.close();
-				listAdapter.notifyDataSetChanged();
+				simpleAdapter.notifyDataSetChanged();
 				closeDialog(dialog);
 
 			}

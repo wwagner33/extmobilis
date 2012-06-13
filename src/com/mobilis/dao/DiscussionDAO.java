@@ -45,8 +45,8 @@ public class DiscussionDAO extends DBAdapter {
 
 	public Cursor getDiscussionsFromClass(int classId) { // Pegar apenas o
 															// necessário
-		Cursor cursor = getDatabase().query("discussions", null, null, null,
-				null, null, null);
+		Cursor cursor = getDatabase().query("discussions", null,
+				"class_id=" + classId, null, null, null, null);
 		cursor.moveToFirst();
 		return cursor;
 	}
@@ -94,24 +94,6 @@ public class DiscussionDAO extends DBAdapter {
 
 	// TTS
 
-	public void addDiscussion(ContentValues[] values, int classId) {
-		clearDiscussion(classId);
-		for (int i = 0; i < values.length; i++) {
-			values[i].put("class_id", classId);
-			getDatabase().insert("discussions", null, values[i]);
-		}
-	}
-
-	public boolean existsDiscussison(int classId) {
-		Cursor cursor = getDatabase().rawQuery(
-				"SELECT count(_id) from discussions WHERE class_id=" + classId,
-				null);
-		cursor.moveToFirst();
-		int count = cursor.getInt(0);
-		cursor.close();
-		return (count > 0) ? true : false;
-	}
-
 	public Discussion[] getClassDiscussions(int classId) {
 		Cursor cursor = getDatabase().rawQuery(
 				"SELECT * FROM discussions WHERE class_id = " + classId, null);
@@ -119,15 +101,11 @@ public class DiscussionDAO extends DBAdapter {
 
 		while (cursor.moveToNext()) {
 			int i = cursor.getPosition();
-			discussions[i] = cursoToDiscussion(cursor);
+			discussions[i] = cursorToDiscussion(cursor);
 		}
 
 		cursor.close();
 		return discussions;
-	}
-
-	public void clearDiscussion(int classId) {
-		getDatabase().delete("discussions", "class_id=" + classId, null);
 	}
 
 	public void setNextPosts(int discussionId, int value) {
@@ -163,14 +141,14 @@ public class DiscussionDAO extends DBAdapter {
 		Discussion discussion = new Discussion();
 		if (cursor.getCount() > 0) {
 			cursor.moveToFirst();
-			discussion = cursoToDiscussion(cursor);
+			discussion = cursorToDiscussion(cursor);
 		}
 
 		cursor.close();
 		return discussion;
 	}
 
-	private Discussion cursoToDiscussion(Cursor cursor) {
+	private Discussion cursorToDiscussion(Cursor cursor) {
 		final Discussion discussion = new Discussion();
 		discussion.setId(cursor.getInt(cursor.getColumnIndex("_id")));
 		discussion.setName(cursor.getString(cursor.getColumnIndex("name")));
@@ -184,22 +162,6 @@ public class DiscussionDAO extends DBAdapter {
 				.getColumnIndex("next_posts")));
 		discussion.setPreviousPosts(cursor.getInt(cursor
 				.getColumnIndex("previous_posts")));
-		return discussion;
-	}
-
-	public Discussion getDiscussion(String discussionName) {
-		Cursor cursor = getDatabase()
-				.rawQuery(
-						"SELECT * FROM discussions WHERE name='"
-								+ discussionName + "'", null);
-
-		Discussion discussion = new Discussion();
-		if (cursor.getCount() > 0) {
-			cursor.moveToFirst();
-			discussion = cursoToDiscussion(cursor);
-		}
-
-		cursor.close();
 		return discussion;
 	}
 }

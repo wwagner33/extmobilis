@@ -30,7 +30,6 @@ import com.mobilis.model.DiscussionPost;
 import com.mobilis.util.Constants;
 import com.mobilis.util.MobilisStatus;
 import com.mobilis.util.ParseJSON;
-import com.mobilis.util.ZipManager;
 import com.mobilis.ws.Connection;
 
 public class DiscussionListController extends MobilisListActivity {
@@ -39,7 +38,6 @@ public class DiscussionListController extends MobilisListActivity {
 	private ParseJSON jsonParser;
 	private String forumName;
 	private ProgressDialog progressDialog;
-	private ZipManager zipManager;
 	private DialogMaker dialogMaker;
 	private DiscussionDAO discussionDAO;
 	private PostDAO postDAO;
@@ -59,7 +57,6 @@ public class DiscussionListController extends MobilisListActivity {
 		jsonParser = new ParseJSON(this);
 		postDAO = new PostDAO(this);
 		discussionDAO = new DiscussionDAO(this);
-		zipManager = new ZipManager();
 		dialogMaker = new DialogMaker(this);
 		restoreDialog();
 		updateList();
@@ -125,11 +122,6 @@ public class DiscussionListController extends MobilisListActivity {
 
 		postDAO.open();
 		discussionDAO.open();
-
-		Log.w("TopicId", "" + topicId);
-
-		// if (postDAO.postExistsOnTopic(topicId)
-		// && !discussionDAO.hasNewPostsFlag(topicId)) {
 
 		if (postDAO.postExistsOnTopic(topicId)) {
 			postDAO.close();

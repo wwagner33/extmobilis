@@ -2,26 +2,22 @@ package com.mobilis.controller;
 
 import android.app.ProgressDialog;
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.CursorAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
+import android.widget.SimpleCursorAdapter;
 
 import com.mobilis.dao.ClassDAO;
 import com.mobilis.dao.CourseDAO;
 import com.mobilis.dialog.DialogMaker;
 import com.mobilis.interfaces.MobilisListActivity;
 import com.mobilis.util.Constants;
+import com.mobilis.util.MobilisStatus;
 import com.mobilis.util.ParseJSON;
 import com.mobilis.ws.Connection;
 
@@ -29,8 +25,6 @@ public class CourseListController extends MobilisListActivity {
 
 	private Intent intent;
 	private ParseJSON jsonParser;
-	private LayoutInflater inflater;
-	private CourseListAdapter listAdapter;
 	private CourseDAO courseDAO;
 	private Cursor cursor;
 	private ClassDAO classDAO;
@@ -38,12 +32,15 @@ public class CourseListController extends MobilisListActivity {
 	private CourseHandler handler;
 	private ProgressDialog progressDialog;
 	private DialogMaker dialogMaker;
+	private MobilisStatus appState;
+	private SimpleCursorAdapter simpleAdapter;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.course);
+		appState = MobilisStatus.getInstance();
 		dialogMaker = new DialogMaker(this);
 		progressDialog = dialogMaker
 				.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
@@ -84,13 +81,15 @@ public class CourseListController extends MobilisListActivity {
 		startActivity(intent);
 	}
 
+	@SuppressWarnings("deprecation")
 	public void updateList() {
 
 		courseDAO.open();
 		cursor = courseDAO.getAllCourses();
 		courseDAO.close();
-		listAdapter = new CourseListAdapter(this, cursor);
-		setListAdapter(listAdapter);
+		simpleAdapter = new SimpleCursorAdapter(this, R.layout.course_item,
+				cursor, new String[] { "name" }, new int[] { R.id.item });
+		setListAdapter(simpleAdapter);
 	}
 
 	@Override
@@ -98,19 +97,13 @@ public class CourseListController extends MobilisListActivity {
 			long id) {
 
 		super.onListItemClick(listView, view, position, id);
-
-		Object courseItem = listView.getAdapter().getItem(position);
-		int courseId = (Integer) courseItem;
-
-		SharedPreferences.Editor editor = getPreferences().edit();
-		editor.putInt("SelectedCourse", courseId);
-		commit(editor);
-
-		Log.w("COURSE_ID", "" + courseId);
-
+		Cursor itemCursor;
+		itemCursor = (Cursor) listView.getAdapter().getItem(position);
+		int courseId = itemCursor.getInt(itemCursor.getColumnIndex("_id"));
+		appState.selectedCourse = courseId;
 		classDAO.open();
 
-		if (classDAO.existClasses(getPreferences().getInt("SelectedCourse", 0))) {
+		if (classDAO.existClasses(appState.selectedCourse)) {
 			classDAO.close();
 			intent = new Intent(this, ClassListController.class);
 			closeDialog(progressDialog);
@@ -146,38 +139,6 @@ public class CourseListController extends MobilisListActivity {
 		obtainCourses(Constants.URL_COURSES);
 	}
 
-	private class CourseListAdapter extends CursorAdapter {
-
-		@SuppressWarnings("deprecation")
-		public CourseListAdapter(Context context, Cursor c) {
-			super(context, c);
-			inflater = LayoutInflater.from(context);
-		}
-
-		@Override
-		public void bindView(View convertView, Context context, Cursor cursor) {
-
-			if (cursor != null) {
-
-				TextView courseName = (TextView) convertView
-						.findViewById(R.id.item);
-				courseName.setText(cursor.getString(cursor
-						.getColumnIndex("name")));
-			}
-		}
-
-		@Override
-		public View newView(Context context, Cursor cursor, ViewGroup parent) {
-
-			return inflater.inflate(R.layout.course_item, parent, false);
-		}
-
-		@Override
-		public Object getItem(int position) {
-			return getCursor().getInt(getCursor().getColumnIndex("_id"));
-		}
-	}
-
 	private class CourseHandler extends Handler {
 		@Override
 		public void handleMessage(Message msg) {
@@ -206,8 +167,7 @@ public class CourseListController extends MobilisListActivity {
 
 				classDAO.open();
 
-				classDAO.addClasses(values,
-						getPreferences().getInt("SelectedCourse", 0));
+				classDAO.addClasses(values, appState.selectedCourse);
 				classDAO.close();
 
 				intent = new Intent(getApplicationContext(),

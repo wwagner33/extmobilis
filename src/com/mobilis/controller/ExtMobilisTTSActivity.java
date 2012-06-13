@@ -592,8 +592,6 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 						discussionDAO.close();
 					}
 
-					Log.i("MARK 3", "MARK 3");
-
 					footerClicked = false;
 					if (loadedposts.size() == 0) {
 						Toast.makeText(
