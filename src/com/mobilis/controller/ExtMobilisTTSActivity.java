@@ -66,11 +66,13 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 	private DialogMaker dialogMaker;
 	private ProgressDialog dialog;
 	private int previous;
+	private MobilisStatus appState;
 
 	@SuppressWarnings("deprecation")
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.posts_new);
+		appState = MobilisStatus.getInstance();
 		postHandler = new PostHandler();
 		wsSolar = new Connection(postHandler);
 		MobilisStatus status = MobilisStatus.getInstance();
@@ -89,8 +91,7 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 		discussionPosts = new ArrayList<DiscussionPost>();
 
 		discussionDAO.open();
-		discussion = discussionDAO.getDiscussion(getPreferences().getInt(
-				"SelectedTopic", 0));
+		discussion = discussionDAO.getDiscussion(appState.selectedDiscussion);
 		discussionDAO.close();
 
 		forumName = (TextView) findViewById(R.id.discussion_name);
@@ -129,7 +130,9 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 			loadPostsFromDatabase();
 	}
 
+	@SuppressWarnings("unchecked")
 	public void loadPostsFromRetainedState() {
+		@SuppressWarnings("deprecation")
 		Object[] retainedState = (Object[]) getLastNonConfigurationInstance();
 
 		if (retainedState[0] != null) {
@@ -296,7 +299,6 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 			break;
 
 		case R.id.details:
-
 			intent = new Intent(this, PostDetailController.class);
 			startActivity(intent);
 			break;
@@ -470,10 +472,8 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 		}
 		positionExpanded = groupPosition;
 		Log.w("Posição expandida: ", "" + positionExpanded);
-		SharedPreferences.Editor editor = getPreferences().edit();
-		editor.putLong("SelectedPost", discussionPosts.get(groupPosition)
-				.getId());
-		commit(editor);
+		appState.selectedPost = (int) discussionPosts.get(groupPosition)
+				.getId();
 		Log.i("POST ID", "" + discussionPosts.get(groupPosition).getId());
 	}
 
@@ -484,8 +484,7 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 	public void downloadImages() {
 		postDAO.open();
 		wsSolar.getImages(
-				postDAO.getIdsOfPostsWithoutImage(getPreferences().getInt(
-						"SelectedTopic", 0)),
+				postDAO.getIdsOfPostsWithoutImage(appState.selectedDiscussion),
 				getPreferences().getString("token", null));
 		postDAO.close();
 	}
@@ -538,7 +537,7 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 						discussionPosts, ExtMobilisTTSActivity.this);
 				postDAO.open();
 				postDAO.insertPostsToDB(loadedposts,
-						getPreferences().getInt("SelectedTopic", 0));
+						appState.selectedDiscussion);
 				postDAO.close();
 				discussionDAO.open();
 				discussion.setNextPosts(beforeAfter[afterIndex]);
@@ -582,12 +581,12 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 
 					if (beforeAfter[afterIndex] == 0) {
 						discussionDAO.open();
-						if (discussionDAO.hasNewPostsFlag(getPreferences()
-								.getInt("SelectedTopic", 0))) {
+						if (discussionDAO
+								.hasNewPostsFlag(appState.selectedDiscussion)) {
 							ContentValues newFlag = new ContentValues();
 							newFlag.put("has_new_posts", 0);
-							discussionDAO.updateFlag(newFlag, getPreferences()
-									.getInt("SelectedTopic", 0));
+							discussionDAO.updateFlag(newFlag,
+									appState.selectedDiscussion);
 						}
 						discussionDAO.close();
 					}
@@ -644,8 +643,8 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 					setFooter();
 
 					postDAO.open();
-					postDAO.insertPostsToDB(loadedposts, getPreferences()
-							.getInt("SelectedTopic", 0));
+					postDAO.insertPostsToDB(loadedposts,
+							appState.selectedDiscussion);
 					postDAO.close();
 				}
 			}

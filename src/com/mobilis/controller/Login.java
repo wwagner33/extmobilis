@@ -160,6 +160,7 @@ public class Login extends MobilisActivity implements OnClickListener,
 				SharedPreferences.Editor editor = getPreferences().edit();
 				editor.putString("token", tokenParsed[0].getAsString("token"));
 				commit(editor);
+
 				String token = getPreferences().getString("token", null);
 				getCourseList(token);
 

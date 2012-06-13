@@ -2,7 +2,6 @@ package com.mobilis.controller;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 
 import org.json.simple.JSONObject;
 
@@ -44,7 +43,6 @@ import com.mobilis.model.Discussion;
 import com.mobilis.util.Constants;
 import com.mobilis.util.MobilisStatus;
 import com.mobilis.util.ParseJSON;
-import com.mobilis.util.ZipManager;
 import com.mobilis.ws.Connection;
 
 public class ResponseController extends MobilisActivity implements
@@ -74,12 +72,14 @@ public class ResponseController extends MobilisActivity implements
 	private ResponseHandler handler;
 	private Connection connection;
 	private PostDAO postDAO;
+	private MobilisStatus appState;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.response);
+		appState = MobilisStatus.getInstance();
 		postDAO = new PostDAO(this);
 		setVolumeControlStream(AudioManager.STREAM_MUSIC);
 		handler = new ResponseHandler();
@@ -102,6 +102,7 @@ public class ResponseController extends MobilisActivity implements
 		charCount = (TextView) findViewById(R.id.char_number);
 		charCount.setText("0/" + Constants.TEXT_MAX_CHARACTER_LENGHT);
 		jsonParser = new ParseJSON(this);
+
 		restoreDialog();
 
 	}
@@ -201,10 +202,11 @@ public class ResponseController extends MobilisActivity implements
 			}
 
 			else {
-				if (getPreferences().getLong("SelectedPost", 0) > 0) {
-					postObject = jsonParser.buildTextResponseWithParentObject(
-							message.getText().toString(), getPreferences()
-									.getLong("SelectedPost", 0));
+				if (appState.selectedPost > -1) {
+					postObject = jsonParser
+							.buildTextResponseWithParentObject(message
+									.getText().toString(),
+									appState.selectedPost);
 
 				} else {
 					postObject = jsonParser
@@ -294,8 +296,7 @@ public class ResponseController extends MobilisActivity implements
 		progressDialog.show();
 		String token = getPreferences().getString("token", null);
 
-		String url = "discussions/"
-				+ getPreferences().getInt("SelectedTopic", 0)
+		String url = "discussions/" + appState.selectedDiscussion
 				+ "/posts?auth_token=" + token;
 
 		connection.postToServer(Constants.CONNECTION_POST_TEXT_RESPONSE,
@@ -450,11 +451,9 @@ public class ResponseController extends MobilisActivity implements
 							getApplicationContext());
 					discussionDAO.open();
 					Discussion currentDiscussion = discussionDAO
-							.getDiscussion(getPreferences().getInt(
-									"SelectedTopic", 0));
+							.getDiscussion(appState.selectedDiscussion);
 
-					discussionDAO.setNextPosts(
-							getPreferences().getInt("SelectedTopic", 0),
+					discussionDAO.setNextPosts(appState.selectedDiscussion,
 							(currentDiscussion.getNextPosts() + 1));
 					discussionDAO.close();
 					Intent intent = new Intent(getApplicationContext(),
@@ -471,11 +470,9 @@ public class ResponseController extends MobilisActivity implements
 						getApplicationContext());
 				discussionDAO.open();
 				Discussion currentDiscussion = discussionDAO
-						.getDiscussion(getPreferences().getInt("SelectedTopic",
-								0));
+						.getDiscussion(appState.selectedDiscussion);
 
-				discussionDAO.setNextPosts(
-						getPreferences().getInt("SelectedTopic", 0),
+				discussionDAO.setNextPosts(appState.selectedDiscussion,
 						(currentDiscussion.getNextPosts() + 1));
 				discussionDAO.close();
 				Intent intent = new Intent(getApplicationContext(),
@@ -484,8 +481,8 @@ public class ResponseController extends MobilisActivity implements
 
 				MobilisStatus status = MobilisStatus.getInstance();
 				postDAO.open();
-				status.ids = postDAO.getIdsOfPostsWithoutImage(getPreferences()
-						.getInt("SelectedTopic", 0));
+				status.ids = postDAO
+						.getIdsOfPostsWithoutImage(appState.selectedDiscussion);
 				postDAO.close();
 				startActivity(intent);
 
@@ -499,8 +496,8 @@ public class ResponseController extends MobilisActivity implements
 				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				MobilisStatus status = MobilisStatus.getInstance();
 				postDAO.open();
-				status.ids = postDAO.getIdsOfPostsWithoutImage(getPreferences()
-						.getInt("SelectedTopic", 0));
+				status.ids = postDAO
+						.getIdsOfPostsWithoutImage(appState.selectedDiscussion);
 				postDAO.close();
 				startActivity(intent);
 			}

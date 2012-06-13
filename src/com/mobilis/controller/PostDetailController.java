@@ -7,7 +7,6 @@ import android.text.method.ScrollingMovementMethod;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.mobilis.dao.DiscussionDAO;
@@ -15,6 +14,7 @@ import com.mobilis.dao.PostDAO;
 import com.mobilis.interfaces.MobilisActivity;
 import com.mobilis.model.Discussion;
 import com.mobilis.model.DiscussionPost;
+import com.mobilis.util.MobilisStatus;
 
 public class PostDetailController extends MobilisActivity implements
 		OnClickListener {
@@ -26,12 +26,14 @@ public class PostDetailController extends MobilisActivity implements
 	private DiscussionPost post;
 	private DiscussionDAO discussionDAO;
 	private PostDAO postDAO;
+	private MobilisStatus appState;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.post_detail);
+		appState = MobilisStatus.getInstance();
 		discussionDAO = new DiscussionDAO(this);
 		postDAO = new PostDAO(this);
 		body = (TextView) findViewById(R.id.post_body_detail);
@@ -40,7 +42,7 @@ public class PostDetailController extends MobilisActivity implements
 		userName = (TextView) findViewById(R.id.user_name_detail);
 		response = (ImageView) findViewById(R.id.answer_topic);
 		response.setOnClickListener(this);
-		if (getPreferences().getBoolean("isForumClosed", false) == true) {
+		if (appState.forumClosed == true) {
 			response.setVisibility(View.GONE);
 		}
 		avatar = (ImageView) findViewById(R.id.avatar);
@@ -51,12 +53,10 @@ public class PostDetailController extends MobilisActivity implements
 			}
 		}
 		discussionDAO.open();
-		discussion = discussionDAO.getDiscussion(getPreferences().getInt(
-				"SelectedTopic", 0));
+		discussion = discussionDAO.getDiscussion(appState.selectedDiscussion);
 		discussionDAO.close();
 		postDAO.open();
-		post = postDAO.getPost((int) getPreferences()
-				.getLong("SelectedPost", 0));
+		post = postDAO.getPost(appState.selectedPost);
 		postDAO.close();
 
 		body.setText(post.getContent());

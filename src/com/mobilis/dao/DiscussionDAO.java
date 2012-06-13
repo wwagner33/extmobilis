@@ -84,14 +84,6 @@ public class DiscussionDAO extends DBAdapter {
 				null);
 	}
 
-	public void updateBeforeAndAfter(int discussionId, int[] beforeAfter) {
-		ContentValues newValues = new ContentValues();
-		newValues.put("previous_posts", beforeAfter[0]);
-		newValues.put("next_posts", beforeAfter[1]);
-		getDatabase().update("discussions", newValues, "_id=" + discussionId,
-				null);
-	}
-
 	// TTS
 
 	public Discussion[] getClassDiscussions(int classId) {

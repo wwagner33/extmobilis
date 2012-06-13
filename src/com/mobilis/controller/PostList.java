@@ -34,10 +34,12 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.mobilis.dao.DiscussionDAO;
 import com.mobilis.dao.PostDAO;
 import com.mobilis.dialog.DialogMaker;
 import com.mobilis.exception.ImageFileNotFoundException;
 import com.mobilis.interfaces.MobilisListActivity;
+import com.mobilis.model.Discussion;
 import com.mobilis.util.Constants;
 import com.mobilis.util.DateUtils;
 import com.mobilis.util.MobilisStatus;
@@ -71,13 +73,14 @@ public class PostList extends MobilisListActivity implements OnClickListener,
 	private PostHandler handler;
 	private Connection connection;
 
-	// private boolean newPosts = false;
-
 	private View connectionFooterView;
 	private View warningFooterView;
 
 	private Button footerButton;
 	private DialogMaker dialogMaker;
+	private MobilisStatus appState;
+	private DiscussionDAO discussionDAO;
+	private Discussion discussion;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +88,12 @@ public class PostList extends MobilisListActivity implements OnClickListener,
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.post);
 
+		discussionDAO = new DiscussionDAO(this);
+		discussionDAO.open();
+		discussion = discussionDAO.getDiscussion(appState.selectedDiscussion);
+		discussionDAO.close();
+
+		appState = MobilisStatus.getInstance();
 		dialogMaker = new DialogMaker(this);
 
 		warningFooterView = ((LayoutInflater) this
@@ -109,7 +118,7 @@ public class PostList extends MobilisListActivity implements OnClickListener,
 		answerForum.setOnClickListener(this);
 		answerForum.setClickable(true);
 
-		if (getPreferences().getBoolean("isForumClosed", false) == true) {
+		if (appState.forumClosed == true) {
 			answerForum.setVisibility(View.GONE);
 		}
 
@@ -133,13 +142,12 @@ public class PostList extends MobilisListActivity implements OnClickListener,
 
 		textName = (TextView) findViewById(R.id.nome_forum);
 
-		textName.setText(getPreferences().getString("CurrentForumName", null));
+		textName.setText(discussion.getName());
 
 		getListView().setOnScrollListener(this);
 
 		postDAO.open();
-		cursor = postDAO.getPostsFromTopic(getPreferences().getInt(
-				"SelectedTopic", 0));
+		cursor = postDAO.getPostsFromTopic(appState.selectedDiscussion);
 		postDAO.close();
 
 		restoreActivitySettings(savedInstanceState);
@@ -274,9 +282,6 @@ public class PostList extends MobilisListActivity implements OnClickListener,
 				position);
 		Intent intent = new Intent(this, PostDetailController.class);
 		intent.putExtra("username", listValue.getAsString("user_nick"));
-
-		intent.putExtra("content", listValue.getAsString("content"));
-		intent.putExtra("topicId", getPreferences().getInt("SelectedTopic", 0));
 
 		SharedPreferences.Editor editor = getPreferences().edit();
 		editor.putLong("SelectedPost", listValue.getAsInteger("_id"));

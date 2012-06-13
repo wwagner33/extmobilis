@@ -6,22 +6,21 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
 
+import android.content.Context;
+import android.os.Handler;
+import android.os.Message;
+import android.util.Log;
+
 import com.mobilis.controller.ExtMobilisTTSActivity.PostManagerHandler;
 import com.mobilis.model.BlockQueue;
 import com.mobilis.model.DiscussionPost;
 import com.mobilis.util.Constants;
 import com.mobilis.ws.WebServiceBing;
 
-import android.content.Context;
-import android.os.Handler;
-import android.os.Message;
-import android.util.Log;
-
 public class TTSPostsManager implements Runnable {
 	private ArrayList<DiscussionPost> posts;
 	private BlockQueue blocks;
 	private int currentPostIndex;
-	private int playlistIndex;
 	private PostPlayer postPlayer;
 	private Thread threadPlayer;
 	private WebServiceBing webServiceBing;

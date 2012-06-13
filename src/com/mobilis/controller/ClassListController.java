@@ -105,10 +105,7 @@ public class ClassListController extends MobilisListActivity {
 		Cursor itemCursor = (Cursor) l.getAdapter().getItem(position);
 		int classId = itemCursor.getInt(itemCursor.getColumnIndex("_id"));
 
-		Log.i("SelectedClass", String.valueOf(classId));
-		SharedPreferences.Editor editor = getPreferences().edit();
-		editor.putInt("SelectedClass", classId);
-		commit(editor);
+		appState.selectedClass = classId;
 
 		topicDAO.open();
 
@@ -143,8 +140,6 @@ public class ClassListController extends MobilisListActivity {
 				ContentValues[] values = jsonParser.parseJSON(msg.getData()
 						.getString("content"), Constants.PARSE_CLASSES_ID);
 				classDAO.open();
-				// classDAO.addClasses(values,
-				// getPreferences().getInt("SelectedClass", 0));
 				classDAO.addClasses(values, appState.selectedCourse);
 				classDAO.close();
 				simpleAdapter.notifyDataSetChanged();
@@ -180,8 +175,7 @@ public class ClassListController extends MobilisListActivity {
 						}
 					}
 
-					topicDAO.addDiscussions(values,
-							getPreferences().getInt("SelectedClass", 0));
+					topicDAO.addDiscussions(values, appState.selectedClass);
 					topicDAO.close();
 
 					intent = new Intent(getApplicationContext(),
@@ -196,7 +190,7 @@ public class ClassListController extends MobilisListActivity {
 
 	@Override
 	public void menuRefreshItemSelected() {
-		int selectedCourse = getPreferences().getInt("SelectedCourse", 0);
+		int selectedCourse = appState.selectedCourse;
 		dialog = dialogMaker
 				.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
 		dialog.show();

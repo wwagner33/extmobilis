@@ -45,13 +45,14 @@ public class DiscussionListController extends MobilisListActivity {
 	private DiscussionsAdapter listAdapter;
 	private DiscussionHandler handler;
 	private Connection connection;
+	private MobilisStatus appState;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.discussion);
-
+		appState = MobilisStatus.getInstance();
 		handler = new DiscussionHandler();
 		connection = new Connection(handler);
 		jsonParser = new ParseJSON(this);
@@ -64,9 +65,7 @@ public class DiscussionListController extends MobilisListActivity {
 
 	@SuppressWarnings("deprecation")
 	public void restoreDialog() {
-		Log.i("OnRestore", "TRUE");
 		if (getLastNonConfigurationInstance() != null) {
-			Log.i("OnRestore2", "TRUE");
 			progressDialog = (ProgressDialog) getLastNonConfigurationInstance();
 			progressDialog.show();
 		}
@@ -88,8 +87,7 @@ public class DiscussionListController extends MobilisListActivity {
 	public void updateList() {
 
 		discussionDAO.open();
-		cursor = discussionDAO.getDiscussionsFromClass(getPreferences().getInt(
-				"SelectedClass", 0));
+		cursor = discussionDAO.getDiscussionsFromClass(appState.selectedClass);
 		discussionDAO.close();
 		listAdapter = new DiscussionsAdapter(this, cursor);
 		setListAdapter(listAdapter);
@@ -103,27 +101,23 @@ public class DiscussionListController extends MobilisListActivity {
 		Object content = l.getAdapter().getItem(position);
 		ContentValues item = (ContentValues) content;
 
-		int topicId = item.getAsInteger("_id");
+		int discussionId = item.getAsInteger("_id");
 		forumName = item.getAsString("name");
-
-		SharedPreferences.Editor editor = getPreferences().edit();
 
 		if (item.getAsString("status").equals("0")
 				|| item.getAsString("status").equals("2")) {
-			editor.putBoolean("isForumClosed", true);
+			appState.forumClosed = true;
 
 		} else {
-			editor.putBoolean("isForumClosed", false);
+			appState.forumClosed = false;
 		}
 
-		editor.putInt("SelectedTopic", topicId);
-		editor.putString("CurrentForumName", forumName);
-		commit(editor);
+		appState.selectedDiscussion = discussionId;
 
 		postDAO.open();
 		discussionDAO.open();
 
-		if (postDAO.postExistsOnTopic(topicId)) {
+		if (postDAO.postExistsOnTopic(discussionId)) {
 			postDAO.close();
 			discussionDAO.close();
 			intent = new Intent(this, ExtMobilisTTSActivity.class);
@@ -137,7 +131,7 @@ public class DiscussionListController extends MobilisListActivity {
 			progressDialog = dialogMaker
 					.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
 			progressDialog.show();
-			obtainNewPosts(Constants.generateNewPostsTTSURL(topicId,
+			obtainNewPosts(Constants.generateNewPostsTTSURL(discussionId,
 					Constants.oldDateString));
 		}
 	}
@@ -271,8 +265,7 @@ public class DiscussionListController extends MobilisListActivity {
 					}
 				}
 
-				discussionDAO.addDiscussions(values,
-						getPreferences().getInt("SelectedClass", 0));
+				discussionDAO.addDiscussions(values, appState.selectedClass);
 				discussionDAO.close();
 				updateList();
 				closeDialog(progressDialog);
@@ -293,9 +286,10 @@ public class DiscussionListController extends MobilisListActivity {
 				Log.i("PostsAfter", "" + beforeAfter[afterIndex]);
 
 				discussionDAO.open();
-				discussionDAO.updateBeforeAndAfter(
-						getPreferences().getInt("SelectedTopic", 0),
-						beforeAfter);
+				discussionDAO.setNextPosts(appState.selectedDiscussion,
+						beforeAfter[afterIndex]);
+				discussionDAO.setPreviousPosts(appState.selectedDiscussion,
+						beforeAfter[beforeIndex]);
 				discussionDAO.close();
 
 				ArrayList<DiscussionPost> loadedPosts = jsonParser
@@ -303,18 +297,16 @@ public class DiscussionListController extends MobilisListActivity {
 
 				postDAO.open();
 				postDAO.insertPostsToDB(loadedPosts,
-						getPreferences().getInt("SelectedTopic", 0));
+						appState.selectedDiscussion);
 				postDAO.close();
-
-				Log.w("LOADED POSTS", "" + loadedPosts.size());
 
 				intent = new Intent(getApplicationContext(),
 						ExtMobilisTTSActivity.class);
 
 				ArrayList<Integer> ids = null;
 				postDAO.open();
-				ids = postDAO.getIdsOfPostsWithoutImage(getPreferences()
-						.getInt("SelectedTopic", 0));
+				ids = postDAO
+						.getIdsOfPostsWithoutImage(appState.selectedDiscussion);
 				postDAO.close();
 
 				closeDialog(progressDialog);
@@ -333,7 +325,7 @@ public class DiscussionListController extends MobilisListActivity {
 
 	@Override
 	public void menuRefreshItemSelected() {
-		int currentClass = getPreferences().getInt("SelectedClass", 0);
+		int currentClass = appState.selectedClass;
 		progressDialog = dialogMaker
 				.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
 		progressDialog.show();
