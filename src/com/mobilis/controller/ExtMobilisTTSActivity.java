@@ -7,6 +7,7 @@ import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
@@ -26,6 +27,7 @@ import android.widget.Toast;
 import com.mobilis.dao.DiscussionDAO;
 import com.mobilis.dao.PostDAO;
 import com.mobilis.dialog.DialogMaker;
+import com.mobilis.exception.ImageFileNotFoundException;
 import com.mobilis.interfaces.MobilisExpandableListActivity;
 import com.mobilis.model.Discussion;
 import com.mobilis.model.DiscussionPost;
@@ -67,6 +69,7 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 	private ProgressDialog dialog;
 	private int previous;
 	private MobilisStatus appState;
+	private Intent intent;
 
 	@SuppressWarnings("deprecation")
 	public void onCreate(Bundle savedInstanceState) {
@@ -237,7 +240,7 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.reply_button:
-			Intent intent = new Intent(this, ResponseController.class);
+			intent = new Intent(this, ResponseController.class);
 			startActivity(intent);
 			break;
 
@@ -299,7 +302,20 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 			break;
 
 		case R.id.details:
+
+			Log.w("SELECTED POST", "" + appState.selectedPost);
+			postDAO.open();
+			DiscussionPost post = postDAO.getPost(appState.selectedPost);
+			postDAO.close();
 			intent = new Intent(this, PostDetailController.class);
+			try {
+				Bitmap userImage = discussionPostAdapter
+						.getUserImage((int) post.getUserId());
+				intent.putExtra("image", userImage);
+			} catch (ImageFileNotFoundException e) {
+				Log.i("Exception", "Exception");
+			}
+
 			startActivity(intent);
 			break;
 		default:

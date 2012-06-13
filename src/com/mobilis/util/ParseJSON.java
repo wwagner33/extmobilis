@@ -364,7 +364,7 @@ public class ParseJSON {
 		discussionPost.setParentId(parentId);
 
 		long userId = (Long) jsonObject.get("user_id");
-		discussionPost.setUserId(userId);
+		discussionPost.setUserId((int)userId);
 
 		String userNick = (String) jsonObject.get("user_nick");
 		discussionPost.setUserNick(userNick);

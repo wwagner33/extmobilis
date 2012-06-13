@@ -195,15 +195,18 @@ public class PostDAO extends DBAdapter {
 
 	public DiscussionPost getPost(int postId) {
 		Log.i("PostId", "" + postId);
-		Cursor cursor = getDatabase().query("posts",
-				new String[] { "content", "parent_id", "user_nick" },
-				"_id=" + postId, null, null, null, null);
+		Cursor cursor = getDatabase()
+				.query("posts",
+						new String[] { "content", "parent_id", "user_nick",
+								"user_id" }, "_id=" + postId, null, null, null,
+						null);
 		Log.i("Cursor Count = ", "" + cursor.getCount());
 		cursor.moveToFirst();
 		DiscussionPost post = new DiscussionPost();
 		post.setContent(cursor.getString(cursor.getColumnIndex("content")));
 		post.setParentId(cursor.getInt(cursor.getColumnIndex("parent_id")));
 		post.setUserNick(cursor.getString(cursor.getColumnIndex("user_nick")));
+		post.setUserId(cursor.getInt(cursor.getColumnIndex("user_id")));
 		cursor.close();
 		return post;
 	}
@@ -309,7 +312,7 @@ public class PostDAO extends DBAdapter {
 	private DiscussionPost cursorToPost(Cursor cursor) {
 		final DiscussionPost post = new DiscussionPost();
 		post.setId(cursor.getLong(cursor.getColumnIndex("_id")));
-		post.setUserId(cursor.getLong(cursor.getColumnIndex("user_id")));
+		post.setUserId(cursor.getInt(cursor.getColumnIndex("user_id")));
 		post.setDiscussionId(cursor.getLong(cursor
 				.getColumnIndex("discussion_id")));
 		post.setDate(cursor.getString(cursor.getColumnIndex("date")));

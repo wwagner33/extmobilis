@@ -269,6 +269,8 @@ public class DiscussionPostAdapter extends BaseExpandableListAdapter {
 
 	public Bitmap getUserImage(int userId) throws ImageFileNotFoundException {
 
+		Log.i("User id", "" + userId);
+
 		try {
 			final String prefix = String.valueOf(userId);
 
@@ -286,8 +288,10 @@ public class DiscussionPostAdapter extends BaseExpandableListAdapter {
 					.getAbsolutePath());
 			return userImage;
 		} catch (NullPointerException e) {
+			e.printStackTrace();
 			throw new ImageFileNotFoundException();
 		} catch (ArrayIndexOutOfBoundsException e) {
+			e.printStackTrace();
 			throw new ImageFileNotFoundException();
 		}
 	}

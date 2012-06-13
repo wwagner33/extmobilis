@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
@@ -48,7 +49,9 @@ public class PostDetailController extends MobilisActivity implements
 		avatar = (ImageView) findViewById(R.id.avatar);
 		extras = getIntent().getExtras();
 		if (extras != null) {
+			Log.i("EXTRA", "NOT NULL");
 			if (extras.get("image") != null) {
+				Log.i("IMAGE", "NOT NULL");
 				avatar.setImageBitmap((Bitmap) extras.get("image"));
 			}
 		}

@@ -11,7 +11,7 @@ import com.mobilis.util.DateUtils;
 public class DiscussionPost {
 	private long _id;
 	private long parentId;
-	private long userId;
+	private int userId;
 	private long discussionId;
 	private long profileId;
 	private boolean isMarked, isPlaying, isJustLoaded = false;
@@ -23,7 +23,7 @@ public class DiscussionPost {
 
 	}
 
-	public DiscussionPost(long _id, long parentId, long userId,
+	public DiscussionPost(long _id, long parentId, int userId,
 			long discussionId, long profileId, boolean isMarked,
 			String userNick, String content, Calendar date) {
 		this._id = _id;
@@ -57,7 +57,7 @@ public class DiscussionPost {
 		return userId;
 	}
 
-	public void setUserId(long userId) {
+	public void setUserId(int userId) {
 		this.userId = userId;
 	}
 
