@@ -5,8 +5,6 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
@@ -16,13 +14,16 @@ import android.widget.Toast;
 import com.mobilis.dao.ClassDAO;
 import com.mobilis.dao.DiscussionDAO;
 import com.mobilis.dialog.DialogMaker;
+import com.mobilis.interfaces.ConnectionCallback;
 import com.mobilis.interfaces.MobilisListActivity;
 import com.mobilis.util.Constants;
+import com.mobilis.util.ErrorHandler;
 import com.mobilis.util.MobilisStatus;
 import com.mobilis.util.ParseJSON;
 import com.mobilis.ws.Connection;
 
-public class ClassListController extends MobilisListActivity {
+public class ClassListController extends MobilisListActivity implements
+		ConnectionCallback {
 
 	private ParseJSON jsonParser;
 	private ProgressDialog dialog;
@@ -31,7 +32,6 @@ public class ClassListController extends MobilisListActivity {
 	private ClassDAO classDAO;
 	private Cursor cursor;
 	private DiscussionDAO topicDAO;
-	private ClassHandler handler;
 	private Connection connection;
 	private MobilisStatus appState;
 	private SimpleCursorAdapter simpleAdapter;
@@ -42,8 +42,7 @@ public class ClassListController extends MobilisListActivity {
 
 		setContentView(R.layout.curriculum_units);
 		appState = MobilisStatus.getInstance();
-		handler = new ClassHandler();
-		connection = new Connection(handler);
+		connection = new Connection(this);
 		jsonParser = new ParseJSON(this);
 		classDAO = new ClassDAO(this);
 		topicDAO = new DiscussionDAO(this);
@@ -125,68 +124,6 @@ public class ClassListController extends MobilisListActivity {
 		}
 	}
 
-	private class ClassHandler extends Handler {
-		@Override
-		public void handleMessage(Message msg) {
-			super.handleMessage(msg);
-
-			if (msg.what == Constants.MESSAGE_CONNECTION_FAILED) {
-				closeDialog(dialog);
-			}
-
-			if (msg.what == Constants.MESSAGE_CLASS_CONNECTION_OK) {
-
-				ContentValues[] values = jsonParser.parseJSON(msg.getData()
-						.getString("content"), Constants.PARSE_CLASSES_ID);
-				classDAO.open();
-				classDAO.addClasses(values, appState.selectedCourse);
-				classDAO.close();
-				simpleAdapter.notifyDataSetChanged();
-				closeDialog(dialog);
-
-			}
-
-			if (msg.what == Constants.MESSAGE_TOPIC_CONNECTION_OK) {
-
-				Log.w("result", msg.getData().getString("content"));
-
-				if (msg.getData().getString("content").length() <= 2) {
-
-					Toast.makeText(getApplicationContext(), "Fórum Vazio",
-							Toast.LENGTH_SHORT).show();
-					closeDialog(dialog);
-				}
-
-				else {
-
-					ContentValues[] values = jsonParser.parseJSON(msg.getData()
-							.getString("content"), Constants.PARSE_TOPICS_ID);
-
-					topicDAO.open();
-
-					for (int i = 0; i < values.length; i++) {
-						if (topicDAO.hasNewPosts(values[i].getAsInteger("_id"),
-								values[i].getAsString("last_post_date"))) {
-							Log.i("TAG", "Existem posts novos");
-							values[i].put("has_new_posts", true);
-						} else {
-							Log.v("TAG", "Não há posts novos");
-						}
-					}
-
-					topicDAO.addDiscussions(values, appState.selectedClass);
-					topicDAO.close();
-
-					intent = new Intent(getApplicationContext(),
-							DiscussionListController.class);
-					closeDialog(dialog);
-					startActivity(intent);
-
-				}
-			}
-		}
-	}
-
 	@Override
 	public void menuRefreshItemSelected() {
 		int selectedCourse = appState.selectedCourse;
@@ -196,5 +133,73 @@ public class ClassListController extends MobilisListActivity {
 		obtainClasses(Constants.URL_CURRICULUM_UNITS_PREFIX + selectedCourse
 				+ Constants.URL_GROUPS_SUFFIX);
 
+	}
+
+	@Override
+	public void resultFromConnection(int connectionId, String result,
+			int statusCode) {
+		if (statusCode != 200 && statusCode != 201) {
+			closeDialog(dialog);
+			ErrorHandler.handleStatusCode(this, statusCode);
+
+		} else {
+
+			switch (connectionId) {
+			case Constants.CONNECTION_GET_CLASSES:
+
+				ContentValues[] classValues = jsonParser.parseJSON(result,
+						Constants.PARSE_CLASSES_ID);
+				classDAO.open();
+				classDAO.addClasses(classValues, appState.selectedCourse);
+				classDAO.close();
+				simpleAdapter.notifyDataSetChanged();
+				closeDialog(dialog);
+				break;
+
+			case Constants.CONNECTION_GET_TOPICS:
+
+				Log.w("result", result);
+
+				if (result.length() <= 2) {
+
+					Toast.makeText(getApplicationContext(), "Fórum Vazio",
+							Toast.LENGTH_SHORT).show();
+					closeDialog(dialog);
+				}
+
+				else {
+
+					ContentValues[] discussionValues = jsonParser.parseJSON(
+							result, Constants.PARSE_TOPICS_ID);
+
+					topicDAO.open();
+
+					for (int i = 0; i < discussionValues.length; i++) {
+						if (topicDAO.hasNewPosts(discussionValues[i]
+								.getAsInteger("_id"), discussionValues[i]
+								.getAsString("last_post_date"))) {
+							Log.i("TAG", "Existem posts novos");
+							discussionValues[i].put("has_new_posts", true);
+						} else {
+							Log.v("TAG", "Não há posts novos");
+						}
+					}
+
+					topicDAO.addDiscussions(discussionValues,
+							appState.selectedClass);
+					topicDAO.close();
+
+					intent = new Intent(getApplicationContext(),
+							DiscussionListController.class);
+					closeDialog(dialog);
+					startActivity(intent);
+
+				}
+				break;
+
+			default:
+				break;
+			}
+		}
 	}
 }

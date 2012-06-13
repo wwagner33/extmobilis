@@ -30,10 +30,7 @@ import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
-import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 
 import com.mobilis.interfaces.ConnectionCallback;
@@ -41,16 +38,10 @@ import com.mobilis.util.Constants;
 
 public class Connection {
 
-	private Handler handler;
 	private ConnectionCallback callback;
 
-	public Connection(Handler handler) {
-		this.handler = handler;
-	}
-
-	public Connection(Handler handler, ConnectionCallback callback) {
+	public Connection(ConnectionCallback callback) {
 		this.callback = callback;
-		this.handler = handler;
 	}
 
 	public void getFromServer(int connectionId, String url, String token) {
@@ -113,74 +104,6 @@ public class Connection {
 		imageConnection.user_id = userId;
 		imageConnection.token = token;
 		return imageConnection;
-	}
-
-	private void sendPositiveMessage(String result, int connectionId) {
-		Message message = Message.obtain();
-		Bundle bundle = new Bundle();
-
-		if (connectionId == Constants.CONNECTION_POST_TOKEN) {
-			message.what = Constants.MESSAGE_TOKEN_CONNECTION_OK;
-		}
-
-		if (connectionId == Constants.CONNECTION_GET_COURSES) {
-			message.what = Constants.MESSAGE_COURSE_CONNECTION_OK;
-		}
-
-		if (connectionId == Constants.CONNECTION_GET_CLASSES) {
-			message.what = Constants.MESSAGE_CLASS_CONNECTION_OK;
-		}
-
-		if (connectionId == Constants.CONNECTION_GET_TOPICS) {
-			message.what = Constants.MESSAGE_TOPIC_CONNECTION_OK;
-		}
-
-		if (connectionId == Constants.CONNECTION_GET_NEW_POSTS) {
-			message.what = Constants.MESSAGE_NEW_POST_CONNECTION_OK;
-		}
-		if (connectionId == Constants.CONNECTION_GET_HISTORY_POSTS) {
-			message.what = Constants.MESSAGE_HISTORY_POST_CONNECTION_OK;
-		}
-
-		if (connectionId == Constants.CONNECTION_POST_AUDIO) {
-			message.what = Constants.MESSAGE_AUDIO_POST_OK;
-		}
-
-		if (connectionId == Constants.CONNECTION_POST_TEXT_RESPONSE) {
-			message.what = Constants.MESSAGE_TEXT_RESPONSE_OK;
-		}
-		if (connectionId == Constants.CONNECTION_GET_IMAGES) {
-			message.what = Constants.MESSAGE_IMAGE_CONNECTION_OK;
-		}
-
-		bundle.putString("content", result);
-		message.setData(bundle);
-		handler.sendMessage(message);
-	}
-
-	private void sendNegativeMessage(int connectionId, int statusCode) {
-
-		Message message = Message.obtain();
-		Bundle bundle = new Bundle();
-
-		if (connectionId == Constants.CONNECTION_GET_IMAGES) {
-			handler.sendEmptyMessage(Constants.MESSAGE_IMAGE_CONNECION_FAILED);
-		}
-
-		else if (connectionId == Constants.CONNECTION_GET_HISTORY_POSTS) {
-			handler.sendEmptyMessage(Constants.MESSAGE_HISTORY_POST_CONNECTION_FAILED);
-		}
-
-		else if (connectionId == Constants.CONNECTION_POST_AUDIO) {
-			handler.sendEmptyMessage(Constants.MESSAGE_AUDIO_POST_FAILED);
-		}
-
-		else {
-			message.what = Constants.MESSAGE_CONNECTION_FAILED;
-			bundle.putInt("statusCode", statusCode);
-			message.setData(bundle);
-			handler.sendMessage(message);
-		}
 	}
 
 	private Object[] executeGet(String URL, String authToken, HttpGet get)
@@ -441,33 +364,16 @@ public class Connection {
 		@Override
 		protected void onPostExecute(Object[] result) {
 
-			if (result != null) {
-
-				if (result[1] != null) {
-					if (statusCode != 699)
-						statusCode = (Integer) result[1];
-				}
-
-				if (result[0] != null)
-					sendPositiveMessage((String) result[0], connectionId);
-
-				else if (result[0] == null && statusCode != 0) {
-					sendNegativeMessage(connectionId, statusCode);
-				}
-
-				else {
-
-					if (connectionId != Constants.CONNECTION_GET_IMAGES) {
-						sendNegativeMessage(connectionId, statusCode);
-					}
-
+			if (result[1] != null) {
+				if (statusCode != 699) {
+					statusCode = (Integer) result[1];
 				}
 			}
 
-			else
-				sendNegativeMessage(connectionId, statusCode);
+			Log.w("STATUS CODE", "" + statusCode);
+			callback.resultFromConnection(connectionId, (String) result[0],
+					statusCode);
 			super.onPostExecute(result);
-
 		}
 	}
 
@@ -495,7 +401,6 @@ public class Connection {
 				e.printStackTrace();
 				return 1;
 			} catch (NullPointerException e) {
-				// error no abortConnection
 				toWatch.statusCode = 699;
 				return 1;
 			}

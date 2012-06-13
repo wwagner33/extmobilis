@@ -39,11 +39,9 @@ public class AudioDialog extends Dialog implements OnSeekBarChangeListener,
 	private Message message;
 	private Bundle bundle;
 
-	public AudioDialog(Context context, AudioPlayer player,
-			Handler activityHandler) {
+	public AudioDialog(Context context, AudioPlayer player) {
 		super(context);
 
-		this.activityHandler = activityHandler;
 		this.player = player;
 		audioHandler = new AudioHandler();
 		message = Message.obtain();

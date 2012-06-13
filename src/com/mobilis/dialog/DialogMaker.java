@@ -5,14 +5,14 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
-import android.os.Handler;
 
+import com.mobilis.interfaces.AudioDialogListener;
 import com.mobilis.util.Constants;
 
 public class DialogMaker implements OnClickListener {
 
 	private Context context;
-	private Handler handler;
+	private AudioDialogListener dialogListener;
 
 	public DialogMaker(Context context) {
 		this.context = context;
@@ -28,13 +28,13 @@ public class DialogMaker implements OnClickListener {
 			dialog.setCancelable(false);
 			return dialog;
 		}
-
 		return dialog;
 	}
 
-	public AlertDialog makeAlertDialog(int id, Handler handler) {
+	public AlertDialog makeAlertDialog(int id,
+			AudioDialogListener dialogListener) {
 
-		this.handler = handler;
+		this.dialogListener = dialogListener;
 		AlertDialog.Builder builder = new AlertDialog.Builder(context);
 		builder.setPositiveButton("OK", this);
 		builder.setNeutralButton("Cancel", this);
@@ -43,20 +43,17 @@ public class DialogMaker implements OnClickListener {
 		builder.setTitle("Descartar?");
 		AlertDialog dialog = builder.create();
 		return dialog;
-
 	}
 
 	@Override
 	public void onClick(DialogInterface dialog, int which) {
 
 		if (which == AlertDialog.BUTTON_POSITIVE) {
-			handler.sendEmptyMessage(Constants.DIALOG_ALERT_POSITIVE_BUTTON_CLICKED);
+			dialogListener.positiveButtonClicked();
 		}
 
 		if (which == AlertDialog.BUTTON_NEGATIVE) {
-			handler.sendEmptyMessage(Constants.DIALOG_ALERT_NEGATIVE_BUTTON_CLICKED);
+			dialogListener.negativeButtonClicked();
 		}
-
 	}
-
 }

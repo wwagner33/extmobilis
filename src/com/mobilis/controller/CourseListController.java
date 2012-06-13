@@ -5,8 +5,6 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
@@ -15,13 +13,16 @@ import android.widget.SimpleCursorAdapter;
 import com.mobilis.dao.ClassDAO;
 import com.mobilis.dao.CourseDAO;
 import com.mobilis.dialog.DialogMaker;
+import com.mobilis.interfaces.ConnectionCallback;
 import com.mobilis.interfaces.MobilisListActivity;
 import com.mobilis.util.Constants;
+import com.mobilis.util.ErrorHandler;
 import com.mobilis.util.MobilisStatus;
 import com.mobilis.util.ParseJSON;
 import com.mobilis.ws.Connection;
 
-public class CourseListController extends MobilisListActivity {
+public class CourseListController extends MobilisListActivity implements
+		ConnectionCallback {
 
 	private Intent intent;
 	private ParseJSON jsonParser;
@@ -29,7 +30,6 @@ public class CourseListController extends MobilisListActivity {
 	private Cursor cursor;
 	private ClassDAO classDAO;
 	private Connection connection;
-	private CourseHandler handler;
 	private ProgressDialog progressDialog;
 	private DialogMaker dialogMaker;
 	private MobilisStatus appState;
@@ -44,8 +44,7 @@ public class CourseListController extends MobilisListActivity {
 		dialogMaker = new DialogMaker(this);
 		progressDialog = dialogMaker
 				.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
-		handler = new CourseHandler();
-		connection = new Connection(handler);
+		connection = new Connection(this);
 		courseDAO = new CourseDAO(this);
 		classDAO = new ClassDAO(this);
 		jsonParser = new ParseJSON(this);
@@ -139,45 +138,45 @@ public class CourseListController extends MobilisListActivity {
 		obtainCourses(Constants.URL_COURSES);
 	}
 
-	private class CourseHandler extends Handler {
-		@Override
-		public void handleMessage(Message msg) {
-			// TODO Auto-generated method stub
-			super.handleMessage(msg);
+	@Override
+	public void resultFromConnection(int connectionId, String result,
+			int statusCode) {
+		if (statusCode != 201 && statusCode != 200) {
+			
+			closeDialog(progressDialog);
+			ErrorHandler.handleStatusCode(this, statusCode);
 
-			if (msg.what == Constants.MESSAGE_COURSE_CONNECTION_OK) {
+		} else {
+			switch (connectionId) {
 
+			case Constants.CONNECTION_GET_COURSES:
 				Log.i("Teste", "Teste");
-				ContentValues[] values = jsonParser.parseJSON(msg.getData()
-						.getString("content"), Constants.PARSE_COURSES_ID);
+				ContentValues[] courseValues = jsonParser.parseJSON(result,
+						Constants.PARSE_COURSES_ID);
 				courseDAO.open();
-				courseDAO.addCourses(values);
+				courseDAO.addCourses(courseValues);
 				courseDAO.close();
 				updateList();
 				closeDialog(progressDialog);
+				break;
 
-			}
-
-			if (msg.what == Constants.MESSAGE_CLASS_CONNECTION_OK) {
-
-				Log.i("RESULT", msg.getData().getString("content"));
-
-				ContentValues[] values = jsonParser.parseJSON(msg.getData()
-						.getString("content"), Constants.PARSE_CLASSES_ID);
+			case Constants.CONNECTION_GET_CLASSES:
+				ContentValues[] classValues = jsonParser.parseJSON(result,
+						Constants.PARSE_CLASSES_ID);
 
 				classDAO.open();
 
-				classDAO.addClasses(values, appState.selectedCourse);
+				classDAO.addClasses(classValues, appState.selectedCourse);
 				classDAO.close();
 
 				intent = new Intent(getApplicationContext(),
 						ClassListController.class);
 				closeDialog(progressDialog);
 				startActivity(intent);
-			}
+				break;
 
-			if (msg.what == Constants.MESSAGE_CONNECTION_FAILED) {
-				closeDialog(progressDialog);
+			default:
+				break;
 			}
 		}
 	}

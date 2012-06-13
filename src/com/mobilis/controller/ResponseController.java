@@ -15,8 +15,6 @@ import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaRecorder;
 import android.media.MediaRecorder.OnInfoListener;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -38,16 +36,19 @@ import com.mobilis.dao.DiscussionDAO;
 import com.mobilis.dao.PostDAO;
 import com.mobilis.dialog.AudioDialog;
 import com.mobilis.dialog.DialogMaker;
+import com.mobilis.interfaces.AudioDialogListener;
+import com.mobilis.interfaces.ConnectionCallback;
 import com.mobilis.interfaces.MobilisActivity;
 import com.mobilis.model.Discussion;
 import com.mobilis.util.Constants;
+import com.mobilis.util.ErrorHandler;
 import com.mobilis.util.MobilisStatus;
 import com.mobilis.util.ParseJSON;
 import com.mobilis.ws.Connection;
 
 public class ResponseController extends MobilisActivity implements
 		OnClickListener, OnChronometerTickListener, OnCompletionListener,
-		TextWatcher, OnInfoListener {
+		TextWatcher, OnInfoListener, ConnectionCallback, AudioDialogListener {
 
 	private EditText message;
 	private Button submit;
@@ -69,21 +70,23 @@ public class ResponseController extends MobilisActivity implements
 	private AlertDialog warningDialog;
 	private ProgressDialog progressDialog;
 	private AudioDialog audioDialog;
-	private ResponseHandler handler;
 	private Connection connection;
 	private PostDAO postDAO;
 	private MobilisStatus appState;
+	private DiscussionDAO discussionDAO;
+	private Discussion currentDiscussion;
+	private Intent intent;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.response);
+		discussionDAO = new DiscussionDAO(this);
 		appState = MobilisStatus.getInstance();
 		postDAO = new PostDAO(this);
 		setVolumeControlStream(AudioManager.STREAM_MUSIC);
-		handler = new ResponseHandler();
-		connection = new Connection(handler);
+		connection = new Connection(this);
 		dialogMaker = new DialogMaker(this);
 		progressDialog = dialogMaker
 				.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
@@ -153,7 +156,6 @@ public class ResponseController extends MobilisActivity implements
 				audioDialog = (AudioDialog) restoredObjects[2];
 				audioDialog.show();
 			}
-
 		}
 	}
 
@@ -175,7 +177,7 @@ public class ResponseController extends MobilisActivity implements
 	public void onBackPressed() {
 		if (message.length() > 0 || existsRecording) {
 			warningDialog = dialogMaker.makeAlertDialog(
-					Constants.DIALOG_ALERT_DISCARD, handler);
+					Constants.DIALOG_ALERT_DISCARD, this);
 			warningDialog.show();
 		} else {
 			super.onBackPressed();
@@ -188,7 +190,7 @@ public class ResponseController extends MobilisActivity implements
 		if (v.getId() == R.id.record_image) {
 
 			player = new AudioPlayer();
-			audioDialog = new AudioDialog(this, player, handler);
+			audioDialog = new AudioDialog(this, player);
 			audioDialog.show();
 		}
 
@@ -402,93 +404,13 @@ public class ResponseController extends MobilisActivity implements
 	public void onInfo(MediaRecorder mr, int what, int extra) {
 	}
 
-	private class ResponseHandler extends Handler {
+	@Override
+	public void resultFromConnection(int connectionId, String result,
+			int statusCode) {
 
-		@Override
-		public void handleMessage(Message msg) {
-			super.handleMessage(msg);
-
-			if (msg.what == Constants.DIALOG_ALERT_POSITIVE_BUTTON_CLICKED) {
-				Toast.makeText(getApplicationContext(), "Mensagem descartada",
-						Toast.LENGTH_SHORT).show();
-				finish();
-			}
-
-			if (msg.what == Constants.DIALOG_ALERT_NEGATIVE_BUTTON_CLICKED) {
-				Toast.makeText(getApplicationContext(), "onHandlerNegative",
-						Toast.LENGTH_SHORT).show();
-
-			}
-
-			if (msg.what == Constants.DIALOG_DELETE_AREA_CLICKED) {
-				deleteRecording();
-			}
-
-			if (msg.what == Constants.MESSAGE_CONNECTION_FAILED) {
-				closeDialog(progressDialog);
-			}
-
-			if (msg.what == Constants.MESSAGE_TEXT_RESPONSE_OK) {
-
-				Log.w("TEXT RESPONSE RESULT", msg.getData()
-						.getString("content"));
-
-				ContentValues[] resultFromServer;
-				jsonParser = new ParseJSON(getApplicationContext());
-				resultFromServer = jsonParser
-						.parseJSON(msg.getData().getString("content"),
-								Constants.PARSE_TEXT_RESPONSE_ID);
-
-				if (existsRecording) {
-					long postId = (Long) resultFromServer[0].get("post_id");
-					sendAudioPost(
-							Constants.generateAudioResponseURL((int) postId),
-							recorder.getAudioFile(), getPreferences()
-									.getString("token", null));
-
-				} else {
-					DiscussionDAO discussionDAO = new DiscussionDAO(
-							getApplicationContext());
-					discussionDAO.open();
-					Discussion currentDiscussion = discussionDAO
-							.getDiscussion(appState.selectedDiscussion);
-
-					discussionDAO.setNextPosts(appState.selectedDiscussion,
-							(currentDiscussion.getNextPosts() + 1));
-					discussionDAO.close();
-					Intent intent = new Intent(getApplicationContext(),
-							ExtMobilisTTSActivity.class);
-					intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-
-					startActivity(intent);
-				}
-			}
-
-			if (msg.what == Constants.MESSAGE_AUDIO_POST_OK) {
-
-				DiscussionDAO discussionDAO = new DiscussionDAO(
-						getApplicationContext());
-				discussionDAO.open();
-				Discussion currentDiscussion = discussionDAO
-						.getDiscussion(appState.selectedDiscussion);
-
-				discussionDAO.setNextPosts(appState.selectedDiscussion,
-						(currentDiscussion.getNextPosts() + 1));
-				discussionDAO.close();
-				Intent intent = new Intent(getApplicationContext(),
-						ExtMobilisTTSActivity.class);
-				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-
-				MobilisStatus status = MobilisStatus.getInstance();
-				postDAO.open();
-				status.ids = postDAO
-						.getIdsOfPostsWithoutImage(appState.selectedDiscussion);
-				postDAO.close();
-				startActivity(intent);
-
-			}
-
-			if (msg.what == Constants.MESSAGE_AUDIO_POST_FAILED) {
+		if (statusCode != 200 && statusCode != 201) {
+			switch (connectionId) {
+			case Constants.CONNECTION_POST_AUDIO:
 				Toast.makeText(getApplicationContext(),
 						"Erro no envio de áudio", Toast.LENGTH_SHORT).show();
 				Intent intent = new Intent(getApplicationContext(),
@@ -500,7 +422,84 @@ public class ResponseController extends MobilisActivity implements
 						.getIdsOfPostsWithoutImage(appState.selectedDiscussion);
 				postDAO.close();
 				startActivity(intent);
+				break;
+
+			default:
+				ErrorHandler.handleStatusCode(this, statusCode);
+				closeDialog(progressDialog);
+				break;
+			}
+
+		} else {
+			switch (connectionId) {
+
+			case Constants.CONNECTION_POST_AUDIO:
+				discussionDAO.open();
+				currentDiscussion = discussionDAO
+						.getDiscussion(appState.selectedDiscussion);
+
+				discussionDAO.setNextPosts(appState.selectedDiscussion,
+						(currentDiscussion.getNextPosts() + 1));
+				discussionDAO.close();
+				intent = new Intent(getApplicationContext(),
+						ExtMobilisTTSActivity.class);
+				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+				MobilisStatus status = MobilisStatus.getInstance();
+				postDAO.open();
+				status.ids = postDAO
+						.getIdsOfPostsWithoutImage(appState.selectedDiscussion);
+				postDAO.close();
+				startActivity(intent);
+				break;
+
+			case Constants.CONNECTION_POST_TEXT_RESPONSE:
+				Log.w("TEXT RESPONSE RESULT", result);
+
+				ContentValues[] resultFromServer;
+				jsonParser = new ParseJSON(getApplicationContext());
+				resultFromServer = jsonParser.parseJSON(result,
+						Constants.PARSE_TEXT_RESPONSE_ID);
+
+				if (existsRecording) {
+					long postId = (Long) resultFromServer[0].get("post_id");
+					sendAudioPost(
+							Constants.generateAudioResponseURL((int) postId),
+							recorder.getAudioFile(), getPreferences()
+									.getString("token", null));
+
+				} else {
+					discussionDAO.open();
+					currentDiscussion = discussionDAO
+							.getDiscussion(appState.selectedDiscussion);
+
+					discussionDAO.setNextPosts(appState.selectedDiscussion,
+							(currentDiscussion.getNextPosts() + 1));
+					discussionDAO.close();
+					intent = new Intent(getApplicationContext(),
+							ExtMobilisTTSActivity.class);
+					intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+					startActivity(intent);
+				}
+				break;
+
+			default:
+				break;
 			}
 		}
+	}
+
+	@Override
+	public void positiveButtonClicked() {
+		Toast.makeText(getApplicationContext(), "Mensagem descartada",
+				Toast.LENGTH_SHORT).show();
+		finish();
+	}
+
+	@Override
+	public void negativeButtonClicked() {
+		Toast.makeText(getApplicationContext(), "onHandlerNegative",
+				Toast.LENGTH_SHORT).show();
 	}
 }

@@ -120,19 +120,6 @@ public class Constants {
 	public static final int CONNECTION_POST_AUDIO = 608;
 
 	// Mesagens de Conexão bem sucedida
-	public static final int MESSAGE_CONNECTION_FAILED = 700;
-	public static final int MESSAGE_TOKEN_CONNECTION_OK = 701;
-	public static final int MESSAGE_COURSE_CONNECTION_OK = 702;
-	public static final int MESSAGE_CLASS_CONNECTION_OK = 703;
-	public static final int MESSAGE_TOPIC_CONNECTION_OK = 704;
-	public static final int MESSAGE_NEW_POST_CONNECTION_OK = 705;
-	public static final int MESSAGE_IMAGE_CONNECTION_OK = 706;
-	public static final int MESSAGE_HISTORY_POST_CONNECTION_OK = 707;
-	public static final int MESSAGE_AUDIO_POST_OK = 708;
-	public static final int MESSAGE_TEXT_RESPONSE_OK = 709;
-	public static final int MESSAGE_IMAGE_CONNECION_FAILED = 710;
-	public static final int MESSAGE_HISTORY_POST_CONNECTION_FAILED = 711;
-	public static final int MESSAGE_AUDIO_POST_FAILED = 721;
 
 	// TTS
 	public static final String DATABASE_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";

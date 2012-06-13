@@ -8,8 +8,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -38,7 +36,6 @@ public class Login extends MobilisActivity implements OnClickListener,
 	private CourseDAO courseDAO;
 
 	private Connection connection;
-	private LoginHandler handler;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -56,8 +53,7 @@ public class Login extends MobilisActivity implements OnClickListener,
 	public void init(int layoutId) {
 
 		setContentView(layoutId);
-		handler = new LoginHandler();
-		connection = new Connection(handler, this);
+		connection = new Connection(this);
 		jsonParser = new ParseJSON(this);
 		courseDAO = new CourseDAO(this);
 		dialogMaker = new DialogMaker(this);
@@ -144,18 +140,23 @@ public class Login extends MobilisActivity implements OnClickListener,
 		closeDialog(dialog);
 	}
 
-	private class LoginHandler extends Handler {
-		@Override
-		public void handleMessage(Message msg) {
-			super.handleMessage(msg);
+	@Override
+	public void resultFromConnection(int connectionId, String result,
+			int statusCode) {
 
-			if (msg.what == Constants.MESSAGE_TOKEN_CONNECTION_OK) {
+		if (statusCode != 200 && statusCode != 201) {
 
+			closeDialog(dialog);
+			ErrorHandler.handleStatusCode(this, statusCode);
+		} else {
+
+			switch (connectionId) {
+
+			case Constants.CONNECTION_POST_TOKEN:
 				Log.w("Token Connection", "OK");
 
 				jsonParser = new ParseJSON(getApplicationContext());
-				ContentValues[] tokenParsed = jsonParser.parseJSON(msg
-						.getData().getString("content"),
+				ContentValues[] tokenParsed = jsonParser.parseJSON(result,
 						Constants.PARSE_TOKEN_ID);
 				SharedPreferences.Editor editor = getPreferences().edit();
 				editor.putString("token", tokenParsed[0].getAsString("token"));
@@ -163,13 +164,11 @@ public class Login extends MobilisActivity implements OnClickListener,
 
 				String token = getPreferences().getString("token", null);
 				getCourseList(token);
+				break;
 
-			}
-
-			if (msg.what == Constants.MESSAGE_COURSE_CONNECTION_OK) {
-
-				ContentValues[] values = jsonParser.parseJSON(msg.getData()
-						.getString("content"), Constants.PARSE_COURSES_ID);
+			case Constants.CONNECTION_GET_COURSES:
+				ContentValues[] values = jsonParser.parseJSON(result,
+						Constants.PARSE_COURSES_ID);
 				courseDAO.open();
 				courseDAO.addCourses(values);
 				courseDAO.close();
@@ -178,26 +177,10 @@ public class Login extends MobilisActivity implements OnClickListener,
 						CourseListController.class);
 
 				startActivity(intent);
+				break;
 
-			}
-
-			if (msg.what == Constants.MESSAGE_CONNECTION_FAILED) {
-				int statusCode = msg.getData().getInt("statusCode");
-				ErrorHandler.handleStatusCode(getApplicationContext(),
-						statusCode);
-				closeDialog(dialog);
-			}
-		}
-	}
-
-	@Override
-	public void resultFromConnection(int connectionId, String result,
-			int statusCode) {
-		if (statusCode != 200 || statusCode != 201) {
-			// handleError(statusCode)
-		} else {
-			switch (connectionId) {
-			// TODO
+			default:
+				break;
 			}
 		}
 	}

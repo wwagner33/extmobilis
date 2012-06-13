@@ -27,16 +27,18 @@ import com.mobilis.dao.DiscussionDAO;
 import com.mobilis.dao.PostDAO;
 import com.mobilis.dialog.DialogMaker;
 import com.mobilis.exception.ImageFileNotFoundException;
+import com.mobilis.interfaces.ConnectionCallback;
 import com.mobilis.interfaces.MobilisExpandableListActivity;
 import com.mobilis.model.Discussion;
 import com.mobilis.model.DiscussionPost;
 import com.mobilis.util.Constants;
+import com.mobilis.util.ErrorHandler;
 import com.mobilis.util.MobilisStatus;
 import com.mobilis.util.ParseJSON;
 import com.mobilis.ws.Connection;
 
 public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
-		implements OnClickListener {
+		implements OnClickListener, ConnectionCallback {
 
 	private Discussion discussion;
 	private ArrayList<DiscussionPost> discussionPosts;
@@ -48,7 +50,6 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 	private int footerId = 0;
 	private final int FUTURE_POST_ID = 1;
 	private final int REFRESH_ID = 2;
-	private PostHandler postHandler;
 
 	public int positionExpanded = -1;
 	public boolean contentPostIsExpanded = false;
@@ -69,14 +70,15 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 	private int previous;
 	private MobilisStatus appState;
 	private Intent intent;
+	private ParseJSON jsonParser;
 
 	@SuppressWarnings("deprecation")
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.posts_new);
+		jsonParser = new ParseJSON(this);
 		appState = MobilisStatus.getInstance();
-		postHandler = new PostHandler();
-		wsSolar = new Connection(postHandler);
+		wsSolar = new Connection(this);
 		MobilisStatus status = MobilisStatus.getInstance();
 
 		if (status.ids != null) {
@@ -504,169 +506,6 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 		postDAO.close();
 	}
 
-	private class PostHandler extends Handler {
-		ParseJSON jsonParser = new ParseJSON(getApplicationContext());
-
-		@Override
-		public void handleMessage(Message message) {
-			super.handleMessage(message);
-
-			switch (message.what) {
-			case Constants.MESSAGE_CONNECTION_FAILED:
-				closeDialog(dialog);
-				break;
-			case Constants.MESSAGE_NEW_POST_CONNECTION_OK:
-				downloadImages();
-				closeDialog(dialog);
-				parsePosts(message.getData().getString("content"));
-				Log.w("Deu", "certo");
-				break;
-			case Constants.MESSAGE_HISTORY_POST_CONNECTION_OK:
-				downloadImages();
-				closeDialog(dialog);
-				parsePosts(message.getData().getString("content"));
-				Log.w("History POSTS", "OK");
-				break;
-
-			case Constants.MESSAGE_IMAGE_CONNECTION_OK:
-				discussionPostAdapter.notifyDataSetChanged();
-			default:
-				break;
-			}
-		}
-
-		private void parsePosts(String content) {
-			int[] beforeAfter = new int[2];
-			final int beforeIndex = 0;
-			final int afterIndex = 1;
-
-			beforeAfter = jsonParser.parseBeforeAndAfter(content);
-
-			ArrayList<DiscussionPost> loadedposts = jsonParser
-					.parsePostsTTS(content);
-
-			if (!(headerClicked || footerClicked)) {
-
-				discussionPosts = loadedposts;
-				discussionPostAdapter = new DiscussionPostAdapter(
-						discussionPosts, ExtMobilisTTSActivity.this);
-				postDAO.open();
-				postDAO.insertPostsToDB(loadedposts,
-						appState.selectedDiscussion);
-				postDAO.close();
-				discussionDAO.open();
-				discussion.setNextPosts(beforeAfter[afterIndex]);
-				setFooter();
-				discussionDAO.setNextPosts(discussion.getId(),
-						discussion.getNextPosts());
-				discussion.setPreviousPosts(beforeAfter[beforeIndex]);
-				setHeader();
-				discussionDAO.setPreviousPosts(discussion.getId(),
-						discussion.getPreviousPosts());
-				discussionDAO.close();
-				setListAdapter(discussionPostAdapter);
-			} else {
-				if (headerClicked) {
-
-					ArrayList<DiscussionPost> invertedLoadedPosts = jsonParser
-							.parseInvertedPosts(content);
-
-					if (discussion.getPreviousPosts() % 20 != 0) {
-						discussion.setPreviousPosts(discussion
-								.getPreviousPosts()
-								- invertedLoadedPosts.size());
-					}
-
-					else {
-						discussion.setPreviousPosts(beforeAfter[beforeIndex]);
-					}
-
-					if (discussion.getPreviousPosts() < previous) {
-						previous = discussion.getPreviousPosts();
-					}
-
-					discussionPosts.addAll(0, invertedLoadedPosts);
-					discussionPostAdapter = new DiscussionPostAdapter(
-							discussionPosts, ExtMobilisTTSActivity.this);
-					setHeader();
-					headerClicked = false;
-					setListAdapter(discussionPostAdapter);
-
-				} else if (footerClicked) {
-
-					if (beforeAfter[afterIndex] == 0) {
-						discussionDAO.open();
-						if (discussionDAO
-								.hasNewPostsFlag(appState.selectedDiscussion)) {
-							ContentValues newFlag = new ContentValues();
-							newFlag.put("has_new_posts", 0);
-							discussionDAO.updateFlag(newFlag,
-									appState.selectedDiscussion);
-						}
-						discussionDAO.close();
-					}
-
-					footerClicked = false;
-					if (loadedposts.size() == 0) {
-						Toast.makeText(
-								getApplicationContext(),
-								getApplication().getResources().getString(
-										R.string.no_new_posts),
-								Toast.LENGTH_SHORT).show();
-						return;
-					}
-
-					discussionPosts.addAll(loadedposts);
-					postDAO.open();
-					ArrayList<DiscussionPost> postsFromDB = new ArrayList<DiscussionPost>(
-							Arrays.asList(postDAO.getAllPosts(discussion
-									.getId())));
-					postDAO.close();
-					if (postsFromDB.size() - loadedposts.size() != 0) {
-
-						ArrayList<DiscussionPost> postsToRemain = new ArrayList<DiscussionPost>();
-
-						for (int i = loadedposts.size(); i < postsFromDB.size(); i++) {
-							postsToRemain.add(postsFromDB.get(i));
-						}
-
-						for (DiscussionPost disc : loadedposts) {
-							postsToRemain.add(disc);
-						}
-
-						Log.i("SIZE", "" + postsToRemain.size());
-						discussionDAO.open();
-						discussionDAO.setPreviousPosts(
-								discussion.getId(),
-								discussion.getPreviousPosts()
-										+ loadedposts.size());
-						discussionDAO.close();
-						loadedposts = postsToRemain;
-					} else {
-						discussion.setPreviousPosts(beforeAfter[beforeIndex]);
-						discussionDAO.open();
-
-						discussionDAO.setPreviousPosts(discussion.getId(),
-								discussion.getPreviousPosts());
-						discussionDAO.close();
-					}
-					discussionDAO.open();
-					discussion.setNextPosts(beforeAfter[afterIndex]);
-					discussionDAO.setNextPosts(discussion.getId(),
-							discussion.getNextPosts());
-					discussionDAO.close();
-					setFooter();
-
-					postDAO.open();
-					postDAO.insertPostsToDB(loadedposts,
-							appState.selectedDiscussion);
-					postDAO.close();
-				}
-			}
-			discussionPostAdapter.notifyDataSetChanged();
-		}
-	}
-
 	public void includePlayControll() {
 		play.setVisibility(View.VISIBLE);
 		prev.setVisibility(View.VISIBLE);
@@ -727,6 +566,173 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 			if (position < ttsPostsManager.getPostsSize() - 1) {
 				stop();
 				play(position + 1);
+			}
+		}
+	}
+
+	private void parsePosts(String content) {
+		int[] beforeAfter = new int[2];
+		final int beforeIndex = 0;
+		final int afterIndex = 1;
+
+		beforeAfter = jsonParser.parseBeforeAndAfter(content);
+
+		ArrayList<DiscussionPost> loadedposts = jsonParser
+				.parsePostsTTS(content);
+
+		if (!(headerClicked || footerClicked)) {
+
+			discussionPosts = loadedposts;
+			discussionPostAdapter = new DiscussionPostAdapter(discussionPosts,
+					ExtMobilisTTSActivity.this);
+			postDAO.open();
+			postDAO.insertPostsToDB(loadedposts, appState.selectedDiscussion);
+			postDAO.close();
+			discussionDAO.open();
+			discussion.setNextPosts(beforeAfter[afterIndex]);
+			setFooter();
+			discussionDAO.setNextPosts(discussion.getId(),
+					discussion.getNextPosts());
+			discussion.setPreviousPosts(beforeAfter[beforeIndex]);
+			setHeader();
+			discussionDAO.setPreviousPosts(discussion.getId(),
+					discussion.getPreviousPosts());
+			discussionDAO.close();
+			setListAdapter(discussionPostAdapter);
+		} else {
+			if (headerClicked) {
+
+				ArrayList<DiscussionPost> invertedLoadedPosts = jsonParser
+						.parseInvertedPosts(content);
+
+				if (discussion.getPreviousPosts() % 20 != 0) {
+					discussion.setPreviousPosts(discussion.getPreviousPosts()
+							- invertedLoadedPosts.size());
+				}
+
+				else {
+					discussion.setPreviousPosts(beforeAfter[beforeIndex]);
+				}
+
+				if (discussion.getPreviousPosts() < previous) {
+					previous = discussion.getPreviousPosts();
+				}
+
+				discussionPosts.addAll(0, invertedLoadedPosts);
+				discussionPostAdapter = new DiscussionPostAdapter(
+						discussionPosts, ExtMobilisTTSActivity.this);
+				setHeader();
+				headerClicked = false;
+				setListAdapter(discussionPostAdapter);
+
+			} else if (footerClicked) {
+
+				if (beforeAfter[afterIndex] == 0) {
+					discussionDAO.open();
+					if (discussionDAO
+							.hasNewPostsFlag(appState.selectedDiscussion)) {
+						ContentValues newFlag = new ContentValues();
+						newFlag.put("has_new_posts", 0);
+						discussionDAO.updateFlag(newFlag,
+								appState.selectedDiscussion);
+					}
+					discussionDAO.close();
+				}
+
+				footerClicked = false;
+				if (loadedposts.size() == 0) {
+					Toast.makeText(
+							getApplicationContext(),
+							getApplication().getResources().getString(
+									R.string.no_new_posts), Toast.LENGTH_SHORT)
+							.show();
+					return;
+				}
+
+				discussionPosts.addAll(loadedposts);
+				postDAO.open();
+				ArrayList<DiscussionPost> postsFromDB = new ArrayList<DiscussionPost>(
+						Arrays.asList(postDAO.getAllPosts(discussion.getId())));
+				postDAO.close();
+				if (postsFromDB.size() - loadedposts.size() != 0) {
+
+					ArrayList<DiscussionPost> postsToRemain = new ArrayList<DiscussionPost>();
+
+					for (int i = loadedposts.size(); i < postsFromDB.size(); i++) {
+						postsToRemain.add(postsFromDB.get(i));
+					}
+
+					for (DiscussionPost disc : loadedposts) {
+						postsToRemain.add(disc);
+					}
+
+					Log.i("SIZE", "" + postsToRemain.size());
+					discussionDAO.open();
+					discussionDAO.setPreviousPosts(discussion.getId(),
+							discussion.getPreviousPosts() + loadedposts.size());
+					discussionDAO.close();
+					loadedposts = postsToRemain;
+				} else {
+					discussion.setPreviousPosts(beforeAfter[beforeIndex]);
+					discussionDAO.open();
+
+					discussionDAO.setPreviousPosts(discussion.getId(),
+							discussion.getPreviousPosts());
+					discussionDAO.close();
+				}
+				discussionDAO.open();
+				discussion.setNextPosts(beforeAfter[afterIndex]);
+				discussionDAO.setNextPosts(discussion.getId(),
+						discussion.getNextPosts());
+				discussionDAO.close();
+				setFooter();
+
+				postDAO.open();
+				postDAO.insertPostsToDB(loadedposts,
+						appState.selectedDiscussion);
+				postDAO.close();
+			}
+		}
+		discussionPostAdapter.notifyDataSetChanged();
+	}
+
+	@Override
+	public void resultFromConnection(int connectionId, String result,
+			int statusCode) {
+		if (statusCode != 200 && statusCode != 201) {
+
+			switch (connectionId) {
+
+			case Constants.CONNECTION_GET_IMAGES:
+				// nada
+				break;
+			default:
+				ErrorHandler.handleStatusCode(this, statusCode);
+				closeDialog(dialog);
+				break;
+			}
+
+		} else {
+			switch (connectionId) {
+
+			case Constants.CONNECTION_GET_NEW_POSTS:
+				downloadImages();
+				closeDialog(dialog);
+				parsePosts(result);
+				break;
+
+			case Constants.CONNECTION_GET_HISTORY_POSTS:
+				downloadImages();
+				closeDialog(dialog);
+				parsePosts(result);
+				break;
+
+			case Constants.CONNECTION_GET_IMAGES:
+				discussionPostAdapter.notifyDataSetChanged();
+				break;
+
+			default:
+				break;
 			}
 		}
 	}

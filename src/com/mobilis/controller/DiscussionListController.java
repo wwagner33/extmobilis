@@ -10,8 +10,6 @@ import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.StateListDrawable;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,14 +22,17 @@ import android.widget.TextView;
 import com.mobilis.dao.DiscussionDAO;
 import com.mobilis.dao.PostDAO;
 import com.mobilis.dialog.DialogMaker;
+import com.mobilis.interfaces.ConnectionCallback;
 import com.mobilis.interfaces.MobilisListActivity;
 import com.mobilis.model.DiscussionPost;
 import com.mobilis.util.Constants;
+import com.mobilis.util.ErrorHandler;
 import com.mobilis.util.MobilisStatus;
 import com.mobilis.util.ParseJSON;
 import com.mobilis.ws.Connection;
 
-public class DiscussionListController extends MobilisListActivity {
+public class DiscussionListController extends MobilisListActivity implements
+		ConnectionCallback {
 
 	private Intent intent;
 	private ParseJSON jsonParser;
@@ -41,7 +42,6 @@ public class DiscussionListController extends MobilisListActivity {
 	private PostDAO postDAO;
 	private Cursor cursor;
 	private DiscussionsAdapter listAdapter;
-	private DiscussionHandler handler;
 	private Connection connection;
 	private MobilisStatus appState;
 
@@ -51,8 +51,7 @@ public class DiscussionListController extends MobilisListActivity {
 
 		setContentView(R.layout.discussion);
 		appState = MobilisStatus.getInstance();
-		handler = new DiscussionHandler();
-		connection = new Connection(handler);
+		connection = new Connection(this);
 		jsonParser = new ParseJSON(this);
 		postDAO = new PostDAO(this);
 		discussionDAO = new DiscussionDAO(this);
@@ -233,51 +232,35 @@ public class DiscussionListController extends MobilisListActivity {
 		updateList();
 	}
 
-	private class DiscussionHandler extends Handler {
-		@Override
-		public void handleMessage(Message msg) {
-			super.handleMessage(msg);
+	@Override
+	public void menuRefreshItemSelected() {
+		int currentClass = appState.selectedClass;
+		progressDialog = dialogMaker
+				.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
+		progressDialog.show();
+		obtainTopics(Constants.URL_GROUPS_PREFIX + currentClass
+				+ Constants.URL_DISCUSSION_SUFFIX);
+	}
 
-			switch (msg.what) {
+	@Override
+	public void resultFromConnection(int connectionId, String result,
+			int statusCode) {
+		if (statusCode != 200 && statusCode != 201) {
 
-			case Constants.MESSAGE_CONNECTION_FAILED:
-				closeDialog(progressDialog);
-				break;
+			closeDialog(progressDialog);
+			ErrorHandler.handleStatusCode(this, statusCode);
 
-			case Constants.MESSAGE_TOPIC_CONNECTION_OK:
+		} else {
+			switch (connectionId) {
 
-				ContentValues[] values = jsonParser.parseJSON(msg.getData()
-						.getString("content"), Constants.PARSE_TOPICS_ID);
-
-				discussionDAO.open();
-
-				for (int i = 0; i < values.length; i++) {
-					if (discussionDAO.hasNewPosts(
-							values[i].getAsInteger("_id"),
-							values[i].getAsString("last_post_date"))) {
-						Log.i("TAG", "Existem posts novos");
-						values[i].put("has_new_posts", true);
-					} else {
-						Log.v("TAG", "Não há posts novos");
-					}
-				}
-
-				discussionDAO.addDiscussions(values, appState.selectedClass);
-				discussionDAO.close();
-				updateList();
-				closeDialog(progressDialog);
-				break;
-
-			case Constants.MESSAGE_NEW_POST_CONNECTION_OK:
-
+			case Constants.CONNECTION_GET_NEW_POSTS:
 				closeDialog(progressDialog);
 
 				int[] beforeAfter = new int[2];
 				final int beforeIndex = 0;
 				final int afterIndex = 1;
 
-				beforeAfter = jsonParser.parseBeforeAndAfter(msg.getData()
-						.getString("content"));
+				beforeAfter = jsonParser.parseBeforeAndAfter(result);
 
 				Log.i("PostsBefore", "" + beforeAfter[beforeIndex]);
 				Log.i("PostsAfter", "" + beforeAfter[afterIndex]);
@@ -290,7 +273,7 @@ public class DiscussionListController extends MobilisListActivity {
 				discussionDAO.close();
 
 				ArrayList<DiscussionPost> loadedPosts = jsonParser
-						.parsePostsTTS(msg.getData().getString("content"));
+						.parsePostsTTS(result);
 
 				postDAO.open();
 				postDAO.insertPostsToDB(loadedPosts,
@@ -314,19 +297,30 @@ public class DiscussionListController extends MobilisListActivity {
 				startActivityForResult(intent, 0);
 				break;
 
+			case Constants.CONNECTION_GET_TOPICS:
+				ContentValues[] values = jsonParser.parseJSON(result,
+						Constants.PARSE_TOPICS_ID);
+				discussionDAO.open();
+				for (int i = 0; i < values.length; i++) {
+					if (discussionDAO.hasNewPosts(
+							values[i].getAsInteger("_id"),
+							values[i].getAsString("last_post_date"))) {
+						Log.i("TAG", "Existem posts novos");
+						values[i].put("has_new_posts", true);
+					} else {
+						Log.v("TAG", "Não há posts novos");
+					}
+				}
+
+				discussionDAO.addDiscussions(values, appState.selectedClass);
+				discussionDAO.close();
+				updateList();
+				closeDialog(progressDialog);
+				break;
+
 			default:
 				break;
 			}
 		}
-	}
-
-	@Override
-	public void menuRefreshItemSelected() {
-		int currentClass = appState.selectedClass;
-		progressDialog = dialogMaker
-				.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
-		progressDialog.show();
-		obtainTopics(Constants.URL_GROUPS_PREFIX + currentClass
-				+ Constants.URL_DISCUSSION_SUFFIX);
 	}
 }
