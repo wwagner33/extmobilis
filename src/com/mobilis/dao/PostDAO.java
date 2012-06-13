@@ -311,18 +311,16 @@ public class PostDAO extends DBAdapter {
 
 	private DiscussionPost cursorToPost(Cursor cursor) {
 		final DiscussionPost post = new DiscussionPost();
-		post.setId(cursor.getLong(cursor.getColumnIndex("_id")));
+		post.setId(cursor.getInt(cursor.getColumnIndex("_id")));
 		post.setUserId(cursor.getInt(cursor.getColumnIndex("user_id")));
-		post.setDiscussionId(cursor.getLong(cursor
+		post.setDiscussionId(cursor.getInt(cursor
 				.getColumnIndex("discussion_id")));
 		post.setDate(cursor.getString(cursor.getColumnIndex("date")));
-		post.setParentId(cursor.getLong(cursor.getColumnIndex("parent_id")));
-		post.setProfileId(cursor.getLong(cursor.getColumnIndex("profile_id")));
+		post.setParentId(cursor.getInt(cursor.getColumnIndex("parent_id")));
+		post.setProfileId(cursor.getInt(cursor.getColumnIndex("profile_id")));
 		post.setMarked(cursor.getInt(cursor.getColumnIndex("is_marked")) == 1);
 		post.setUserNick(cursor.getString(cursor.getColumnIndex("user_nick")));
 		post.setContent(cursor.getString(cursor.getColumnIndex("content")));
-		// post.setContentLast(cursor.getString(cursor
-		// .getColumnIndex("content_last")));
 		return post;
 	}
 

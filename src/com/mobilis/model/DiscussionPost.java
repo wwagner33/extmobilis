@@ -9,11 +9,11 @@ import com.mobilis.util.Constants;
 import com.mobilis.util.DateUtils;
 
 public class DiscussionPost {
-	private long _id;
-	private long parentId;
+	private int _id;
+	private int parentId;
 	private int userId;
-	private long discussionId;
-	private long profileId;
+	private int discussionId;
+	private int profileId;
 	private boolean isMarked, isPlaying, isJustLoaded = false;
 	private String userNick;
 	private String content;
@@ -23,9 +23,9 @@ public class DiscussionPost {
 
 	}
 
-	public DiscussionPost(long _id, long parentId, int userId,
-			long discussionId, long profileId, boolean isMarked,
-			String userNick, String content, Calendar date) {
+	public DiscussionPost(int _id, int parentId, int userId, int discussionId,
+			int profileId, boolean isMarked, String userNick, String content,
+			Calendar date) {
 		this._id = _id;
 		this.parentId = parentId;
 		this.userId = userId;
@@ -37,23 +37,23 @@ public class DiscussionPost {
 		this.date = date;
 	}
 
-	public long getId() {
+	public int getId() {
 		return _id;
 	}
 
-	public void setId(long id) {
+	public void setId(int id) {
 		this._id = id;
 	}
 
-	public long getParentId() {
+	public int getParentId() {
 		return parentId;
 	}
 
-	public void setParentId(long parentId) {
+	public void setParentId(int parentId) {
 		this.parentId = parentId;
 	}
 
-	public long getUserId() {
+	public int getUserId() {
 		return userId;
 	}
 
@@ -61,19 +61,19 @@ public class DiscussionPost {
 		this.userId = userId;
 	}
 
-	public long getDiscussionId() {
+	public int getDiscussionId() {
 		return discussionId;
 	}
 
-	public void setDiscussionId(long discussionId) {
+	public void setDiscussionId(int discussionId) {
 		this.discussionId = discussionId;
 	}
 
-	public long getProfileId() {
+	public int getProfileId() {
 		return profileId;
 	}
 
-	public void setProfileId(long profileId) {
+	public void setProfileId(int profileId) {
 		this.profileId = profileId;
 	}
 

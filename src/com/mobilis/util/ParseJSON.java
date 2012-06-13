@@ -352,16 +352,16 @@ public class ParseJSON {
 		// discussionPost.setContentLast(contentLast);
 
 		long discussionId = (Long) jsonObject.get("discussion_id");
-		discussionPost.setDiscussionId(discussionId);
+		discussionPost.setDiscussionId((int)discussionId);
 
 		long _id = (Long) jsonObject.get("id");
-		discussionPost.setId(_id);
+		discussionPost.setId((int)_id);
 
 		long parentId = 0;
 		if (jsonObject.get("parent_id") != null) {
 			parentId = (Long) jsonObject.get("parent_id");
 		}
-		discussionPost.setParentId(parentId);
+		discussionPost.setParentId((int)parentId);
 
 		long userId = (Long) jsonObject.get("user_id");
 		discussionPost.setUserId((int)userId);

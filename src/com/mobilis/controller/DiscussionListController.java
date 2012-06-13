@@ -6,7 +6,6 @@ import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.StateListDrawable;
@@ -36,7 +35,6 @@ public class DiscussionListController extends MobilisListActivity {
 
 	private Intent intent;
 	private ParseJSON jsonParser;
-	private String forumName;
 	private ProgressDialog progressDialog;
 	private DialogMaker dialogMaker;
 	private DiscussionDAO discussionDAO;
@@ -102,7 +100,6 @@ public class DiscussionListController extends MobilisListActivity {
 		ContentValues item = (ContentValues) content;
 
 		int discussionId = item.getAsInteger("_id");
-		forumName = item.getAsString("name");
 
 		if (item.getAsString("status").equals("0")
 				|| item.getAsString("status").equals("2")) {
