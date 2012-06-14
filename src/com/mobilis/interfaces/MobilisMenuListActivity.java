@@ -1,11 +1,7 @@
 package com.mobilis.interfaces;
 
-import android.app.Dialog;
 import android.app.ListActivity;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -13,35 +9,9 @@ import android.view.MenuItem;
 import com.mobilis.controller.Config;
 import com.mobilis.controller.Login;
 import com.mobilis.controller.R;
+import com.mobilis.util.MobilisPreferences;
 
-public abstract class MobilisListActivity extends ListActivity {
-
-	private SharedPreferences settings;
-
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		settings = PreferenceManager.getDefaultSharedPreferences(this);
-	}
-
-	public SharedPreferences getPreferences() {
-		return settings;
-	}
-
-	public void commit(SharedPreferences.Editor editor) {
-		if (android.os.Build.VERSION.SDK_INT <= 8)
-			editor.commit();
-		else
-			editor.commit();
-	}
-
-	public void closeDialog(Dialog dialog) {
-
-		if (dialog != null) {
-			if (dialog.isShowing())
-				dialog.dismiss();
-		}
-	}
+public abstract class MobilisMenuListActivity extends ListActivity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -57,9 +27,8 @@ public abstract class MobilisListActivity extends ListActivity {
 		}
 		if (item.getItemId() == R.id.menu_logout) {
 
-			SharedPreferences.Editor editor = settings.edit();
-			editor.putString("token", null);
-			commit(editor);
+			MobilisPreferences preferences = MobilisPreferences.getInstance(this);
+			preferences.setToken(null);
 			Intent intent = new Intent(this, Login.class);
 			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			startActivity(intent);
