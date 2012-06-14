@@ -2,10 +2,10 @@ package com.mobilis.controller;
 
 import org.json.simple.JSONObject;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,13 +18,13 @@ import android.widget.Toast;
 import com.mobilis.dao.CourseDAO;
 import com.mobilis.dialog.DialogMaker;
 import com.mobilis.interfaces.ConnectionCallback;
-import com.mobilis.interfaces.MobilisActivity;
 import com.mobilis.util.Constants;
 import com.mobilis.util.ErrorHandler;
+import com.mobilis.util.MobilisPreferences;
 import com.mobilis.util.ParseJSON;
 import com.mobilis.ws.Connection;
 
-public class Login extends MobilisActivity implements OnClickListener,
+public class Login extends Activity implements OnClickListener,
 		ConnectionCallback {
 
 	private EditText login, password;
@@ -34,6 +34,7 @@ public class Login extends MobilisActivity implements OnClickListener,
 	private ParseJSON jsonParser;
 	private DialogMaker dialogMaker;
 	private CourseDAO courseDAO;
+	private MobilisPreferences prefs;
 
 	private Connection connection;
 
@@ -53,6 +54,7 @@ public class Login extends MobilisActivity implements OnClickListener,
 	public void init(int layoutId) {
 
 		setContentView(layoutId);
+		prefs = MobilisPreferences.getInstance(this);
 		connection = new Connection(this);
 		jsonParser = new ParseJSON(this);
 		courseDAO = new CourseDAO(this);
@@ -78,7 +80,7 @@ public class Login extends MobilisActivity implements OnClickListener,
 	public Object onRetainNonConfigurationInstance() {
 		if (dialog != null) {
 			if (dialog.isShowing()) {
-				closeDialog(dialog);
+				dialog.dismiss();
 				return dialog;
 			}
 		}
@@ -118,8 +120,7 @@ public class Login extends MobilisActivity implements OnClickListener,
 	public void getCourseList(String token) {
 
 		connection.getFromServer(Constants.CONNECTION_GET_COURSES,
-				Constants.URL_COURSES, getPreferences()
-						.getString("token", null));
+				Constants.URL_COURSES, prefs.getToken());
 
 	}
 
@@ -137,7 +138,7 @@ public class Login extends MobilisActivity implements OnClickListener,
 	@Override
 	protected void onStop() {
 		super.onStop();
-		closeDialog(dialog);
+		dialog.dismiss();
 	}
 
 	@Override
@@ -146,7 +147,7 @@ public class Login extends MobilisActivity implements OnClickListener,
 
 		if (statusCode != 200 && statusCode != 201) {
 
-			closeDialog(dialog);
+			dialog.dismiss();
 			ErrorHandler.handleStatusCode(this, statusCode);
 		} else {
 
@@ -158,12 +159,8 @@ public class Login extends MobilisActivity implements OnClickListener,
 				jsonParser = new ParseJSON(getApplicationContext());
 				ContentValues[] tokenParsed = jsonParser.parseJSON(result,
 						Constants.PARSE_TOKEN_ID);
-				SharedPreferences.Editor editor = getPreferences().edit();
-				editor.putString("token", tokenParsed[0].getAsString("token"));
-				commit(editor);
-
-				String token = getPreferences().getString("token", null);
-				getCourseList(token);
+				prefs.setToken(tokenParsed[0].getAsString("token"));
+				getCourseList(prefs.getToken());
 				break;
 
 			case Constants.CONNECTION_GET_COURSES:

@@ -23,15 +23,15 @@ import com.mobilis.dao.DiscussionDAO;
 import com.mobilis.dao.PostDAO;
 import com.mobilis.dialog.DialogMaker;
 import com.mobilis.interfaces.ConnectionCallback;
-import com.mobilis.interfaces.MobilisListActivity;
+import com.mobilis.interfaces.MobilisMenuListActivity;
 import com.mobilis.model.DiscussionPost;
 import com.mobilis.util.Constants;
 import com.mobilis.util.ErrorHandler;
-import com.mobilis.util.MobilisStatus;
+import com.mobilis.util.MobilisPreferences;
 import com.mobilis.util.ParseJSON;
 import com.mobilis.ws.Connection;
 
-public class DiscussionListController extends MobilisListActivity implements
+public class DiscussionListController extends MobilisMenuListActivity implements
 		ConnectionCallback {
 
 	private Intent intent;
@@ -43,19 +43,21 @@ public class DiscussionListController extends MobilisListActivity implements
 	private Cursor cursor;
 	private DiscussionsAdapter listAdapter;
 	private Connection connection;
-	private MobilisStatus appState;
+	private MobilisPreferences appState;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.discussion);
-		appState = MobilisStatus.getInstance();
+		appState = MobilisPreferences.getInstance(this);
 		connection = new Connection(this);
 		jsonParser = new ParseJSON(this);
 		postDAO = new PostDAO(this);
 		discussionDAO = new DiscussionDAO(this);
 		dialogMaker = new DialogMaker(this);
+		progressDialog = dialogMaker
+				.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
 		restoreDialog();
 		updateList();
 	}
@@ -74,7 +76,7 @@ public class DiscussionListController extends MobilisListActivity implements
 		if (progressDialog != null) {
 			if (progressDialog.isShowing()) {
 				Log.i("OnRetain2", "True");
-				closeDialog(progressDialog);
+				progressDialog.dismiss();
 				return progressDialog;
 			}
 		}
@@ -117,15 +119,13 @@ public class DiscussionListController extends MobilisListActivity implements
 			postDAO.close();
 			discussionDAO.close();
 			intent = new Intent(this, ExtMobilisTTSActivity.class);
-			closeDialog(progressDialog);
+			progressDialog.dismiss();
 			startActivityForResult(intent, 0);
 
 		} else {
 			Log.w("Não Existem posts no banco", " ");
 			postDAO.close();
 			discussionDAO.close();
-			progressDialog = dialogMaker
-					.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
 			progressDialog.show();
 			obtainNewPosts(Constants.generateNewPostsTTSURL(discussionId,
 					Constants.oldDateString));
@@ -135,13 +135,13 @@ public class DiscussionListController extends MobilisListActivity implements
 	public void obtainNewPosts(String url) {
 
 		connection.getFromServer(Constants.CONNECTION_GET_NEW_POSTS, url,
-				getPreferences().getString("token", null));
+				appState.getToken());
 	}
 
 	public void obtainTopics(String url) {
 
 		connection.getFromServer(Constants.CONNECTION_GET_TOPICS, url,
-				getPreferences().getString("token", null));
+				appState.getToken());
 
 	}
 
@@ -247,14 +247,14 @@ public class DiscussionListController extends MobilisListActivity implements
 			int statusCode) {
 		if (statusCode != 200 && statusCode != 201) {
 
-			closeDialog(progressDialog);
+			progressDialog.dismiss();
 			ErrorHandler.handleStatusCode(this, statusCode);
 
 		} else {
 			switch (connectionId) {
 
 			case Constants.CONNECTION_GET_NEW_POSTS:
-				closeDialog(progressDialog);
+				progressDialog.dismiss();
 
 				int[] beforeAfter = new int[2];
 				final int beforeIndex = 0;
@@ -289,10 +289,11 @@ public class DiscussionListController extends MobilisListActivity implements
 						.getIdsOfPostsWithoutImage(appState.selectedDiscussion);
 				postDAO.close();
 
-				closeDialog(progressDialog);
+				progressDialog.dismiss();
 				Log.i("USER IDS", "" + ids.size());
 				postDAO.close();
-				MobilisStatus status = MobilisStatus.getInstance();
+				MobilisPreferences status = MobilisPreferences
+						.getInstance(this);
 				status.ids = ids;
 				startActivityForResult(intent, 0);
 				break;
@@ -315,7 +316,7 @@ public class DiscussionListController extends MobilisListActivity implements
 				discussionDAO.addDiscussions(values, appState.selectedClass);
 				discussionDAO.close();
 				updateList();
-				closeDialog(progressDialog);
+				progressDialog.dismiss();
 				break;
 
 			default:

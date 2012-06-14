@@ -20,8 +20,8 @@ import com.mobilis.util.Constants;
 public class WebServiceBing {
 
 	private HttpGet get;
-	String addressAudio;
-	DiscussionPost post;
+	private String addressAudio;
+	private DiscussionPost post;
 	private HttpResponse response = null;
 	private DefaultHttpClient client;
 	public static final String BING_URI = "http://api.microsofttranslator.com/v2/Http.svc/Speak?appId=03CAF44417913E4B9D82BE6202DBFBD768B8C5E1&text=";

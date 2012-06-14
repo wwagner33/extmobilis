@@ -15,14 +15,14 @@ import com.mobilis.dao.ClassDAO;
 import com.mobilis.dao.DiscussionDAO;
 import com.mobilis.dialog.DialogMaker;
 import com.mobilis.interfaces.ConnectionCallback;
-import com.mobilis.interfaces.MobilisListActivity;
+import com.mobilis.interfaces.MobilisMenuListActivity;
 import com.mobilis.util.Constants;
 import com.mobilis.util.ErrorHandler;
-import com.mobilis.util.MobilisStatus;
+import com.mobilis.util.MobilisPreferences;
 import com.mobilis.util.ParseJSON;
 import com.mobilis.ws.Connection;
 
-public class ClassListController extends MobilisListActivity implements
+public class ClassListController extends MobilisMenuListActivity implements
 		ConnectionCallback {
 
 	private ParseJSON jsonParser;
@@ -33,7 +33,7 @@ public class ClassListController extends MobilisListActivity implements
 	private Cursor cursor;
 	private DiscussionDAO topicDAO;
 	private Connection connection;
-	private MobilisStatus appState;
+	private MobilisPreferences appState;
 	private SimpleCursorAdapter simpleAdapter;
 
 	@Override
@@ -41,7 +41,7 @@ public class ClassListController extends MobilisListActivity implements
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.curriculum_units);
-		appState = MobilisStatus.getInstance();
+		appState = MobilisPreferences.getInstance(this);
 		connection = new Connection(this);
 		jsonParser = new ParseJSON(this);
 		classDAO = new ClassDAO(this);
@@ -63,7 +63,7 @@ public class ClassListController extends MobilisListActivity implements
 	public Object onRetainNonConfigurationInstance() {
 		if (dialog != null) {
 			if (dialog.isShowing()) {
-				closeDialog(dialog);
+				dialog.dismiss();
 				return dialog;
 			}
 		}
@@ -73,13 +73,13 @@ public class ClassListController extends MobilisListActivity implements
 	public void obtainTopics(String url) {
 
 		connection.getFromServer(Constants.CONNECTION_GET_TOPICS, url,
-				getPreferences().getString("token", null));
+				appState.getToken());
 	}
 
 	public void obtainClasses(String url) {
 
 		connection.getFromServer(Constants.CONNECTION_GET_CLASSES, url,
-				getPreferences().getString("token", null));
+				appState.getToken());
 
 	}
 
@@ -139,7 +139,7 @@ public class ClassListController extends MobilisListActivity implements
 	public void resultFromConnection(int connectionId, String result,
 			int statusCode) {
 		if (statusCode != 200 && statusCode != 201) {
-			closeDialog(dialog);
+			dialog.dismiss();
 			ErrorHandler.handleStatusCode(this, statusCode);
 
 		} else {
@@ -153,7 +153,7 @@ public class ClassListController extends MobilisListActivity implements
 				classDAO.addClasses(classValues, appState.selectedCourse);
 				classDAO.close();
 				simpleAdapter.notifyDataSetChanged();
-				closeDialog(dialog);
+				dialog.dismiss();
 				break;
 
 			case Constants.CONNECTION_GET_TOPICS:
@@ -164,7 +164,7 @@ public class ClassListController extends MobilisListActivity implements
 
 					Toast.makeText(getApplicationContext(), "Fórum Vazio",
 							Toast.LENGTH_SHORT).show();
-					closeDialog(dialog);
+					dialog.dismiss();
 				}
 
 				else {
@@ -191,12 +191,11 @@ public class ClassListController extends MobilisListActivity implements
 
 					intent = new Intent(getApplicationContext(),
 							DiscussionListController.class);
-					closeDialog(dialog);
+					dialog.dismiss();
 					startActivity(intent);
 
 				}
 				break;
-
 			default:
 				break;
 			}

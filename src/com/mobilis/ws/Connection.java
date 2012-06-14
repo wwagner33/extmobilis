@@ -383,7 +383,6 @@ public class Connection {
 
 		@Override
 		protected Integer doInBackground(Object... params) {
-			// TODO Auto-generated method stub
 			try {
 				toWatch = (ExecuteConnection) params[0];
 				toWatch.get(15, TimeUnit.SECONDS);
@@ -409,7 +408,6 @@ public class Connection {
 
 		@Override
 		protected void onPostExecute(Integer result) {
-			// TODO Auto-generated method stub
 			super.onPostExecute(result);
 			if (result == 1) {
 			}

@@ -1,29 +1,31 @@
 package com.mobilis.controller;
 
+import com.mobilis.util.MobilisPreferences;
+
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
+import android.preference.PreferenceActivity;
 
-import com.mobilis.interfaces.MobilisPreferenceActivity;
-
-public class Config extends MobilisPreferenceActivity implements
+public class Config extends PreferenceActivity implements
 		OnPreferenceChangeListener {
 
 	private CheckBoxPreference autoLogin;
+	private MobilisPreferences preferences;
 
 	@SuppressWarnings("deprecation")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
+		preferences = MobilisPreferences.getInstance(this);
 		addPreferencesFromResource(R.layout.config);
 		autoLogin = (CheckBoxPreference) findPreference("checkbox_preference");
 		autoLogin.setOnPreferenceChangeListener(this);
 
-		boolean initialState = (getPreferences().getBoolean("AutoLogin", true)) ? true
-				: false;
+		boolean initialState = (preferences.getPreferences().getBoolean(
+				"AutoLogin", true)) ? true : false;
 		autoLogin.setChecked(initialState);
 
 	}
@@ -34,15 +36,17 @@ public class Config extends MobilisPreferenceActivity implements
 
 		if (newValue == true) {
 
-			SharedPreferences.Editor editor = getPreferences().edit();
+			SharedPreferences.Editor editor = preferences.getPreferences()
+					.edit();
 			editor.putBoolean("AutoLogin", newValue);
-			commit(editor);
+			editor.commit();
 			autoLogin.setChecked(true);
 
 		} else {
-			SharedPreferences.Editor editor = getPreferences().edit();
+			SharedPreferences.Editor editor = preferences.getPreferences()
+					.edit();
 			editor.putBoolean("AutoLogin", newValue);
-			commit(editor);
+			editor.commit();
 			autoLogin.setChecked(false);
 		}
 

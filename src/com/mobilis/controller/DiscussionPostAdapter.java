@@ -288,10 +288,8 @@ public class DiscussionPostAdapter extends BaseExpandableListAdapter {
 					.getAbsolutePath());
 			return userImage;
 		} catch (NullPointerException e) {
-			e.printStackTrace();
 			throw new ImageFileNotFoundException();
 		} catch (ArrayIndexOutOfBoundsException e) {
-			e.printStackTrace();
 			throw new ImageFileNotFoundException();
 		}
 	}

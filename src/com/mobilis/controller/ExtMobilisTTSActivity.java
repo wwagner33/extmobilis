@@ -3,6 +3,7 @@ package com.mobilis.controller;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import android.app.ExpandableListActivity;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Intent;
@@ -28,17 +29,16 @@ import com.mobilis.dao.PostDAO;
 import com.mobilis.dialog.DialogMaker;
 import com.mobilis.exception.ImageFileNotFoundException;
 import com.mobilis.interfaces.ConnectionCallback;
-import com.mobilis.interfaces.MobilisExpandableListActivity;
 import com.mobilis.model.Discussion;
 import com.mobilis.model.DiscussionPost;
 import com.mobilis.util.Constants;
 import com.mobilis.util.ErrorHandler;
-import com.mobilis.util.MobilisStatus;
+import com.mobilis.util.MobilisPreferences;
 import com.mobilis.util.ParseJSON;
 import com.mobilis.ws.Connection;
 
-public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
-		implements OnClickListener, ConnectionCallback {
+public class ExtMobilisTTSActivity extends ExpandableListActivity implements
+		OnClickListener, ConnectionCallback {
 
 	private Discussion discussion;
 	private ArrayList<DiscussionPost> discussionPosts;
@@ -68,7 +68,7 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 	private DialogMaker dialogMaker;
 	private ProgressDialog dialog;
 	private int previous;
-	private MobilisStatus appState;
+	private MobilisPreferences appState;
 	private Intent intent;
 	private ParseJSON jsonParser;
 
@@ -77,14 +77,13 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.posts_new);
 		jsonParser = new ParseJSON(this);
-		appState = MobilisStatus.getInstance();
+		appState = MobilisPreferences.getInstance(this);
 		wsSolar = new Connection(this);
-		MobilisStatus status = MobilisStatus.getInstance();
 
-		if (status.ids != null) {
-			ArrayList<Integer> ids = status.ids;
-			status.ids = null;
-			wsSolar.getImages(ids, getPreferences().getString("token", null));
+		if (appState.ids != null) {
+			ArrayList<Integer> ids = appState.ids;
+			appState.ids = null;
+			wsSolar.getImages(ids, appState.getToken());
 		}
 
 		setVolumeControlStream(AudioManager.STREAM_MUSIC);
@@ -172,7 +171,7 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 
 		if (dialog != null) {
 			if (dialog.isShowing()) {
-				closeDialog(dialog);
+				dialog.dismiss();
 				retainedObjects[0] = dialog;
 			}
 		}
@@ -304,7 +303,6 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 
 		case R.id.details:
 
-			Log.w("SELECTED POST", "" + appState.selectedPost);
 			postDAO.open();
 			DiscussionPost post = postDAO.getPost(appState.selectedPost);
 			postDAO.close();
@@ -457,7 +455,7 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 		String date = discussionPosts.get(0).getDateToString();
 		wsSolar.getFromServer(Constants.CONNECTION_GET_HISTORY_POSTS,
 				Constants.generateHistoryPostTTSURL(discussion.getId(), date),
-				getPreferences().getString("token", null));
+				appState.getToken());
 	}
 
 	private void loadFuturePosts() {
@@ -474,7 +472,7 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 
 		wsSolar.getFromServer(Constants.CONNECTION_GET_NEW_POSTS,
 				Constants.generateNewPostsTTSURL(discussion.getId(), date),
-				getPreferences().getString("token", null));
+				appState.getToken());
 	}
 
 	public void onGroupCollapse(int groupPosition) {
@@ -502,7 +500,7 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 		postDAO.open();
 		wsSolar.getImages(
 				postDAO.getIdsOfPostsWithoutImage(appState.selectedDiscussion),
-				getPreferences().getString("token", null));
+				appState.getToken());
 		postDAO.close();
 	}
 
@@ -708,7 +706,7 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 				break;
 			default:
 				ErrorHandler.handleStatusCode(this, statusCode);
-				closeDialog(dialog);
+				dialog.dismiss();
 				break;
 			}
 
@@ -717,13 +715,13 @@ public class ExtMobilisTTSActivity extends MobilisExpandableListActivity
 
 			case Constants.CONNECTION_GET_NEW_POSTS:
 				downloadImages();
-				closeDialog(dialog);
+				dialog.dismiss();
 				parsePosts(result);
 				break;
 
 			case Constants.CONNECTION_GET_HISTORY_POSTS:
 				downloadImages();
-				closeDialog(dialog);
+				dialog.dismiss();
 				parsePosts(result);
 				break;
 

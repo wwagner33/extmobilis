@@ -5,7 +5,6 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
@@ -14,14 +13,14 @@ import com.mobilis.dao.ClassDAO;
 import com.mobilis.dao.CourseDAO;
 import com.mobilis.dialog.DialogMaker;
 import com.mobilis.interfaces.ConnectionCallback;
-import com.mobilis.interfaces.MobilisListActivity;
+import com.mobilis.interfaces.MobilisMenuListActivity;
 import com.mobilis.util.Constants;
 import com.mobilis.util.ErrorHandler;
-import com.mobilis.util.MobilisStatus;
+import com.mobilis.util.MobilisPreferences;
 import com.mobilis.util.ParseJSON;
 import com.mobilis.ws.Connection;
 
-public class CourseListController extends MobilisListActivity implements
+public class CourseListController extends MobilisMenuListActivity implements
 		ConnectionCallback {
 
 	private Intent intent;
@@ -32,7 +31,7 @@ public class CourseListController extends MobilisListActivity implements
 	private Connection connection;
 	private ProgressDialog progressDialog;
 	private DialogMaker dialogMaker;
-	private MobilisStatus appState;
+	private MobilisPreferences appState;
 	private SimpleCursorAdapter simpleAdapter;
 
 	@Override
@@ -40,7 +39,7 @@ public class CourseListController extends MobilisListActivity implements
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.course);
-		appState = MobilisStatus.getInstance();
+		appState = MobilisPreferences.getInstance(this);
 		dialogMaker = new DialogMaker(this);
 		progressDialog = dialogMaker
 				.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
@@ -63,7 +62,7 @@ public class CourseListController extends MobilisListActivity implements
 	@Override
 	public Object onRetainNonConfigurationInstance() {
 		if (progressDialog.isShowing()) {
-			closeDialog(progressDialog);
+			progressDialog.dismiss();
 			return progressDialog;
 		}
 		return null;
@@ -105,7 +104,7 @@ public class CourseListController extends MobilisListActivity implements
 		if (classDAO.existClasses(appState.selectedCourse)) {
 			classDAO.close();
 			intent = new Intent(this, ClassListController.class);
-			closeDialog(progressDialog);
+			progressDialog.dismiss();
 			startActivity(intent);
 		}
 
@@ -120,15 +119,14 @@ public class CourseListController extends MobilisListActivity implements
 	public void obtainCurriculumUnits(String url) {
 
 		connection.getFromServer(Constants.CONNECTION_GET_CLASSES, url,
-				getPreferences().getString("token", null));
+				appState.getToken());
 
 	}
 
 	public void obtainCourses(String url) {
 
 		connection.getFromServer(Constants.CONNECTION_GET_COURSES,
-				Constants.URL_COURSES, getPreferences()
-						.getString("token", null));
+				Constants.URL_COURSES, appState.getToken());
 
 	}
 
@@ -142,22 +140,21 @@ public class CourseListController extends MobilisListActivity implements
 	public void resultFromConnection(int connectionId, String result,
 			int statusCode) {
 		if (statusCode != 201 && statusCode != 200) {
-			
-			closeDialog(progressDialog);
+
+			progressDialog.dismiss();
 			ErrorHandler.handleStatusCode(this, statusCode);
 
 		} else {
 			switch (connectionId) {
 
 			case Constants.CONNECTION_GET_COURSES:
-				Log.i("Teste", "Teste");
 				ContentValues[] courseValues = jsonParser.parseJSON(result,
 						Constants.PARSE_COURSES_ID);
 				courseDAO.open();
 				courseDAO.addCourses(courseValues);
 				courseDAO.close();
 				updateList();
-				closeDialog(progressDialog);
+				progressDialog.dismiss();
 				break;
 
 			case Constants.CONNECTION_GET_CLASSES:
@@ -171,10 +168,9 @@ public class CourseListController extends MobilisListActivity implements
 
 				intent = new Intent(getApplicationContext(),
 						ClassListController.class);
-				closeDialog(progressDialog);
+				progressDialog.dismiss();
 				startActivity(intent);
 				break;
-
 			default:
 				break;
 			}

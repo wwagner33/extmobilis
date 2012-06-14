@@ -1,5 +1,6 @@
 package com.mobilis.controller;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -12,13 +13,11 @@ import android.widget.TextView;
 
 import com.mobilis.dao.DiscussionDAO;
 import com.mobilis.dao.PostDAO;
-import com.mobilis.interfaces.MobilisActivity;
 import com.mobilis.model.Discussion;
 import com.mobilis.model.DiscussionPost;
-import com.mobilis.util.MobilisStatus;
+import com.mobilis.util.MobilisPreferences;
 
-public class PostDetailController extends MobilisActivity implements
-		OnClickListener {
+public class PostDetailController extends Activity implements OnClickListener {
 
 	private TextView body, userName, forumName;
 	private Bundle extras;
@@ -27,14 +26,14 @@ public class PostDetailController extends MobilisActivity implements
 	private DiscussionPost post;
 	private DiscussionDAO discussionDAO;
 	private PostDAO postDAO;
-	private MobilisStatus appState;
+	private MobilisPreferences appState;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.post_detail);
-		appState = MobilisStatus.getInstance();
+		appState = MobilisPreferences.getInstance(this);
 		discussionDAO = new DiscussionDAO(this);
 		postDAO = new PostDAO(this);
 		body = (TextView) findViewById(R.id.post_body_detail);

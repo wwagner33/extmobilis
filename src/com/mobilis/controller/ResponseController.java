@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import org.json.simple.JSONObject;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
@@ -38,17 +39,16 @@ import com.mobilis.dialog.AudioDialog;
 import com.mobilis.dialog.DialogMaker;
 import com.mobilis.interfaces.AudioDialogListener;
 import com.mobilis.interfaces.ConnectionCallback;
-import com.mobilis.interfaces.MobilisActivity;
 import com.mobilis.model.Discussion;
 import com.mobilis.util.Constants;
 import com.mobilis.util.ErrorHandler;
-import com.mobilis.util.MobilisStatus;
+import com.mobilis.util.MobilisPreferences;
 import com.mobilis.util.ParseJSON;
 import com.mobilis.ws.Connection;
 
-public class ResponseController extends MobilisActivity implements
-		OnClickListener, OnChronometerTickListener, OnCompletionListener,
-		TextWatcher, OnInfoListener, ConnectionCallback, AudioDialogListener {
+public class ResponseController extends Activity implements OnClickListener,
+		OnChronometerTickListener, OnCompletionListener, TextWatcher,
+		OnInfoListener, ConnectionCallback, AudioDialogListener {
 
 	private EditText message;
 	private Button submit;
@@ -72,7 +72,7 @@ public class ResponseController extends MobilisActivity implements
 	private AudioDialog audioDialog;
 	private Connection connection;
 	private PostDAO postDAO;
-	private MobilisStatus appState;
+	private MobilisPreferences appState;
 	private DiscussionDAO discussionDAO;
 	private Discussion currentDiscussion;
 	private Intent intent;
@@ -83,7 +83,7 @@ public class ResponseController extends MobilisActivity implements
 
 		setContentView(R.layout.response);
 		discussionDAO = new DiscussionDAO(this);
-		appState = MobilisStatus.getInstance();
+		appState = MobilisPreferences.getInstance(this);
 		postDAO = new PostDAO(this);
 		setVolumeControlStream(AudioManager.STREAM_MUSIC);
 		connection = new Connection(this);
@@ -116,7 +116,7 @@ public class ResponseController extends MobilisActivity implements
 
 		if (progressDialog != null) {
 			if (progressDialog.isShowing()) {
-				closeDialog(progressDialog);
+				progressDialog.dismiss();
 				dialogStorer[0] = progressDialog;
 			}
 		}
@@ -296,10 +296,9 @@ public class ResponseController extends MobilisActivity implements
 
 	public void sendPost(String jsonString) {
 		progressDialog.show();
-		String token = getPreferences().getString("token", null);
 
 		String url = "discussions/" + appState.selectedDiscussion
-				+ "/posts?auth_token=" + token;
+				+ "/posts?auth_token=" + appState.getToken();
 
 		connection.postToServer(Constants.CONNECTION_POST_TEXT_RESPONSE,
 				jsonString, url);
@@ -309,7 +308,7 @@ public class ResponseController extends MobilisActivity implements
 	public void getNewPosts(String url) {
 
 		connection.getFromServer(Constants.CONNECTION_GET_NEW_POSTS, url,
-				getPreferences().getString("token", null));
+				appState.getToken());
 
 	}
 
@@ -416,7 +415,7 @@ public class ResponseController extends MobilisActivity implements
 				Intent intent = new Intent(getApplicationContext(),
 						ExtMobilisTTSActivity.class);
 				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				MobilisStatus status = MobilisStatus.getInstance();
+				MobilisPreferences status = MobilisPreferences.getInstance(this);
 				postDAO.open();
 				status.ids = postDAO
 						.getIdsOfPostsWithoutImage(appState.selectedDiscussion);
@@ -426,7 +425,7 @@ public class ResponseController extends MobilisActivity implements
 
 			default:
 				ErrorHandler.handleStatusCode(this, statusCode);
-				closeDialog(progressDialog);
+				progressDialog.dismiss();
 				break;
 			}
 
@@ -445,7 +444,7 @@ public class ResponseController extends MobilisActivity implements
 						ExtMobilisTTSActivity.class);
 				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
-				MobilisStatus status = MobilisStatus.getInstance();
+				MobilisPreferences status = MobilisPreferences.getInstance(this);
 				postDAO.open();
 				status.ids = postDAO
 						.getIdsOfPostsWithoutImage(appState.selectedDiscussion);
@@ -465,8 +464,7 @@ public class ResponseController extends MobilisActivity implements
 					long postId = (Long) resultFromServer[0].get("post_id");
 					sendAudioPost(
 							Constants.generateAudioResponseURL((int) postId),
-							recorder.getAudioFile(), getPreferences()
-									.getString("token", null));
+							recorder.getAudioFile(), appState.getToken());
 
 				} else {
 					discussionDAO.open();
