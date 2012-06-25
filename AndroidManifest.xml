@@ -28,7 +28,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Login" />
+        <activity
+            android:name=".Login"
+            android:screenOrientation="portrait" />
         <activity android:name=".CourseListController" />
         <activity android:name=".PostList" />
         <activity android:name=".ClassListController" />

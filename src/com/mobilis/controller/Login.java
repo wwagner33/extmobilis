@@ -6,13 +6,14 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Intent;
-import android.content.res.Configuration;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mobilis.dao.CourseDAO;
@@ -41,14 +42,7 @@ public class Login extends Activity implements OnClickListener,
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
-		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-			init(R.layout.login);
-		}
-
-		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-			init(R.layout.login_landscape);
-		}
+		init(R.layout.login2);
 	}
 
 	public void init(int layoutId) {
@@ -62,10 +56,14 @@ public class Login extends Activity implements OnClickListener,
 		jsonParser = new ParseJSON(this);
 		courseDAO = new CourseDAO(this);
 
-		login = (EditText) findViewById(R.id.campo1);
-		password = (EditText) findViewById(R.id.campo2);
+		login = (EditText) findViewById(R.id.username);
+		password = (EditText) findViewById(R.id.password);
 		submit = (Button) findViewById(R.id.submit);
 		submit.setOnClickListener(this);
+		TextView footerText = (TextView) findViewById(R.id.footer_text);
+		Typeface footerFont = Typeface.createFromAsset(getAssets(),
+				"fonts/ubuntucondensed.ttf");
+		footerText.setTypeface(footerFont);
 		restoreDialog();
 
 	}
