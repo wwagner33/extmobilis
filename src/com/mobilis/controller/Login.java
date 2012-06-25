@@ -54,11 +54,14 @@ public class Login extends Activity implements OnClickListener,
 	public void init(int layoutId) {
 
 		setContentView(layoutId);
+		dialogMaker = new DialogMaker(this);
+		dialog = dialogMaker
+				.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
 		prefs = MobilisPreferences.getInstance(this);
 		connection = new Connection(this);
 		jsonParser = new ParseJSON(this);
 		courseDAO = new CourseDAO(this);
-		dialogMaker = new DialogMaker(this);
+
 		login = (EditText) findViewById(R.id.campo1);
 		password = (EditText) findViewById(R.id.campo2);
 		submit = (Button) findViewById(R.id.submit);
@@ -94,8 +97,6 @@ public class Login extends Activity implements OnClickListener,
 
 			if (!(login.getText().toString().trim().length() == 0 || password
 					.getText().toString().length() == 0)) {
-				dialog = dialogMaker
-						.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
 				dialog.show();
 				requestToken();
 			}
