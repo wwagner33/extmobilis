@@ -2,8 +2,8 @@ package com.mobilis.dialog;
 
 import java.io.IOException;
 
+import android.app.Activity;
 import android.app.Dialog;
-import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -19,7 +19,6 @@ import android.widget.TextView;
 
 import com.mobilis.audio.AudioPlayer;
 import com.mobilis.controller.R;
-import com.mobilis.util.Constants;
 import com.mobilis.util.DateUtils;
 
 public class AudioDialog extends Dialog implements OnSeekBarChangeListener,
@@ -31,17 +30,19 @@ public class AudioDialog extends Dialog implements OnSeekBarChangeListener,
 	private LinearLayout playArea;
 	private LinearLayout deleteArea;
 	private RelativeLayout mediaBar;
-	private Handler activityHandler;
+	// private Handler activityHandler;
 	private ImageView pause, stop;
 	private Thread seekbarThread;
 	private static final int updateLayout = 5;
 	private AudioHandler audioHandler;
 	private Message message;
 	private Bundle bundle;
+	private onDeleteListener deleteListener;
 
-	public AudioDialog(Context context, AudioPlayer player) {
-		super(context);
+	public AudioDialog(Activity activity, AudioPlayer player) {
+		super(activity);
 
+		deleteListener = (onDeleteListener)activity;
 		this.player = player;
 		audioHandler = new AudioHandler();
 		message = Message.obtain();
@@ -50,13 +51,10 @@ public class AudioDialog extends Dialog implements OnSeekBarChangeListener,
 		try {
 			player.prepare();
 		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalStateException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -135,13 +133,11 @@ public class AudioDialog extends Dialog implements OnSeekBarChangeListener,
 
 	@Override
 	public void onStartTrackingTouch(SeekBar arg0) {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void onStopTrackingTouch(SeekBar arg0) {
-		// TODO Auto-generated method stub
 
 	}
 
@@ -150,10 +146,9 @@ public class AudioDialog extends Dialog implements OnSeekBarChangeListener,
 
 		if (v.getId() == R.id.delete_area) {
 
-			activityHandler
-					.sendEmptyMessage(Constants.DIALOG_DELETE_AREA_CLICKED);
-			this.dismiss();
+			deleteListener.onRecordingDeleted();
 
+			this.dismiss();
 		}
 
 		if (v.getId() == R.id.listen_area) {
@@ -166,13 +161,9 @@ public class AudioDialog extends Dialog implements OnSeekBarChangeListener,
 
 				audioProgress.setVisibility(View.VISIBLE);
 
-				activityHandler
-						.sendEmptyMessage(Constants.DIALOG_LISTEN_AREA_CLICKED);
 				playArea.setVisibility(View.GONE);
 				mediaBar.setVisibility(View.VISIBLE);
 
-				activityHandler
-						.sendEmptyMessage(Constants.DIALOG_PLAYBACK_AREA_CLICKED);
 				seekbarThread = new Thread(new Runnable() {
 
 					@Override
@@ -250,5 +241,10 @@ public class AudioDialog extends Dialog implements OnSeekBarChangeListener,
 
 			}
 		}
+	}
+
+	public interface onDeleteListener {
+
+		public void onRecordingDeleted();
 	}
 }

@@ -2,6 +2,7 @@ package com.mobilis.util;
 
 import java.util.ArrayList;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
@@ -36,6 +37,7 @@ public class MobilisPreferences {
 
 	}
 
+	@SuppressLint("NewApi")
 	public void commit(SharedPreferences.Editor editor) {
 		if (android.os.Build.VERSION.SDK_INT <= 8)
 			editor.commit();

@@ -1,119 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent" >
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/login_gradient" >
 
-    <RelativeLayout
-        android:id="@+id/layout1"
-        style="@style/SolarTheme.layout1"
-        android:layout_width="fill_parent"
-        android:layout_height="120dp"
-        android:layout_alignParentTop="true" >
-
-        <ImageView
-            android:id="@+id/title_2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="35dp"
-            android:contentDescription="@string/logo_description"
-            android:scaleType="fitStart"
-            android:src="@drawable/solar_logo_small" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/title_2"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="8dp"
-            android:text="@string/login_greeting_text"
-            android:textColor="@android:color/white" />
-    </RelativeLayout>
-
-    <LinearLayout
-        android:id="@+id/empty_space"
+    <ImageView
+        android:id="@+id/logo"
         android:layout_width="wrap_content"
-        android:layout_height="40dp"
-        android:layout_below="@id/layout1" />
-
-    <RelativeLayout
-        android:id="@+id/text_fileds"
-        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/empty_space" >
+        android:layout_alignParentTop="true"
+        android:layout_centerInParent="true"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="48dp"
+        android:scaleType="center"
+        android:src="@drawable/logo_solar" >
+    </ImageView>
 
-        <EditText
-            android:id="@+id/campo1"
-            android:layout_width="170dp"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="45dp"
-            android:inputType="text" />
+    <EditText
+        android:id="@+id/username"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/logo"
+        android:layout_marginBottom="4dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="48dp"
+        android:hint="Usuário"
+        android:inputType="text" />
 
-        <TextView
-            android:id="@+id/login_user_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBaseline="@id/campo1"
-            android:layout_alignParentLeft="true"
-            android:layout_marginLeft="45dp"
-            android:layout_toLeftOf="@id/campo1"
-            android:text="@string/login_field_text"
-            android:textColor="@color/headerColor" />
+    <EditText
+        android:id="@+id/password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/username"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:hint="Senha"
+        android:inputType="textPassword" />
 
-        <EditText
-            android:id="@+id/campo2"
-            android:layout_width="170dp"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_below="@id/campo1"
-            android:layout_marginRight="45dp"
-            android:layout_marginTop="10dp"
-            android:inputType="textPassword" />
+    <Button
+        android:id="@+id/submit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/password"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="16dp"
+        android:text="Acessar"
+        android:textColor="#1c3584"
+        android:textSize="18sp" />
 
-        <TextView
-            android:id="@+id/login_password_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBaseline="@id/campo2"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@id/campo1"
-            android:layout_marginLeft="45dp"
-            android:layout_toLeftOf="@id/campo2"
-            android:text="@string/password_field_text"
-            android:textColor="@color/headerColor" />
-
-        <Button
-            android:id="@+id/submit"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_below="@id/campo2"
-            android:layout_gravity="center"
-            android:layout_marginRight="45dp"
-            android:layout_marginTop="10dp"
-            android:background="@drawable/button_enter_selector" />
-    </RelativeLayout>
-
-    <LinearLayout
-        android:id="@+id/highlight_bar"
+    <View
+        android:id="@+id/footer"
         android:layout_width="fill_parent"
-        android:layout_height="9dp"
+        android:layout_height="4dp"
         android:layout_alignParentBottom="true"
-        android:background="@color/yellow_hightlight"
-        android:orientation="vertical" />
+        android:background="#f9db43" >
+    </View>
 
     <TextView
-        android:id="@+id/bottom_text"
-        android:layout_width="wrap_content"
+        android:id="@+id/footer_text"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@id/highlight_bar"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="8dp"
-        android:text="INSTITUTO UNIVERSIDADE VIRTUAL - 2012"
-        android:textColor="@color/dark_gray" />
-
-    <!-- android:text="@string/login_submit_button_text" -->
+        android:layout_above="@id/footer"
+        android:layout_centerVertical="true"
+        android:layout_marginBottom="6dp"
+        android:gravity="center"
+        android:text="Instituto Universidade Virtual - 2012"
+        android:textColor="@android:color/white" />
+	'	
 
 </RelativeLayout>

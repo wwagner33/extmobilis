@@ -37,6 +37,7 @@ import com.mobilis.dao.DiscussionDAO;
 import com.mobilis.dao.PostDAO;
 import com.mobilis.dialog.AudioDialog;
 import com.mobilis.dialog.DialogMaker;
+import com.mobilis.dialog.AudioDialog.onDeleteListener;
 import com.mobilis.interfaces.AudioDialogListener;
 import com.mobilis.interfaces.ConnectionCallback;
 import com.mobilis.model.Discussion;
@@ -48,7 +49,8 @@ import com.mobilis.ws.Connection;
 
 public class ResponseController extends Activity implements OnClickListener,
 		OnChronometerTickListener, OnCompletionListener, TextWatcher,
-		OnInfoListener, ConnectionCallback, AudioDialogListener {
+		OnInfoListener, ConnectionCallback, AudioDialogListener,
+		onDeleteListener {
 
 	private EditText message;
 	private Button submit;
@@ -415,7 +417,8 @@ public class ResponseController extends Activity implements OnClickListener,
 				Intent intent = new Intent(getApplicationContext(),
 						ExtMobilisTTSActivity.class);
 				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				MobilisPreferences status = MobilisPreferences.getInstance(this);
+				MobilisPreferences status = MobilisPreferences
+						.getInstance(this);
 				postDAO.open();
 				status.ids = postDAO
 						.getIdsOfPostsWithoutImage(appState.selectedDiscussion);
@@ -444,7 +447,8 @@ public class ResponseController extends Activity implements OnClickListener,
 						ExtMobilisTTSActivity.class);
 				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
-				MobilisPreferences status = MobilisPreferences.getInstance(this);
+				MobilisPreferences status = MobilisPreferences
+						.getInstance(this);
 				postDAO.open();
 				status.ids = postDAO
 						.getIdsOfPostsWithoutImage(appState.selectedDiscussion);
@@ -499,5 +503,10 @@ public class ResponseController extends Activity implements OnClickListener,
 	public void negativeButtonClicked() {
 		Toast.makeText(getApplicationContext(), "onHandlerNegative",
 				Toast.LENGTH_SHORT).show();
+	}
+
+	@Override
+	public void onRecordingDeleted() {
+		deleteRecording();
 	}
 }

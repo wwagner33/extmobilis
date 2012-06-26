@@ -42,7 +42,7 @@ public class Login extends Activity implements OnClickListener,
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		init(R.layout.login2);
+		init(R.layout.login);
 	}
 
 	public void init(int layoutId) {
