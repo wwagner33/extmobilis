@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <resources>
+
     <string name="app_name">Mobilis</string>
     <string name="logo_description">imagem do logo do solar</string>
     <string name="login_greeting_text">Ambiente Móvel do Solar</string>
@@ -17,7 +18,6 @@
     <string name="empty_forum_message">Fórum Vazio</string>
     <string name="topics_title">Forums disponíveis</string>
     <string name="new_topic_image_description">Imagem de Responder forum geral</string>
-    
     <string name="temp_description">to delete</string>
     <string name="discussion_name">Nome do Forum</string>
     <string name="fulano_name">Fulano da Silva Pessoa e Tal</string>
@@ -39,4 +39,5 @@
     <string name="pause">Pause</string>
     <string name="next">Next</string>
     <string name="prev">Previous</string>
+
 </resources>
