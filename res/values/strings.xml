@@ -39,5 +39,7 @@
     <string name="pause">Pause</string>
     <string name="next">Next</string>
     <string name="prev">Previous</string>
+    <string name="no_avaliable_course">Nenhum curso disponível</string>
+    
 
 </resources>
