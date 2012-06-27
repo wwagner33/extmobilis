@@ -12,6 +12,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
+        android:contentDescription="@string/warning_image_description"
         android:src="@drawable/warning1" />
 
     <TextView
@@ -20,7 +21,7 @@
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:layout_toRightOf="@id/warning_image"
-        android:text="Sem conexão" >
+        android:text="@string/no_conection" >
     </TextView>
 
     <Button
@@ -29,6 +30,6 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:onClick="onClick"
-        android:text="Tentar novamente" />
+        android:text="@string/try_again" />
 
 </RelativeLayout>

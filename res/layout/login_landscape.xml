@@ -111,7 +111,7 @@
         android:layout_above="@id/highlight_bar"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="8dp"
-        android:text="INSTITUTO UNIVERSIDADE VIRTUAL - 2012"
+        android:text="@string/iuvi_footer"
         android:textColor="@color/dark_gray" />
 
     <!-- android:text="@string/login_submit_button_text" -->

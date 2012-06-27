@@ -2,7 +2,7 @@
 <resources>
 
     <string name="app_name">Mobilis</string>
-    <string name="logo_description">imagem do logo do solar</string>
+    <string name="logo_description">Imagem do logo do solar</string>
     <string name="login_greeting_text">Ambiente Móvel do Solar</string>
     <string name="login_field_text">LOGIN</string>
     <string name="password_field_text">SENHA</string>
@@ -40,6 +40,27 @@
     <string name="next">Next</string>
     <string name="prev">Previous</string>
     <string name="no_avaliable_course">Nenhum curso disponível</string>
-    
+    <string name="recording_date">Data da Gravação</string>
+    <string name="recording_duration">duração</string>
+    <string name="listen_to">Ouvir</string>
+    <string name="image_audio_description">Imagem que indica que um áudio está sendo exibido</string>
+    <string name="recording_progress_teste">00:00/00:15</string>
+    <string name="button_pause_blue_description">Imagem do botão de pause</string>
+    <string name="stop_button_description">Imagem do botão stop</string>
+    <string name="divider_line">Linha divisória</string>
+    <string name="delete">Deletar</string>
+    <string name="warning_image_description">Imagem de alerta</string>
+    <string name="no_conection">Sem conexão</string>
+    <string name="try_again">Tentar novamente</string>
+    <string name="username_hint">Usuário</string>
+    <string name="password_hint">Senha</string>
+    <string name="submit_button_text">Acessar</string>
+    <string name="iuvi_footer">Instituto Universidade Virtual - 2012</string>
+    <string name="answer_topic_description">Imagem do botão de resposta</string>
+    <string name="loading_more_posts">Carregando mais postagens</string>
+    <string name="avatar_description">Imagem padrão para quando o usuário não possui foto</string>
+    <string name="post_title">Nome</string>
+    <string name="x">X</string>
+    <string name="record_image_description">Imagem que indica que há gravação de áudio</string>
 
 </resources>

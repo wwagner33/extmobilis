@@ -16,7 +16,7 @@
         android:layout_marginTop="5dp"
         android:padding="2dp"
         android:src="@drawable/stock_person"
-        android:contentDescription="Imagem padrão para quando o usuário não possui foto" />
+        android:contentDescription="@string/avatar_description" />
 
     <TextView
         android:id="@+id/post_title"
@@ -24,7 +24,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:layout_toRightOf="@id/avatar"
-        android:text="Nome"
+        android:text="@string/post_title"
         android:textStyle="bold" />
 
     <TextView

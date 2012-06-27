@@ -20,13 +20,13 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
-            android:text="Ouvir" />
+            android:text="@string/listen_to" />
 
         <Button
             android:id="@+id/delete_recording"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="X" />
+            android:text="@string/x" />
     </RelativeLayout>
 
     <EditText
@@ -50,7 +50,7 @@
             android:layout_height="30dp"
             android:layout_centerHorizontal="true"
             android:clickable="true"
-            android:contentDescription="Imagem que indica que há gravação de áudio"
+            android:contentDescription="@string/record_image_description"
             android:src="@drawable/ic_lock_silent_mode_off"
             android:visibility="gone" />
 

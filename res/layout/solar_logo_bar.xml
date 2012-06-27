@@ -13,7 +13,7 @@
         android:layout_centerVertical="true"
         android:layout_marginLeft="5dp"
         android:layout_marginTop="5dp"
-        android:contentDescription="Imagem do logo do solar"
+        android:contentDescription="@string/logo_description"
         android:scaleType="fitStart"
         android:src="@drawable/solar_logo_small" />
 
@@ -26,7 +26,7 @@
         android:layout_marginLeft="5dp"
         android:layout_marginTop="5dp"
         android:paddingRight="8dp"
-        android:text="mobilis"
+        android:text="@string/app_name"
         android:textColor="#FFFF00"
         android:textStyle="italic" />
 

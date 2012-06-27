@@ -67,7 +67,7 @@
             android:layout_alignParentRight="true"
             android:layout_marginTop="10dp"
             android:clickable="true"
-            android:contentDescription="Imagem do botão de resposta"
+            android:contentDescription="@string/answer_topic_description"
             android:paddingRight="5dp"
             android:src="@drawable/button_response_selector" />
     </RelativeLayout>

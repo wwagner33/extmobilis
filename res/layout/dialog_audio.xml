@@ -16,7 +16,7 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_alignParentLeft="true"
-            android:contentDescription="Imagem que indica que um áudio está sendo exibido"
+            android:contentDescription="@string/image_audio_description"
             android:src="@drawable/ic_lock_silent_mode_off" />
 
         <TextView
@@ -26,7 +26,7 @@
             android:layout_marginLeft="15dp"
             android:layout_marginTop="5dp"
             android:layout_toRightOf="@id/image_audio"
-            android:text="Data da Gravação"
+            android:text="@string/recording_date"
             android:textColor="@color/black" />
 
         <TextView
@@ -37,7 +37,7 @@
             android:layout_marginLeft="15dp"
             android:layout_marginTop="5dp"
             android:layout_toRightOf="@id/image_audio"
-            android:text="00:00/00:15"
+            android:text="@string/recording_progress_teste"
             android:textColor="@color/black"
             android:visibility="gone" />
 
@@ -49,7 +49,7 @@
             android:layout_marginLeft="15dp"
             android:layout_marginTop="5dp"
             android:layout_toRightOf="@id/image_audio"
-            android:text="duração"
+            android:text="@string/recording_duration"
             android:textColor="@color/black" />
     </RelativeLayout>
 
@@ -67,7 +67,7 @@
             android:layout_marginLeft="25dp"
             android:layout_marginTop="10dp"
             android:paddingBottom="7dp"
-            android:text="Ouvir"
+            android:text="@string/listen_to"
             android:textColor="@color/black" />
     </LinearLayout>
 
@@ -85,7 +85,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:clickable="true"
-            android:contentDescription="Imagem do botão de pause"
+            android:contentDescription="@string/button_pause_blue_description"
             android:src="@drawable/button_pause_selector" />
 
         <ImageView
@@ -94,7 +94,7 @@
             android:layout_height="wrap_content"
             android:layout_toRightOf="@id/button_pause_blue"
             android:clickable="true"
-            android:contentDescription="Imagem do botão stop"
+            android:contentDescription="@string/stop_button_description"
             android:src="@drawable/button_stop_selector" />
 
         <SeekBar
@@ -111,7 +111,7 @@
         android:layout_width="fill_parent"
         android:layout_height="1dp"
         android:background="@color/courseListIdle"
-        android:contentDescription="Linha divisória" />
+        android:contentDescription="@string/divider_line" />
 
     <LinearLayout
         android:id="@+id/delete_area"
@@ -127,7 +127,7 @@
             android:layout_marginLeft="25dp"
             android:layout_marginTop="10dp"
             android:paddingBottom="10dp"
-            android:text="Deletar"
+            android:text="@string/delete"
             android:textColor="@color/black" />
     </LinearLayout>
 
