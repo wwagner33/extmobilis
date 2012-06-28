@@ -36,8 +36,10 @@ public class TTSPostsManager implements Runnable {
 				postPlayer.playSoundEffect();
 				while (postPlayer.isPlaying()) {
 				}
-				if (threadPlayer != null)
+				if (threadPlayer != null){
 					threadPlayer.interrupt();
+					threadPlayer = null;
+				}
 				comWithActivity.untogglePostPlayingStatus(currentPostIndex);
 				if (currentPostIndex < posts.size() - 1) {
 					comWithActivity.playNext();
@@ -48,6 +50,7 @@ public class TTSPostsManager implements Runnable {
 				}
 				break;
 			case Constants.ERROR_PLAYING:
+				Log.e("Erro", "Reproduçaão");
 				comWithActivity.togglePostPlayingStatus(currentPostIndex);
 				deleteDir(new File(Constants.AUDIO_DEFAULT_PATH));
 				generateError(Constants.ERROR_PLAYING);
@@ -74,7 +77,7 @@ public class TTSPostsManager implements Runnable {
 	void createBlocks(int index) {
 		blocks = new BlockQueue();
 		generateHeader(index);
-		String content = posts.get(index).getContent();
+		String content = posts.get(index).getContent().trim();
 		int end = content.length();
 
 		while (end > 0) {
@@ -232,6 +235,7 @@ public class TTSPostsManager implements Runnable {
 				i++;
 				notifyPostPlayer();
 			} else {
+				Log.e("Stop", "Erro de Conexão!!!");
 				generateError(Constants.CONNECTION_ERROR);
 				return;
 			}

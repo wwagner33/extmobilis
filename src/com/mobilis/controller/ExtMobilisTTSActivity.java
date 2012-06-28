@@ -693,6 +693,14 @@ public class ExtMobilisTTSActivity extends ExpandableListActivity implements
 		}
 		discussionPostAdapter.notifyDataSetChanged();
 	}
+	
+	@Override
+	protected void onStop() {
+		// TODO Auto-generated method stub
+		super.onStop();
+		if(ttsPostsManager != null)
+			ttsPostsManager.stop();
+	}
 
 	@Override
 	public void resultFromConnection(int connectionId, String result,
