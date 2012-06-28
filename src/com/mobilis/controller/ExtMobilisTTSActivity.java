@@ -271,16 +271,7 @@ public class ExtMobilisTTSActivity extends ExpandableListActivity implements
 
 		case R.id.button_play:
 			synchronized (this) {
-				if (play.getContentDescription().toString()
-						.equals(getResources().getString(R.string.play))) {
-					play(positionExpanded);
-				} else if (play.getContentDescription().toString()
-						.equals(getResources().getString(R.string.pause))) {
-					play.setContentDescription(getResources().getString(
-							R.string.play));
-					play.setImageResource(R.drawable.playback_play);
-					ttsPostsManager.pause();
-				}
+				playClick();
 				break;
 			}
 
@@ -319,6 +310,19 @@ public class ExtMobilisTTSActivity extends ExpandableListActivity implements
 			break;
 		default:
 			break;
+		}
+	}
+
+	private void playClick() {
+		if (play.getContentDescription().toString()
+				.equals(getResources().getString(R.string.play))) {
+			play(positionExpanded);
+		} else if (play.getContentDescription().toString()
+				.equals(getResources().getString(R.string.pause))) {
+			play.setContentDescription(getResources().getString(
+					R.string.play));
+			play.setImageResource(R.drawable.playback_play);
+			ttsPostsManager.pause();
 		}
 	}
 
@@ -509,6 +513,9 @@ public class ExtMobilisTTSActivity extends ExpandableListActivity implements
 		prev.setVisibility(View.VISIBLE);
 		next.setVisibility(View.VISIBLE);
 		prev.setVisibility(View.VISIBLE);
+		synchronized (this) {
+			playClick();
+		}
 		discussionPostAdapter.setPlayExpanded(true);
 	}
 
