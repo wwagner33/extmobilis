@@ -36,7 +36,7 @@ public class TTSPostsManager implements Runnable {
 				postPlayer.playSoundEffect();
 				while (postPlayer.isPlaying()) {
 				}
-				if (threadPlayer != null){
+				if (threadPlayer != null) {
 					threadPlayer.interrupt();
 					threadPlayer = null;
 				}
