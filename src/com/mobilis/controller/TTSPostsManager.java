@@ -83,8 +83,10 @@ public class TTSPostsManager implements Runnable {
 		while (end > 0) {
 			int cut = Math.min(content.length(), Constants.MIN_BLOCK_LENGTH);
 			if (cut == content.length()) {
-				Log.w("Content do Bloco", content);
-				blocks.addBlock(content);
+				Log.w("Tamanho da String", "" + content.length());
+				Log.w("Content do Bloco1", content);
+				if(containsLetter(content))
+					blocks.addBlock(content);
 				break;
 			}
 			String blockContent = content.substring(0, cut);
@@ -117,9 +119,26 @@ public class TTSPostsManager implements Runnable {
 				}
 				end = content.length();
 			}
-			Log.w("Content do Bloco", blockContent);
-			blocks.addBlock(blockContent);
+			Log.w("Content do Bloco2", blockContent);
+			Log.w("Tamanho do bloco", ""+blockContent.length());
+			Log.i("Contem espaço", ""+containsLetter(blockContent));
+			if(containsLetter(content))
+				blocks.addBlock(blockContent);
+			else
+				break;
 		}
+	}
+
+	public static boolean containsLetter(String s) {
+		if (s == null)
+			return false;
+		boolean letterFound = false;
+		for (int i = 0; !letterFound && i < s.length(); i++){
+			letterFound = Character.isLetter(s.charAt(i)) && !Character.isSpaceChar(s.charAt(i));
+			if (letterFound)
+				return true;
+		}
+		return letterFound;
 	}
 
 	private void generateHeader(int postIndex) {

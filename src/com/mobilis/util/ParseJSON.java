@@ -242,6 +242,8 @@ public class ParseJSON {
 			String content = (String) jsonObjects[i].get("content");
 
 			if (!content.equals("")) {
+				content = removeBlankSpace(content);
+				Log.w("Content", jsonObjects[i].toJSONString());
 				Spanned markUpFirst = Html.fromHtml(content);
 				rowItem.put("content", markUpFirst.toString());
 			} else {
@@ -282,6 +284,10 @@ public class ParseJSON {
 		}
 
 		return parsedPostValues;
+	}
+
+	private String removeBlankSpace(String text) {
+		return text.replaceAll("\\r\\n\\t|\\r|\\n|\\t", " ");
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -338,6 +344,9 @@ public class ParseJSON {
 		DiscussionPost discussionPost = new DiscussionPost();
 
 		String content = (String) jsonObject.get("content");
+		content = removeBlankSpace(content);
+		content = content.replaceAll("<p>|<p style=\"color: rgb(86, 85, 77); font-family: Arial, Helvetica, sans-serif; font-size: 20px; font-style: italic; \">|&nbsp;|<\\/p>|<span style=\"color: rgb(86, 85, 77); font-family: Arial, Helvetica, sans-serif; font-size: 20px; font-style: italic; \">|<\\/span>", "");
+		Log.w("Content", content);
 		if (content != null) {
 			Spanned markUpFirst = Html.fromHtml(content);
 			content = markUpFirst.toString();
