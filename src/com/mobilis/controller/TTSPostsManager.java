@@ -33,25 +33,40 @@ public class TTSPostsManager implements Runnable {
 			super.handleMessage(msg);
 			switch (msg.what) {
 			case Constants.PLAY_NEXT_POST:
-				postPlayer.playSoundEffect();
-				while (postPlayer.isPlaying()) {
-				}
-				if (threadPlayer != null)
-					threadPlayer.interrupt();
-				comWithActivity.untogglePostPlayingStatus(currentPostIndex);
-				if (currentPostIndex < posts.size() - 1) {
-					comWithActivity.playNext();
-				} else {
-					deleteDir(new File(Constants.AUDIO_DEFAULT_PATH));
-					currentPostIndex = posts.size() - 1;
-					comWithActivity.playedAllPosts();
-				}
+				playNextPost();
 				break;
 			case Constants.ERROR_PLAYING:
-				comWithActivity.togglePostPlayingStatus(currentPostIndex);
-				deleteDir(new File(Constants.AUDIO_DEFAULT_PATH));
-				generateError(Constants.ERROR_PLAYING);
+				errorPlaying();
 				break;
+			}
+		}
+
+		private void errorPlaying() {
+			Log.e("Erro", "Reprodução");
+			comWithActivity.togglePostPlayingStatus(currentPostIndex);
+			deleteDir(new File(Constants.AUDIO_DEFAULT_PATH));
+			generateError(Constants.ERROR_PLAYING);
+		}
+
+		private void playNextPost() {
+			postPlayer.playSoundEffect();
+
+			while (postPlayer.isPlaying()) {
+			}
+
+			if (threadPlayer != null) {
+				threadPlayer.interrupt();
+				threadPlayer = null;
+			}
+
+			comWithActivity.untogglePostPlayingStatus(currentPostIndex);
+
+			if (currentPostIndex < posts.size() - 1) {
+				comWithActivity.playNext();
+			} else {
+				deleteDir(new File(Constants.AUDIO_DEFAULT_PATH));
+				currentPostIndex = posts.size() - 1;
+				comWithActivity.playedAllPosts();
 			}
 		}
 	};
@@ -74,14 +89,16 @@ public class TTSPostsManager implements Runnable {
 	void createBlocks(int index) {
 		blocks = new BlockQueue();
 		generateHeader(index);
-		String content = posts.get(index).getContent();
+		String content = posts.get(index).getContent().trim();
 		int end = content.length();
 
 		while (end > 0) {
 			int cut = Math.min(content.length(), Constants.MIN_BLOCK_LENGTH);
 			if (cut == content.length()) {
-				Log.w("Content do Bloco", content);
-				blocks.addBlock(content);
+				Log.w("Tamanho da String", "" + content.length());
+				Log.w("Content do Bloco1", content);
+				if (containsLetter(content))
+					blocks.addBlock(content);
 				break;
 			}
 			String blockContent = content.substring(0, cut);
@@ -114,9 +131,27 @@ public class TTSPostsManager implements Runnable {
 				}
 				end = content.length();
 			}
-			Log.w("Content do Bloco", blockContent);
-			blocks.addBlock(blockContent);
+			Log.w("Content do Bloco2", blockContent);
+			Log.w("Tamanho do bloco", "" + blockContent.length());
+			Log.i("Contem espaço", "" + containsLetter(blockContent));
+			if (containsLetter(content))
+				blocks.addBlock(blockContent);
+			else
+				break;
 		}
+	}
+
+	public static boolean containsLetter(String s) {
+		if (s == null)
+			return false;
+		boolean letterFound = false;
+		for (int i = 0; !letterFound && i < s.length(); i++) {
+			letterFound = Character.isLetter(s.charAt(i))
+					&& !Character.isSpaceChar(s.charAt(i));
+			if (letterFound)
+				return true;
+		}
+		return letterFound;
 	}
 
 	private void generateHeader(int postIndex) {
@@ -232,6 +267,7 @@ public class TTSPostsManager implements Runnable {
 				i++;
 				notifyPostPlayer();
 			} else {
+				Log.e("Stop", "Erro de Conexão!!!");
 				generateError(Constants.CONNECTION_ERROR);
 				return;
 			}

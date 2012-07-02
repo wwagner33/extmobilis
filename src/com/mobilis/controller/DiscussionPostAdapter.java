@@ -134,7 +134,7 @@ public class DiscussionPostAdapter extends BaseExpandableListAdapter {
 			}
 			if (postDate != null) {
 				postDate.setText(generateDateHeader(groupPosition));
-				postDate.setText(post.getDate());
+			//	postDate.setText(post.getDate());
 			}
 			if (postContent != null) {
 				String content = post.getContent();
@@ -183,16 +183,6 @@ public class DiscussionPostAdapter extends BaseExpandableListAdapter {
 	@Override
 	public boolean isChildSelectable(int groupPosition, int childPosition) {
 		return true;
-	}
-
-	public void includeOrRemovePlayController() {
-		if (isPlayExpanded) {
-			activity.removePlayControll();
-			setPlayExpanded(false);
-		} else {
-			activity.includePlayControll();
-			setPlayExpanded(true);
-		}
 	}
 
 	public void toggleExpandedPostMarkedStatus() {

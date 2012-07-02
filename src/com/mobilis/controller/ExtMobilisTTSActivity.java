@@ -286,19 +286,8 @@ public class ExtMobilisTTSActivity extends ExpandableListActivity implements
 			}
 
 		case R.id.button_play:
-			synchronized (this) {
-				if (play.getContentDescription().toString()
-						.equals(getResources().getString(R.string.play))) {
-					play(positionExpanded);
-				} else if (play.getContentDescription().toString()
-						.equals(getResources().getString(R.string.pause))) {
-					play.setContentDescription(getResources().getString(
-							R.string.play));
-					play.setImageResource(R.drawable.playback_play);
-					ttsPostsManager.pause();
-				}
-				break;
-			}
+			playClick();
+			break;
 
 		case R.id.expand:
 			contentPostIsExpanded = !contentPostIsExpanded;
@@ -309,7 +298,7 @@ public class ExtMobilisTTSActivity extends ExpandableListActivity implements
 			discussionPostAdapter.notifyDataSetChanged();
 			break;
 		case R.id.play:
-			discussionPostAdapter.includeOrRemovePlayController();
+			playPost();
 			break;
 
 		case R.id.reply:
@@ -333,6 +322,35 @@ public class ExtMobilisTTSActivity extends ExpandableListActivity implements
 			break;
 		default:
 			break;
+		}
+	}
+
+	private void playPost() {
+		// se player não estiver visível mostrar
+		if (!discussionPostAdapter.getPlayExpanded()){
+			// incluir o player e tocar o post
+			includePlayControll();
+		} else {
+			// se outro post estiver tocando deve-se pará-lo
+			stop();
+			
+			// tocar o post
+			play(positionExpanded);
+		}
+	}
+
+	private void playClick() {
+		synchronized (this) {
+			if (play.getContentDescription().toString()
+					.equals(getResources().getString(R.string.play))) {
+				play(positionExpanded);
+			} else if (play.getContentDescription().toString()
+					.equals(getResources().getString(R.string.pause))) {
+				play.setContentDescription(getResources().getString(
+						R.string.play));
+				play.setImageResource(R.drawable.playback_play);
+				ttsPostsManager.pause();
+			}
 		}
 	}
 
@@ -514,6 +532,7 @@ public class ExtMobilisTTSActivity extends ExpandableListActivity implements
 		prev.setVisibility(View.VISIBLE);
 		next.setVisibility(View.VISIBLE);
 		prev.setVisibility(View.VISIBLE);
+		playClick();
 		discussionPostAdapter.setPlayExpanded(true);
 	}
 
@@ -676,6 +695,14 @@ public class ExtMobilisTTSActivity extends ExpandableListActivity implements
 			}
 		}
 		discussionPostAdapter.notifyDataSetChanged();
+	}
+
+	@Override
+	protected void onStop() {
+		// TODO Auto-generated method stub
+		super.onStop();
+		if (ttsPostsManager != null)
+			ttsPostsManager.stop();
 	}
 
 	@Override

@@ -72,9 +72,10 @@ public class PostPlayer implements Runnable, OnCompletionListener {
 
 				}
 			} else {
-				Log.e("Player", "Aguardando novo audio");
-				this.wait();
-
+				if (currentBlockIndex < blocksNumber) {
+					Log.e("Player", "Aguardando novo audio");
+					this.wait();
+				}
 			}
 		}
 	}

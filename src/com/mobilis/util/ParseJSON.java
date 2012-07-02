@@ -195,6 +195,10 @@ public class ParseJSON {
 
 	}
 
+	private String removeBlankSpace(String text) {
+		return text.replaceAll("\\r\\n\\t|\\r|\\n|\\t", " ");
+	}
+
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public JSONObject buildTokenObject(String login, String password) {
 		JSONObject jsonObject = new JSONObject();
@@ -237,9 +241,5 @@ public class ParseJSON {
 		result[0] = before.intValue();
 		result[1] = after.intValue();
 		return result;
-	}
-
-	private String removeBlankSpace(String text) {
-		return text.replaceAll("\\r\\n\\t|\\r|\\n|\\t", " ");
 	}
 }

@@ -307,13 +307,24 @@ public class Connection {
 
 	private void abortConnection(ExecuteConnection conn) {
 		if (conn.connectionType == Constants.TYPE_CONNECTION_GET) {
-			if (conn.get != null)
+			Log.i("TESTE1", "");
+			if (conn.get != null) {
 				conn.get.abort();
-			conn.cancel(true);
+				conn.cancel(true);
+				conn.get = null;
+			} else {
+				conn.cancel(true);
+			}
+
 		} else if (conn.connectionType == Constants.TYPE_CONNECTION_POST) {
-			if (conn.post != null)
+			Log.i("TESTE2", "");
+			if (conn.post != null) {
 				conn.post.abort();
-			conn.cancel(true);
+				conn.cancel(true);
+				conn.post = null;
+			} else {
+				conn.cancel(true);
+			}
 		}
 	}
 
@@ -334,6 +345,7 @@ public class Connection {
 		protected Object[] doInBackground(Void... params) {
 
 			try {
+
 				if (connectionType == Constants.TYPE_CONNECTION_GET) {
 
 					if (connectionId == Constants.CONNECTION_GET_IMAGES) {
@@ -377,6 +389,12 @@ public class Connection {
 					statusCode);
 			super.onPostExecute(result);
 		}
+
+		@Override
+		protected void onCancelled() {
+			super.onCancelled();
+			callback.resultFromConnection(connectionId, null, statusCode);
+		}
 	}
 
 	private class ConnectionWatcher extends AsyncTask<Object, Void, Integer> {
@@ -387,7 +405,7 @@ public class Connection {
 		protected Integer doInBackground(Object... params) {
 			try {
 				toWatch = (ExecuteConnection) params[0];
-				toWatch.get(15, TimeUnit.SECONDS);
+				toWatch.get(10, TimeUnit.SECONDS);
 				return 0;
 			} catch (InterruptedException e) {
 				return 2;
