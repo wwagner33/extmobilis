@@ -33,28 +33,40 @@ public class TTSPostsManager implements Runnable {
 			super.handleMessage(msg);
 			switch (msg.what) {
 			case Constants.PLAY_NEXT_POST:
-				postPlayer.playSoundEffect();
-				while (postPlayer.isPlaying()) {
-				}
-				if (threadPlayer != null) {
-					threadPlayer.interrupt();
-					threadPlayer = null;
-				}
-				comWithActivity.untogglePostPlayingStatus(currentPostIndex);
-				if (currentPostIndex < posts.size() - 1) {
-					comWithActivity.playNext();
-				} else {
-					deleteDir(new File(Constants.AUDIO_DEFAULT_PATH));
-					currentPostIndex = posts.size() - 1;
-					comWithActivity.playedAllPosts();
-				}
+				playNextPost();
 				break;
 			case Constants.ERROR_PLAYING:
-				Log.e("Erro", "Reproduçaão");
-				comWithActivity.togglePostPlayingStatus(currentPostIndex);
-				deleteDir(new File(Constants.AUDIO_DEFAULT_PATH));
-				generateError(Constants.ERROR_PLAYING);
+				errorPlaying();
 				break;
+			}
+		}
+
+		private void errorPlaying() {
+			Log.e("Erro", "Reprodução");
+			comWithActivity.togglePostPlayingStatus(currentPostIndex);
+			deleteDir(new File(Constants.AUDIO_DEFAULT_PATH));
+			generateError(Constants.ERROR_PLAYING);
+		}
+
+		private void playNextPost() {
+			postPlayer.playSoundEffect();
+
+			while (postPlayer.isPlaying()) {
+			}
+
+			if (threadPlayer != null) {
+				threadPlayer.interrupt();
+				threadPlayer = null;
+			}
+
+			comWithActivity.untogglePostPlayingStatus(currentPostIndex);
+
+			if (currentPostIndex < posts.size() - 1) {
+				comWithActivity.playNext();
+			} else {
+				deleteDir(new File(Constants.AUDIO_DEFAULT_PATH));
+				currentPostIndex = posts.size() - 1;
+				comWithActivity.playedAllPosts();
 			}
 		}
 	};
@@ -85,7 +97,7 @@ public class TTSPostsManager implements Runnable {
 			if (cut == content.length()) {
 				Log.w("Tamanho da String", "" + content.length());
 				Log.w("Content do Bloco1", content);
-				if(containsLetter(content))
+				if (containsLetter(content))
 					blocks.addBlock(content);
 				break;
 			}
@@ -120,9 +132,9 @@ public class TTSPostsManager implements Runnable {
 				end = content.length();
 			}
 			Log.w("Content do Bloco2", blockContent);
-			Log.w("Tamanho do bloco", ""+blockContent.length());
-			Log.i("Contem espaço", ""+containsLetter(blockContent));
-			if(containsLetter(content))
+			Log.w("Tamanho do bloco", "" + blockContent.length());
+			Log.i("Contem espaço", "" + containsLetter(blockContent));
+			if (containsLetter(content))
 				blocks.addBlock(blockContent);
 			else
 				break;
@@ -133,8 +145,9 @@ public class TTSPostsManager implements Runnable {
 		if (s == null)
 			return false;
 		boolean letterFound = false;
-		for (int i = 0; !letterFound && i < s.length(); i++){
-			letterFound = Character.isLetter(s.charAt(i)) && !Character.isSpaceChar(s.charAt(i));
+		for (int i = 0; !letterFound && i < s.length(); i++) {
+			letterFound = Character.isLetter(s.charAt(i))
+					&& !Character.isSpaceChar(s.charAt(i));
 			if (letterFound)
 				return true;
 		}

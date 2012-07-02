@@ -345,20 +345,16 @@ public class ParseJSON {
 
 		String content = (String) jsonObject.get("content");
 		content = removeBlankSpace(content);
-		content = content.replaceAll("<p>|<p style=\"color: rgb(86, 85, 77); font-family: Arial, Helvetica, sans-serif; font-size: 20px; font-style: italic; \">|&nbsp;|<\\/p>|<span style=\"color: rgb(86, 85, 77); font-family: Arial, Helvetica, sans-serif; font-size: 20px; font-style: italic; \">|<\\/span>", "");
+		content = content
+				.replaceAll(
+						"<p>|<p style=\"color: rgb(86, 85, 77); font-family: Arial, Helvetica, sans-serif; font-size: 20px; font-style: italic; \">|&nbsp;|<\\/p>|<span style=\"color: rgb(86, 85, 77); font-family: Arial, Helvetica, sans-serif; font-size: 20px; font-style: italic; \">|<\\/span>",
+						"");
 		Log.w("Content", content);
 		if (content != null) {
 			Spanned markUpFirst = Html.fromHtml(content);
 			content = markUpFirst.toString();
 		}
 		discussionPost.setContent(content);
-
-		// String contentLast = (String) jsonObject.get("content_last");
-		// if (contentLast != null) {
-		// Spanned markUpLast = Html.fromHtml(contentLast);
-		// contentLast = markUpLast.toString();
-		// }
-		// discussionPost.setContentLast(contentLast);
 
 		long discussionId = (Long) jsonObject.get("discussion_id");
 		discussionPost.setDiscussionId((int) discussionId);
