@@ -183,16 +183,6 @@ public class DiscussionPostAdapter extends BaseExpandableListAdapter {
 		return true;
 	}
 
-	public void includeOrRemovePlayController() {
-		if (isPlayExpanded) {
-			activity.removePlayControll();
-			setPlayExpanded(false);
-		} else {
-			activity.includePlayControll();
-			setPlayExpanded(true);
-		}
-	}
-
 	public void toggleExpandedPostMarkedStatus() {
 		DiscussionPost post = posts.get(activity.positionExpanded);
 		post.setMarked(!post.isMarked());

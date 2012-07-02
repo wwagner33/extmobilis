@@ -282,7 +282,7 @@ public class ExtMobilisTTSActivity extends ExpandableListActivity implements
 			discussionPostAdapter.notifyDataSetChanged();
 			break;
 		case R.id.play:
-			discussionPostAdapter.includeOrRemovePlayController();
+			playPost();
 			break;
 
 		case R.id.reply:
@@ -308,6 +308,20 @@ public class ExtMobilisTTSActivity extends ExpandableListActivity implements
 			break;
 		default:
 			break;
+		}
+	}
+
+	private void playPost() {
+		// se player não estiver visível mostrar
+		if (!discussionPostAdapter.getPlayExpanded()){
+			// incluir o player e tocar o post
+			includePlayControll();
+		} else {
+			// se outro post estiver tocando deve-se pará-lo
+			stop();
+			
+			// tocar o post
+			play(positionExpanded);
 		}
 	}
 
