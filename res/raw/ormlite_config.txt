@@ -1,0 +1,147 @@
+#
+# generated on 2012/07/02 09:56:44
+#
+# --table-start--
+dataClass=com.mobilis.model.Course
+tableName=courses
+# --table-fields-start--
+# --field-start--
+fieldName=_id
+columnName=_id
+id=true
+# --field-end--
+# --field-start--
+fieldName=offerId
+columnName=offer_id
+# --field-end--
+# --field-start--
+fieldName=groupId
+columnName=group_id
+# --field-end--
+# --field-start--
+fieldName=allocationTagId
+columnName=allocation_tag_id
+# --field-end--
+# --field-start--
+fieldName=semester
+columnName=semester
+# --field-end--
+# --field-start--
+fieldName=name
+columnName=name
+# --field-end--
+# --table-fields-end--
+# --table-end--
+#################################
+# --table-start--
+dataClass=com.mobilis.model.Discussion
+tableName=discussions
+# --table-fields-start--
+# --field-start--
+fieldName=_id
+columnName=_id
+id=true
+# --field-end--
+# --field-start--
+fieldName=name
+columnName=name
+# --field-end--
+# --field-start--
+fieldName=lastPostDate
+columnName=last_post_date
+# --field-end--
+# --field-start--
+fieldName=status
+columnName=status
+# --field-end--
+# --field-start--
+fieldName=classId
+columnName=class_id
+# --field-end--
+# --field-start--
+fieldName=description
+columnName=description
+# --field-end--
+# --field-start--
+fieldName=nextPosts
+columnName=next_posts
+# --field-end--
+# --field-start--
+fieldName=previousPosts
+columnName=previous_posts
+# --field-end--
+# --field-start--
+fieldName=hasNewPosts
+columnName=has_new_posts
+# --field-end--
+# --table-fields-end--
+# --table-end--
+#################################
+# --table-start--
+dataClass=com.mobilis.model.Post
+tableName=posts
+# --table-fields-start--
+# --field-start--
+fieldName=_id
+columnName=_id
+id=true
+# --field-end--
+# --field-start--
+fieldName=parentId
+columnName=parent_id
+# --field-end--
+# --field-start--
+fieldName=userId
+columnName=user_id
+# --field-end--
+# --field-start--
+fieldName=discussionId
+columnName=discussion_id
+# --field-end--
+# --field-start--
+fieldName=profileId
+columnName=profile_id
+# --field-end--
+# --field-start--
+fieldName=isMarked
+columnName=is_marked
+# --field-end--
+# --field-start--
+fieldName=userNick
+columnName=user_nick
+# --field-end--
+# --field-start--
+fieldName=content
+columnName=content
+# --field-end--
+# --field-start--
+fieldName=date
+columnName=date
+# --field-end--
+# --table-fields-end--
+# --table-end--
+#################################
+# --table-start--
+dataClass=com.mobilis.model.Class
+tableName=classes
+# --table-fields-start--
+# --field-start--
+fieldName=_id
+columnName=_id
+id=true
+# --field-end--
+# --field-start--
+fieldName=courseId
+columnName=course_id
+# --field-end--
+# --field-start--
+fieldName=code
+columnName=code
+# --field-end--
+# --field-start--
+fieldName=semester
+columnName=semester
+# --field-end--
+# --table-fields-end--
+# --table-end--
+#################################

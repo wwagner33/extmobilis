@@ -1,7 +1,8 @@
 package com.mobilis.controller;
 
+import java.util.ArrayList;
+
 import android.app.ProgressDialog;
-import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -9,11 +10,15 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
+import com.j256.ormlite.android.apptools.OpenHelperManager;
 import com.mobilis.dao.ClassDAO;
 import com.mobilis.dao.CourseDAO;
+import com.mobilis.dao.DatabaseHelper;
 import com.mobilis.dialog.DialogMaker;
 import com.mobilis.interfaces.ConnectionCallback;
 import com.mobilis.interfaces.MobilisMenuListActivity;
+import com.mobilis.model.Class;
+import com.mobilis.model.Course;
 import com.mobilis.util.Constants;
 import com.mobilis.util.ErrorHandler;
 import com.mobilis.util.MobilisPreferences;
@@ -33,22 +38,40 @@ public class CourseListController extends MobilisMenuListActivity implements
 	private DialogMaker dialogMaker;
 	private MobilisPreferences appState;
 	private SimpleCursorAdapter simpleAdapter;
+	private DatabaseHelper helper = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.course);
+		helper = getHelper();
 		appState = MobilisPreferences.getInstance(this);
 		dialogMaker = new DialogMaker(this);
 		progressDialog = dialogMaker
 				.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
 		connection = new Connection(this);
-		courseDAO = new CourseDAO(this);
-		classDAO = new ClassDAO(this);
-		jsonParser = new ParseJSON(this);
+		courseDAO = new CourseDAO(helper);
+		classDAO = new ClassDAO(helper);
+		jsonParser = new ParseJSON();
 		restoreActivityState();
 		updateList();
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		if (helper != null) {
+			OpenHelperManager.releaseHelper();
+			helper = null;
+		}
+	}
+
+	private DatabaseHelper getHelper() {
+		if (helper == null) {
+			helper = OpenHelperManager.getHelper(this, DatabaseHelper.class);
+		}
+		return helper;
 	}
 
 	@SuppressWarnings("deprecation")
@@ -70,9 +93,7 @@ public class CourseListController extends MobilisMenuListActivity implements
 
 	@Override
 	public void onBackPressed() {
-
 		super.onBackPressed();
-
 		Intent intent = new Intent(this, InitialConfig.class);
 		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		intent.putExtra("FinishActivity", "YES");
@@ -82,9 +103,7 @@ public class CourseListController extends MobilisMenuListActivity implements
 	@SuppressWarnings("deprecation")
 	public void updateList() {
 
-		courseDAO.open();
-		cursor = courseDAO.getAllCourses();
-		courseDAO.close();
+		cursor = courseDAO.getCoursesAsCursor();
 		simpleAdapter = new SimpleCursorAdapter(this, R.layout.course_item,
 				cursor, new String[] { "name" }, new int[] { R.id.item });
 		setListAdapter(simpleAdapter);
@@ -99,17 +118,14 @@ public class CourseListController extends MobilisMenuListActivity implements
 		itemCursor = (Cursor) listView.getAdapter().getItem(position);
 		int courseId = itemCursor.getInt(itemCursor.getColumnIndex("_id"));
 		appState.selectedCourse = courseId;
-		classDAO.open();
 
-		if (classDAO.existClasses(appState.selectedCourse)) {
-			classDAO.close();
+		if (classDAO.existClassesOnCourse(appState.selectedCourse)) {
 			intent = new Intent(this, ClassListController.class);
 			progressDialog.dismiss();
 			startActivity(intent);
 		}
 
 		else {
-			classDAO.close();
 			progressDialog.show();
 			obtainCurriculumUnits(Constants.URL_CURRICULUM_UNITS_PREFIX
 					+ courseId + Constants.URL_GROUPS_SUFFIX);
@@ -137,6 +153,7 @@ public class CourseListController extends MobilisMenuListActivity implements
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public void resultFromConnection(int connectionId, String result,
 			int statusCode) {
 		if (statusCode != 201 && statusCode != 200) {
@@ -148,23 +165,25 @@ public class CourseListController extends MobilisMenuListActivity implements
 			switch (connectionId) {
 
 			case Constants.CONNECTION_GET_COURSES:
-				ContentValues[] courseValues = jsonParser.parseJSON(result,
-						Constants.PARSE_COURSES_ID);
-				courseDAO.open();
-				courseDAO.addCourses(courseValues);
-				courseDAO.close();
+
+				ArrayList<Course> courseValues = (ArrayList<Course>) jsonParser
+						.parseJSON(result, Constants.PARSE_COURSES_ID);
+				courseDAO.clearCourses();
+				courseDAO.addCourse(courseValues
+						.toArray(new Course[courseValues.size()]));
 				updateList();
 				progressDialog.dismiss();
 				break;
 
 			case Constants.CONNECTION_GET_CLASSES:
-				ContentValues[] classValues = jsonParser.parseJSON(result,
-						Constants.PARSE_CLASSES_ID);
 
-				classDAO.open();
+				ArrayList<Class> classValues = (ArrayList<Class>) jsonParser
+						.parseJSON(result, Constants.PARSE_CLASSES_ID);
 
-				classDAO.addClasses(classValues, appState.selectedCourse);
-				classDAO.close();
+				classDAO.addClass(
+						classValues
+								.toArray(new com.mobilis.model.Class[classValues
+										.size()]), appState.selectedCourse);
 
 				intent = new Intent(getApplicationContext(),
 						ClassListController.class);

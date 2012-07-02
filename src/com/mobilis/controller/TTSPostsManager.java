@@ -13,12 +13,12 @@ import android.util.Log;
 
 import com.mobilis.controller.ExtMobilisTTSActivity.PostManagerHandler;
 import com.mobilis.model.BlockQueue;
-import com.mobilis.model.DiscussionPost;
+import com.mobilis.model.Post;
 import com.mobilis.util.Constants;
 import com.mobilis.ws.WebServiceBing;
 
 public class TTSPostsManager implements Runnable {
-	private ArrayList<DiscussionPost> posts;
+	private ArrayList<Post> posts;
 	private BlockQueue blocks;
 	private int currentPostIndex;
 	private PostPlayer postPlayer;
@@ -56,7 +56,7 @@ public class TTSPostsManager implements Runnable {
 		}
 	};
 
-	public TTSPostsManager(ArrayList<DiscussionPost> posts, int postIndex,
+	public TTSPostsManager(ArrayList<Post> posts, int postIndex,
 			PostManagerHandler comWithActivity, Context context) {
 		super();
 		this.context = context;

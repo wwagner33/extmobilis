@@ -2,39 +2,57 @@ package com.mobilis.model;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.table.DatabaseTable;
 import com.mobilis.util.Constants;
 import com.mobilis.util.DateUtils;
 
-public class DiscussionPost {
+@DatabaseTable(tableName = "posts")
+public class Post {
+
+	public static final String ID_FIELD_NAME = "_id";
+	public static final String PARENT_ID_FIELD_NAME = "parent_id";
+	public static final String USER_ID_FIELD_NAME = "user_id";
+	public static final String DISCUSSION_ID_FIELD_NAME = "discussion_id";
+	public static final String PROFILE_ID_FIELD_NAME = "profile_id";
+	public static final String USER_NICK_FIELD_NAME = "user_nick";
+	public static final String CONTENT_FIELD_NAME = "content";
+	public static final String DATE_FIELD_NAME = "date";
+	public static final String IS_MARKED_FIELD_NAME = "is_marked";
+
+	@DatabaseField(id = true, columnName = ID_FIELD_NAME)
 	private int _id;
+
+	@DatabaseField(columnName = PARENT_ID_FIELD_NAME)
 	private int parentId;
+
+	@DatabaseField(columnName = USER_ID_FIELD_NAME)
 	private int userId;
+
+	@DatabaseField(columnName = DISCUSSION_ID_FIELD_NAME)
 	private int discussionId;
+
+	@DatabaseField(columnName = PROFILE_ID_FIELD_NAME)
 	private int profileId;
-	private boolean isMarked, isPlaying, isJustLoaded = false;
+
+	@DatabaseField(columnName = IS_MARKED_FIELD_NAME)
+	private boolean isMarked = false;
+
+	private boolean isPlaying, isJustLoaded = false;
+
+	@DatabaseField(columnName = USER_NICK_FIELD_NAME)
 	private String userNick;
+
+	@DatabaseField(columnName = CONTENT_FIELD_NAME)
 	private String content;
-	private Calendar date;
 
-	public DiscussionPost() {
+	@DatabaseField(columnName = DATE_FIELD_NAME)
+	private Date date;
 
-	}
+	public Post() {
 
-	public DiscussionPost(int _id, int parentId, int userId, int discussionId,
-			int profileId, boolean isMarked, String userNick, String content,
-			Calendar date) {
-		this._id = _id;
-		this.parentId = parentId;
-		this.userId = userId;
-		this.discussionId = discussionId;
-		this.profileId = profileId;
-		this.isMarked = isMarked;
-		this.userNick = userNick;
-		this.content = content;
-		this.date = date;
 	}
 
 	public int getId() {
@@ -107,12 +125,11 @@ public class DiscussionPost {
 		return simpleDateFormat.format(date.getTime());
 	}
 
-	public void setDate(Calendar date) {
+	public void setDate(Date date) {
 		this.date = date;
 	}
 
 	public void setDate(String dateString) {
-		Calendar cal = Calendar.getInstance();
 		Date date = new Date();
 		try {
 			date = DateUtils.getDbFormat().parse(dateString);
@@ -120,8 +137,7 @@ public class DiscussionPost {
 			e.printStackTrace();
 			return;
 		}
-		cal.setTime(date);
-		this.date = cal;
+		this.date = date;
 	}
 
 	public String getDateToString() {

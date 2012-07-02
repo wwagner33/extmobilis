@@ -21,23 +21,25 @@ import android.widget.TextView;
 
 import com.mobilis.dao.PostDAO;
 import com.mobilis.exception.ImageFileNotFoundException;
-import com.mobilis.model.DiscussionPost;
+import com.mobilis.model.Post;
 import com.mobilis.util.Constants;
 
 public class DiscussionPostAdapter extends BaseExpandableListAdapter {
 
-	private List<DiscussionPost> posts;
+	private List<Post> posts;
 	private View expandButton, play, markButton, reply, details;
 	private ExtMobilisTTSActivity activity;
 	private boolean isPlayExpanded = false;
+	private PostDAO postDAO;
 
-	public DiscussionPostAdapter(List<DiscussionPost> posts,
+	public DiscussionPostAdapter(List<Post> posts,
 			ExtMobilisTTSActivity extMobilisTTSActivity) {
 		this.posts = posts;
 		activity = extMobilisTTSActivity;
+		postDAO = new PostDAO(activity.getHelper());
 	}
 
-	public void setPosts(List<DiscussionPost> newPosts) {
+	public void setPosts(List<Post> newPosts) {
 		posts = newPosts;
 	}
 
@@ -117,7 +119,7 @@ public class DiscussionPostAdapter extends BaseExpandableListAdapter {
 			// Será exibido a imagem default
 		}
 
-		DiscussionPost post = posts.get(groupPosition);
+		Post post = posts.get(groupPosition);
 
 		if (post != null) {
 			TextView userNick = (TextView) convertView
@@ -194,23 +196,19 @@ public class DiscussionPostAdapter extends BaseExpandableListAdapter {
 	}
 
 	public void toggleExpandedPostMarkedStatus() {
-		DiscussionPost post = posts.get(activity.positionExpanded);
+		Post post = posts.get(activity.positionExpanded);
 		post.setMarked(!post.isMarked());
-		// atualizar post no banco
-		PostDAO postDAO = new PostDAO(activity);
-		postDAO.open();
-		postDAO.setMarked((int) post.getId(), post.isMarked());
-		postDAO.close();
+		postDAO.updatePost(post);
 	}
 
 	public void untogglePostPlayingStatus(int postIndex) {
-		DiscussionPost post = posts.get(postIndex);
+		Post post = posts.get(postIndex);
 		post.setPlaying(false);
 		notifyDataSetChanged();
 	}
 
 	public void togglePostPlayingStatus(int postIndex) {
-		DiscussionPost post = posts.get(postIndex);
+		Post post = posts.get(postIndex);
 		post.setPlaying(true);
 		notifyDataSetChanged();
 	}

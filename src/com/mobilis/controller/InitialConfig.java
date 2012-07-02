@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 
+import com.j256.ormlite.android.apptools.OpenHelperManager;
 import com.mobilis.dao.CourseDAO;
 import com.mobilis.dao.DatabaseHelper;
 import com.mobilis.util.Constants;
@@ -19,16 +20,21 @@ public class InitialConfig extends Activity {
 	private Bundle extras;
 	private MobilisPreferences prefs;
 
+	private DatabaseHelper helper;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		if (helper == null) {
+			helper = OpenHelperManager.getHelper(this, DatabaseHelper.class);
+		}
 
 		prefs = MobilisPreferences.getInstance(this);
 		File file = new File(Constants.PATH_MAIN_FOLDER);
 		if (!file.exists()) {
 			file.mkdirs();
 		}
-		DatabaseHelper helper = new DatabaseHelper(this);
 
 		if (getIntent().getExtras() != null) {
 			extras = getIntent().getExtras();
@@ -39,35 +45,23 @@ public class InitialConfig extends Activity {
 		}
 
 		else {
+			if (prefs.getPreferences().getString("token", null) != null) {
 
-			if (helper.checkDataBaseExistence()) {
+				CourseDAO courseDAO = new CourseDAO(helper);
+				boolean existCourses = courseDAO.existCourses();
 
-				if (prefs.getPreferences().getString("token", null) != null) {
-
-					CourseDAO courseDAO = new CourseDAO(this);
-					courseDAO.open();
-					boolean existCourses = courseDAO.existCourses();
-					courseDAO.close();
-
-					if (prefs.getPreferences().getBoolean("AutoLogin", true)
-							&& existCourses) {
-						intent = new Intent(this, CourseListController.class);
-						startActivity(intent);
-					} else {
-						intent = new Intent(this, Login.class);
-						startActivity(intent);
-
-					}
-				} else {
-					setConfigurations();
-					Intent intent = new Intent(this, Login.class);
+				if (prefs.getPreferences().getBoolean("AutoLogin", true)
+						&& existCourses) {
+					intent = new Intent(this, CourseListController.class);
 					startActivity(intent);
-				}
-			}
+				} else {
+					intent = new Intent(this, Login.class);
+					startActivity(intent);
 
-			else {
-				helper.copyDatabaseFile();
-				intent = new Intent(this, Login.class);
+				}
+			} else {
+				setConfigurations();
+				Intent intent = new Intent(this, Login.class);
 				startActivity(intent);
 			}
 		}
@@ -85,6 +79,15 @@ public class InitialConfig extends Activity {
 		super.onStop();
 		if (cursor != null) {
 			cursor.close();
+		}
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		if (helper != null) {
+			OpenHelperManager.releaseHelper();
+			helper = null;
 		}
 	}
 }

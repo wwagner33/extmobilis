@@ -2,7 +2,7 @@ package com.mobilis.controller;
 
 import java.io.IOException;
 
-import com.mobilis.model.DiscussionPost;
+import com.mobilis.model.Post;
 import com.mobilis.util.Constants;
 
 import android.content.Context;
@@ -12,7 +12,7 @@ import android.os.Handler;
 import android.util.Log;
 
 public class PostPlayer implements Runnable, OnCompletionListener {
-	private DiscussionPost post;
+	private Post post;
 	private MediaPlayer mediaPlayer;
 	private Context context;
 	private int currentBlockIndex = 0; // Deve ser thread safe
@@ -27,9 +27,10 @@ public class PostPlayer implements Runnable, OnCompletionListener {
 			return getHeader();
 		else
 			return "Paga a parte do blockpositions";
+	
 	}
 
-	public PostPlayer(int numberOfBlocks, Handler handler, DiscussionPost post,
+	public PostPlayer(int numberOfBlocks, Handler handler, Post post,
 			Context context, boolean isLastPost) {
 		super();
 		this.isLastPost = isLastPost;

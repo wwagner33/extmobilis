@@ -1,10 +1,11 @@
 package com.mobilis.controller;
 
+import java.util.ArrayList;
+
 import org.json.simple.JSONObject;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.ContentValues;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -16,9 +17,12 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.j256.ormlite.android.apptools.OpenHelperManager;
 import com.mobilis.dao.CourseDAO;
+import com.mobilis.dao.DatabaseHelper;
 import com.mobilis.dialog.DialogMaker;
 import com.mobilis.interfaces.ConnectionCallback;
+import com.mobilis.model.Course;
 import com.mobilis.util.Constants;
 import com.mobilis.util.ErrorHandler;
 import com.mobilis.util.MobilisPreferences;
@@ -36,6 +40,7 @@ public class Login extends Activity implements OnClickListener,
 	private DialogMaker dialogMaker;
 	private CourseDAO courseDAO;
 	private MobilisPreferences prefs;
+	private DatabaseHelper helper = null;
 
 	private Connection connection;
 
@@ -45,16 +50,26 @@ public class Login extends Activity implements OnClickListener,
 		init(R.layout.login);
 	}
 
+	private DatabaseHelper getHelper() {
+		if (helper == null) {
+			helper = OpenHelperManager.getHelper(this, DatabaseHelper.class);
+		}
+		return helper;
+	}
+
 	public void init(int layoutId) {
 
 		setContentView(layoutId);
+		helper = getHelper();
 		dialogMaker = new DialogMaker(this);
 		dialog = dialogMaker
 				.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
 		prefs = MobilisPreferences.getInstance(this);
 		connection = new Connection(this);
-		jsonParser = new ParseJSON(this);
-		courseDAO = new CourseDAO(this);
+
+		jsonParser = new ParseJSON();
+
+		courseDAO = new CourseDAO(helper);
 
 		login = (EditText) findViewById(R.id.username);
 		password = (EditText) findViewById(R.id.password);
@@ -141,6 +156,16 @@ public class Login extends Activity implements OnClickListener,
 	}
 
 	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		if (helper != null) {
+			OpenHelperManager.releaseHelper();
+			helper = null;
+		}
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
 	public void resultFromConnection(int connectionId, String result,
 			int statusCode) {
 
@@ -155,19 +180,20 @@ public class Login extends Activity implements OnClickListener,
 			case Constants.CONNECTION_POST_TOKEN:
 				Log.w("Token Connection", "OK");
 
-				jsonParser = new ParseJSON(getApplicationContext());
-				ContentValues[] tokenParsed = jsonParser.parseJSON(result,
-						Constants.PARSE_TOKEN_ID);
-				prefs.setToken(tokenParsed[0].getAsString("token"));
+				ArrayList<String> tokenParsed = (ArrayList<String>) jsonParser
+						.parseJSON(result, Constants.PARSE_TOKEN_ID);
+				prefs.setToken(tokenParsed.get(0));
 				getCourseList(prefs.getToken());
 				break;
 
 			case Constants.CONNECTION_GET_COURSES:
-				ContentValues[] values = jsonParser.parseJSON(result,
-						Constants.PARSE_COURSES_ID);
-				courseDAO.open();
-				courseDAO.addCourses(values);
-				courseDAO.close();
+
+				ArrayList<Course> courses = (ArrayList<Course>) jsonParser
+						.parseJSON(result, Constants.PARSE_COURSES_ID);
+
+				courseDAO.clearCourses();
+				courseDAO
+						.addCourse(courses.toArray(new Course[courses.size()]));
 
 				intent = new Intent(getApplicationContext(),
 						CourseListController.class);

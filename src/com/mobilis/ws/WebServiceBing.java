@@ -14,19 +14,19 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import android.util.Log;
-import com.mobilis.model.DiscussionPost;
+import com.mobilis.model.Post;
 import com.mobilis.util.Constants;
 
 public class WebServiceBing {
 
 	private HttpGet get;
 	private String addressAudio;
-	private DiscussionPost post;
+	private Post post;
 	private HttpResponse response = null;
 	private DefaultHttpClient client;
 	public static final String BING_URI = "http://api.microsofttranslator.com/v2/Http.svc/Speak?appId=03CAF44417913E4B9D82BE6202DBFBD768B8C5E1&text=";
 
-	public WebServiceBing(DiscussionPost post) {
+	public WebServiceBing(Post post) {
 		this.post = post;
 	}
 

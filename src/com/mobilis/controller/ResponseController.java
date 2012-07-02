@@ -2,13 +2,13 @@ package com.mobilis.controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import org.json.simple.JSONObject;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.ContentValues;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -31,13 +31,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.j256.ormlite.android.apptools.OpenHelperManager;
 import com.mobilis.audio.AudioPlayer;
 import com.mobilis.audio.AudioRecorder;
+import com.mobilis.dao.DatabaseHelper;
 import com.mobilis.dao.DiscussionDAO;
 import com.mobilis.dao.PostDAO;
 import com.mobilis.dialog.AudioDialog;
-import com.mobilis.dialog.DialogMaker;
 import com.mobilis.dialog.AudioDialog.onDeleteListener;
+import com.mobilis.dialog.DialogMaker;
 import com.mobilis.interfaces.AudioDialogListener;
 import com.mobilis.interfaces.ConnectionCallback;
 import com.mobilis.model.Discussion;
@@ -78,15 +80,17 @@ public class ResponseController extends Activity implements OnClickListener,
 	private DiscussionDAO discussionDAO;
 	private Discussion currentDiscussion;
 	private Intent intent;
+	private DatabaseHelper helper = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.response);
-		discussionDAO = new DiscussionDAO(this);
+		helper = getHelper();
+		discussionDAO = new DiscussionDAO(helper);
 		appState = MobilisPreferences.getInstance(this);
-		postDAO = new PostDAO(this);
+		postDAO = new PostDAO(helper);
 		setVolumeControlStream(AudioManager.STREAM_MUSIC);
 		connection = new Connection(this);
 		dialogMaker = new DialogMaker(this);
@@ -106,10 +110,26 @@ public class ResponseController extends Activity implements OnClickListener,
 		player = new AudioPlayer();
 		charCount = (TextView) findViewById(R.id.char_number);
 		charCount.setText("0/" + Constants.TEXT_MAX_CHARACTER_LENGHT);
-		jsonParser = new ParseJSON(this);
+		jsonParser = new ParseJSON();
 
 		restoreDialog();
 
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		if (helper != null) {
+			OpenHelperManager.releaseHelper();
+			helper = null;
+		}
+	}
+
+	private DatabaseHelper getHelper() {
+		if (helper == null) {
+			helper = OpenHelperManager.getHelper(this, DatabaseHelper.class);
+		}
+		return helper;
 	}
 
 	@Override
@@ -406,6 +426,7 @@ public class ResponseController extends Activity implements OnClickListener,
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public void resultFromConnection(int connectionId, String result,
 			int statusCode) {
 
@@ -419,10 +440,8 @@ public class ResponseController extends Activity implements OnClickListener,
 				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				MobilisPreferences status = MobilisPreferences
 						.getInstance(this);
-				postDAO.open();
 				status.ids = postDAO
 						.getIdsOfPostsWithoutImage(appState.selectedDiscussion);
-				postDAO.close();
 				startActivity(intent);
 				break;
 
@@ -436,48 +455,46 @@ public class ResponseController extends Activity implements OnClickListener,
 			switch (connectionId) {
 
 			case Constants.CONNECTION_POST_AUDIO:
-				discussionDAO.open();
 				currentDiscussion = discussionDAO
 						.getDiscussion(appState.selectedDiscussion);
 
-				discussionDAO.setNextPosts(appState.selectedDiscussion,
-						(currentDiscussion.getNextPosts() + 1));
-				discussionDAO.close();
+				currentDiscussion
+						.setNextPosts(currentDiscussion.getNextPosts() + 1);
+				discussionDAO.updateDiscussion(currentDiscussion);
+
 				intent = new Intent(getApplicationContext(),
 						ExtMobilisTTSActivity.class);
 				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
 				MobilisPreferences status = MobilisPreferences
 						.getInstance(this);
-				postDAO.open();
 				status.ids = postDAO
 						.getIdsOfPostsWithoutImage(appState.selectedDiscussion);
-				postDAO.close();
 				startActivity(intent);
 				break;
 
 			case Constants.CONNECTION_POST_TEXT_RESPONSE:
 				Log.w("TEXT RESPONSE RESULT", result);
 
-				ContentValues[] resultFromServer;
-				jsonParser = new ParseJSON(getApplicationContext());
-				resultFromServer = jsonParser.parseJSON(result,
-						Constants.PARSE_TEXT_RESPONSE_ID);
+				ArrayList<String> resultFromServer;
+
+				resultFromServer = (ArrayList<String>) jsonParser.parseJSON(
+						result, Constants.PARSE_TEXT_RESPONSE_ID);
 
 				if (existsRecording) {
-					long postId = (Long) resultFromServer[0].get("post_id");
+					long postId = Long.parseLong(resultFromServer.get(0));
 					sendAudioPost(
 							Constants.generateAudioResponseURL((int) postId),
 							recorder.getAudioFile(), appState.getToken());
 
 				} else {
-					discussionDAO.open();
 					currentDiscussion = discussionDAO
 							.getDiscussion(appState.selectedDiscussion);
+					currentDiscussion.setNextPosts(currentDiscussion
+							.getNextPosts() + 1);
 
-					discussionDAO.setNextPosts(appState.selectedDiscussion,
-							(currentDiscussion.getNextPosts() + 1));
-					discussionDAO.close();
+					discussionDAO.updateDiscussion(currentDiscussion);
+
 					intent = new Intent(getApplicationContext(),
 							ExtMobilisTTSActivity.class);
 					intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

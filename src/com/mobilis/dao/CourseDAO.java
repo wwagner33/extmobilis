@@ -1,52 +1,73 @@
 package com.mobilis.dao;
 
-import android.content.ContentValues;
-import android.content.Context;
+import java.sql.SQLException;
+import java.util.ArrayList;
+
 import android.database.Cursor;
 
-public class CourseDAO extends DBAdapter {
+import com.j256.ormlite.android.AndroidCompiledStatement;
+import com.j256.ormlite.dao.RuntimeExceptionDao;
+import com.j256.ormlite.stmt.PreparedQuery;
+import com.j256.ormlite.stmt.QueryBuilder;
+import com.j256.ormlite.stmt.StatementBuilder.StatementType;
+import com.j256.ormlite.table.TableUtils;
+import com.mobilis.model.Course;
 
-	public CourseDAO(Context context) {
-		super(context);
+public class CourseDAO {
+
+	private DatabaseHelper helper = null;
+	private RuntimeExceptionDao<Course, Integer> dao;
+
+	public CourseDAO(DatabaseHelper helper) {
+		this.helper = helper;
+		dao = helper.getRuntimeExceptionDao(Course.class);
+
 	}
 
-	public void addCourses(ContentValues[] values) {
-
-		if (existCourses()) {
-			clearCourses();
-		}
-
-		getDatabase().beginTransaction();
-		for (int i = 0; i < values.length; i++) {
-			getDatabase().insert("courses", null, values[i]);
-		}
-		getDatabase().setTransactionSuccessful();
-		getDatabase().endTransaction();
+	public RuntimeExceptionDao<Course, Integer> getDao() {
+		return dao;
 	}
 
 	public boolean existCourses() {
+		return (dao.countOf() > 0) ? true : false;
+	}
 
-		Cursor cursor = getDatabase().query("courses", new String[] { "_id" },
-				null, null, null, null, null, "1");
-		cursor.moveToFirst();
+	public void addCourse(Course course) {
+		dao.create(course);
+	}
+
+	public void addCourse(Course[] courses) {
+		for (Course course : courses) {
+			addCourse(course);
+		}
+	}
+
+	public ArrayList<Course> getCourses() {
+		return new ArrayList<Course>(dao.queryForAll());
+	}
+
+	public Cursor getCoursesAsCursor() {
+
+		QueryBuilder<Course, Integer> queryBuilder = dao.queryBuilder();
+		PreparedQuery<Course> query;
+
 		try {
-			int count = cursor.getInt(0);
-			cursor.close();
-			return (count != 0) ? true : false;
-		} catch (Exception e) {
-			return false;
+			query = queryBuilder.prepare();
+			AndroidCompiledStatement statement = (AndroidCompiledStatement) query
+					.compile(helper.getConnectionSource()
+							.getReadOnlyConnection(), StatementType.SELECT);
+			Cursor cursor = statement.getCursor();
+			return cursor;
+		} catch (SQLException e) {
+			throw new RuntimeException();
 		}
 	}
 
 	public void clearCourses() {
-		getDatabase().delete("courses", null, null);
-	}
-
-	public Cursor getAllCourses() { // Pegar só as colunas necessárias
-
-		Cursor cursor = getDatabase().query("courses", null, null, null, null,
-				null, null, null);
-		cursor.moveToFirst();
-		return cursor;
+		try {
+			TableUtils.clearTable(helper.getConnectionSource(), Course.class);
+		} catch (SQLException e) {
+			throw new RuntimeException();
+		}
 	}
 }

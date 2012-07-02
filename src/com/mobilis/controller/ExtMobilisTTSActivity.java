@@ -1,11 +1,9 @@
 package com.mobilis.controller;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import android.app.ExpandableListActivity;
 import android.app.ProgressDialog;
-import android.content.ContentValues;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.media.AudioManager;
@@ -24,13 +22,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.j256.ormlite.android.apptools.OpenHelperManager;
+import com.mobilis.dao.DatabaseHelper;
 import com.mobilis.dao.DiscussionDAO;
 import com.mobilis.dao.PostDAO;
 import com.mobilis.dialog.DialogMaker;
 import com.mobilis.exception.ImageFileNotFoundException;
 import com.mobilis.interfaces.ConnectionCallback;
 import com.mobilis.model.Discussion;
-import com.mobilis.model.DiscussionPost;
+import com.mobilis.model.Post;
 import com.mobilis.util.Constants;
 import com.mobilis.util.ErrorHandler;
 import com.mobilis.util.MobilisPreferences;
@@ -41,7 +41,7 @@ public class ExtMobilisTTSActivity extends ExpandableListActivity implements
 		OnClickListener, ConnectionCallback {
 
 	private Discussion discussion;
-	private ArrayList<DiscussionPost> discussionPosts;
+	private ArrayList<Post> discussionPosts;
 	private DiscussionPostAdapter discussionPostAdapter;
 	private ExpandableListView expandableListView;
 	private View header;
@@ -71,12 +71,14 @@ public class ExtMobilisTTSActivity extends ExpandableListActivity implements
 	private MobilisPreferences appState;
 	private Intent intent;
 	private ParseJSON jsonParser;
+	private DatabaseHelper helper = null;
 
 	@SuppressWarnings("deprecation")
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.posts_new);
-		jsonParser = new ParseJSON(this);
+		helper = getHelper();
+		jsonParser = new ParseJSON();
 		appState = MobilisPreferences.getInstance(this);
 		wsSolar = new Connection(this);
 
@@ -89,13 +91,11 @@ public class ExtMobilisTTSActivity extends ExpandableListActivity implements
 		setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
 		dialogMaker = new DialogMaker(this);
-		postDAO = new PostDAO(this);
-		discussionDAO = new DiscussionDAO(this);
-		discussionPosts = new ArrayList<DiscussionPost>();
+		postDAO = new PostDAO(helper);
+		discussionDAO = new DiscussionDAO(helper);
+		discussionPosts = new ArrayList<Post>();
 
-		discussionDAO.open();
 		discussion = discussionDAO.getDiscussion(appState.selectedDiscussion);
-		discussionDAO.close();
 
 		forumName = (TextView) findViewById(R.id.discussion_name);
 		forumName.setText(discussion.getName());
@@ -133,6 +133,22 @@ public class ExtMobilisTTSActivity extends ExpandableListActivity implements
 			loadPostsFromDatabase();
 	}
 
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		if (helper != null) {
+			OpenHelperManager.releaseHelper();
+			helper = null;
+		}
+	}
+
+	public DatabaseHelper getHelper() {
+		if (helper == null) {
+			helper = OpenHelperManager.getHelper(this, DatabaseHelper.class);
+		}
+		return helper;
+	}
+
 	@SuppressWarnings("unchecked")
 	public void loadPostsFromRetainedState() {
 		@SuppressWarnings("deprecation")
@@ -143,7 +159,7 @@ public class ExtMobilisTTSActivity extends ExpandableListActivity implements
 			dialog.show();
 		}
 		if (retainedState[1] != null) {
-			discussionPosts = (ArrayList<DiscussionPost>) retainedState[1];
+			discussionPosts = (ArrayList<Post>) retainedState[1];
 		}
 
 		if (retainedState[2] != null) {
@@ -303,9 +319,7 @@ public class ExtMobilisTTSActivity extends ExpandableListActivity implements
 
 		case R.id.details:
 
-			postDAO.open();
-			DiscussionPost post = postDAO.getPost(appState.selectedPost);
-			postDAO.close();
+			Post post = postDAO.getPost(appState.selectedPost);
 			intent = new Intent(this, PostDetailController.class);
 			try {
 				Bitmap userImage = discussionPostAdapter
@@ -323,14 +337,9 @@ public class ExtMobilisTTSActivity extends ExpandableListActivity implements
 	}
 
 	private void loadPostsFromDatabase() {
-		discussionDAO.open();
 		discussion = discussionDAO.getDiscussion(discussion.getId());
 		previous = discussion.getPreviousPosts();
-		discussionDAO.close();
-		postDAO.open();
-		discussionPosts = new ArrayList<DiscussionPost>(Arrays.asList(postDAO
-				.getAllPosts(discussion.getId())));
-		postDAO.close();
+		discussionPosts = postDAO.getAllPostsFromDiscussion(discussion.getId());
 		discussionPostAdapter = new DiscussionPostAdapter(discussionPosts,
 				ExtMobilisTTSActivity.this);
 
@@ -463,13 +472,11 @@ public class ExtMobilisTTSActivity extends ExpandableListActivity implements
 		int discussionSize = discussionPosts.size();
 		String date;
 		if (discussionSize == 0) {
-			date = "19800217111000"; // se possível mudar para a data de início
-										// da discussion
+			date = "19800217111000";
+
 		} else {
 			date = discussionPosts.get(discussionSize - 1).getDateToString();
 		}
-		// faz a chamada dos posts posteriores a essa data
-
 		wsSolar.getFromServer(Constants.CONNECTION_GET_NEW_POSTS,
 				Constants.generateNewPostsTTSURL(discussion.getId(), date),
 				appState.getToken());
@@ -497,11 +504,9 @@ public class ExtMobilisTTSActivity extends ExpandableListActivity implements
 	}
 
 	public void downloadImages() {
-		postDAO.open();
 		wsSolar.getImages(
 				postDAO.getIdsOfPostsWithoutImage(appState.selectedDiscussion),
 				appState.getToken());
-		postDAO.close();
 	}
 
 	public void includePlayControll() {
@@ -538,6 +543,7 @@ public class ExtMobilisTTSActivity extends ExpandableListActivity implements
 	}
 
 	public class PostManagerHandler extends Handler {
+
 		@Override
 		public void handleMessage(Message msg) {
 			super.handleMessage(msg);
@@ -568,6 +574,7 @@ public class ExtMobilisTTSActivity extends ExpandableListActivity implements
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	private void parsePosts(String content) {
 		int[] beforeAfter = new int[2];
 		final int beforeIndex = 0;
@@ -575,37 +582,33 @@ public class ExtMobilisTTSActivity extends ExpandableListActivity implements
 
 		beforeAfter = jsonParser.parseBeforeAndAfter(content);
 
-		ArrayList<DiscussionPost> loadedposts = jsonParser
-				.parsePostsTTS(content);
+		ArrayList<Post> loadedposts = (ArrayList<Post>) jsonParser.parseJSON(
+				content, Constants.PARSE_POSTS_ID);
 
 		if (!(headerClicked || footerClicked)) {
 
 			discussionPosts = loadedposts;
 			discussionPostAdapter = new DiscussionPostAdapter(discussionPosts,
 					ExtMobilisTTSActivity.this);
-			postDAO.open();
-			postDAO.insertPostsToDB(loadedposts, appState.selectedDiscussion);
-			postDAO.close();
-			discussionDAO.open();
+			postDAO.insertPosts(
+					loadedposts.toArray(new Post[loadedposts.size()]),
+					appState.selectedDiscussion);
 			discussion.setNextPosts(beforeAfter[afterIndex]);
 			setFooter();
-			discussionDAO.setNextPosts(discussion.getId(),
-					discussion.getNextPosts());
-			discussion.setPreviousPosts(beforeAfter[beforeIndex]);
+			discussion.getNextPosts();
 			setHeader();
-			discussionDAO.setPreviousPosts(discussion.getId(),
-					discussion.getPreviousPosts());
-			discussionDAO.close();
+			discussion.getPreviousPosts();
+			discussionDAO.updateDiscussion(discussion);
 			setListAdapter(discussionPostAdapter);
 		} else {
 			if (headerClicked) {
 
-				ArrayList<DiscussionPost> invertedLoadedPosts = jsonParser
-						.parseInvertedPosts(content);
+				ArrayList<Post> loadedPosts = (ArrayList<Post>) jsonParser
+						.parseJSON(content, Constants.PARSE_POSTS_ID);
 
 				if (discussion.getPreviousPosts() % 20 != 0) {
 					discussion.setPreviousPosts(discussion.getPreviousPosts()
-							- invertedLoadedPosts.size());
+							- loadedPosts.size());
 				}
 
 				else {
@@ -616,7 +619,7 @@ public class ExtMobilisTTSActivity extends ExpandableListActivity implements
 					previous = discussion.getPreviousPosts();
 				}
 
-				discussionPosts.addAll(0, invertedLoadedPosts);
+				discussionPosts.addAll(0, loadedPosts);
 				discussionPostAdapter = new DiscussionPostAdapter(
 						discussionPosts, ExtMobilisTTSActivity.this);
 				setHeader();
@@ -626,15 +629,9 @@ public class ExtMobilisTTSActivity extends ExpandableListActivity implements
 			} else if (footerClicked) {
 
 				if (beforeAfter[afterIndex] == 0) {
-					discussionDAO.open();
-					if (discussionDAO
-							.hasNewPostsFlag(appState.selectedDiscussion)) {
-						ContentValues newFlag = new ContentValues();
-						newFlag.put("has_new_posts", 0);
-						discussionDAO.updateFlag(newFlag,
-								appState.selectedDiscussion);
+					if (discussion.HasNewPosts()) {
+						discussion.setHasNewPosts(false);
 					}
-					discussionDAO.close();
 				}
 
 				footerClicked = false;
@@ -648,47 +645,34 @@ public class ExtMobilisTTSActivity extends ExpandableListActivity implements
 				}
 
 				discussionPosts.addAll(loadedposts);
-				postDAO.open();
-				ArrayList<DiscussionPost> postsFromDB = new ArrayList<DiscussionPost>(
-						Arrays.asList(postDAO.getAllPosts(discussion.getId())));
-				postDAO.close();
+				ArrayList<Post> postsFromDB = postDAO
+						.getAllPostsFromDiscussion(discussion.getId());
 				if (postsFromDB.size() - loadedposts.size() != 0) {
 
-					ArrayList<DiscussionPost> postsToRemain = new ArrayList<DiscussionPost>();
+					ArrayList<Post> postsToRemain = new ArrayList<Post>();
 
 					for (int i = loadedposts.size(); i < postsFromDB.size(); i++) {
 						postsToRemain.add(postsFromDB.get(i));
 					}
 
-					for (DiscussionPost disc : loadedposts) {
+					for (Post disc : loadedposts) {
 						postsToRemain.add(disc);
 					}
 
-					Log.i("SIZE", "" + postsToRemain.size());
-					discussionDAO.open();
-					discussionDAO.setPreviousPosts(discussion.getId(),
-							discussion.getPreviousPosts() + loadedposts.size());
-					discussionDAO.close();
+					discussion.setPreviousPosts(discussion.getPreviousPosts()
+							+ loadedposts.size());
 					loadedposts = postsToRemain;
 				} else {
-					discussion.setPreviousPosts(beforeAfter[beforeIndex]);
-					discussionDAO.open();
-
-					discussionDAO.setPreviousPosts(discussion.getId(),
-							discussion.getPreviousPosts());
-					discussionDAO.close();
+					discussion.setPreviousPosts(discussion.getPreviousPosts()
+							+ loadedposts.size());
 				}
-				discussionDAO.open();
 				discussion.setNextPosts(beforeAfter[afterIndex]);
-				discussionDAO.setNextPosts(discussion.getId(),
-						discussion.getNextPosts());
-				discussionDAO.close();
-				setFooter();
+				discussionDAO.updateDiscussion(discussion);
 
-				postDAO.open();
-				postDAO.insertPostsToDB(loadedposts,
+				setFooter();
+				postDAO.insertPosts(
+						loadedposts.toArray(new Post[loadedposts.size()]),
 						appState.selectedDiscussion);
-				postDAO.close();
 			}
 		}
 		discussionPostAdapter.notifyDataSetChanged();
@@ -702,7 +686,6 @@ public class ExtMobilisTTSActivity extends ExpandableListActivity implements
 			switch (connectionId) {
 
 			case Constants.CONNECTION_GET_IMAGES:
-				// nada
 				break;
 			default:
 				ErrorHandler.handleStatusCode(this, statusCode);

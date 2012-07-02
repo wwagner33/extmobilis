@@ -6,7 +6,6 @@ public class Constants {
 
 	public static final String URL_LOCAL = "http://10.0.2.2:3000/";
 	public static final String URL_SERVER = "http://apolo11teste.virtual.ufc.br/solar/";
-
 	// public static final String URL_SERVER = "http://apolo11.virtual.ufc.br/";
 	public static final String URL_TOKEN = "sessions";
 	public static final String URL_COURSES = "curriculum_units.json"; // suffix
@@ -17,28 +16,16 @@ public class Constants {
 	public static final String URL_CURRICULUM_UNITS_PREFIX = "curriculum_units/";
 	public static final String URL_POSTS_SUFFIX = "/posts.json";
 
-	public static String generateHistoryPostURL(int topicId, String date) {
-		String url = "discussions/" + topicId + "/posts/" + "history/" + date
-				+ ".json";
-		return url;
-	}
-
 	public static String generateHistoryPostTTSURL(int topicId, String date) {
 
 		String url = "discussions/" + topicId + "/posts/history/" + date
-				+ "/order/desc" + "/limit/" + TOTAL_POSTS_TO_LOAD + ".json";
+				+ "/order/asc" + "/limit/" + TOTAL_POSTS_TO_LOAD + ".json";
 		return url;
 	}
 
 	public static String generateNewPostsTTSURL(int topicId, String date) {
 		String url = "discussions/" + topicId + "/posts/news/" + date
 				+ "/order/asc" + "/limit/" + TOTAL_POSTS_TO_LOAD + ".json";
-		return url;
-	}
-
-	public static String generateNewPostsURL(int topicId) {
-		String url = "discussions/" + topicId + "/posts/" + "news/"
-				+ oldDateString + ".json";
 		return url;
 	}
 

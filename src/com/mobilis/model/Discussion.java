@@ -1,35 +1,62 @@
 package com.mobilis.model;
 
 import java.text.ParseException;
-import java.util.Calendar;
 import java.util.Date;
 
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.table.DatabaseTable;
 import com.mobilis.util.DateUtils;
 
+@DatabaseTable(tableName = "discussions")
 public class Discussion {
+
+	public static final String ID_FIELD_NAME = "_id";
+	public static final String NAME_FIELD_NAME = "name";
+	public static final String LAST_POST_DATE_FIELD_NAME = "last_post_date";
+	public static final String STATUS_FIELD_NAME = "status";
+	public static final String CLASS_ID_FIELD_NAME = "class_id";
+	public static final String DESCRIPTION_FIELD_NAME = "description";
+	public static final String NEXT_POSTS_FIELD_NAME = "next_posts";
+	public static final String PREVIOUS_POSTS_FIELD_NAME = "previous_posts";
+	public static final String HAS_NEW_POSTS_FIELD_NAME = "has_new_posts";
+
+	@DatabaseField(id = true, columnName = ID_FIELD_NAME)
 	private int _id;
+
+	@DatabaseField(columnName = NAME_FIELD_NAME)
 	private String name;
-	private Calendar lastPostDate;
+
+	@DatabaseField(columnName = LAST_POST_DATE_FIELD_NAME)
+	private Date lastPostDate;
+
+	@DatabaseField(columnName = STATUS_FIELD_NAME)
 	private int status;
+
+	@DatabaseField(columnName = CLASS_ID_FIELD_NAME)
 	private int classId;
+
+	@DatabaseField(columnName = DESCRIPTION_FIELD_NAME)
 	private String description;
+
+	@DatabaseField(columnName = NEXT_POSTS_FIELD_NAME)
 	private int nextPosts;
+
+	@DatabaseField(columnName = PREVIOUS_POSTS_FIELD_NAME)
 	private int previousPosts;
+
+	@DatabaseField(columnName = HAS_NEW_POSTS_FIELD_NAME)
+	private boolean hasNewPosts = false;
 
 	public Discussion() {
 
 	}
 
-	public Discussion(int _id, String name, Calendar lastPostDate, int status,
-			int classId, String description, int nextPosts, int previousPosts) {
+	public int get_id() {
+		return _id;
+	}
+
+	public void set_id(int _id) {
 		this._id = _id;
-		this.name = name;
-		this.lastPostDate = lastPostDate;
-		this.status = status;
-		this.classId = classId;
-		this.description = description;
-		this.nextPosts = nextPosts;
-		this.previousPosts = previousPosts;
 	}
 
 	public int getId() {
@@ -48,16 +75,15 @@ public class Discussion {
 		this.name = name;
 	}
 
-	public Calendar getLastPostDate() {
+	public Date getLastPostDate() {
 		return lastPostDate;
 	}
 
-	public void setLastPostDate(Calendar lastPostDate) {
+	public void setLastPostDate(Date lastPostDate) {
 		this.lastPostDate = lastPostDate;
 	}
 
 	public void setLastPostDate(String lastPostDateString) {
-		Calendar cal = Calendar.getInstance();
 		Date date = new Date();
 		try {
 			date = DateUtils.getDbFormat().parse(lastPostDateString);
@@ -65,8 +91,7 @@ public class Discussion {
 			e.printStackTrace();
 			return;
 		}
-		cal.setTime(date);
-		this.lastPostDate = cal;
+		this.lastPostDate = date;
 	}
 
 	public int getStatus() {
@@ -107,6 +132,14 @@ public class Discussion {
 
 	public void setPreviousPosts(int previousPosts) {
 		this.previousPosts = previousPosts;
+	}
+
+	public boolean HasNewPosts() {
+		return hasNewPosts;
+	}
+
+	public void setHasNewPosts(boolean hasNewPosts) {
+		this.hasNewPosts = hasNewPosts;
 	}
 
 }

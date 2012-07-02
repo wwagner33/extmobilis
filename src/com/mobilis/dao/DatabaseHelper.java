@@ -1,119 +1,59 @@
-/*
- ******************************************************************************
- * Parts of this code sample are licensed under Apache License, Version 2.0   *
- * Copyright (c) 2009, Android Open Handset Alliance. All rights reserved.    *
- *																			  *																			*
- * Except as noted, this code sample is offered under a modified BSD license. *
- * Copyright (C) 2010, Motorola Mobility, Inc. All rights reserved.           *
- * 																			  *
- * For more details, see MOTODEV_Studio_for_Android_LicenseNotices.pdf        * 
- * in your installation folder.                                               *
- ******************************************************************************
- */
 package com.mobilis.dao;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.sql.SQLException;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteException;
-import android.database.sqlite.SQLiteOpenHelper;
 
-import com.mobilis.util.Constants;
+import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
+import com.j256.ormlite.dao.Dao;
+import com.j256.ormlite.support.ConnectionSource;
+import com.j256.ormlite.table.TableUtils;
+import com.mobilis.controller.R;
+import com.mobilis.model.Class;
+import com.mobilis.model.Course;
+import com.mobilis.model.Discussion;
+import com.mobilis.model.Post;
 
-public class DatabaseHelper extends SQLiteOpenHelper {
+public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
-	String outFileName = Constants.DATABASE_PATH + Constants.DATABASE_NAME;
-
-	private final Context context;
+	public static final String TAG = "DatabaseHelper";
+	public static final String DATABASE_NAME = "mobilis.db";
+	public static final int DATABASE_VERSION = 1;
 
 	public DatabaseHelper(Context context) {
-
-		super(context, Constants.DATABASE_NAME, null, 1);
-		this.context = context;
+		super(context, DATABASE_NAME, null, DATABASE_VERSION,
+				R.raw.ormlite_config);
 	}
 
-	public DatabaseHelper(Context context, boolean copyDatabase) {
+	@Override
+	public void onCreate(SQLiteDatabase arg0, ConnectionSource arg1) {
+		try {
 
-		this(context);
-		if (copyDatabase) {
-			copyDatabaseFile();
+			TableUtils.createTable(connectionSource, Course.class);
+			TableUtils.createTable(connectionSource, Class.class);
+			TableUtils.createTable(connectionSource, Discussion.class);
+			TableUtils.createTable(connectionSource, Post.class);
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 
 	@Override
-	public void onCreate(SQLiteDatabase db) {
-		// Leave this method empty
-	}
-
-	@Override
-	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		// fill in your code here
-	}
-
-	public void copyDatabaseFile() {
-
-		InputStream myInput = null;
-		OutputStream myOutput = null;
-		SQLiteDatabase database = null;
-
-		database = this.getReadableDatabase();
-		try {
-
-			myInput = context.getAssets().open(Constants.DATABASE_NAME);
-
-			myOutput = new FileOutputStream(outFileName);
-
-			byte[] buffer = new byte[1024];
-			int length;
-			while ((length = myInput.read(buffer)) > 0) {
-				myOutput.write(buffer, 0, length);
-			}
-		} catch (FileNotFoundException e) {
-			// handle your exception here
-		} catch (IOException e) {
-			// handle your exception here
-		} finally {
-			try {
-
-				myOutput.flush();
-				myOutput.close();
-				myInput.close();
-				if (database != null && database.isOpen()) {
-
-					database.close();
-				}
-			} catch (Exception e) {
-				// handle your exception here
-			}
-		}
+	public void onUpgrade(SQLiteDatabase arg0, ConnectionSource arg1, int arg2,
+			int arg3) {
+		// TODO Auto-generated method stub
 
 	}
 
-	public boolean checkDataBaseExistence() {
+	private Dao<Course, Integer> courseDAO;
 
-		SQLiteDatabase checkDB = null;
-
-		try {
-
-			checkDB = SQLiteDatabase.openDatabase(outFileName, null,
-					SQLiteDatabase.NO_LOCALIZED_COLLATORS);
-			checkDB.close();
-		} catch (SQLiteException e) {
-
+	public Dao<Course, Integer> getDao() throws SQLException {
+		if (courseDAO == null) {
+			courseDAO = getDao(Course.class);
 		}
-
-		if (checkDB != null) {
-			return true;
-		} else {
-			checkDB = this.getReadableDatabase();
-			checkDB.close();
-			return false;
-		}
-
+		return courseDAO;
 	}
 }

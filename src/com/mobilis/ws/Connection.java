@@ -309,9 +309,11 @@ public class Connection {
 		if (conn.connectionType == Constants.TYPE_CONNECTION_GET) {
 			if (conn.get != null)
 				conn.get.abort();
+			conn.cancel(true);
 		} else if (conn.connectionType == Constants.TYPE_CONNECTION_POST) {
 			if (conn.post != null)
 				conn.post.abort();
+			conn.cancel(true);
 		}
 	}
 
