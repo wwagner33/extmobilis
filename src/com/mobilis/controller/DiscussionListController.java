@@ -92,7 +92,6 @@ public class DiscussionListController extends MobilisMenuListActivity implements
 
 	@Override
 	public Object onRetainNonConfigurationInstance() {
-		Log.i("OnRetain", "True");
 		if (progressDialog != null) {
 			if (progressDialog.isShowing()) {
 				Log.i("OnRetain2", "True");
@@ -239,7 +238,6 @@ public class DiscussionListController extends MobilisMenuListActivity implements
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		Log.w("OnActivityResult", "OK");
 		updateList();
 	}
 

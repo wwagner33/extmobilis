@@ -704,7 +704,6 @@ public class ExtMobilisTTSActivity extends ExpandableListActivity implements
 
 	@Override
 	protected void onStop() {
-		// TODO Auto-generated method stub
 		super.onStop();
 		if (ttsPostsManager != null)
 			ttsPostsManager.stop();
@@ -716,7 +715,6 @@ public class ExtMobilisTTSActivity extends ExpandableListActivity implements
 		if (statusCode != 200 && statusCode != 201) {
 
 			switch (connectionId) {
-
 			case Constants.CONNECTION_GET_IMAGES:
 				break;
 			default:

@@ -132,8 +132,8 @@ public class ParseJSON {
 			JSONObject jsonObject = (JSONObject) object;
 
 			ArrayList<Integer> result = new ArrayList<Integer>();
-			result.add((Integer) jsonObject.get("result"));
-			result.add((Integer) jsonObject.get("post_id"));
+			result.add(((Long) jsonObject.get("result")).intValue());
+			result.add(((Long) jsonObject.get("post_id")).intValue());
 			return result;
 
 		case Constants.PARSE_POSTS_ID:

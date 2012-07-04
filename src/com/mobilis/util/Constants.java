@@ -118,8 +118,8 @@ public class Constants {
 	public static final int STOP_AUDIO = 1;
 	public static final int ERROR_PLAYING = -1;
 	public static final int CONNECTION_ERROR = -2;
-	public static final int MIN_BLOCK_LENGTH = 100;
-	public static final int MAX_BLOCK_LENGTH = 150;
+	public static final int MIN_BLOCK_LENGTH = 200; // 100
+	public static final int MAX_BLOCK_LENGTH = 400; // 150
 	public static final int TOTAL_POSTS_TO_LOAD = 20;
 
 }

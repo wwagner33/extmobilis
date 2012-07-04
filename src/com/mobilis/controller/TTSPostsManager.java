@@ -133,12 +133,7 @@ public class TTSPostsManager implements Runnable {
 			Log.i(TAG, "BlockContent = " + blockContent);
 
 			if (blockContent != null) {
-				if (blockContent.length() < content.length()) {
-					blocks.addBlock(blockContent);
-				} else {
-					blocks.addBlock(blockContent);
-					break;
-				}
+				blocks.addBlock(blockContent);
 			} else {
 				Log.i(TAG, "BlockContent IS NULL");
 				break;
