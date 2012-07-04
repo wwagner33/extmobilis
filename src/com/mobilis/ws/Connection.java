@@ -378,15 +378,21 @@ public class Connection {
 		@Override
 		protected void onPostExecute(Object[] result) {
 
-			if (result[1] != null) {
-				if (statusCode != 699) {
-					statusCode = (Integer) result[1];
+			String content = null;
+
+			if (result != null) {
+				if (result[1] != null) {
+					if (statusCode != 699) {
+						statusCode = (Integer) result[1];
+					}
+				}
+				if (result[0] != null) {
+					content = (String) result[0];
 				}
 			}
 
 			Log.w("STATUS CODE", "" + statusCode);
-			callback.resultFromConnection(connectionId, (String) result[0],
-					statusCode);
+			callback.resultFromConnection(connectionId, content, statusCode);
 			super.onPostExecute(result);
 		}
 

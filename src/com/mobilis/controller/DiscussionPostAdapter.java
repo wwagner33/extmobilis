@@ -11,7 +11,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.TransitionDrawable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,10 +26,18 @@ import com.mobilis.util.Constants;
 public class DiscussionPostAdapter extends BaseExpandableListAdapter {
 
 	private List<Post> posts;
-	private View expandButton, play, markButton, reply, details;
 	private ExtMobilisTTSActivity activity;
 	private boolean isPlayExpanded = false;
 	private PostDAO postDAO;
+
+	static class ChildViewHolder {
+		View play, reply, details, expandButton, markButton;
+	}
+
+	static class ParentViewHolder {
+		TextView userNick, postDate, postContent;
+		ImageView userPhoto;
+	}
 
 	public DiscussionPostAdapter(List<Post> posts,
 			ExtMobilisTTSActivity extMobilisTTSActivity) {
@@ -54,28 +61,33 @@ public class DiscussionPostAdapter extends BaseExpandableListAdapter {
 	public View getChildView(int groupPosition, int childPosition,
 			boolean isLastChild, View convertView, ViewGroup parent) {
 
+		ChildViewHolder childHolder;
+
 		if (convertView == null) {
+
 			LayoutInflater inflater = (LayoutInflater) activity
 					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			convertView = inflater.inflate(R.layout.discussion_list_item_menu,
 					null);
+			childHolder = new ChildViewHolder();
+			childHolder.expandButton = convertView.findViewById(R.id.expand);
+			childHolder.markButton = convertView.findViewById(R.id.mark);
+			childHolder.play = convertView.findViewById(R.id.play);
+			childHolder.details = convertView.findViewById(R.id.details);
+			childHolder.reply = convertView.findViewById(R.id.reply);
+
+			convertView.setTag(childHolder);
 		}
-		// TODO Adicionar Eventos dos botões da Child
 
-		expandButton = convertView.findViewById(R.id.expand);
-		expandButton.setOnClickListener(activity);
+		else {
+			childHolder = (ChildViewHolder) convertView.getTag();
+		}
 
-		markButton = convertView.findViewById(R.id.mark);
-		markButton.setOnClickListener(activity);
-
-		play = convertView.findViewById(R.id.play);
-		play.setOnClickListener(activity);
-
-		reply = convertView.findViewById(R.id.reply);
-		reply.setOnClickListener(activity);
-
-		details = convertView.findViewById(R.id.details);
-		details.setOnClickListener(activity);
+		childHolder.expandButton.setOnClickListener(activity);
+		childHolder.markButton.setOnClickListener(activity);
+		childHolder.play.setOnClickListener(activity);
+		childHolder.reply.setOnClickListener(activity);
+		childHolder.details.setOnClickListener(activity);
 
 		return convertView;
 	}
@@ -104,37 +116,50 @@ public class DiscussionPostAdapter extends BaseExpandableListAdapter {
 	public View getGroupView(int groupPosition, boolean isExpanded,
 			View convertView, ViewGroup parent) {
 
-		LayoutInflater inflater = (LayoutInflater) activity
-				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		convertView = inflater.inflate(R.layout.discussion_list_item, null);
+		ParentViewHolder parentHolder;
+		Post post = posts.get(groupPosition);
 
-		ImageView userPhoto = (ImageView) convertView
-				.findViewById(R.id.user_photo);
+		if (convertView == null) {
+
+			LayoutInflater inflater = (LayoutInflater) activity
+					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			convertView = inflater.inflate(R.layout.discussion_list_item, null);
+			parentHolder = new ParentViewHolder();
+
+			parentHolder.userPhoto = (ImageView) convertView
+					.findViewById(R.id.user_photo);
+
+			parentHolder.userNick = (TextView) convertView
+					.findViewById(R.id.user_nick);
+
+			parentHolder.postDate = (TextView) convertView
+					.findViewById(R.id.post_date);
+			parentHolder.postContent = (TextView) convertView
+					.findViewById(R.id.post_content);
+			convertView.setTag(parentHolder);
+
+		} else {
+			parentHolder = (ParentViewHolder) convertView.getTag();
+		}
 
 		try {
-			userPhoto.setImageBitmap(getUserImage((int) posts
-					.get(groupPosition).getUserId()));
-			Log.i("USER NAME", "" + posts.get(groupPosition).getUserNick());
+			parentHolder.userPhoto.setImageBitmap(getUserImage((int) posts.get(
+					groupPosition).getUserId()));
 		} catch (ImageFileNotFoundException e) {
 			// Será exibido a imagem default
 		}
 
-		Post post = posts.get(groupPosition);
-
 		if (post != null) {
-			TextView userNick = (TextView) convertView
-					.findViewById(R.id.user_nick);
-			TextView postDate = (TextView) convertView
-					.findViewById(R.id.post_date);
 			TextView postContent = (TextView) convertView
 					.findViewById(R.id.post_content);
 
-			if (userNick != null) {
-				userNick.setText(post.getUserNick());
+			if (parentHolder.userNick != null) {
+				parentHolder.userNick.setText(post.getUserNick());
 			}
-			if (postDate != null) {
-				postDate.setText(generateDateHeader(groupPosition));
-			//	postDate.setText(post.getDate());
+			if (parentHolder.postDate != null) {
+				parentHolder.postDate
+						.setText(generateDateHeader(groupPosition));
+				// postDate.setText(post.getDate());
 			}
 			if (postContent != null) {
 				String content = post.getContent();
@@ -256,8 +281,6 @@ public class DiscussionPostAdapter extends BaseExpandableListAdapter {
 	}
 
 	public Bitmap getUserImage(int userId) throws ImageFileNotFoundException {
-
-		Log.i("User id", "" + userId);
 
 		try {
 			final String prefix = String.valueOf(userId);

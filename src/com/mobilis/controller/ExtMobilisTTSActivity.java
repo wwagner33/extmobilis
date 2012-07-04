@@ -60,7 +60,7 @@ public class ExtMobilisTTSActivity extends ExpandableListActivity implements
 	private TextView forumName;
 	private PostDAO postDAO;
 	private DiscussionDAO discussionDAO;
-	private ImageButton play, prev, next;
+	private ImageButton barButtonPlay, prev, next;
 	private TTSPostsManager ttsPostsManager;
 	private Thread threadTTSPostsManager;
 	boolean playAfterStop = false;
@@ -72,8 +72,8 @@ public class ExtMobilisTTSActivity extends ExpandableListActivity implements
 	private Intent intent;
 	private ParseJSON jsonParser;
 	private DatabaseHelper helper = null;
+	private static final String TAG = "TTS-ACTIVITY";
 
-	@SuppressWarnings("deprecation")
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.posts_new);
@@ -118,8 +118,8 @@ public class ExtMobilisTTSActivity extends ExpandableListActivity implements
 		footerRefresh = inflater.inflate(R.layout.refresh_discussion_list_item,
 				expandableListView, false);
 
-		play = (ImageButton) findViewById(R.id.button_play);
-		play.setOnClickListener(this);
+		barButtonPlay = (ImageButton) findViewById(R.id.button_play);
+		barButtonPlay.setOnClickListener(this);
 
 		prev = (ImageButton) findViewById(R.id.button_prev);
 		prev.setOnClickListener(this);
@@ -206,8 +206,12 @@ public class ExtMobilisTTSActivity extends ExpandableListActivity implements
 	}
 
 	private void play(int position) {
-		play.setContentDescription(getResources().getString(R.string.pause));
-		play.setImageResource(R.drawable.playback_pause);
+
+		Log.i(TAG, "Posotion of post = " + position);
+
+		barButtonPlay.setContentDescription(getResources().getString(
+				R.string.pause));
+		barButtonPlay.setImageResource(R.drawable.playback_pause);
 		if (ttsPostsManager == null && !playAfterStop) {
 			ttsPostsManager = new TTSPostsManager(discussionPosts, position,
 					handlerPostManager, getApplicationContext());
@@ -239,15 +243,17 @@ public class ExtMobilisTTSActivity extends ExpandableListActivity implements
 					getResources().getString(R.string.error_connection_failed),
 					Toast.LENGTH_SHORT).show();
 
-			play.setContentDescription(getResources().getString(R.string.play));
-			play.setImageResource(R.drawable.playback_play);
+			barButtonPlay.setContentDescription(getResources().getString(
+					R.string.play));
+			barButtonPlay.setImageResource(R.drawable.playback_play);
 			break;
 		case Constants.ERROR_PLAYING:
 			Toast.makeText(getApplicationContext(),
 					getResources().getString(R.string.error_playing),
 					Toast.LENGTH_SHORT).show();
-			play.setContentDescription(getResources().getString(R.string.play));
-			play.setImageResource(R.drawable.playback_play);
+			barButtonPlay.setContentDescription(getResources().getString(
+					R.string.play));
+			barButtonPlay.setImageResource(R.drawable.playback_play);
 			break;
 		}
 	}
@@ -327,13 +333,13 @@ public class ExtMobilisTTSActivity extends ExpandableListActivity implements
 
 	private void playPost() {
 		// se player não estiver visível mostrar
-		if (!discussionPostAdapter.getPlayExpanded()){
+		if (!discussionPostAdapter.getPlayExpanded()) {
 			// incluir o player e tocar o post
 			includePlayControll();
 		} else {
 			// se outro post estiver tocando deve-se pará-lo
 			stop();
-			
+
 			// tocar o post
 			play(positionExpanded);
 		}
@@ -341,14 +347,14 @@ public class ExtMobilisTTSActivity extends ExpandableListActivity implements
 
 	private void playClick() {
 		synchronized (this) {
-			if (play.getContentDescription().toString()
+			if (barButtonPlay.getContentDescription().toString()
 					.equals(getResources().getString(R.string.play))) {
 				play(positionExpanded);
-			} else if (play.getContentDescription().toString()
+			} else if (barButtonPlay.getContentDescription().toString()
 					.equals(getResources().getString(R.string.pause))) {
-				play.setContentDescription(getResources().getString(
+				barButtonPlay.setContentDescription(getResources().getString(
 						R.string.play));
-				play.setImageResource(R.drawable.playback_play);
+				barButtonPlay.setImageResource(R.drawable.playback_play);
 				ttsPostsManager.pause();
 			}
 		}
@@ -528,7 +534,7 @@ public class ExtMobilisTTSActivity extends ExpandableListActivity implements
 	}
 
 	public void includePlayControll() {
-		play.setVisibility(View.VISIBLE);
+		barButtonPlay.setVisibility(View.VISIBLE);
 		prev.setVisibility(View.VISIBLE);
 		next.setVisibility(View.VISIBLE);
 		prev.setVisibility(View.VISIBLE);
@@ -537,9 +543,10 @@ public class ExtMobilisTTSActivity extends ExpandableListActivity implements
 	}
 
 	public void removePlayControll() {
-		play.setContentDescription(getResources().getString(R.string.play));
-		play.setImageResource(R.drawable.playback_play);
-		play.setVisibility(View.GONE);
+		barButtonPlay.setContentDescription(getResources().getString(
+				R.string.play));
+		barButtonPlay.setImageResource(R.drawable.playback_play);
+		barButtonPlay.setVisibility(View.GONE);
 		prev.setVisibility(View.GONE);
 		next.setVisibility(View.GONE);
 		prev.setVisibility(View.GONE);

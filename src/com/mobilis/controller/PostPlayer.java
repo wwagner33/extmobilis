@@ -1,5 +1,6 @@
 package com.mobilis.controller;
 
+import java.io.File;
 import java.io.IOException;
 
 import com.mobilis.model.Post;
@@ -8,10 +9,12 @@ import com.mobilis.util.Constants;
 import android.content.Context;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
+import android.media.MediaPlayer.OnErrorListener;
 import android.os.Handler;
 import android.util.Log;
 
-public class PostPlayer implements Runnable, OnCompletionListener {
+public class PostPlayer implements Runnable, OnCompletionListener,
+		OnErrorListener {
 	private Post post;
 	private MediaPlayer mediaPlayer;
 	private Context context;
@@ -21,13 +24,16 @@ public class PostPlayer implements Runnable, OnCompletionListener {
 	private boolean isPaused = false;
 	private Handler handler;
 	private boolean isLastPost;
+	public static final String TAG = "POSTPLAYER";
+
+	public static final int MAX_TIME_TO_SLEEP = 1800;
 
 	String getBlockAtIndex(int index) {
 		if (index == 0)
 			return getHeader();
 		else
 			return "Paga a parte do blockpositions";
-	
+
 	}
 
 	public PostPlayer(int numberOfBlocks, Handler handler, Post post,
@@ -41,6 +47,7 @@ public class PostPlayer implements Runnable, OnCompletionListener {
 		Log.w("Blocks Number", "" + blocksNumber);
 		mediaPlayer = new MediaPlayer();
 		mediaPlayer.setOnCompletionListener(this);
+		mediaPlayer.setOnErrorListener(this);
 	}
 
 	int blocksCount() {
@@ -57,25 +64,38 @@ public class PostPlayer implements Runnable, OnCompletionListener {
 		return null;
 	}
 
-	void play() throws IllegalStateException, IOException, InterruptedException {
+	void play() {
+		// IOException, InterruptedException
 		synchronized (this) {
-			if (currentBlockIndex <= lastAvailableBlockIndex) {
-				Log.w("Current", "" + currentBlockIndex);
-				Log.w("last", "" + lastAvailableBlockIndex);
-				Log.w("Number total", "" + blocksNumber);
-				if (!mediaPlayer.isPlaying()) {
-					Log.e("Player", "Tocando");
-					mediaPlayer.setDataSource(Constants.AUDIO_DEFAULT_PATH
-							+ post.getId() + "/" + currentBlockIndex + ".mp3");
-					mediaPlayer.prepare();
-					mediaPlayer.start();
 
+			try {
+
+				if (currentBlockIndex <= lastAvailableBlockIndex) {
+					Log.w("Current", "" + currentBlockIndex);
+					Log.w("last", "" + lastAvailableBlockIndex);
+					Log.w("Number total", "" + blocksNumber);
+					if (!mediaPlayer.isPlaying()) {
+						Log.e("Player", "Tocando");
+						File file = new File(Constants.AUDIO_DEFAULT_PATH
+								+ post.getId() + "/" + currentBlockIndex
+								+ ".mp3");
+						Log.i(TAG, "File Exists = " + file.exists());
+						mediaPlayer.setDataSource(Constants.AUDIO_DEFAULT_PATH
+								+ post.getId() + "/" + currentBlockIndex
+								+ ".mp3");
+						mediaPlayer.prepare();
+						mediaPlayer.start();
+					}
+				} else {
+					if (currentBlockIndex < blocksNumber) {
+						Log.e("Player", "Aguardando novo audio");
+						this.wait();
+					}
 				}
-			} else {
-				if (currentBlockIndex < blocksNumber) {
-					Log.e("Player", "Aguardando novo audio");
-					this.wait();
-				}
+
+			} catch (Exception e) {
+				e.printStackTrace();
+				Log.i(TAG, "OnException");
 			}
 		}
 	}
@@ -101,24 +121,26 @@ public class PostPlayer implements Runnable, OnCompletionListener {
 			if (!mediaPlayer.isPlaying() && !isPaused) {
 				try {
 					this.play();
-					Thread.sleep(Constants.MAX_TIME_TO_SLEEP);
+					Thread.sleep(MAX_TIME_TO_SLEEP);
 				} catch (IllegalStateException e) {
-					handler.sendEmptyMessage(Constants.ERROR_PLAYING);
-					e.printStackTrace();
-					return;
-				} catch (IOException e) {
+					Log.i(TAG, "IllegalStateException");
 					handler.sendEmptyMessage(Constants.ERROR_PLAYING);
 					e.printStackTrace();
 					return;
 				} catch (InterruptedException e) {
+					e.printStackTrace();
 					break;
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
 			}
 		}
 		if (lastAvailableBlockIndex != -1 && !Thread.interrupted()) {
+			Log.i(TAG, "Playing next post");
 			handler.sendEmptyMessage(Constants.PLAY_NEXT_POST);
 		} else
-			handler.sendEmptyMessage(Constants.STOP_AUDIO);
+			Log.i(TAG, "Stopping audio");
+		handler.sendEmptyMessage(Constants.STOP_AUDIO);
 	}
 
 	public void playSoundEffect() {
@@ -133,6 +155,7 @@ public class PostPlayer implements Runnable, OnCompletionListener {
 
 	@Override
 	public void onCompletion(MediaPlayer mp) {
+		Log.i(TAG, "onCompletionListener");
 		currentBlockIndex++;
 		mp.stop();
 		mp.reset();
@@ -152,5 +175,11 @@ public class PostPlayer implements Runnable, OnCompletionListener {
 
 	public boolean isPlaying() {
 		return mediaPlayer.isPlaying();
+	}
+
+	@Override
+	public boolean onError(MediaPlayer mp, int what, int extra) {
+		Log.i(TAG, "OnErrorListener");
+		return false;
 	}
 }

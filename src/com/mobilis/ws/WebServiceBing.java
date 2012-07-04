@@ -25,6 +25,7 @@ public class WebServiceBing {
 	private HttpResponse response = null;
 	private DefaultHttpClient client;
 	public static final String BING_URI = "http://api.microsofttranslator.com/v2/Http.svc/Speak?appId=03CAF44417913E4B9D82BE6202DBFBD768B8C5E1&text=";
+	public static final String TAG = "WSBING";
 
 	public WebServiceBing(Post post) {
 		this.post = post;
@@ -46,11 +47,11 @@ public class WebServiceBing {
 				+ "/" + index + ".mp3");
 		InputStream audioInput = getAudio(text);
 		if (audioInput == null) {
-			Log.e("Retorno", "false");
+			Log.e(TAG, "Retorno = " + false);
 			return false;
 		}
 		handleResponse(audioInput);
-		Log.e("Retorno", "true");
+		Log.e(TAG, "Retorno = " + true);
 		return true;
 	}
 
@@ -67,7 +68,7 @@ public class WebServiceBing {
 			Log.w("URI", String.valueOf(get.getURI()));
 			response = client.execute(get);
 			int connectionStatus = response.getStatusLine().getStatusCode();
-			Log.w("StatusCode", String.valueOf(connectionStatus));
+			Log.w(TAG, "Status Code = " + String.valueOf(connectionStatus));
 			audioResponse = response.getEntity().getContent();
 			Log.e("audioResponse", response.toString());
 			return audioResponse;
@@ -76,6 +77,9 @@ public class WebServiceBing {
 			e.printStackTrace();
 			return null;
 		} catch (IllegalStateException e) {
+			e.printStackTrace();
+			return null;
+		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
 		}

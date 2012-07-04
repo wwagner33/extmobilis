@@ -26,6 +26,22 @@ public class TTSPostsManager implements Runnable {
 	private WebServiceBing webServiceBing;
 	private PostManagerHandler comWithActivity;
 	private Context context;
+	private static String TAG = "TTS";
+
+	public TTSPostsManager(ArrayList<Post> posts, int postIndex,
+			PostManagerHandler comWithActivity, Context context) {
+		super();
+		this.context = context;
+		this.comWithActivity = comWithActivity;
+		this.posts = posts;
+		currentPostIndex = postIndex;
+		play(currentPostIndex);
+	}
+
+	private void play(int postIndex) {
+		comWithActivity.togglePostPlayingStatus(postIndex);
+		createBlocks(postIndex);
+	}
 
 	Handler playAllPosts = new Handler() {
 		@Override
@@ -71,21 +87,6 @@ public class TTSPostsManager implements Runnable {
 		}
 	};
 
-	public TTSPostsManager(ArrayList<Post> posts, int postIndex,
-			PostManagerHandler comWithActivity, Context context) {
-		super();
-		this.context = context;
-		this.comWithActivity = comWithActivity;
-		this.posts = posts;
-		currentPostIndex = postIndex;
-		play(currentPostIndex);
-	}
-
-	private void play(int postIndex) {
-		comWithActivity.togglePostPlayingStatus(postIndex);
-		createBlocks(postIndex);
-	}
-
 	void createBlocks(int index) {
 		blocks = new BlockQueue();
 		generateHeader(index);
@@ -95,10 +96,10 @@ public class TTSPostsManager implements Runnable {
 		while (end > 0) {
 			int cut = Math.min(content.length(), Constants.MIN_BLOCK_LENGTH);
 			if (cut == content.length()) {
-				Log.w("Tamanho da String", "" + content.length());
-				Log.w("Content do Bloco1", content);
-				if (containsLetter(content))
+				if (containsLetter(content)) {
+					Log.i(TAG, "BlockContent = " + content);
 					blocks.addBlock(content);
+				}
 				break;
 			}
 			String blockContent = content.substring(0, cut);
@@ -115,8 +116,6 @@ public class TTSPostsManager implements Runnable {
 					Math.min(content.length(), Constants.MAX_BLOCK_LENGTH),
 					occurrenceOfDot), occurrenceOfExclamation),
 					occurrenceOfInterrogation), occurrenceOfSemi);
-			Log.w("Ocorrencia do Pause", "" + occurenceOfPause);
-			Log.w("Tamanho da String", "" + content.length());
 			blockContent = blockContent.concat(content.substring(0,
 					occurenceOfPause));
 			if (occurenceOfPause == content.length()) {
@@ -131,14 +130,23 @@ public class TTSPostsManager implements Runnable {
 				}
 				end = content.length();
 			}
-			Log.w("Content do Bloco2", blockContent);
-			Log.w("Tamanho do bloco", "" + blockContent.length());
-			Log.i("Contem espaço", "" + containsLetter(blockContent));
-			if (containsLetter(content))
-				blocks.addBlock(blockContent);
-			else
+			Log.i(TAG, "BlockContent = " + blockContent);
+
+			if (blockContent != null) {
+				if (blockContent.length() < content.length()) {
+					blocks.addBlock(blockContent);
+				} else {
+					blocks.addBlock(blockContent);
+					break;
+				}
+			} else {
+				Log.i(TAG, "BlockContent IS NULL");
 				break;
+			}
 		}
+
+		Log.i(TAG, "Number of Blocks  = " + blocks.getNumberOfBlocks());
+
 	}
 
 	public static boolean containsLetter(String s) {
@@ -217,10 +225,14 @@ public class TTSPostsManager implements Runnable {
 	}
 
 	public void stop() {
-		postPlayer.stop();
-		if (threadPlayer != null) {
-			threadPlayer.interrupt();
-			threadPlayer = null;
+		try {
+			postPlayer.stop();
+			if (threadPlayer != null) {
+				threadPlayer.interrupt();
+				threadPlayer = null;
+			}
+		} catch (NullPointerException e) {
+			e.printStackTrace();
 		}
 	}
 
@@ -256,6 +268,7 @@ public class TTSPostsManager implements Runnable {
 		postPlayer = new PostPlayer(blocks.getNumberOfBlocks(), playAllPosts,
 				posts.get(currentPostIndex), context, isLastPost);
 		threadPlayer = new Thread(postPlayer);
+
 		threadPlayer.start();
 
 		int i = 0;

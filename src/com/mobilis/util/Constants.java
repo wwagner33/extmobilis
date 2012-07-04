@@ -114,7 +114,6 @@ public class Constants {
 	public static final String AUDIO_DEFAULT_PATH = Environment
 			.getExternalStorageDirectory().getAbsolutePath()
 			+ "/Mobilis/TTS/audios/";
-	public static final int MAX_TIME_TO_SLEEP = 1800;
 	public static final int PLAY_NEXT_POST = 0;
 	public static final int STOP_AUDIO = 1;
 	public static final int ERROR_PLAYING = -1;
