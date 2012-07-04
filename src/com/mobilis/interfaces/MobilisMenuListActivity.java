@@ -27,7 +27,8 @@ public abstract class MobilisMenuListActivity extends ListActivity {
 		}
 		if (item.getItemId() == R.id.menu_logout) {
 
-			MobilisPreferences preferences = MobilisPreferences.getInstance(this);
+			MobilisPreferences preferences = MobilisPreferences
+					.getInstance(this);
 			preferences.setToken(null);
 			Intent intent = new Intent(this, Login.class);
 			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
