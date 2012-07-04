@@ -1,7 +1,5 @@
 package com.mobilis.controller;
 
-import com.mobilis.util.MobilisPreferences;
-
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
@@ -9,13 +7,14 @@ import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceActivity;
 
+import com.mobilis.util.MobilisPreferences;
+
 public class Config extends PreferenceActivity implements
 		OnPreferenceChangeListener {
 
 	private CheckBoxPreference autoLogin;
 	private MobilisPreferences preferences;
 
-	@SuppressWarnings("deprecation")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);

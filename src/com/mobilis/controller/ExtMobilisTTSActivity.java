@@ -50,7 +50,6 @@ public class ExtMobilisTTSActivity extends ExpandableListActivity implements
 	private int footerId = 0;
 	private final int FUTURE_POST_ID = 1;
 	private final int REFRESH_ID = 2;
-
 	public int positionExpanded = -1;
 	public boolean contentPostIsExpanded = false;
 	private boolean headerClicked = false;
@@ -151,7 +150,6 @@ public class ExtMobilisTTSActivity extends ExpandableListActivity implements
 
 	@SuppressWarnings("unchecked")
 	public void loadPostsFromRetainedState() {
-		@SuppressWarnings("deprecation")
 		Object[] retainedState = (Object[]) getLastNonConfigurationInstance();
 
 		if (retainedState[0] != null) {

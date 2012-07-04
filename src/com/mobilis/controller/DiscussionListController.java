@@ -83,7 +83,6 @@ public class DiscussionListController extends MobilisMenuListActivity implements
 		return helper;
 	}
 
-	@SuppressWarnings("deprecation")
 	public void restoreDialog() {
 		if (getLastNonConfigurationInstance() != null) {
 			progressDialog = (ProgressDialog) getLastNonConfigurationInstance();
@@ -162,7 +161,6 @@ public class DiscussionListController extends MobilisMenuListActivity implements
 
 		LayoutInflater inflater;
 
-		@SuppressWarnings("deprecation")
 		public DiscussionsAdapter(Context context, Cursor c) {
 			super(context, c);
 			inflater = LayoutInflater.from(context);

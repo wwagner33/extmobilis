@@ -77,7 +77,6 @@ public class ClassListController extends MobilisMenuListActivity implements
 		return helper;
 	}
 
-	@SuppressWarnings("deprecation")
 	public void restoreDialog() {
 		if (getLastNonConfigurationInstance() != null) {
 			dialog = (ProgressDialog) getLastNonConfigurationInstance();
@@ -109,9 +108,7 @@ public class ClassListController extends MobilisMenuListActivity implements
 
 	}
 
-	@SuppressWarnings("deprecation")
 	public void updateList() {
-
 		cursor = classDAO.getClassesAsCursor(appState.selectedCourse);
 		simpleAdapter = new SimpleCursorAdapter(this,
 				R.layout.curriculum_units_item, cursor,

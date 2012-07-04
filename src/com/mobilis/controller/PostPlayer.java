@@ -1,10 +1,6 @@
 package com.mobilis.controller;
 
 import java.io.File;
-import java.io.IOException;
-
-import com.mobilis.model.Post;
-import com.mobilis.util.Constants;
 
 import android.content.Context;
 import android.media.MediaPlayer;
@@ -12,6 +8,9 @@ import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnErrorListener;
 import android.os.Handler;
 import android.util.Log;
+
+import com.mobilis.model.Post;
+import com.mobilis.util.Constants;
 
 public class PostPlayer implements Runnable, OnCompletionListener,
 		OnErrorListener {

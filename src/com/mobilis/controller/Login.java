@@ -83,7 +83,6 @@ public class Login extends Activity implements OnClickListener,
 
 	}
 
-	@SuppressWarnings("deprecation")
 	public void restoreDialog() {
 		if (getLastNonConfigurationInstance() != null) {
 
@@ -174,7 +173,6 @@ public class Login extends Activity implements OnClickListener,
 			dialog.dismiss();
 			ErrorHandler.handleStatusCode(this, statusCode);
 		} else {
-
 			switch (connectionId) {
 
 			case Constants.CONNECTION_POST_TOKEN:

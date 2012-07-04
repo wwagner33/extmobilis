@@ -158,7 +158,6 @@ public class ResponseController extends Activity implements OnClickListener,
 		return dialogStorer;
 	}
 
-	@SuppressWarnings("deprecation")
 	public void restoreDialog() {
 		Log.i("OnRestore", "TRUE");
 		if (getLastNonConfigurationInstance() != null) {

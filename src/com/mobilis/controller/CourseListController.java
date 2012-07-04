@@ -74,7 +74,6 @@ public class CourseListController extends MobilisMenuListActivity implements
 		return helper;
 	}
 
-	@SuppressWarnings("deprecation")
 	public void restoreActivityState() {
 		if (getLastNonConfigurationInstance() != null) {
 			progressDialog = ((ProgressDialog) getLastNonConfigurationInstance());
@@ -100,9 +99,7 @@ public class CourseListController extends MobilisMenuListActivity implements
 		startActivity(intent);
 	}
 
-	@SuppressWarnings("deprecation")
 	public void updateList() {
-
 		cursor = courseDAO.getCoursesAsCursor();
 		simpleAdapter = new SimpleCursorAdapter(this, R.layout.course_item,
 				cursor, new String[] { "name" }, new int[] { R.id.item });
