@@ -345,7 +345,6 @@ public class Connection {
 		protected Object[] doInBackground(Void... params) {
 
 			try {
-
 				if (connectionType == Constants.TYPE_CONNECTION_GET) {
 
 					if (connectionId == Constants.CONNECTION_GET_IMAGES) {

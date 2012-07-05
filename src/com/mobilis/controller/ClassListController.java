@@ -8,6 +8,8 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
@@ -29,7 +31,7 @@ import com.mobilis.util.ParseJSON;
 import com.mobilis.ws.Connection;
 
 public class ClassListController extends MobilisMenuListActivity implements
-		ConnectionCallback {
+		ConnectionCallback, OnItemClickListener {
 
 	private ParseJSON jsonParser;
 	private ProgressDialog dialog;
@@ -43,6 +45,7 @@ public class ClassListController extends MobilisMenuListActivity implements
 	private MobilisPreferences appState;
 	private SimpleCursorAdapter simpleAdapter;
 	private DatabaseHelper helper = null;
+	private ListView list;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +60,9 @@ public class ClassListController extends MobilisMenuListActivity implements
 		topicDAO = new DiscussionDAO(helper);
 		postDAO = new PostDAO(helper);
 		dialogMaker = new DialogMaker(this);
+		list = (ListView) findViewById(R.id.list);
+		list.setOnItemClickListener(this);
+
 		restoreDialog();
 		updateList();
 	}
@@ -78,14 +84,14 @@ public class ClassListController extends MobilisMenuListActivity implements
 	}
 
 	public void restoreDialog() {
-		if (getLastNonConfigurationInstance() != null) {
-			dialog = (ProgressDialog) getLastNonConfigurationInstance();
+		if (getLastCustomNonConfigurationInstance() != null) {
+			dialog = (ProgressDialog) getLastCustomNonConfigurationInstance();
 			dialog.show();
 		}
 	}
 
 	@Override
-	public Object onRetainNonConfigurationInstance() {
+	public Object onRetainCustomNonConfigurationInstance() {
 		if (dialog != null) {
 			if (dialog.isShowing()) {
 				dialog.dismiss();
@@ -113,32 +119,7 @@ public class ClassListController extends MobilisMenuListActivity implements
 		simpleAdapter = new SimpleCursorAdapter(this,
 				R.layout.curriculum_units_item, cursor,
 				new String[] { "code" }, new int[] { R.id.turmas_item });
-		setListAdapter(simpleAdapter);
-	}
-
-	@Override
-	protected void onListItemClick(ListView l, View v, int position, long id) {
-
-		super.onListItemClick(l, v, position, id);
-
-		Cursor itemCursor = (Cursor) l.getAdapter().getItem(position);
-		int classId = itemCursor.getInt(itemCursor.getColumnIndex("_id"));
-
-		appState.selectedClass = classId;
-
-		if (topicDAO.existsDiscussionOnClass(classId)) {
-			intent = new Intent(this, DiscussionListController.class);
-			startActivity(intent);
-
-		}
-
-		else {
-			dialog = dialogMaker
-					.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
-			dialog.show();
-			obtainTopics(Constants.URL_GROUPS_PREFIX + classId
-					+ Constants.URL_DISCUSSION_SUFFIX);
-		}
+		list.setAdapter(simpleAdapter);
 	}
 
 	@Override
@@ -214,6 +195,30 @@ public class ClassListController extends MobilisMenuListActivity implements
 			default:
 				break;
 			}
+		}
+	}
+
+	@Override
+	public void onItemClick(AdapterView<?> parent, View view, int position,
+			long id) {
+
+		Cursor itemCursor = (Cursor) list.getAdapter().getItem(position);
+		int classId = itemCursor.getInt(itemCursor.getColumnIndex("_id"));
+
+		appState.selectedClass = classId;
+
+		if (topicDAO.existsDiscussionOnClass(classId)) {
+			intent = new Intent(this, DiscussionListController.class);
+			startActivity(intent);
+
+		}
+
+		else {
+			dialog = dialogMaker
+					.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
+			dialog.show();
+			obtainTopics(Constants.URL_GROUPS_PREFIX + classId
+					+ Constants.URL_DISCUSSION_SUFFIX);
 		}
 	}
 }

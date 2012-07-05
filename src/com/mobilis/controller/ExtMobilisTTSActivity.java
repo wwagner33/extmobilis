@@ -2,7 +2,6 @@ package com.mobilis.controller;
 
 import java.util.ArrayList;
 
-import android.app.ExpandableListActivity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -12,11 +11,14 @@ import android.media.MediaPlayer.OnCompletionListener;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ExpandableListView;
+import android.widget.ExpandableListView.OnGroupCollapseListener;
+import android.widget.ExpandableListView.OnGroupExpandListener;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -37,8 +39,9 @@ import com.mobilis.util.MobilisPreferences;
 import com.mobilis.util.ParseJSON;
 import com.mobilis.ws.Connection;
 
-public class ExtMobilisTTSActivity extends ExpandableListActivity implements
-		OnClickListener, ConnectionCallback {
+public class ExtMobilisTTSActivity extends FragmentActivity implements
+		OnClickListener, ConnectionCallback, OnGroupCollapseListener,
+		OnGroupExpandListener {
 
 	private Discussion discussion;
 	private ArrayList<Post> discussionPosts;
@@ -105,7 +108,10 @@ public class ExtMobilisTTSActivity extends ExpandableListActivity implements
 		replyButton = findViewById(R.id.reply_button);
 		replyButton.setOnClickListener(this);
 
-		expandableListView = getExpandableListView();
+		// expandableListView = getExpandableListView();
+		expandableListView = (ExpandableListView) findViewById(R.id.list);
+		expandableListView.setOnGroupCollapseListener(this);
+		expandableListView.setOnGroupExpandListener(this);
 		LayoutInflater inflater = getLayoutInflater();
 
 		header = inflater.inflate(R.layout.load_available_posts_item,
@@ -126,7 +132,7 @@ public class ExtMobilisTTSActivity extends ExpandableListActivity implements
 		next = (ImageButton) findViewById(R.id.button_next);
 		next.setOnClickListener(this);
 
-		if (getLastNonConfigurationInstance() != null) {
+		if (getLastCustomNonConfigurationInstance() != null) {
 			loadPostsFromRetainedState();
 		} else
 			loadPostsFromDatabase();
@@ -150,7 +156,7 @@ public class ExtMobilisTTSActivity extends ExpandableListActivity implements
 
 	@SuppressWarnings("unchecked")
 	public void loadPostsFromRetainedState() {
-		Object[] retainedState = (Object[]) getLastNonConfigurationInstance();
+		Object[] retainedState = (Object[]) getLastCustomNonConfigurationInstance();
 
 		if (retainedState[0] != null) {
 			dialog = (ProgressDialog) retainedState[0];
@@ -174,12 +180,13 @@ public class ExtMobilisTTSActivity extends ExpandableListActivity implements
 
 		setHeader();
 		setFooter();
-		setListAdapter(discussionPostAdapter);
+		// setListAdapter(discussionPostAdapter);
+		expandableListView.setAdapter(discussionPostAdapter);
 
 	}
 
 	@Override
-	public Object onRetainNonConfigurationInstance() {
+	public Object onRetainCustomNonConfigurationInstance() {
 
 		Object[] retainedObjects = new Object[4];
 
@@ -201,6 +208,7 @@ public class ExtMobilisTTSActivity extends ExpandableListActivity implements
 		retainedObjects[3] = previous;
 
 		return retainedObjects;
+
 	}
 
 	private void play(int position) {
@@ -367,7 +375,8 @@ public class ExtMobilisTTSActivity extends ExpandableListActivity implements
 
 		setHeader();
 		setFooter();
-		setListAdapter(discussionPostAdapter);
+		// setListAdapter(discussionPostAdapter);
+		expandableListView.setAdapter(discussionPostAdapter);
 	}
 
 	private void setHeader() {
@@ -394,7 +403,8 @@ public class ExtMobilisTTSActivity extends ExpandableListActivity implements
 									R.string.not_loaded_posts_count));
 			return;
 		}
-		getExpandableListView().addHeaderView(header);
+		// getExpandableListView().addHeaderView(header);
+		expandableListView.addHeaderView(header);
 
 		((TextView) header.findViewById(R.id.load_available_posts))
 				.setText(discussion.getPreviousPosts()
@@ -504,13 +514,15 @@ public class ExtMobilisTTSActivity extends ExpandableListActivity implements
 				appState.getToken());
 	}
 
+	@Override
 	public void onGroupCollapse(int groupPosition) {
-		super.onGroupCollapse(groupPosition);
+		// super.onGroupCollapse(groupPosition);
 		positionExpanded = -1;
 	}
 
+	@Override
 	public void onGroupExpand(int groupPosition) {
-		super.onGroupExpand(groupPosition);
+		// super.onGroupExpand(groupPosition);
 		if (hasPositionExpanded()) {
 			collapse();
 		}
@@ -623,7 +635,9 @@ public class ExtMobilisTTSActivity extends ExpandableListActivity implements
 			setHeader();
 			discussion.getPreviousPosts();
 			discussionDAO.updateDiscussion(discussion);
-			setListAdapter(discussionPostAdapter);
+			// setListAdapter(discussionPostAdapter);
+			expandableListView.setAdapter(discussionPostAdapter);
+
 		} else {
 			if (headerClicked) {
 
@@ -648,7 +662,8 @@ public class ExtMobilisTTSActivity extends ExpandableListActivity implements
 						discussionPosts, ExtMobilisTTSActivity.this);
 				setHeader();
 				headerClicked = false;
-				setListAdapter(discussionPostAdapter);
+				// setListAdapter(discussionPostAdapter);
+				expandableListView.setAdapter(discussionPostAdapter);
 
 			} else if (footerClicked) {
 
@@ -747,4 +762,5 @@ public class ExtMobilisTTSActivity extends ExpandableListActivity implements
 			}
 		}
 	}
+
 }

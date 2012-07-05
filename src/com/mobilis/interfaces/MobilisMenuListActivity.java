@@ -2,6 +2,7 @@ package com.mobilis.interfaces;
 
 import android.app.ListActivity;
 import android.content.Intent;
+import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -11,7 +12,7 @@ import com.mobilis.controller.Login;
 import com.mobilis.controller.R;
 import com.mobilis.util.MobilisPreferences;
 
-public abstract class MobilisMenuListActivity extends ListActivity {
+public abstract class MobilisMenuListActivity extends FragmentActivity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {

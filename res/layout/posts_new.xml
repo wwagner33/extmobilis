@@ -49,7 +49,7 @@
             android:src="@drawable/reply_button" />
 
         <ExpandableListView
-            android:id="@android:id/list"
+            android:id="@+id/list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_above="@+id/footer"

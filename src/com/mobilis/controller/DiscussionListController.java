@@ -14,6 +14,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.CursorAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -35,7 +37,7 @@ import com.mobilis.util.ParseJSON;
 import com.mobilis.ws.Connection;
 
 public class DiscussionListController extends MobilisMenuListActivity implements
-		ConnectionCallback {
+		ConnectionCallback, OnItemClickListener {
 
 	private Intent intent;
 	private ParseJSON jsonParser;
@@ -48,12 +50,15 @@ public class DiscussionListController extends MobilisMenuListActivity implements
 	private Connection connection;
 	private MobilisPreferences appState;
 	private DatabaseHelper helper;
+	private ListView list;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.discussion);
+		list = (ListView) findViewById(R.id.list);
+		list.setOnItemClickListener(this);
 		helper = getHelper();
 		appState = MobilisPreferences.getInstance(this);
 		connection = new Connection(this);
@@ -84,14 +89,14 @@ public class DiscussionListController extends MobilisMenuListActivity implements
 	}
 
 	public void restoreDialog() {
-		if (getLastNonConfigurationInstance() != null) {
-			progressDialog = (ProgressDialog) getLastNonConfigurationInstance();
+		if (getLastCustomNonConfigurationInstance() != null) {
+			progressDialog = (ProgressDialog) getLastCustomNonConfigurationInstance();
 			progressDialog.show();
 		}
 	}
 
 	@Override
-	public Object onRetainNonConfigurationInstance() {
+	public Object onRetainCustomNonConfigurationInstance() {
 		if (progressDialog != null) {
 			if (progressDialog.isShowing()) {
 				Log.i("OnRetain2", "True");
@@ -103,44 +108,10 @@ public class DiscussionListController extends MobilisMenuListActivity implements
 	}
 
 	public void updateList() {
-
 		cursor = discussionDAO
 				.getDiscussionsFromClassAsCursor(appState.selectedClass);
 		listAdapter = new DiscussionsAdapter(this, cursor);
-		setListAdapter(listAdapter);
-
-	}
-
-	@Override
-	protected void onListItemClick(ListView l, View v, int position, long id) {
-
-		super.onListItemClick(l, v, position, id);
-		Object content = l.getAdapter().getItem(position);
-		ContentValues item = (ContentValues) content;
-
-		int discussionId = item.getAsInteger("_id");
-
-		if (item.getAsString("status").equals("0")
-				|| item.getAsString("status").equals("2")) {
-			appState.forumClosed = true;
-
-		} else {
-			appState.forumClosed = false;
-		}
-
-		appState.selectedDiscussion = discussionId;
-
-		if (postDAO.postsExistOnDiscusison(discussionId)) {
-			intent = new Intent(this, ExtMobilisTTSActivity.class);
-			progressDialog.dismiss();
-			startActivityForResult(intent, 0);
-
-		} else {
-			Log.w("Não Existem posts no banco", " ");
-			progressDialog.show();
-			obtainNewPosts(Constants.generateNewPostsTTSURL(discussionId,
-					Constants.oldDateString));
-		}
+		list.setAdapter(listAdapter);
 	}
 
 	public void obtainNewPosts(String url) {
@@ -328,5 +299,37 @@ public class DiscussionListController extends MobilisMenuListActivity implements
 				break;
 			}
 		}
+	}
+
+	@Override
+	public void onItemClick(AdapterView<?> parent, View view, int position,
+			long id) {
+		Object content = list.getAdapter().getItem(position);
+		ContentValues item = (ContentValues) content;
+
+		int discussionId = item.getAsInteger("_id");
+
+		if (item.getAsString("status").equals("0")
+				|| item.getAsString("status").equals("2")) {
+			appState.forumClosed = true;
+
+		} else {
+			appState.forumClosed = false;
+		}
+
+		appState.selectedDiscussion = discussionId;
+
+		if (postDAO.postsExistOnDiscusison(discussionId)) {
+			intent = new Intent(this, ExtMobilisTTSActivity.class);
+			progressDialog.dismiss();
+			startActivityForResult(intent, 0);
+
+		} else {
+			Log.w("Não Existem posts no banco", " ");
+			progressDialog.show();
+			obtainNewPosts(Constants.generateNewPostsTTSURL(discussionId,
+					Constants.oldDateString));
+		}
+
 	}
 }

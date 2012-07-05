@@ -6,9 +6,13 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+import android.widget.TextView;
 
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 import com.mobilis.dao.ClassDAO;
@@ -26,7 +30,7 @@ import com.mobilis.util.ParseJSON;
 import com.mobilis.ws.Connection;
 
 public class CourseListController extends MobilisMenuListActivity implements
-		ConnectionCallback {
+		ConnectionCallback, OnItemClickListener {
 
 	private Intent intent;
 	private ParseJSON jsonParser;
@@ -39,6 +43,7 @@ public class CourseListController extends MobilisMenuListActivity implements
 	private MobilisPreferences appState;
 	private SimpleCursorAdapter simpleAdapter;
 	private DatabaseHelper helper = null;
+	private ListView list;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +59,12 @@ public class CourseListController extends MobilisMenuListActivity implements
 		courseDAO = new CourseDAO(helper);
 		classDAO = new ClassDAO(helper);
 		jsonParser = new ParseJSON();
+		TextView emptyText = new TextView(this);
+		emptyText.setText("Nenhum Curso Disponível");
+		emptyText.setGravity(Gravity.CENTER);
+		list = (ListView) findViewById(R.id.list);
+		list.setOnItemClickListener(this);
+		list.setEmptyView(emptyText);
 		restoreActivityState();
 		updateList();
 	}
@@ -75,14 +86,14 @@ public class CourseListController extends MobilisMenuListActivity implements
 	}
 
 	public void restoreActivityState() {
-		if (getLastNonConfigurationInstance() != null) {
-			progressDialog = ((ProgressDialog) getLastNonConfigurationInstance());
+		if (getLastCustomNonConfigurationInstance() != null) {
+			progressDialog = ((ProgressDialog) getLastCustomNonConfigurationInstance());
 			progressDialog.show();
 		}
 	}
 
 	@Override
-	public Object onRetainNonConfigurationInstance() {
+	public Object onRetainCustomNonConfigurationInstance() {
 		if (progressDialog.isShowing()) {
 			progressDialog.dismiss();
 			return progressDialog;
@@ -103,30 +114,8 @@ public class CourseListController extends MobilisMenuListActivity implements
 		cursor = courseDAO.getCoursesAsCursor();
 		simpleAdapter = new SimpleCursorAdapter(this, R.layout.course_item,
 				cursor, new String[] { "name" }, new int[] { R.id.item });
-		setListAdapter(simpleAdapter);
-	}
+		list.setAdapter(simpleAdapter);
 
-	@Override
-	protected void onListItemClick(ListView listView, View view, int position,
-			long id) {
-
-		super.onListItemClick(listView, view, position, id);
-		Cursor itemCursor;
-		itemCursor = (Cursor) listView.getAdapter().getItem(position);
-		int courseId = itemCursor.getInt(itemCursor.getColumnIndex("_id"));
-		appState.selectedCourse = courseId;
-
-		if (classDAO.existClassesOnCourse(appState.selectedCourse)) {
-			intent = new Intent(this, ClassListController.class);
-			progressDialog.dismiss();
-			startActivity(intent);
-		}
-
-		else {
-			progressDialog.show();
-			obtainCurriculumUnits(Constants.URL_CURRICULUM_UNITS_PREFIX
-					+ courseId + Constants.URL_GROUPS_SUFFIX);
-		}
 	}
 
 	public void obtainCurriculumUnits(String url) {
@@ -190,6 +179,27 @@ public class CourseListController extends MobilisMenuListActivity implements
 			default:
 				break;
 			}
+		}
+	}
+
+	@Override
+	public void onItemClick(AdapterView<?> parent, View view, int position,
+			long id) {
+		Cursor itemCursor;
+		itemCursor = (Cursor) list.getAdapter().getItem(position);
+		int courseId = itemCursor.getInt(itemCursor.getColumnIndex("_id"));
+		appState.selectedCourse = courseId;
+
+		if (classDAO.existClassesOnCourse(appState.selectedCourse)) {
+			intent = new Intent(this, ClassListController.class);
+			progressDialog.dismiss();
+			startActivity(intent);
+		}
+
+		else {
+			progressDialog.show();
+			obtainCurriculumUnits(Constants.URL_CURRICULUM_UNITS_PREFIX
+					+ courseId + Constants.URL_GROUPS_SUFFIX);
 		}
 	}
 }
