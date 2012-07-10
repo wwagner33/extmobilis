@@ -24,8 +24,12 @@ public class PostPlayer implements Runnable, OnCompletionListener,
 	private Handler handler;
 	private boolean isLastPost;
 	public static final String TAG = "POSTPLAYER";
-
 	public static final int MAX_TIME_TO_SLEEP = 1800;
+
+	public static final int PLAYER_STOPPED = 1;
+	public static final int PLAYER_PAUSED = 2;
+	public static final int PLAYER_UNITIALIZED = 3;
+	public boolean isPrepared = false;
 
 	String getBlockAtIndex(int index) {
 		if (index == 0)
@@ -66,9 +70,7 @@ public class PostPlayer implements Runnable, OnCompletionListener,
 	void play() {
 		// IOException, InterruptedException
 		synchronized (this) {
-
 			try {
-
 				if (currentBlockIndex <= lastAvailableBlockIndex) {
 					Log.w("Current", "" + currentBlockIndex);
 					Log.w("last", "" + lastAvailableBlockIndex);
@@ -181,4 +183,9 @@ public class PostPlayer implements Runnable, OnCompletionListener,
 		Log.i(TAG, "OnErrorListener");
 		return false;
 	}
+
+	public MediaPlayer getMediaPlayer() {
+		return mediaPlayer;
+	}
+
 }

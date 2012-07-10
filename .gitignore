@@ -1,5 +1,10 @@
+#Mobilis
 bin/*
 gen/*
 .settings/*
 .classpath
 src/com/mobilis/controller/Mobilis.java
+
+#Sherlock-Bar
+sherlock-bar-library/bin/*
+sherlick-bar-library/.settings/*

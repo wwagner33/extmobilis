@@ -11,6 +11,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.TransitionDrawable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +23,7 @@ import com.mobilis.dao.PostDAO;
 import com.mobilis.exception.ImageFileNotFoundException;
 import com.mobilis.model.Post;
 import com.mobilis.util.Constants;
+import com.mobilis.util.EllipsizingTextView;
 
 public class DiscussionPostAdapter extends BaseExpandableListAdapter {
 
@@ -29,14 +31,16 @@ public class DiscussionPostAdapter extends BaseExpandableListAdapter {
 	private ExtMobilisTTSActivity activity;
 	private boolean isPlayExpanded = false;
 	private PostDAO postDAO;
+	public static final String TAG = "DiscussionPostsAdapter";
 
 	static class ChildViewHolder {
 		View play, reply, details, expandButton, markButton;
 	}
 
 	static class ParentViewHolder {
-		TextView userNick, postDate, postContent;
+		TextView userNick, postDate;
 		ImageView userPhoto;
+		int originalPosition;
 	}
 
 	public DiscussionPostAdapter(List<Post> posts,
@@ -116,65 +120,46 @@ public class DiscussionPostAdapter extends BaseExpandableListAdapter {
 	public View getGroupView(int groupPosition, boolean isExpanded,
 			View convertView, ViewGroup parent) {
 
-		ParentViewHolder parentHolder;
-		Post post = posts.get(groupPosition);
+		LayoutInflater inflater = (LayoutInflater) activity
+				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		convertView = inflater.inflate(R.layout.discussion_list_item, null);
 
-		if (convertView == null) {
-
-			LayoutInflater inflater = (LayoutInflater) activity
-					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			convertView = inflater.inflate(R.layout.discussion_list_item, null);
-			parentHolder = new ParentViewHolder();
-
-			parentHolder.userPhoto = (ImageView) convertView
-					.findViewById(R.id.user_photo);
-
-			parentHolder.userNick = (TextView) convertView
-					.findViewById(R.id.user_nick);
-
-			parentHolder.postDate = (TextView) convertView
-					.findViewById(R.id.post_date);
-			parentHolder.postContent = (TextView) convertView
-					.findViewById(R.id.post_content);
-			convertView.setTag(parentHolder);
-
-		} else {
-			parentHolder = (ParentViewHolder) convertView.getTag();
-		}
+		ImageView userPhoto = (ImageView) convertView
+				.findViewById(R.id.user_photo);
 
 		try {
-			parentHolder.userPhoto.setImageBitmap(getUserImage((int) posts.get(
-					groupPosition).getUserId()));
+			userPhoto.setImageBitmap(getUserImage((int) posts
+					.get(groupPosition).getUserId()));
+			Log.i(TAG, "USER NAME =" + posts.get(groupPosition).getUserNick());
 		} catch (ImageFileNotFoundException e) {
-			// Será exibido a imagem default
+			Log.e(TAG, "No image");
 		}
 
+		Post post = posts.get(groupPosition);
+
 		if (post != null) {
-			TextView postContent = (TextView) convertView
+			TextView userNick = (TextView) convertView
+					.findViewById(R.id.user_nick);
+			TextView postDate = (TextView) convertView
+					.findViewById(R.id.post_date);
+			EllipsizingTextView postContent = (EllipsizingTextView)convertView
 					.findViewById(R.id.post_content);
 
-			if (parentHolder.userNick != null) {
-				parentHolder.userNick.setText(post.getUserNick());
+			if (userNick != null) {
+				userNick.setText(post.getUserNick());
 			}
-			if (parentHolder.postDate != null) {
-				parentHolder.postDate
-						.setText(generateDateHeader(groupPosition));
-				// postDate.setText(post.getDate());
+			if (postDate != null) {
+				postDate.setText(generateDateHeader(groupPosition));
 			}
 			if (postContent != null) {
 				String content = post.getContent();
-				if (content.length() <= 150)
-					postContent.setText(content);
-				else
-					postContent.setText(content.substring(0, 149));
-
+				content = content.replaceAll("\\s", " ").trim();
+				postContent.setText(content);
 				if (groupPosition == activity.positionExpanded
 						&& activity.contentPostIsExpanded) {
 					postContent.setMaxLines(500);
-					if (content.length() > 150)
-						postContent.append(content.substring(150));
 				} else {
-					postContent.setMaxLines(3);
+					postContent.setMaxLines(5);
 				}
 			}
 

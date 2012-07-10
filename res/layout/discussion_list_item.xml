@@ -3,8 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/white"
-    android:orientation="vertical" 
-    android:paddingBottom="@dimen/small_space">
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/small_space" >
 
     <ImageView
         android:layout_width="match_parent"
@@ -30,10 +30,10 @@
         android:layout_alignBottom="@dimen/small_space"
         android:layout_alignTop="@+id/user_photo"
         android:layout_toRightOf="@+id/user_photo"
+        android:minLines="2"
         android:text="@string/fulano_name"
         android:textColor="@color/user_post_text"
-        android:textSize="@dimen/user_name_text_size" 
-        android:minLines="2"/>
+        android:textSize="@dimen/user_name_text_size" />
 
     <TextView
         android:id="@+id/post_date"
@@ -46,12 +46,13 @@
         android:textColor="@color/user_post_date_text"
         android:textSize="@dimen/user_post_date_text_size" />
 
-    <TextView
+    <com.mobilis.util.EllipsizingTextView
         android:id="@+id/post_content"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/user_nick"
         android:layout_toRightOf="@+id/user_photo"
+        android:ellipsize="end"
         android:text="@string/sample_text"
         android:textColor="@color/user_post_text"
         android:textSize="@dimen/user_post_date_text_size" />

@@ -108,7 +108,6 @@ public class ExtMobilisTTSActivity extends FragmentActivity implements
 		replyButton = findViewById(R.id.reply_button);
 		replyButton.setOnClickListener(this);
 
-		// expandableListView = getExpandableListView();
 		expandableListView = (ExpandableListView) findViewById(R.id.list);
 		expandableListView.setOnGroupCollapseListener(this);
 		expandableListView.setOnGroupExpandListener(this);
@@ -180,7 +179,6 @@ public class ExtMobilisTTSActivity extends FragmentActivity implements
 
 		setHeader();
 		setFooter();
-		// setListAdapter(discussionPostAdapter);
 		expandableListView.setAdapter(discussionPostAdapter);
 
 	}
@@ -375,7 +373,6 @@ public class ExtMobilisTTSActivity extends FragmentActivity implements
 
 		setHeader();
 		setFooter();
-		// setListAdapter(discussionPostAdapter);
 		expandableListView.setAdapter(discussionPostAdapter);
 	}
 
@@ -403,7 +400,6 @@ public class ExtMobilisTTSActivity extends FragmentActivity implements
 									R.string.not_loaded_posts_count));
 			return;
 		}
-		// getExpandableListView().addHeaderView(header);
 		expandableListView.addHeaderView(header);
 
 		((TextView) header.findViewById(R.id.load_available_posts))
@@ -516,13 +512,11 @@ public class ExtMobilisTTSActivity extends FragmentActivity implements
 
 	@Override
 	public void onGroupCollapse(int groupPosition) {
-		// super.onGroupCollapse(groupPosition);
 		positionExpanded = -1;
 	}
 
 	@Override
 	public void onGroupExpand(int groupPosition) {
-		// super.onGroupExpand(groupPosition);
 		if (hasPositionExpanded()) {
 			collapse();
 		}
@@ -567,6 +561,7 @@ public class ExtMobilisTTSActivity extends FragmentActivity implements
 	private void stop() {
 		Log.i("Stop", "Stopped");
 		if (threadTTSPostsManager != null && ttsPostsManager != null) {
+			ttsPostsManager.pause();
 			discussionPostAdapter.untogglePostPlayingStatus(ttsPostsManager
 					.getCurrentPostIndex());
 			threadTTSPostsManager.interrupt();
@@ -635,7 +630,6 @@ public class ExtMobilisTTSActivity extends FragmentActivity implements
 			setHeader();
 			discussion.getPreviousPosts();
 			discussionDAO.updateDiscussion(discussion);
-			// setListAdapter(discussionPostAdapter);
 			expandableListView.setAdapter(discussionPostAdapter);
 
 		} else {

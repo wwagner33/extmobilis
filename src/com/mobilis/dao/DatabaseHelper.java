@@ -17,7 +17,6 @@ import com.mobilis.model.Post;
 
 public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
-	public static final String TAG = "DatabaseHelper";
 	public static final String DATABASE_NAME = "mobilis.db";
 	public static final int DATABASE_VERSION = 1;
 
@@ -36,7 +35,6 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 			TableUtils.createTable(connectionSource, Post.class);
 
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -44,8 +42,6 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 	@Override
 	public void onUpgrade(SQLiteDatabase arg0, ConnectionSource arg1, int arg2,
 			int arg3) {
-		// TODO Auto-generated method stub
-
 	}
 
 	private Dao<Course, Integer> courseDAO;
