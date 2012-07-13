@@ -1,68 +1,74 @@
 package com.mobilis.controller;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.ExpandableListView;
-import android.widget.ExpandableListView.OnGroupCollapseListener;
-import android.widget.ExpandableListView.OnGroupExpandListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
+import com.mobilis.controller.R.color;
 import com.mobilis.dao.DatabaseHelper;
 import com.mobilis.dao.DiscussionDAO;
 import com.mobilis.dao.PostDAO;
 import com.mobilis.dialog.DialogMaker;
-import com.mobilis.exception.ImageFileNotFoundException;
 import com.mobilis.interfaces.ConnectionCallback;
 import com.mobilis.model.Discussion;
 import com.mobilis.model.Post;
 import com.mobilis.util.Constants;
+import com.mobilis.util.DateUtils;
 import com.mobilis.util.ErrorHandler;
 import com.mobilis.util.MobilisPreferences;
 import com.mobilis.util.ParseJSON;
 import com.mobilis.ws.Connection;
 
-public class ExtMobilisTTSActivity extends FragmentActivity implements
-		OnClickListener, ConnectionCallback, OnGroupCollapseListener,
-		OnGroupExpandListener {
+public class ExtMobilisTTSActivity extends SherlockFragmentActivity implements
+		OnClickListener, ConnectionCallback, OnItemClickListener {
 
 	private Discussion discussion;
 	private ArrayList<Post> discussionPosts;
-	private DiscussionPostAdapter discussionPostAdapter;
-	private ExpandableListView expandableListView;
+	private ListView postsList;
+	private PostAdapter postsAdapter;
 	private View header;
 	private View footerFuturePosts;
 	private View footerRefresh;
 	private int footerId = 0;
 	private final int FUTURE_POST_ID = 1;
 	private final int REFRESH_ID = 2;
-	public int positionExpanded = -1;
-	public boolean contentPostIsExpanded = false;
+	public int positionSelected = -1;
+	// public boolean contentPostIsExpanded = false;
 	private boolean headerClicked = false;
 	private boolean footerClicked = false;
 	private Connection wsSolar;
-	private View replyButton;
-	private TextView forumName;
 	private PostDAO postDAO;
 	private DiscussionDAO discussionDAO;
-	private ImageButton barButtonPlay, prev, next;
+	private ImageButton barButtonPlay, prev, next, stop;
 	private TTSPostsManager ttsPostsManager;
 	private Thread threadTTSPostsManager;
 	boolean playAfterStop = false;
@@ -75,10 +81,28 @@ public class ExtMobilisTTSActivity extends FragmentActivity implements
 	private ParseJSON jsonParser;
 	private DatabaseHelper helper = null;
 	private static final String TAG = "TTS-ACTIVITY";
+	private boolean actionBarSelected = false;
+	private boolean playbackBarIsVisible = false;
+	private ActionBar actionBar;
 
 	public void onCreate(Bundle savedInstanceState) {
+
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.posts_new);
+
+		actionBar = getSupportActionBar();
+		actionBar.setHomeButtonEnabled(false);
+		actionBar.setDisplayShowHomeEnabled(false);
+		actionBar.setTitle("Postagens");
+
+		TextView forumTitle = (TextView) findViewById(R.id.forum_title);
+		forumTitle.setTypeface(Typeface.createFromAsset(getAssets(),
+				"fonts/Roboto-Bold.ttf"));
+
+		TextView forumRange = (TextView) findViewById(R.id.forum_range);
+		// forumRange.setTypeface(Typeface.createFromAsset(getAssets(),
+		// "fonts/Roboto-Thin.ttf"));
+
 		helper = getHelper();
 		jsonParser = new ParseJSON();
 		appState = MobilisPreferences.getInstance(this);
@@ -99,28 +123,32 @@ public class ExtMobilisTTSActivity extends FragmentActivity implements
 
 		discussion = discussionDAO.getDiscussion(appState.selectedDiscussion);
 
-		forumName = (TextView) findViewById(R.id.discussion_name);
-		forumName.setText(discussion.getName());
+		// Log.e(TAG, "Start Date = " +
+		// teste.format(discussion.getStartDate()));
+
+		SimpleDateFormat exhibFormat = DateUtils.getExhibitionFormat();
+		String startDate = exhibFormat.format(discussion.getStartDate());
+		String endDate = exhibFormat.format(discussion.getStartDate());
+		forumRange.setText(startDate + " - " + endDate);
+
+		forumTitle.setText(discussion.getName().toUpperCase());
 
 		dialog = dialogMaker
 				.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
 
-		replyButton = findViewById(R.id.reply_button);
-		replyButton.setOnClickListener(this);
+		postsList = (ListView) findViewById(R.id.list);
+		postsList.setOnItemClickListener(this);
 
-		expandableListView = (ExpandableListView) findViewById(R.id.list);
-		expandableListView.setOnGroupCollapseListener(this);
-		expandableListView.setOnGroupExpandListener(this);
 		LayoutInflater inflater = getLayoutInflater();
 
 		header = inflater.inflate(R.layout.load_available_posts_item,
-				expandableListView, false);
+				postsList, false);
 
 		footerFuturePosts = inflater.inflate(
-				R.layout.load_available_posts_item, expandableListView, false);
+				R.layout.load_available_posts_item, postsList, false);
 
 		footerRefresh = inflater.inflate(R.layout.refresh_discussion_list_item,
-				expandableListView, false);
+				postsList, false);
 
 		barButtonPlay = (ImageButton) findViewById(R.id.button_play);
 		barButtonPlay.setOnClickListener(this);
@@ -131,10 +159,104 @@ public class ExtMobilisTTSActivity extends FragmentActivity implements
 		next = (ImageButton) findViewById(R.id.button_next);
 		next.setOnClickListener(this);
 
+		stop = (ImageButton) findViewById(R.id.button_stop);
+		stop.setOnClickListener(this);
+
 		if (getLastCustomNonConfigurationInstance() != null) {
 			loadPostsFromRetainedState();
 		} else
 			loadPostsFromDatabase();
+	}
+
+	@Override
+	public void onBackPressed() {
+
+		if (positionSelected != -1) {
+			postsAdapter.untogglePostMarkedStatus(positionSelected);
+			actionBarSelected = false;
+			positionSelected = -1;
+			setActionBarNotSelected();
+			invalidateOptionsMenu();
+
+		} else
+			super.onBackPressed();
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		menu.clear();
+		MenuInflater inflater = getSupportMenuInflater();
+		if (!actionBarSelected) {
+			inflater.inflate(R.menu.options_menu_action, menu);
+
+		} else {
+			inflater.inflate(R.menu.action_bar_selected, menu);
+		}
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+
+		switch (item.getItemId()) {
+
+		case R.id.reply:
+			intent = new Intent(this, ResponseController.class);
+			startActivity(intent);
+			return true;
+
+		case R.id.play:
+			if (!playbackBarIsVisible) {
+				includePlayControll();
+			} else {
+				stop();
+				// play(positionSelected);
+			}
+			playbackBarIsVisible = true;
+			return true;
+
+		case R.id.expand:
+			if (discussionPosts.get(positionSelected).isExpanded()) {
+				discussionPosts.get(positionSelected).setExpanded(false);
+			} else {
+				discussionPosts.get(positionSelected).setExpanded(true);
+			}
+			postsAdapter.notifyDataSetChanged();
+			return true;
+
+		case R.id.mark:
+			// TODO mark
+			return true;
+
+		case R.id.details:
+			// TODO mark
+			return true;
+
+		default:
+			return false;
+
+		}
+	}
+
+	public void setActionBarSelected() {
+		actionBar.setHomeButtonEnabled(false);
+		actionBar.setDisplayShowHomeEnabled(false);
+		actionBar.setDisplayShowTitleEnabled(false);
+		actionBar.setDisplayUseLogoEnabled(false);
+		actionBar.setDisplayHomeAsUpEnabled(false);
+		actionBar.setDisplayShowCustomEnabled(true);
+		actionBar.setBackgroundDrawable(new ColorDrawable(getResources()
+				.getColor(R.color.action_bar_active)));
+
+	}
+
+	public void setActionBarNotSelected() {
+		actionBar.setDisplayShowTitleEnabled(true);
+		actionBar.setHomeButtonEnabled(false);
+		actionBar.setDisplayShowHomeEnabled(false);
+		actionBar.setTitle("Postagens");
+		actionBar.setBackgroundDrawable(new ColorDrawable(getResources()
+				.getColor(R.color.action_bar_idle)));
 	}
 
 	@Override
@@ -174,12 +296,12 @@ public class ExtMobilisTTSActivity extends FragmentActivity implements
 			previous = discussion.getPreviousPosts();
 		}
 
-		discussionPostAdapter = new DiscussionPostAdapter(discussionPosts,
+		postsAdapter = new PostAdapter(discussionPosts,
 				ExtMobilisTTSActivity.this);
 
 		setHeader();
 		setFooter();
-		expandableListView.setAdapter(discussionPostAdapter);
+		postsList.setAdapter(postsAdapter);
 
 	}
 
@@ -217,6 +339,10 @@ public class ExtMobilisTTSActivity extends FragmentActivity implements
 				R.string.pause));
 		barButtonPlay.setImageResource(R.drawable.playback_pause);
 		if (ttsPostsManager == null && !playAfterStop) {
+
+			// TODO layerDrawable MOD
+			discussionPosts.get(position).setPlaying(true);
+
 			ttsPostsManager = new TTSPostsManager(discussionPosts, position,
 					handlerPostManager, getApplicationContext());
 			threadTTSPostsManager = new Thread(ttsPostsManager);
@@ -265,102 +391,94 @@ public class ExtMobilisTTSActivity extends FragmentActivity implements
 	@Override
 	public void onClick(View v) {
 		switch (v.getId()) {
-		case R.id.reply_button:
-			intent = new Intent(this, ResponseController.class);
-			startActivity(intent);
-			break;
 
 		case R.id.button_next:
-			synchronized (this) {
 
-				if (ttsPostsManager != null) {
-					int position = ttsPostsManager.getCurrentPostIndex();
-					if (position < ttsPostsManager.getPostsSize() - 1) {
-						stop();
-						play(position + 1);
-					}
+			if (ttsPostsManager != null) {
+				int position = ttsPostsManager.getCurrentPostIndex();
+				if (position < ttsPostsManager.getPostsSize() - 1) {
+					stop();
+					play(position + 1);
 				}
-				break;
 			}
+			break;
 
 		case R.id.button_prev:
-			synchronized (this) {
-				if (ttsPostsManager != null) {
-					int position = ttsPostsManager.getCurrentPostIndex();
-					if (position > 0) {
-						stop();
-						play(position - 1);
-					}
+			if (ttsPostsManager != null) {
+				int position = ttsPostsManager.getCurrentPostIndex();
+				if (position > 0) {
+					stop();
+					play(position - 1);
 				}
-				break;
 			}
+			break;
 
 		case R.id.button_play:
 			playClick();
 			break;
 
-		case R.id.expand:
-			contentPostIsExpanded = !contentPostIsExpanded;
-			discussionPostAdapter.notifyDataSetChanged();
-			break;
-		case R.id.mark:
-			discussionPostAdapter.toggleExpandedPostMarkedStatus();
-			discussionPostAdapter.notifyDataSetChanged();
-			break;
-		case R.id.play:
-			playPost();
+		case R.id.button_stop:
+			removePlayControll();
 			break;
 
-		case R.id.reply:
-			intent = new Intent(this, ResponseController.class);
-			startActivity(intent);
-			break;
+		// case R.id.expand:
+		// contentPostIsExpanded = !contentPostIsExpanded;
+		// postsAdapter.notifyDataSetChanged();
+		// break;
 
-		case R.id.details:
+		// case R.id.mark:
+		// postsAdapter.toggleExpandedPostMarkedStatus();
+		// postsAdapter.notifyDataSetChanged();
+		// break;
 
-			Post post = postDAO.getPost(appState.selectedPost);
-			intent = new Intent(this, PostDetailController.class);
-			try {
-				Bitmap userImage = discussionPostAdapter
-						.getUserImage((int) post.getUserId());
-				intent.putExtra("image", userImage);
-			} catch (ImageFileNotFoundException e) {
-				Log.i("Exception", "Exception");
-			}
+		// case R.id.play:
+		// playPost();to
+		// break;
 
-			startActivity(intent);
-			break;
+		// case R.id.reply:
+		// intent = new Intent(this, ResponseController.class);
+		// startActivity(intent);
+		// break;
+
+		// case R.id.details:
+		//
+		// Post post = postDAO.getPost(appState.selectedPost);
+		// intent = new Intent(this, PostDetailController.class);
+		// try {
+		// Bitmap userImage = postsAdapter.getUserImage((int) post
+		// .getUserId());
+		// intent.putExtra("image", userImage);
+		// } catch (ImageFileNotFoundException e) {
+		// Log.i("Exception", "Exception");
+		// }
+		//
+		// startActivity(intent);
+		// break;
+
 		default:
 			break;
 		}
 	}
 
-	private void playPost() {
-		// se player não estiver visível mostrar
-		if (!discussionPostAdapter.getPlayExpanded()) {
-			// incluir o player e tocar o post
+	private void showPlayerBAr() {
+		if (!playbackBarIsVisible) {
 			includePlayControll();
 		} else {
-			// se outro post estiver tocando deve-se pará-lo
 			stop();
-
-			// tocar o post
-			play(positionExpanded);
+			// play(positionSelected);
 		}
 	}
 
 	private void playClick() {
-		synchronized (this) {
-			if (barButtonPlay.getContentDescription().toString()
-					.equals(getResources().getString(R.string.play))) {
-				play(positionExpanded);
-			} else if (barButtonPlay.getContentDescription().toString()
-					.equals(getResources().getString(R.string.pause))) {
-				barButtonPlay.setContentDescription(getResources().getString(
-						R.string.play));
-				barButtonPlay.setImageResource(R.drawable.playback_play);
-				ttsPostsManager.pause();
-			}
+		if (barButtonPlay.getContentDescription().toString()
+				.equals(getResources().getString(R.string.play))) {
+			play(positionSelected);
+		} else if (barButtonPlay.getContentDescription().toString()
+				.equals(getResources().getString(R.string.pause))) {
+			barButtonPlay.setContentDescription(getResources().getString(
+					R.string.play));
+			barButtonPlay.setImageResource(R.drawable.playback_play);
+			ttsPostsManager.pause();
 		}
 	}
 
@@ -368,12 +486,12 @@ public class ExtMobilisTTSActivity extends FragmentActivity implements
 		discussion = discussionDAO.getDiscussion(discussion.getId());
 		previous = discussion.getPreviousPosts();
 		discussionPosts = postDAO.getAllPostsFromDiscussion(discussion.getId());
-		discussionPostAdapter = new DiscussionPostAdapter(discussionPosts,
+		postsAdapter = new PostAdapter(discussionPosts,
 				ExtMobilisTTSActivity.this);
 
 		setHeader();
 		setFooter();
-		expandableListView.setAdapter(discussionPostAdapter);
+		postsList.setAdapter(postsAdapter);
 	}
 
 	private void setHeader() {
@@ -384,15 +502,9 @@ public class ExtMobilisTTSActivity extends FragmentActivity implements
 		}
 	}
 
-	private void collapse() {
-		expandableListView.collapseGroup(positionExpanded);
-		positionExpanded = -1;
-		contentPostIsExpanded = false;
-	}
-
 	private void showHeader() {
 
-		if (expandableListView.getHeaderViewsCount() > 0) {
+		if (postsList.getHeaderViewsCount() > 0) {
 			((TextView) header.findViewById(R.id.load_available_posts))
 					.setText(discussion.getPreviousPosts()
 							+ " "
@@ -400,7 +512,7 @@ public class ExtMobilisTTSActivity extends FragmentActivity implements
 									R.string.not_loaded_posts_count));
 			return;
 		}
-		expandableListView.addHeaderView(header);
+		postsList.addHeaderView(header);
 
 		((TextView) header.findViewById(R.id.load_available_posts))
 				.setText(discussion.getPreviousPosts()
@@ -415,13 +527,12 @@ public class ExtMobilisTTSActivity extends FragmentActivity implements
 				Log.e("Header", "Clicado");
 				headerClicked = true;
 				loadPreviousPosts();
-				collapse();
 			}
 		});
 	}
 
 	private void hideHeader() {
-		expandableListView.removeHeaderView(header);
+		postsList.removeHeaderView(header);
 	}
 
 	private void setFooter() {
@@ -447,10 +558,10 @@ public class ExtMobilisTTSActivity extends FragmentActivity implements
 			return;
 		}
 		if (footerId == REFRESH_ID) {
-			expandableListView.removeFooterView(footerRefresh);
+			postsList.removeFooterView(footerRefresh);
 		}
 
-		expandableListView.addFooterView(footerFuturePosts, null, true);
+		postsList.addFooterView(footerFuturePosts, null, true);
 		footerId = FUTURE_POST_ID;
 		footerFuturePosts.setOnClickListener(new OnClickListener() {
 
@@ -459,7 +570,6 @@ public class ExtMobilisTTSActivity extends FragmentActivity implements
 				dialog.show();
 				loadFuturePosts();
 				footerClicked = true;
-				collapse();
 			}
 		});
 	}
@@ -471,10 +581,10 @@ public class ExtMobilisTTSActivity extends FragmentActivity implements
 		}
 		if (footerId == FUTURE_POST_ID) {
 			Log.d("refresh", "remove footerFuturePosts");
-			expandableListView.removeFooterView(footerFuturePosts);
+			postsList.removeFooterView(footerFuturePosts);
 		}
 
-		expandableListView.addFooterView(footerRefresh, null, true);
+		postsList.addFooterView(footerRefresh, null, true);
 		footerId = REFRESH_ID;
 		footerRefresh.setOnClickListener(new OnClickListener() {
 
@@ -483,7 +593,6 @@ public class ExtMobilisTTSActivity extends FragmentActivity implements
 				dialog.show();
 				loadFuturePosts();
 				footerClicked = true;
-				collapse();
 			}
 		});
 	}
@@ -510,27 +619,6 @@ public class ExtMobilisTTSActivity extends FragmentActivity implements
 				appState.getToken());
 	}
 
-	@Override
-	public void onGroupCollapse(int groupPosition) {
-		positionExpanded = -1;
-	}
-
-	@Override
-	public void onGroupExpand(int groupPosition) {
-		if (hasPositionExpanded()) {
-			collapse();
-		}
-		positionExpanded = groupPosition;
-		Log.w("Posição expandida: ", "" + positionExpanded);
-		appState.selectedPost = (int) discussionPosts.get(groupPosition)
-				.getId();
-		Log.i("POST ID", "" + discussionPosts.get(groupPosition).getId());
-	}
-
-	private boolean hasPositionExpanded() {
-		return expandableListView.isGroupExpanded(positionExpanded);
-	}
-
 	public void downloadImages() {
 		wsSolar.getImages(
 				postDAO.getIdsOfPostsWithoutImage(appState.selectedDiscussion),
@@ -542,27 +630,31 @@ public class ExtMobilisTTSActivity extends FragmentActivity implements
 		prev.setVisibility(View.VISIBLE);
 		next.setVisibility(View.VISIBLE);
 		prev.setVisibility(View.VISIBLE);
-		playClick();
-		discussionPostAdapter.setPlayExpanded(true);
+		stop.setVisibility(View.VISIBLE);
+		// playClick();
 	}
 
 	public void removePlayControll() {
-		barButtonPlay.setContentDescription(getResources().getString(
-				R.string.play));
-		barButtonPlay.setImageResource(R.drawable.playback_play);
-		barButtonPlay.setVisibility(View.GONE);
-		prev.setVisibility(View.GONE);
-		next.setVisibility(View.GONE);
-		prev.setVisibility(View.GONE);
-		discussionPostAdapter.setPlayExpanded(false);
-		stop();
+
+		if (playbackBarIsVisible) {
+			barButtonPlay.setContentDescription(getResources().getString(
+					R.string.play));
+			barButtonPlay.setImageResource(R.drawable.playback_play);
+			barButtonPlay.setVisibility(View.GONE);
+			prev.setVisibility(View.GONE);
+			next.setVisibility(View.GONE);
+			prev.setVisibility(View.GONE);
+			stop.setVisibility(View.GONE);
+			stop();
+			playbackBarIsVisible = false;
+		}
 	}
 
 	private void stop() {
 		Log.i("Stop", "Stopped");
 		if (threadTTSPostsManager != null && ttsPostsManager != null) {
 			ttsPostsManager.pause();
-			discussionPostAdapter.untogglePostPlayingStatus(ttsPostsManager
+			postsAdapter.untogglePostPlayingStatus(ttsPostsManager
 					.getCurrentPostIndex());
 			threadTTSPostsManager.interrupt();
 			ttsPostsManager.stop();
@@ -585,11 +677,11 @@ public class ExtMobilisTTSActivity extends FragmentActivity implements
 		}
 
 		public void togglePostPlayingStatus(int postIndex) {
-			discussionPostAdapter.togglePostPlayingStatus(postIndex);
+			postsAdapter.togglePostPlayingStatus(postIndex);
 		}
 
 		public void untogglePostPlayingStatus(int postIndex) {
-			discussionPostAdapter.untogglePostPlayingStatus(postIndex);
+			postsAdapter.untogglePostPlayingStatus(postIndex);
 		}
 
 		public void playedAllPosts() {
@@ -619,7 +711,7 @@ public class ExtMobilisTTSActivity extends FragmentActivity implements
 		if (!(headerClicked || footerClicked)) {
 
 			discussionPosts = loadedposts;
-			discussionPostAdapter = new DiscussionPostAdapter(discussionPosts,
+			postsAdapter = new PostAdapter(discussionPosts,
 					ExtMobilisTTSActivity.this);
 			postDAO.insertPosts(
 					loadedposts.toArray(new Post[loadedposts.size()]),
@@ -630,7 +722,7 @@ public class ExtMobilisTTSActivity extends FragmentActivity implements
 			setHeader();
 			discussion.getPreviousPosts();
 			discussionDAO.updateDiscussion(discussion);
-			expandableListView.setAdapter(discussionPostAdapter);
+			postsList.setAdapter(postsAdapter);
 
 		} else {
 			if (headerClicked) {
@@ -652,12 +744,11 @@ public class ExtMobilisTTSActivity extends FragmentActivity implements
 				}
 
 				discussionPosts.addAll(0, loadedPosts);
-				discussionPostAdapter = new DiscussionPostAdapter(
-						discussionPosts, ExtMobilisTTSActivity.this);
+				postsAdapter = new PostAdapter(discussionPosts,
+						ExtMobilisTTSActivity.this);
 				setHeader();
 				headerClicked = false;
-				// setListAdapter(discussionPostAdapter);
-				expandableListView.setAdapter(discussionPostAdapter);
+				postsList.setAdapter(postsAdapter);
 
 			} else if (footerClicked) {
 
@@ -708,7 +799,7 @@ public class ExtMobilisTTSActivity extends FragmentActivity implements
 						appState.selectedDiscussion);
 			}
 		}
-		discussionPostAdapter.notifyDataSetChanged();
+		postsAdapter.notifyDataSetChanged();
 	}
 
 	@Override
@@ -748,7 +839,7 @@ public class ExtMobilisTTSActivity extends FragmentActivity implements
 				break;
 
 			case Constants.CONNECTION_GET_IMAGES:
-				discussionPostAdapter.notifyDataSetChanged();
+				postsAdapter.notifyDataSetChanged();
 				break;
 
 			default:
@@ -757,4 +848,32 @@ public class ExtMobilisTTSActivity extends FragmentActivity implements
 		}
 	}
 
+	@Override
+	public void onItemClick(AdapterView<?> parent, View view, int position,
+			long id) {
+
+		Log.i(TAG, "Action Bar height = " + actionBar.getHeight());
+
+		int arrayPosition = position;
+		if (positionSelected == -1) {
+			postsAdapter.togglePostMarkedStatus(arrayPosition);
+			positionSelected = arrayPosition;
+			actionBarSelected = true;
+			setActionBarSelected();
+		} else if (positionSelected == arrayPosition) {
+			postsAdapter.untogglePostMarkedStatus(arrayPosition);
+			actionBarSelected = false;
+			positionSelected = -1;
+			setActionBarNotSelected();
+		} else {
+			postsAdapter.togglePostMarkedStatus(arrayPosition);
+			postsAdapter.untogglePostMarkedStatus(positionSelected);
+			positionSelected = arrayPosition;
+			actionBarSelected = true;
+			setActionBarSelected();
+		}
+
+		invalidateOptionsMenu();
+		// TODO Mudança de actionBar
+	}
 }

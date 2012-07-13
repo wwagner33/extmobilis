@@ -230,6 +230,11 @@ public class DateUtils {
 		return serverFormat;
 	}
 
+	public static SimpleDateFormat getExhibitionFormat() {
+		SimpleDateFormat exhibFormat = new SimpleDateFormat("dd/MM/yyyy");
+		return exhibFormat;
+	}
+
 	public static SimpleDateFormat getURLFormat() {
 		SimpleDateFormat urlFormat = new SimpleDateFormat("yyyyMMddHHmmss");
 		return urlFormat;

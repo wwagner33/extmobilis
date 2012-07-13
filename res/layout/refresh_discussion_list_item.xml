@@ -5,19 +5,18 @@
     android:background="@android:color/white"
     android:orientation="vertical" >
 
-    <ImageView
-        android:id="@+id/blue_line"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/blue_line_height"
-        android:layout_alignParentTop="true"
-        android:background="@color/list_divider"
-        android:contentDescription="@string/temp_description" />
+    <!-- <ImageView -->
+    <!-- android:id="@+id/blue_line" -->
+    <!-- android:layout_width="match_parent" -->
+    <!-- android:layout_height="1dp" -->
+    <!-- android:layout_alignParentTop="true" -->
+    <!-- android:background="@color/list_divider" -->
+    <!-- android:contentDescription="@string/temp_description" /> -->
 
     <ImageView
         android:id="@+id/refresh_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/blue_line"
         android:layout_centerHorizontal="true"
         android:contentDescription="@string/temp_description"
         android:paddingBottom="5dp"

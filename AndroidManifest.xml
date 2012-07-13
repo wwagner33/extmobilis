@@ -40,7 +40,9 @@
             android:windowSoftInputMode="stateHidden|adjustResize" />
         <activity android:name=".PostDetailController" />
         <activity android:name=".Config" />
-        <activity android:name=".ExtMobilisTTSActivity" />
+        <activity
+            android:name=".ExtMobilisTTSActivity"
+            android:theme="@style/Theme.Mobilis" />
     </application>
 
 </manifest>

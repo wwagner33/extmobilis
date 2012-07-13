@@ -1,5 +1,5 @@
 #
-# generated on 2012/07/02 09:56:44
+# generated on 2012/07/13 09:58:11
 #
 # --table-start--
 dataClass=com.mobilis.model.Course
@@ -74,6 +74,14 @@ columnName=previous_posts
 fieldName=hasNewPosts
 columnName=has_new_posts
 # --field-end--
+# --field-start--
+fieldName=startDate
+columnName=start_date
+# --field-end--
+# --field-start--
+fieldName=endDate
+columnName=end_date
+# --field-end--
 # --table-fields-end--
 # --table-end--
 #################################
@@ -101,10 +109,6 @@ columnName=discussion_id
 # --field-start--
 fieldName=profileId
 columnName=profile_id
-# --field-end--
-# --field-start--
-fieldName=isMarked
-columnName=is_marked
 # --field-end--
 # --field-start--
 fieldName=userNick

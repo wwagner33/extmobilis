@@ -37,10 +37,10 @@ public class Post {
 	@DatabaseField(columnName = PROFILE_ID_FIELD_NAME)
 	private int profileId;
 
-	@DatabaseField(columnName = IS_MARKED_FIELD_NAME)
-	private boolean isMarked = false;
+	// @DatabaseField(columnName = IS_MARKED_FIELD_NAME)
+	// private boolean isMarked = false;
 
-	private boolean isPlaying, isJustLoaded = false;
+	private boolean isMarked, isJustLoaded, isPlaying, isExpanded = false;
 
 	@DatabaseField(columnName = USER_NICK_FIELD_NAME)
 	private String userNick;
@@ -95,14 +95,6 @@ public class Post {
 		this.profileId = profileId;
 	}
 
-	public boolean isMarked() {
-		return isMarked;
-	}
-
-	public void setMarked(boolean isMarked) {
-		this.isMarked = isMarked;
-	}
-
 	public String getUserNick() {
 		return userNick;
 	}
@@ -146,12 +138,12 @@ public class Post {
 		return simpleDateFormat.format(date.getTime());
 	}
 
-	public boolean isPlaying() {
-		return isPlaying;
+	public boolean isMarked() {
+		return isMarked;
 	}
 
-	public void setPlaying(boolean isPlaying) {
-		this.isPlaying = isPlaying;
+	public void setMarked(boolean marked) {
+		this.isMarked = marked;
 	}
 
 	public boolean isJustLoaded() {
@@ -161,4 +153,21 @@ public class Post {
 	public void setJustLoaded(boolean isJustLoaded) {
 		this.isJustLoaded = isJustLoaded;
 	}
+
+	public boolean isPlaying() {
+		return isPlaying;
+	}
+
+	public void setPlaying(boolean isPlaying) {
+		this.isPlaying = isPlaying;
+	}
+
+	public boolean isExpanded() {
+		return isExpanded;
+	}
+
+	public void setExpanded(boolean isExpanded) {
+		this.isExpanded = isExpanded;
+	}
+
 }

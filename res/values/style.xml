@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
 
     <style name="SolarTheme" parent="@android:style/Theme.Light.NoTitleBar"></style>
 
@@ -15,5 +15,15 @@
     <style name="SolarTheme.layout3">
         <item name="android:background">#FFFFFF</item>
     </style>
-    
+
+    <style name="Theme.Mobilis" parent="Theme.Sherlock.ForceOverflow">
+        <item name="actionBarStyle">@style/Widget.Mobilis.ActionBar</item>
+        <item name="android:actionBarStyle">@style/Widget.Mobilis.ActionBar</item>
+    </style>
+
+    <style name="Widget.Mobilis.ActionBar" parent="Widget.Sherlock.ActionBar">
+        <item name="android:background">@color/action_bar_idle</item>
+        <item name="background">@color/action_bar_idle</item>
+    </style>
+
 </resources>

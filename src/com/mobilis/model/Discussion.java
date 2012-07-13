@@ -19,6 +19,8 @@ public class Discussion {
 	public static final String NEXT_POSTS_FIELD_NAME = "next_posts";
 	public static final String PREVIOUS_POSTS_FIELD_NAME = "previous_posts";
 	public static final String HAS_NEW_POSTS_FIELD_NAME = "has_new_posts";
+	public static final String START_DATE_FIELD_NAME = "start_date";
+	public static final String END_DATE_FIELD_NAME = "end_date";
 
 	@DatabaseField(id = true, columnName = ID_FIELD_NAME)
 	private int _id;
@@ -46,6 +48,12 @@ public class Discussion {
 
 	@DatabaseField(columnName = HAS_NEW_POSTS_FIELD_NAME)
 	private boolean hasNewPosts = false;
+
+	@DatabaseField(columnName = START_DATE_FIELD_NAME)
+	private Date startDate;
+
+	@DatabaseField(columnName = END_DATE_FIELD_NAME)
+	private Date endDate;
 
 	public Discussion() {
 
@@ -140,6 +148,22 @@ public class Discussion {
 
 	public void setHasNewPosts(boolean hasNewPosts) {
 		this.hasNewPosts = hasNewPosts;
+	}
+
+	public Date getStartDate() {
+		return startDate;
+	}
+
+	public void setStartDate(Date startDate) {
+		this.startDate = startDate;
+	}
+
+	public Date getEndDate() {
+		return endDate;
+	}
+
+	public void setEndDate(Date endDate) {
+		this.endDate = endDate;
 	}
 
 }

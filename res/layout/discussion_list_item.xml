@@ -6,55 +6,59 @@
     android:orientation="vertical"
     android:paddingBottom="@dimen/small_space" >
 
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/blue_line_height"
-        android:layout_alignParentTop="true"
-        android:background="@color/list_divider"
-        android:contentDescription="@string/temp_description" />
+    <!-- android:background="@drawable/picture_post_frame" -->
+    <!-- android:scaleType="centerInside" -->
 
     <ImageView
         android:id="@+id/user_photo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/medium_space"
-        android:background="@drawable/picture_post_frame"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
         android:contentDescription="@string/temp_description"
-        android:scaleType="centerInside"
         android:src="@drawable/no_picture" />
 
-    <TextView
-        android:id="@+id/user_nick"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/top_text"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@dimen/small_space"
-        android:layout_alignTop="@+id/user_photo"
-        android:layout_toRightOf="@+id/user_photo"
-        android:minLines="2"
-        android:text="@string/fulano_name"
-        android:textColor="@color/user_post_text"
-        android:textSize="@dimen/user_name_text_size" />
+        android:layout_marginTop="8dp"
+        android:layout_toRightOf="@id/user_photo"
+        android:orientation="horizontal" >
 
-    <TextView
-        android:id="@+id/post_date"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/user_nick"
-        android:layout_alignParentRight="true"
-        android:layout_marginRight="@dimen/small_space"
-        android:text="@string/locale_date_format"
-        android:textColor="@color/user_post_date_text"
-        android:textSize="@dimen/user_post_date_text_size" />
+        <TextView
+            android:id="@+id/user_nick"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="left"
+            android:text="@string/fulano_name"
+            android:textColor="@color/text_white_color"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/post_date"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="16dp"
+            android:layout_weight="1"
+            android:gravity="right"
+            android:text="@string/locale_date_format"
+            android:textColor="@color/text_white_color"
+            android:textSize="12sp" />
+    </LinearLayout>
 
     <com.mobilis.util.EllipsizingTextView
         android:id="@+id/post_content"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/user_nick"
+        android:layout_below="@+id/top_text"
         android:layout_toRightOf="@+id/user_photo"
         android:ellipsize="end"
         android:text="@string/sample_text"
-        android:textColor="@color/user_post_text"
-        android:textSize="@dimen/user_post_date_text_size" />
+        android:textColor="@color/text_white_color"
+        android:textSize="14sp" />
 
 </RelativeLayout>
