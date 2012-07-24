@@ -14,6 +14,11 @@ import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 import com.mobilis.dao.ClassDAO;
 import com.mobilis.dao.DatabaseHelper;
@@ -30,7 +35,7 @@ import com.mobilis.util.MobilisPreferences;
 import com.mobilis.util.ParseJSON;
 import com.mobilis.ws.Connection;
 
-public class ClassListController extends MobilisMenuListActivity implements
+public class ClassListController extends SherlockFragmentActivity implements
 		ConnectionCallback, OnItemClickListener {
 
 	private ParseJSON jsonParser;
@@ -46,6 +51,7 @@ public class ClassListController extends MobilisMenuListActivity implements
 	private SimpleCursorAdapter simpleAdapter;
 	private DatabaseHelper helper = null;
 	private ListView list;
+	private ActionBar actionBar;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -62,9 +68,51 @@ public class ClassListController extends MobilisMenuListActivity implements
 		dialogMaker = new DialogMaker(this);
 		list = (ListView) findViewById(R.id.list);
 		list.setOnItemClickListener(this);
-
+		actionBar = getSupportActionBar();
+		actionBar.setDisplayHomeAsUpEnabled(false);
+		actionBar.setHomeButtonEnabled(false);
+		actionBar.setDisplayUseLogoEnabled(false);
+		actionBar.setDisplayShowHomeEnabled(false);
+		actionBar.setTitle("Turmas");
 		restoreDialog();
 		updateList();
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getSupportMenuInflater();
+		inflater.inflate(R.menu.options_menu, menu);
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+
+		switch (item.getItemId()) {
+		case R.id.menu_refresh:
+			int selectedCourse = appState.selectedCourse;
+			dialog = dialogMaker
+					.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
+			dialog.show();
+			obtainClasses(Constants.URL_CURRICULUM_UNITS_PREFIX
+					+ selectedCourse + Constants.URL_GROUPS_SUFFIX);
+			return true;
+
+		case R.id.menu_config:
+			intent = new Intent(this, Config.class);
+			startActivity(intent);
+			return true;
+
+		case R.id.menu_logout:
+			appState.setToken(null);
+			intent = new Intent(this, Login.class);
+			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			startActivity(intent);
+			return true;
+
+		default:
+			return false;
+		}
 	}
 
 	@Override
@@ -120,17 +168,6 @@ public class ClassListController extends MobilisMenuListActivity implements
 				R.layout.curriculum_units_item, cursor,
 				new String[] { "code" }, new int[] { R.id.turmas_item });
 		list.setAdapter(simpleAdapter);
-	}
-
-	@Override
-	public void menuRefreshItemSelected() {
-		int selectedCourse = appState.selectedCourse;
-		dialog = dialogMaker
-				.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
-		dialog.show();
-		obtainClasses(Constants.URL_CURRICULUM_UNITS_PREFIX + selectedCourse
-				+ Constants.URL_GROUPS_SUFFIX);
-
 	}
 
 	@Override

@@ -14,13 +14,17 @@ import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 import com.mobilis.dao.ClassDAO;
 import com.mobilis.dao.CourseDAO;
 import com.mobilis.dao.DatabaseHelper;
 import com.mobilis.dialog.DialogMaker;
 import com.mobilis.interfaces.ConnectionCallback;
-import com.mobilis.interfaces.MobilisMenuListActivity;
 import com.mobilis.model.Class;
 import com.mobilis.model.Course;
 import com.mobilis.util.Constants;
@@ -29,7 +33,7 @@ import com.mobilis.util.MobilisPreferences;
 import com.mobilis.util.ParseJSON;
 import com.mobilis.ws.Connection;
 
-public class CourseListController extends MobilisMenuListActivity implements
+public class CourseListController extends SherlockFragmentActivity implements
 		ConnectionCallback, OnItemClickListener {
 
 	private Intent intent;
@@ -44,6 +48,7 @@ public class CourseListController extends MobilisMenuListActivity implements
 	private SimpleCursorAdapter simpleAdapter;
 	private DatabaseHelper helper = null;
 	private ListView list;
+	private ActionBar actionBar;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -66,7 +71,46 @@ public class CourseListController extends MobilisMenuListActivity implements
 		list.setOnItemClickListener(this);
 		list.setEmptyView(emptyText);
 		restoreActivityState();
+		actionBar = getSupportActionBar();
+		actionBar.setDisplayHomeAsUpEnabled(false);
+		actionBar.setHomeButtonEnabled(false);
+		actionBar.setDisplayUseLogoEnabled(false);
+		actionBar.setDisplayShowHomeEnabled(false);
+		actionBar.setTitle("Cursos");
 		updateList();
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getSupportMenuInflater();
+		inflater.inflate(R.menu.options_menu, menu);
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+
+		switch (item.getItemId()) {
+		case R.id.menu_refresh:
+			progressDialog.show();
+			obtainCourses(Constants.URL_COURSES);
+			return true;
+
+		case R.id.menu_config:
+			intent = new Intent(this, Config.class);
+			startActivity(intent);
+			return true;
+
+		case R.id.menu_logout:
+			appState.setToken(null);
+			intent = new Intent(this, Login.class);
+			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			startActivity(intent);
+			return true;
+
+		default:
+			return false;
+		}
 	}
 
 	@Override
@@ -130,12 +174,6 @@ public class CourseListController extends MobilisMenuListActivity implements
 		connection.getFromServer(Constants.CONNECTION_GET_COURSES,
 				Constants.URL_COURSES, appState.getToken());
 
-	}
-
-	@Override
-	public void menuRefreshItemSelected() {
-		progressDialog.show();
-		obtainCourses(Constants.URL_COURSES);
 	}
 
 	@Override

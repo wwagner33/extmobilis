@@ -31,6 +31,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockActivity;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 import com.mobilis.audio.AudioPlayer;
 import com.mobilis.audio.AudioRecorder;
@@ -49,7 +51,7 @@ import com.mobilis.util.MobilisPreferences;
 import com.mobilis.util.ParseJSON;
 import com.mobilis.ws.Connection;
 
-public class ResponseController extends Activity implements OnClickListener,
+public class ResponseController extends SherlockActivity implements OnClickListener,
 		OnChronometerTickListener, OnCompletionListener, TextWatcher,
 		OnInfoListener, ConnectionCallback, AudioDialogListener,
 		onDeleteListener {
@@ -81,6 +83,7 @@ public class ResponseController extends Activity implements OnClickListener,
 	private Discussion currentDiscussion;
 	private Intent intent;
 	private DatabaseHelper helper = null;
+	private ActionBar actionBar;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -111,7 +114,12 @@ public class ResponseController extends Activity implements OnClickListener,
 		charCount = (TextView) findViewById(R.id.char_number);
 		charCount.setText("0/" + Constants.TEXT_MAX_CHARACTER_LENGHT);
 		jsonParser = new ParseJSON();
-
+		actionBar = getSupportActionBar();
+		actionBar.setDisplayHomeAsUpEnabled(false);
+		actionBar.setHomeButtonEnabled(false);
+		actionBar.setDisplayUseLogoEnabled(false);
+		actionBar.setDisplayShowHomeEnabled(false);
+		actionBar.setTitle("Responder");
 		restoreDialog();
 
 	}

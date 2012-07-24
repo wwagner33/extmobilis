@@ -2,17 +2,15 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/testel"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent" >
+    android:layout_height="fill_parent"
+    android:background="@android:color/white" >
 
-    <include
-        android:id="@+id/top_bar"
-        layout="@layout/solar_logo_bar" />
 
     <RelativeLayout
         android:id="@+id/middle_bar"
         android:layout_width="wrap_content"
         android:layout_height="50dp"
-        android:layout_below="@id/top_bar" >
+        android:layout_alignParentTop="true" >
 
         <TextView
             android:layout_width="fill_parent"

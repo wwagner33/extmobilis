@@ -2,11 +2,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:orientation="vertical" >
+    android:orientation="vertical"
+    android:background="@android:color/white" >
 
-    <include
-        android:id="@+id/layout_top_response"
-        layout="@layout/solar_logo_bar" />
 
     <RelativeLayout
         android:id="@+id/audio_preview_bar"
@@ -30,6 +28,7 @@
     </RelativeLayout>
 
     <EditText
+        android:layout_margin="16dp"
         android:id="@+id/criar_topico_conteudo"
         android:layout_width="fill_parent"
         android:layout_height="0dip"

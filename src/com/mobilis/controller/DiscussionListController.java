@@ -21,6 +21,11 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 import com.mobilis.dao.DatabaseHelper;
 import com.mobilis.dao.DiscussionDAO;
@@ -36,8 +41,8 @@ import com.mobilis.util.MobilisPreferences;
 import com.mobilis.util.ParseJSON;
 import com.mobilis.ws.Connection;
 
-public class DiscussionListController extends MobilisMenuListActivity implements
-		ConnectionCallback, OnItemClickListener {
+public class DiscussionListController extends SherlockFragmentActivity
+		implements ConnectionCallback, OnItemClickListener {
 
 	private Intent intent;
 	private ParseJSON jsonParser;
@@ -51,6 +56,7 @@ public class DiscussionListController extends MobilisMenuListActivity implements
 	private MobilisPreferences appState;
 	private DatabaseHelper helper;
 	private ListView list;
+	private ActionBar actionBar;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -68,8 +74,51 @@ public class DiscussionListController extends MobilisMenuListActivity implements
 		dialogMaker = new DialogMaker(this);
 		progressDialog = dialogMaker
 				.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
+		actionBar = getSupportActionBar();
+		actionBar.setDisplayHomeAsUpEnabled(false);
+		actionBar.setHomeButtonEnabled(false);
+		actionBar.setDisplayUseLogoEnabled(false);
+		actionBar.setDisplayShowHomeEnabled(false);
+		actionBar.setTitle("Fóruns");
 		restoreDialog();
 		updateList();
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getSupportMenuInflater();
+		inflater.inflate(R.menu.options_menu, menu);
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+
+		switch (item.getItemId()) {
+		case R.id.menu_refresh:
+			int currentClass = appState.selectedClass;
+			progressDialog = dialogMaker
+					.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
+			progressDialog.show();
+			obtainTopics(Constants.URL_GROUPS_PREFIX + currentClass
+					+ Constants.URL_DISCUSSION_SUFFIX);
+			return true;
+
+		case R.id.menu_config:
+			intent = new Intent(this, Config.class);
+			startActivity(intent);
+			return true;
+
+		case R.id.menu_logout:
+			appState.setToken(null);
+			intent = new Intent(this, Login.class);
+			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			startActivity(intent);
+			return true;
+
+		default:
+			return false;
+		}
 	}
 
 	@Override
@@ -210,16 +259,6 @@ public class DiscussionListController extends MobilisMenuListActivity implements
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		updateList();
-	}
-
-	@Override
-	public void menuRefreshItemSelected() {
-		int currentClass = appState.selectedClass;
-		progressDialog = dialogMaker
-				.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
-		progressDialog.show();
-		obtainTopics(Constants.URL_GROUPS_PREFIX + currentClass
-				+ Constants.URL_DISCUSSION_SUFFIX);
 	}
 
 	@Override

@@ -31,13 +31,17 @@
         <activity
             android:name=".Login"
             android:screenOrientation="portrait" />
-        <activity android:name=".CourseListController" />
+        <activity android:name=".CourseListController" 
+            android:theme="@style/Theme.Mobilis"/>
         <activity android:name=".PostList" />
-        <activity android:name=".ClassListController" />
-        <activity android:name=".DiscussionListController" />
+        <activity android:name=".ClassListController" 
+            android:theme="@style/Theme.Mobilis"/>
+        <activity android:name=".DiscussionListController" 
+            android:theme="@style/Theme.Mobilis"/>
         <activity
             android:name=".ResponseController"
-            android:windowSoftInputMode="stateHidden|adjustResize" />
+            android:windowSoftInputMode="stateHidden|adjustResize" 
+            android:theme="@style/Theme.Mobilis"/>
         <activity android:name=".PostDetailController" />
         <activity android:name=".Config" />
         <activity
