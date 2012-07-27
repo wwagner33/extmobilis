@@ -219,7 +219,7 @@ public class TTSPostsManager implements Runnable {
 		try {
 			postPlayer.pause();
 		} catch (Exception e) {
-			
+
 		}
 	}
 

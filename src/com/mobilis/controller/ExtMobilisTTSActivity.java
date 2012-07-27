@@ -62,7 +62,6 @@ public class ExtMobilisTTSActivity extends SherlockFragmentActivity implements
 	private final int FUTURE_POST_ID = 1;
 	private final int REFRESH_ID = 2;
 	public int positionSelected = -1;
-	// public boolean contentPostIsExpanded = false;
 	private boolean headerClicked = false;
 	private boolean footerClicked = false;
 	private Connection wsSolar;
@@ -84,6 +83,7 @@ public class ExtMobilisTTSActivity extends SherlockFragmentActivity implements
 	private boolean actionBarSelected = false;
 	private boolean playbackBarIsVisible = false;
 	private ActionBar actionBar;
+	private boolean headerIsAttached;
 
 	public void onCreate(Bundle savedInstanceState) {
 
@@ -497,8 +497,10 @@ public class ExtMobilisTTSActivity extends SherlockFragmentActivity implements
 	private void setHeader() {
 		if (discussion.getPreviousPosts() > 0) {
 			showHeader();
+			headerIsAttached = true;
 		} else {
 			hideHeader();
+			headerIsAttached = false;
 		}
 	}
 
@@ -852,9 +854,13 @@ public class ExtMobilisTTSActivity extends SherlockFragmentActivity implements
 	public void onItemClick(AdapterView<?> parent, View view, int position,
 			long id) {
 
-		Log.i(TAG, "Action Bar height = " + actionBar.getHeight());
-
 		int arrayPosition = position;
+		Log.i(TAG, "Position  = " + position);
+		if (headerIsAttached) {
+			arrayPosition--;
+		}
+		Log.e(TAG, "ArrayPosition  = " + arrayPosition);
+
 		if (positionSelected == -1) {
 			postsAdapter.togglePostMarkedStatus(arrayPosition);
 			positionSelected = arrayPosition;
