@@ -128,7 +128,7 @@ public class ExtMobilisTTSActivity extends SherlockFragmentActivity implements
 
 		SimpleDateFormat exhibFormat = DateUtils.getExhibitionFormat();
 		String startDate = exhibFormat.format(discussion.getStartDate());
-		String endDate = exhibFormat.format(discussion.getStartDate());
+		String endDate = exhibFormat.format(discussion.getEndDate());
 		forumRange.setText(startDate + " - " + endDate);
 
 		forumTitle.setText(discussion.getName().toUpperCase());

@@ -125,7 +125,7 @@ public class ParseJSON {
 					discussion.setStartDate(startDate);
 
 					Date endDate = serverFormat.parse((String) jsonObjects[i]
-							.get("start_date"));
+							.get("end_date"));
 					discussion.setEndDate(endDate);
 
 				} catch (ParseException e) {
