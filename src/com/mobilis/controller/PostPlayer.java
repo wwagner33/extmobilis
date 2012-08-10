@@ -30,6 +30,7 @@ public class PostPlayer implements Runnable, OnCompletionListener,
 	public static final int PLAYER_PAUSED = 2;
 	public static final int PLAYER_UNITIALIZED = 3;
 	public boolean isPrepared = false;
+	private long playingDuration = 0;
 
 	String getBlockAtIndex(int index) {
 		if (index == 0)
@@ -47,7 +48,7 @@ public class PostPlayer implements Runnable, OnCompletionListener,
 		this.handler = handler;
 		this.post = post;
 		blocksNumber = numberOfBlocks - 1;
-		Log.w("Blocks Number", "" + blocksNumber);
+		// Log.v(TAG, "Post Character Lenght = " + post.getContent().length());
 		mediaPlayer = new MediaPlayer();
 		mediaPlayer.setOnCompletionListener(this);
 		mediaPlayer.setOnErrorListener(this);
@@ -72,15 +73,10 @@ public class PostPlayer implements Runnable, OnCompletionListener,
 		synchronized (this) {
 			try {
 				if (currentBlockIndex <= lastAvailableBlockIndex) {
-					Log.w("Current", "" + currentBlockIndex);
-					Log.w("last", "" + lastAvailableBlockIndex);
-					Log.w("Number total", "" + blocksNumber);
 					if (!mediaPlayer.isPlaying()) {
-						Log.e("Player", "Tocando");
 						File file = new File(Constants.AUDIO_DEFAULT_PATH
 								+ post.getId() + "/" + currentBlockIndex
 								+ ".mp3");
-						Log.i(TAG, "File Exists = " + file.exists());
 						mediaPlayer.setDataSource(Constants.AUDIO_DEFAULT_PATH
 								+ post.getId() + "/" + currentBlockIndex
 								+ ".mp3");
@@ -89,14 +85,12 @@ public class PostPlayer implements Runnable, OnCompletionListener,
 					}
 				} else {
 					if (currentBlockIndex < blocksNumber) {
-						Log.e("Player", "Aguardando novo audio");
 						this.wait();
 					}
 				}
 
 			} catch (Exception e) {
 				e.printStackTrace();
-				Log.i(TAG, "OnException");
 			}
 		}
 	}
@@ -118,13 +112,16 @@ public class PostPlayer implements Runnable, OnCompletionListener,
 
 	@Override
 	public void run() {
+
+		Log.e(TAG, "Starting Player");
+		playingDuration = System.currentTimeMillis();
+
 		while (blocksNumber >= currentBlockIndex && !Thread.interrupted()) {
 			if (!mediaPlayer.isPlaying() && !isPaused) {
 				try {
 					this.play();
 					Thread.sleep(MAX_TIME_TO_SLEEP);
 				} catch (IllegalStateException e) {
-					Log.i(TAG, "IllegalStateException");
 					handler.sendEmptyMessage(Constants.ERROR_PLAYING);
 					e.printStackTrace();
 					return;
@@ -137,11 +134,9 @@ public class PostPlayer implements Runnable, OnCompletionListener,
 			}
 		}
 		if (lastAvailableBlockIndex != -1 && !Thread.interrupted()) {
-			Log.i(TAG, "Playing next post");
 			handler.sendEmptyMessage(Constants.PLAY_NEXT_POST);
 		} else
-			Log.i(TAG, "Stopping audio");
-		handler.sendEmptyMessage(Constants.STOP_AUDIO);
+			handler.sendEmptyMessage(Constants.STOP_AUDIO);
 	}
 
 	public void playSoundEffect() {
@@ -156,11 +151,14 @@ public class PostPlayer implements Runnable, OnCompletionListener,
 
 	@Override
 	public void onCompletion(MediaPlayer mp) {
-		Log.i(TAG, "onCompletionListener");
 		currentBlockIndex++;
 		mp.stop();
 		mp.reset();
 		if (currentBlockIndex > blocksNumber) {
+
+			playingDuration = System.currentTimeMillis() - playingDuration;
+			Log.i(TAG, "Duração do áudio em segundos = "
+					+ (playingDuration / 1000));
 			mp.release();
 		}
 	}
@@ -180,12 +178,10 @@ public class PostPlayer implements Runnable, OnCompletionListener,
 
 	@Override
 	public boolean onError(MediaPlayer mp, int what, int extra) {
-		Log.i(TAG, "OnErrorListener");
 		return false;
 	}
 
 	public MediaPlayer getMediaPlayer() {
 		return mediaPlayer;
 	}
-
 }

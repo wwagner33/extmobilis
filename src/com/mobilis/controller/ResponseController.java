@@ -51,9 +51,9 @@ import com.mobilis.util.MobilisPreferences;
 import com.mobilis.util.ParseJSON;
 import com.mobilis.ws.Connection;
 
-public class ResponseController extends SherlockActivity implements OnClickListener,
-		OnChronometerTickListener, OnCompletionListener, TextWatcher,
-		OnInfoListener, ConnectionCallback, AudioDialogListener,
+public class ResponseController extends SherlockActivity implements
+		OnClickListener, OnChronometerTickListener, OnCompletionListener,
+		TextWatcher, OnInfoListener, ConnectionCallback, AudioDialogListener,
 		onDeleteListener {
 
 	private EditText message;
@@ -84,6 +84,7 @@ public class ResponseController extends SherlockActivity implements OnClickListe
 	private Intent intent;
 	private DatabaseHelper helper = null;
 	private ActionBar actionBar;
+	private String TAG = "RESPONSE";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -483,18 +484,20 @@ public class ResponseController extends SherlockActivity implements OnClickListe
 			case Constants.CONNECTION_POST_TEXT_RESPONSE:
 				Log.w("TEXT RESPONSE RESULT", result);
 
-				ArrayList<String> resultFromServer;
+				ArrayList<Integer> resultFromServer;
 
-				resultFromServer = (ArrayList<String>) jsonParser.parseJSON(
+				resultFromServer = (ArrayList<Integer>) jsonParser.parseJSON(
 						result, Constants.PARSE_TEXT_RESPONSE_ID);
 
 				if (existsRecording) {
-					long postId = Long.parseLong(resultFromServer.get(0));
+					Log.i(TAG, "Exists Recording");
+					int postId = resultFromServer.get(1);
 					sendAudioPost(
-							Constants.generateAudioResponseURL((int) postId),
+							Constants.generateAudioResponseURL(postId),
 							recorder.getAudioFile(), appState.getToken());
 
 				} else {
+					Log.i(TAG, "No recording");
 					currentDiscussion = discussionDAO
 							.getDiscussion(appState.selectedDiscussion);
 					currentDiscussion.setNextPosts(currentDiscussion

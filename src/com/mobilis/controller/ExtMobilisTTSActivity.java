@@ -85,6 +85,8 @@ public class ExtMobilisTTSActivity extends SherlockFragmentActivity implements
 	private ActionBar actionBar;
 	private boolean headerIsAttached;
 
+	private int playingDelay = 0; // TODO delay do começo do audio.
+
 	public void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
@@ -122,9 +124,6 @@ public class ExtMobilisTTSActivity extends SherlockFragmentActivity implements
 		discussionPosts = new ArrayList<Post>();
 
 		discussion = discussionDAO.getDiscussion(appState.selectedDiscussion);
-
-		// Log.e(TAG, "Start Date = " +
-		// teste.format(discussion.getStartDate()));
 
 		SimpleDateFormat exhibFormat = DateUtils.getExhibitionFormat();
 		String startDate = exhibFormat.format(discussion.getStartDate());
@@ -865,16 +864,21 @@ public class ExtMobilisTTSActivity extends SherlockFragmentActivity implements
 			postsAdapter.togglePostMarkedStatus(arrayPosition);
 			positionSelected = arrayPosition;
 			actionBarSelected = true;
+			appState.selectedPost = (Integer) postsAdapter
+					.getItem(arrayPosition);
 			setActionBarSelected();
 		} else if (positionSelected == arrayPosition) {
 			postsAdapter.untogglePostMarkedStatus(arrayPosition);
 			actionBarSelected = false;
 			positionSelected = -1;
+			appState.selectedPost = -1;
 			setActionBarNotSelected();
 		} else {
 			postsAdapter.togglePostMarkedStatus(arrayPosition);
 			postsAdapter.untogglePostMarkedStatus(positionSelected);
 			positionSelected = arrayPosition;
+			appState.selectedPost = (Integer) postsAdapter
+					.getItem(arrayPosition);
 			actionBarSelected = true;
 			setActionBarSelected();
 		}

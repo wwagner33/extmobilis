@@ -27,6 +27,9 @@ public class WebServiceBing {
 	public static final String BING_URI = "http://api.microsofttranslator.com/v2/Http.svc/Speak?appId=03CAF44417913E4B9D82BE6202DBFBD768B8C5E1&text=";
 	public static final String TAG = "WSBING";
 
+	private long connectionTime = 0;
+	private long connectionTimePlusFileSaving = 0;
+
 	public WebServiceBing(Post post) {
 		this.post = post;
 	}
@@ -36,22 +39,21 @@ public class WebServiceBing {
 	}
 
 	public boolean getAudioAsync(String text, int index) {
-		Log.e("Produtor chama audio", "sim");
+
+		Log.v(TAG, "Post Index = " + index);
+
+		connectionTimePlusFileSaving = System.currentTimeMillis();
 		setAddress(Constants.AUDIO_DEFAULT_PATH + post.getId() + "/" + index
 				+ ".mp3");
 		File parentDirecotory = new File(Constants.AUDIO_DEFAULT_PATH
 				+ post.getId() + "/");
 		if (!parentDirecotory.exists())
 			parentDirecotory.mkdirs();
-		Log.e("Salvando audio em", Constants.AUDIO_DEFAULT_PATH + post.getId()
-				+ "/" + index + ".mp3");
 		InputStream audioInput = getAudio(text);
 		if (audioInput == null) {
-			Log.e(TAG, "Retorno = " + false);
 			return false;
 		}
 		handleResponse(audioInput);
-		Log.e(TAG, "Retorno = " + true);
 		return true;
 	}
 
@@ -65,12 +67,20 @@ public class WebServiceBing {
 			String uriOld = BING_URI + sentence + "&language=pt";
 
 			get = new HttpGet(uriOld);
-			Log.w("URI", String.valueOf(get.getURI()));
+
+			connectionTime = System.currentTimeMillis();
+			// Log.e(TAG, "Starting Bing Connection at " + connectionTime);
 			response = client.execute(get);
+			// Log.e(TAG, "Connection End at " + System.currentTimeMillis());
+			connectionTime = (System.currentTimeMillis() - connectionTime);
+			// Log.w(TAG, " Bing Connection Time in Seconds = " + connectionTime
+			// / 1000);
+			Log.w(TAG, "Connection Time in Millis = " + connectionTime);
+
 			int connectionStatus = response.getStatusLine().getStatusCode();
 			Log.w(TAG, "Status Code = " + String.valueOf(connectionStatus));
 			audioResponse = response.getEntity().getContent();
-			Log.e("audioResponse", response.toString());
+			// Log.e("audioResponse", response.toString());
 			return audioResponse;
 
 		} catch (IOException e) {
@@ -101,7 +111,14 @@ public class WebServiceBing {
 			}
 
 			fos.close();
-			Log.e("Audio Salvo", addressAudio);
+			connectionTimePlusFileSaving = System.currentTimeMillis()
+					- connectionTimePlusFileSaving;
+			Log.e(TAG, "Áudio baixado e salvo no cartão SD");
+			// Log.i(TAG, "Connection time & file saving in seconds="
+			// + connectionTimePlusFileSaving / 1000);
+			Log.i(TAG, "Connection time & file saving in millis = "
+					+ connectionTimePlusFileSaving);
+
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

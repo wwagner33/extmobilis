@@ -75,7 +75,7 @@ public class PostAdapter extends BaseAdapter {
 
 	@Override
 	public Object getItem(int position) {
-		return position;
+		return posts.get(position).getId();
 	}
 
 	@Override

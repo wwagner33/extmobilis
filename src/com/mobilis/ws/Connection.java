@@ -205,7 +205,9 @@ public class Connection {
 		Object resultSet[] = new Object[2];
 
 		if (audioFile == null) {
-
+			Log.i("Connection", "Audio is Null");
+		} else {
+			Log.i("Connection", "Audio not Null");
 		}
 
 		DefaultHttpClient client = new DefaultHttpClient();
