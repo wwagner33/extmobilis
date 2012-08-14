@@ -20,7 +20,7 @@ import com.mobilis.model.Post;
 
 public class ParseJSON {
 
-	public ArrayList<?> parseJSON(String content, int parseId) {
+	public ArrayList<? extends Object> parseJSON(String content, int parseId) {
 
 		Object object = JSONValue.parse(content);
 		JSONArray jsonArray = null;
@@ -33,52 +33,35 @@ public class ParseJSON {
 		switch (parseId) {
 
 		case Constants.PARSE_TOKEN_ID:
-
 			JSONObject globalJSON = (JSONObject) object;
-
 			JSONObject sessionsJSON = (JSONObject) globalJSON.get("session");
-
 			String tokenString = (String) sessionsJSON.get("auth_token");
-
 			ArrayList<String> tokenHolder = new ArrayList<String>();
 			tokenHolder.add(tokenString);
-
 			return tokenHolder;
 
 		case Constants.PARSE_COURSES_ID:
-
 			ArrayList<Course> courses = new ArrayList<Course>();
-
 			for (int i = 0; i < jsonArray.size(); i++) {
 				jsonObjects[i] = (JSONObject) jsonArray.get(i);
-
 				Course course = new Course();
-
 				course.set_id(((Long) jsonObjects[i].get("id")).intValue());
-
 				course.setOfferId(Integer.parseInt((String) jsonObjects[i]
 						.get("offer_id")));
-
 				course.setGroupId(Integer.parseInt((String) jsonObjects[i]
 						.get("group_id")));
-
 				course.setSemester((String) jsonObjects[i].get("semester"));
-
 				course.setAllocationTagId(Integer
 						.parseInt((String) jsonObjects[i]
 								.get("allocation_tag_id")));
-
 				course.setName((String) jsonObjects[i].get("name"));
-
 				courses.add(course);
 			}
-
 			return courses;
 
 		case Constants.PARSE_CLASSES_ID:
 
 			ArrayList<Class> classes = new ArrayList<Class>();
-
 			for (int i = 0; i < jsonArray.size(); i++) {
 				jsonObjects[i] = (JSONObject) jsonArray.get(i);
 
@@ -89,7 +72,6 @@ public class ParseJSON {
 				mClass.setSemester((String) jsonObjects[i].get("semester"));
 				classes.add(mClass);
 			}
-
 			return classes;
 
 		case Constants.PARSE_TOPICS_ID:
@@ -139,16 +121,13 @@ public class ParseJSON {
 		case Constants.PARSE_TEXT_RESPONSE_ID:
 
 			JSONObject jsonObject = (JSONObject) object;
-
 			ArrayList<Integer> result = new ArrayList<Integer>();
 			result.add(((Long) jsonObject.get("result")).intValue());
 			result.add(((Long) jsonObject.get("post_id")).intValue());
 			return result;
 
 		case Constants.PARSE_POSTS_ID:
-
 			ArrayList<Post> parsedPosts = new ArrayList<Post>();
-
 			for (int i = 1; i < jsonArray.size(); i++) {
 
 				jsonObjects[i] = (JSONObject) jsonArray.get(i);
@@ -201,7 +180,6 @@ public class ParseJSON {
 		default:
 			return null;
 		}
-
 	}
 
 	private String removeBlankSpace(String text) {
@@ -227,13 +205,12 @@ public class ParseJSON {
 		jsonMap.put("parent_id", parentId);
 		responseJSON.put("discussion_post", jsonMap);
 		return responseJSON;
-
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings("unchecked")
 	public JSONObject buildTextResponseWithoutParent(String content) {
 		JSONObject responseJSON = new JSONObject();
-		LinkedHashMap jsonMap = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> jsonMap = new LinkedHashMap<String, String>();
 		jsonMap.put("content", content);
 		jsonMap.put("parent_id", Constants.noParentString);
 		responseJSON.put("discussion_post", jsonMap);

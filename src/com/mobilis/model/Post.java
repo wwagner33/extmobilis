@@ -37,9 +37,6 @@ public class Post {
 	@DatabaseField(columnName = PROFILE_ID_FIELD_NAME)
 	private int profileId;
 
-	// @DatabaseField(columnName = IS_MARKED_FIELD_NAME)
-	// private boolean isMarked = false;
-
 	private boolean isMarked, isJustLoaded, isPlaying, isExpanded = false;
 
 	@DatabaseField(columnName = USER_NICK_FIELD_NAME)
@@ -52,7 +49,6 @@ public class Post {
 	private Date date;
 
 	public Post() {
-
 	}
 
 	public int getId() {
@@ -169,5 +165,4 @@ public class Post {
 	public void setExpanded(boolean isExpanded) {
 		this.isExpanded = isExpanded;
 	}
-
 }

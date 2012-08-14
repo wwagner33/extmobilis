@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="@android:color/white" >
+    android:background="@color/white" >
 
     <View
         android:id="@+id/action_bar_footer"
@@ -18,11 +18,8 @@
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
         android:layout_marginTop="8dp"
-        android:text="TESTANDO A FONTE"
         android:textColor="@color/text_white_color"
         android:textSize="14sp" />
-
-    <!-- android:layout_marginBottom="24dp" -->
 
     <TextView
         android:id="@+id/forum_range"
@@ -31,7 +28,6 @@
         android:layout_alignLeft="@id/forum_title"
         android:layout_below="@id/forum_title"
         android:layout_marginBottom="8dp"
-        android:text="00/00/0000 - 00/00/0000"
         android:textColor="@color/text_white_color"
         android:textSize="14sp" />
 

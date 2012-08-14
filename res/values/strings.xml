@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <resources>
-
     <string name="app_name">Mobilis</string>
     <string name="logo_description">Imagem do logo do solar</string>
     <string name="login_greeting_text">Ambiente Móvel do Solar</string>
@@ -19,27 +18,17 @@
     <string name="topics_title">Forums disponíveis</string>
     <string name="new_topic_image_description">Imagem de Responder forum geral</string>
     <string name="temp_description">to delete</string>
-    <string name="discussion_name">Nome do Forum</string>
     <string name="fulano_name">Fulano da Silva Pessoa e Tal</string>
     <string name="sample_text">Teste de post, mas não sei quantos carateres podem caber aqui no entanto vamos ver até quando eu posse escrever, só sei que no final irei só colocar concordo mesmo.</string>
     <string name="not_loaded_posts_count"> postagens</string>
-    <string name="not_read_messages"> mensagens não lidas</string>
-    <string name="read_messages"> mensagens lidas</string>
     <string name="locale_date_format">dd/MM/yyyy</string>
     <string name="no_new_posts">Não há novos posts</string>
     <string name="error_connection_failed">Erro de conexão. Tente novamente.</string>
-    <string name="error_connection_timeout">Tempo limite de conexão atingido.</string>
-    <string name="error_connection_refused">Conexão recusada.</string>
-    <string name="error_server_down">Servidor Indisponível.</string>
-    <string name="error_token_expired">Senha ou Login inválidos.</string>
-    <string name="error_unknown">Erro desconhecido.</string>
-    <string name="error_page_not_found">Página não encontrada.</string>
     <string name="error_playing">Erro ao Reproduzir o Áudio.</string>
     <string name="play">Play</string>
     <string name="pause">Pause</string>
     <string name="next">Next</string>
     <string name="prev">Previous</string>
-    <string name="no_avaliable_course">Nenhum curso disponível</string>
     <string name="recording_date">Data da Gravação</string>
     <string name="recording_duration">duração</string>
     <string name="listen_to">Ouvir</string>

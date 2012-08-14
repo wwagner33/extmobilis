@@ -33,7 +33,7 @@ import com.mobilis.util.MobilisPreferences;
 import com.mobilis.util.ParseJSON;
 import com.mobilis.ws.Connection;
 
-public class CourseListController extends SherlockFragmentActivity implements
+public class CourseListActivity extends SherlockFragmentActivity implements
 		ConnectionCallback, OnItemClickListener {
 
 	private Intent intent;
@@ -97,13 +97,13 @@ public class CourseListController extends SherlockFragmentActivity implements
 			return true;
 
 		case R.id.menu_config:
-			intent = new Intent(this, Config.class);
+			intent = new Intent(this, ConfigActivity.class);
 			startActivity(intent);
 			return true;
 
 		case R.id.menu_logout:
 			appState.setToken(null);
-			intent = new Intent(this, Login.class);
+			intent = new Intent(this, LoginActivity.class);
 			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			startActivity(intent);
 			return true;
@@ -148,7 +148,7 @@ public class CourseListController extends SherlockFragmentActivity implements
 	@Override
 	public void onBackPressed() {
 		super.onBackPressed();
-		Intent intent = new Intent(this, InitialConfig.class);
+		Intent intent = new Intent(this, GatewayActivity.class);
 		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		intent.putExtra("FinishActivity", "YES");
 		startActivity(intent);
@@ -210,7 +210,7 @@ public class CourseListController extends SherlockFragmentActivity implements
 										.size()]), appState.selectedCourse);
 
 				intent = new Intent(getApplicationContext(),
-						ClassListController.class);
+						ClassActivity.class);
 				progressDialog.dismiss();
 				startActivity(intent);
 				break;
@@ -229,7 +229,7 @@ public class CourseListController extends SherlockFragmentActivity implements
 		appState.selectedCourse = courseId;
 
 		if (classDAO.existClassesOnCourse(appState.selectedCourse)) {
-			intent = new Intent(this, ClassListController.class);
+			intent = new Intent(this, ClassActivity.class);
 			progressDialog.dismiss();
 			startActivity(intent);
 		}

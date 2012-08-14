@@ -1,4 +1,4 @@
-package com.mobilis.controller;
+package com.mobilis.audio;
 
 import java.io.File;
 import java.text.DateFormatSymbols;
@@ -11,7 +11,8 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
-import com.mobilis.controller.ExtMobilisTTSActivity.PostManagerHandler;
+import com.mobilis.audio.PostPlayer;
+import com.mobilis.controller.PostsActivity.PostManagerHandler;
 import com.mobilis.model.BlockQueue;
 import com.mobilis.model.Post;
 import com.mobilis.util.Constants;

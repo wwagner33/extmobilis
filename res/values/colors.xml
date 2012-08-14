@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
-
     <color name="courseListIdle">#e7e7f1</color>
     <color name="courseListPressed">#fceaa0</color>
     <color name="headerColor">#2A2B71</color>
@@ -11,16 +10,11 @@
     <color name="black">#000000</color>
     <color name="disabled">#EFEFEF</color>
     <color name="yellow_hightlight">#FFFF00</color>
-    <color name="main_header_bg">#ff122e92</color>
     <color name="discussion_name">#FF122E92</color>
     <color name="list_divider">#000000</color>
     <color name="not_loaded_post_count">#FF666666</color>
-    <color name="main_footer">#FFF9EC00</color>
-    <color name="user_post_text">#FF000000</color>
-    <color name="user_post_date_text">#FFCCCCCC</color>
     <color name="text_white_color">#222222</color>
     <color name="action_bar_active">#f9db43</color>
     <color name="action_bar_idle">#08237f</color>
     <color name="playback_selected">#fffeaa0c</color>
-
 </resources>

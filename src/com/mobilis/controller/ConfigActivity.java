@@ -9,7 +9,7 @@ import android.preference.PreferenceActivity;
 
 import com.mobilis.util.MobilisPreferences;
 
-public class Config extends PreferenceActivity implements
+public class ConfigActivity extends PreferenceActivity implements
 		OnPreferenceChangeListener {
 
 	private CheckBoxPreference autoLogin;

@@ -1,11 +1,11 @@
-package com.mobilis.controller;
+package com.mobilis.audio;
 
 import android.content.Context;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnErrorListener;
 import android.os.Handler;
-
+import com.mobilis.controller.R;
 import com.mobilis.model.Post;
 import com.mobilis.util.Constants;
 
@@ -62,7 +62,7 @@ public class PostPlayer implements Runnable, OnCompletionListener,
 		return null;
 	}
 
-	void play() {
+	public void play() {
 		synchronized (this) {
 			try {
 				if (currentBlockIndex <= lastAvailableBlockIndex) {
@@ -77,7 +77,7 @@ public class PostPlayer implements Runnable, OnCompletionListener,
 		}
 	}
 
-	void stop() {
+	public void stop() {
 		try {
 			if (mediaPlayer.isPlaying())
 				mediaPlayer.stop();
@@ -87,7 +87,7 @@ public class PostPlayer implements Runnable, OnCompletionListener,
 		}
 	}
 
-	void pause() {
+	public void pause() {
 		mediaPlayer.pause();
 		isPaused = true;
 	}

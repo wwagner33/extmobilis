@@ -19,7 +19,7 @@ import com.mobilis.model.Discussion;
 import com.mobilis.model.Post;
 import com.mobilis.util.MobilisPreferences;
 
-public class PostDetailController extends Activity implements OnClickListener {
+public class PostDetailsActivity extends Activity implements OnClickListener {
 
 	private TextView body, userName, forumName;
 	private Bundle extras;
@@ -84,7 +84,7 @@ public class PostDetailController extends Activity implements OnClickListener {
 
 	@Override
 	public void onClick(View v) {
-		Intent intent = new Intent(this, ResponseController.class);
+		Intent intent = new Intent(this, ResponseActivity.class);
 		startActivity(intent);
 	}
 }

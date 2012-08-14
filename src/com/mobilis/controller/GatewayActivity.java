@@ -14,7 +14,7 @@ import com.mobilis.dao.DatabaseHelper;
 import com.mobilis.util.Constants;
 import com.mobilis.util.MobilisPreferences;
 
-public class InitialConfig extends Activity {
+public class GatewayActivity extends Activity {
 	private Intent intent;
 	private Cursor cursor;
 	private Bundle extras;
@@ -51,16 +51,16 @@ public class InitialConfig extends Activity {
 
 				if (prefs.getPreferences().getBoolean("AutoLogin", true)
 						&& existCourses) {
-					intent = new Intent(this, CourseListController.class);
+					intent = new Intent(this, CourseListActivity.class);
 					startActivity(intent);
 				} else {
-					intent = new Intent(this, Login.class);
+					intent = new Intent(this, LoginActivity.class);
 					startActivity(intent);
 
 				}
 			} else {
 				setConfigurations();
-				Intent intent = new Intent(this, Login.class);
+				Intent intent = new Intent(this, LoginActivity.class);
 				startActivity(intent);
 			}
 		}

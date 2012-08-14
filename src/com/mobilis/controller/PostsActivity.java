@@ -31,6 +31,7 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
+import com.mobilis.audio.TTSPostsManager;
 import com.mobilis.dao.DatabaseHelper;
 import com.mobilis.dao.DiscussionDAO;
 import com.mobilis.dao.PostDAO;
@@ -45,7 +46,7 @@ import com.mobilis.util.MobilisPreferences;
 import com.mobilis.util.ParseJSON;
 import com.mobilis.ws.Connection;
 
-public class ExtMobilisTTSActivity extends SherlockFragmentActivity implements
+public class PostsActivity extends SherlockFragmentActivity implements
 		OnClickListener, ConnectionCallback, OnItemClickListener {
 
 	private Discussion discussion;
@@ -97,8 +98,6 @@ public class ExtMobilisTTSActivity extends SherlockFragmentActivity implements
 				"fonts/Roboto-Bold.ttf"));
 
 		TextView forumRange = (TextView) findViewById(R.id.forum_range);
-		// forumRange.setTypeface(Typeface.createFromAsset(getAssets(),
-		// "fonts/Roboto-Thin.ttf"));
 
 		helper = getHelper();
 		jsonParser = new ParseJSON();
@@ -195,7 +194,7 @@ public class ExtMobilisTTSActivity extends SherlockFragmentActivity implements
 		switch (item.getItemId()) {
 
 		case R.id.reply:
-			intent = new Intent(this, ResponseController.class);
+			intent = new Intent(this, ResponseActivity.class);
 			startActivity(intent);
 			return true;
 
@@ -289,8 +288,7 @@ public class ExtMobilisTTSActivity extends SherlockFragmentActivity implements
 			previous = discussion.getPreviousPosts();
 		}
 
-		postsAdapter = new PostAdapter(discussionPosts,
-				ExtMobilisTTSActivity.this);
+		postsAdapter = new PostAdapter(discussionPosts, PostsActivity.this);
 
 		setHeader();
 		setFooter();
@@ -434,8 +432,7 @@ public class ExtMobilisTTSActivity extends SherlockFragmentActivity implements
 		discussion = discussionDAO.getDiscussion(discussion.getId());
 		previous = discussion.getPreviousPosts();
 		discussionPosts = postDAO.getAllPostsFromDiscussion(discussion.getId());
-		postsAdapter = new PostAdapter(discussionPosts,
-				ExtMobilisTTSActivity.this);
+		postsAdapter = new PostAdapter(discussionPosts, PostsActivity.this);
 
 		setHeader();
 		setFooter();
@@ -661,8 +658,7 @@ public class ExtMobilisTTSActivity extends SherlockFragmentActivity implements
 		if (!(headerClicked || footerClicked)) {
 
 			discussionPosts = loadedposts;
-			postsAdapter = new PostAdapter(discussionPosts,
-					ExtMobilisTTSActivity.this);
+			postsAdapter = new PostAdapter(discussionPosts, PostsActivity.this);
 			postDAO.insertPosts(
 					loadedposts.toArray(new Post[loadedposts.size()]),
 					appState.selectedDiscussion);
@@ -695,7 +691,7 @@ public class ExtMobilisTTSActivity extends SherlockFragmentActivity implements
 
 				discussionPosts.addAll(0, loadedPosts);
 				postsAdapter = new PostAdapter(discussionPosts,
-						ExtMobilisTTSActivity.this);
+						PostsActivity.this);
 				setHeader();
 				headerClicked = false;
 				postsList.setAdapter(postsAdapter);

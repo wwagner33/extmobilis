@@ -14,7 +14,6 @@ public class Course {
 	public static final String NAME_FIELD_NAME = "name";
 
 	public Course() {
-
 	}
 
 	@DatabaseField(id = true, columnName = ID_FIELD_NAME)

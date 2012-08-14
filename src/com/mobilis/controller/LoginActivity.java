@@ -28,7 +28,7 @@ import com.mobilis.util.MobilisPreferences;
 import com.mobilis.util.ParseJSON;
 import com.mobilis.ws.Connection;
 
-public class Login extends Activity implements OnClickListener,
+public class LoginActivity extends Activity implements OnClickListener,
 		ConnectionCallback {
 
 	private EditText login, password;
@@ -135,7 +135,7 @@ public class Login extends Activity implements OnClickListener,
 	public void onBackPressed() {
 
 		super.onBackPressed();
-		Intent intent = new Intent(this, InitialConfig.class);
+		Intent intent = new Intent(this, GatewayActivity.class);
 		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		intent.putExtra(Constants.REQUEST_FINISH_ACTIVITY_ON_RETURN_TEXT,
 				Constants.REQUEST_FINISH_ACTIVITY_ON_RETURN_VALUE);
@@ -183,7 +183,7 @@ public class Login extends Activity implements OnClickListener,
 				courseDAO
 						.addCourse(courses.toArray(new Course[courses.size()]));
 				intent = new Intent(getApplicationContext(),
-						CourseListController.class);
+						CourseListActivity.class);
 				startActivity(intent);
 				break;
 

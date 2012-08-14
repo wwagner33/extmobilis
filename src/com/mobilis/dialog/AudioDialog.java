@@ -30,7 +30,6 @@ public class AudioDialog extends Dialog implements OnSeekBarChangeListener,
 	private LinearLayout playArea;
 	private LinearLayout deleteArea;
 	private RelativeLayout mediaBar;
-	// private Handler activityHandler;
 	private ImageView pause, stop;
 	private Thread seekbarThread;
 	private static final int updateLayout = 5;
@@ -42,7 +41,7 @@ public class AudioDialog extends Dialog implements OnSeekBarChangeListener,
 	public AudioDialog(Activity activity, AudioPlayer player) {
 		super(activity);
 
-		deleteListener = (onDeleteListener)activity;
+		deleteListener = (onDeleteListener) activity;
 		this.player = player;
 		audioHandler = new AudioHandler();
 		message = Message.obtain();

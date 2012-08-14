@@ -1,6 +1,7 @@
 package com.mobilis.controller;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.text.DateFormatSymbols;
 import java.util.Calendar;
@@ -23,7 +24,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.mobilis.dao.PostDAO;
-import com.mobilis.exception.ImageFileNotFoundException;
 import com.mobilis.model.Post;
 import com.mobilis.util.Constants;
 import com.mobilis.util.EllipsizingTextView;
@@ -31,7 +31,7 @@ import com.mobilis.util.EllipsizingTextView;
 public class PostAdapter extends BaseAdapter {
 
 	private List<Post> posts;
-	private ExtMobilisTTSActivity activity;
+	private PostsActivity activity;
 	private PostDAO postDao;
 	private final String TAG = "PostAdapter";
 	private Drawable noImage;
@@ -46,7 +46,7 @@ public class PostAdapter extends BaseAdapter {
 		ImageView avatar;
 	}
 
-	public PostAdapter(List<Post> posts, ExtMobilisTTSActivity activity) {
+	public PostAdapter(List<Post> posts, PostsActivity activity) {
 		this.posts = posts;
 		this.activity = activity;
 		inflater = LayoutInflater.from(activity);
@@ -140,7 +140,7 @@ public class PostAdapter extends BaseAdapter {
 				}
 			}
 
-		} catch (ImageFileNotFoundException e) {
+		} catch (FileNotFoundException e) {
 
 			if (posts.get(position).isPlaying()) {
 				Drawable[] layers = new Drawable[2];
@@ -257,7 +257,7 @@ public class PostAdapter extends BaseAdapter {
 		return header;
 	}
 
-	public Bitmap getUserImage(int userId) throws ImageFileNotFoundException {
+	public Bitmap getUserImage(int userId) throws FileNotFoundException {
 
 		try {
 			final String prefix = String.valueOf(userId);
@@ -276,9 +276,9 @@ public class PostAdapter extends BaseAdapter {
 					.getAbsolutePath());
 			return userImage;
 		} catch (NullPointerException e) {
-			throw new ImageFileNotFoundException();
+			throw new FileNotFoundException();
 		} catch (ArrayIndexOutOfBoundsException e) {
-			throw new ImageFileNotFoundException();
+			throw new FileNotFoundException();
 		}
 	}
 

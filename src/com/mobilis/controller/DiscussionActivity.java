@@ -39,7 +39,7 @@ import com.mobilis.util.MobilisPreferences;
 import com.mobilis.util.ParseJSON;
 import com.mobilis.ws.Connection;
 
-public class DiscussionListController extends SherlockFragmentActivity
+public class DiscussionActivity extends SherlockFragmentActivity
 		implements ConnectionCallback, OnItemClickListener {
 
 	private Intent intent;
@@ -103,13 +103,13 @@ public class DiscussionListController extends SherlockFragmentActivity
 			return true;
 
 		case R.id.menu_config:
-			intent = new Intent(this, Config.class);
+			intent = new Intent(this, ConfigActivity.class);
 			startActivity(intent);
 			return true;
 
 		case R.id.menu_logout:
 			appState.setToken(null);
-			intent = new Intent(this, Login.class);
+			intent = new Intent(this, LoginActivity.class);
 			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			startActivity(intent);
 			return true;
@@ -290,7 +290,7 @@ public class DiscussionListController extends SherlockFragmentActivity
 						appState.selectedDiscussion);
 
 				intent = new Intent(getApplicationContext(),
-						ExtMobilisTTSActivity.class);
+						PostsActivity.class);
 
 				ArrayList<Integer> ids = null;
 				ids = postDAO
@@ -349,7 +349,7 @@ public class DiscussionListController extends SherlockFragmentActivity
 		appState.selectedDiscussion = discussionId;
 
 		if (postDAO.postsExistOnDiscusison(discussionId)) {
-			intent = new Intent(this, ExtMobilisTTSActivity.class);
+			intent = new Intent(this, PostsActivity.class);
 			progressDialog.dismiss();
 			startActivityForResult(intent, 0);
 

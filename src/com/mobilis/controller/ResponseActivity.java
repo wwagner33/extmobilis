@@ -50,7 +50,7 @@ import com.mobilis.util.MobilisPreferences;
 import com.mobilis.util.ParseJSON;
 import com.mobilis.ws.Connection;
 
-public class ResponseController extends SherlockActivity implements
+public class ResponseActivity extends SherlockActivity implements
 		OnClickListener, OnChronometerTickListener, OnCompletionListener,
 		TextWatcher, OnInfoListener, ConnectionCallback, AudioDialogListener,
 		onDeleteListener {
@@ -443,7 +443,7 @@ public class ResponseController extends SherlockActivity implements
 				Toast.makeText(getApplicationContext(),
 						"Erro no envio de áudio", Toast.LENGTH_SHORT).show();
 				Intent intent = new Intent(getApplicationContext(),
-						ExtMobilisTTSActivity.class);
+						PostsActivity.class);
 				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				MobilisPreferences status = MobilisPreferences
 						.getInstance(this);
@@ -470,7 +470,7 @@ public class ResponseController extends SherlockActivity implements
 				discussionDAO.updateDiscussion(currentDiscussion);
 
 				intent = new Intent(getApplicationContext(),
-						ExtMobilisTTSActivity.class);
+						PostsActivity.class);
 				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
 				MobilisPreferences status = MobilisPreferences
@@ -504,7 +504,7 @@ public class ResponseController extends SherlockActivity implements
 					discussionDAO.updateDiscussion(currentDiscussion);
 
 					intent = new Intent(getApplicationContext(),
-							ExtMobilisTTSActivity.class);
+							PostsActivity.class);
 					intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
 					startActivity(intent);
