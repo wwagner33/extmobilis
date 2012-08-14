@@ -18,11 +18,9 @@ import com.mobilis.util.Constants;
 
 public class PostDAO {
 
-	private DatabaseHelper helper = null;
 	private RuntimeExceptionDao<Post, Integer> dao;
 
 	public PostDAO(DatabaseHelper helper) {
-		this.helper = helper;
 		dao = helper.getRuntimeExceptionDao(Post.class);
 	}
 

@@ -20,7 +20,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.mobilis.dao.PostDAO;
@@ -38,11 +37,8 @@ public class PostAdapter extends BaseAdapter {
 	private Drawable noImage;
 	private LayoutInflater inflater;
 
-	private Typeface robotoThin;
 	private Typeface robotoRegular;
 	private Typeface robotoLight;
-
-	// private HashMap<Integer, Bitmap> imageCache;
 
 	static class ViewHolder {
 		TextView userNick, postDate;
@@ -55,10 +51,6 @@ public class PostAdapter extends BaseAdapter {
 		this.activity = activity;
 		inflater = LayoutInflater.from(activity);
 		postDao = new PostDAO(activity.getHelper());
-
-		robotoThin = Typeface.createFromAsset(activity.getAssets(),
-				"fonts/Roboto-Thin.ttf");
-
 		robotoRegular = Typeface.createFromAsset(activity.getAssets(),
 				"fonts/Roboto-Regular.ttf");
 
@@ -170,9 +162,6 @@ public class PostAdapter extends BaseAdapter {
 		if (post != null) {
 
 			holder.userNick.setTypeface(robotoRegular);
-
-			// holder.postDate.setTypeface(robotoThin);
-
 			holder.postContent.setTypeface(robotoLight);
 
 			if (holder.userNick != null) {

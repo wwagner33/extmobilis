@@ -5,7 +5,6 @@ import java.util.ArrayList;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.media.AudioManager;
@@ -22,7 +21,6 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,7 +31,6 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
-import com.mobilis.controller.R.color;
 import com.mobilis.dao.DatabaseHelper;
 import com.mobilis.dao.DiscussionDAO;
 import com.mobilis.dao.PostDAO;
@@ -84,8 +81,6 @@ public class ExtMobilisTTSActivity extends SherlockFragmentActivity implements
 	private boolean playbackBarIsVisible = false;
 	private ActionBar actionBar;
 	private boolean headerIsAttached;
-
-	private int playingDelay = 0; // TODO delay do começo do audio.
 
 	public void onCreate(Bundle savedInstanceState) {
 
@@ -228,12 +223,11 @@ public class ExtMobilisTTSActivity extends SherlockFragmentActivity implements
 			return true;
 
 		case R.id.details:
-			// TODO mark
+			// TODO details
 			return true;
 
 		default:
 			return false;
-
 		}
 	}
 
@@ -339,7 +333,6 @@ public class ExtMobilisTTSActivity extends SherlockFragmentActivity implements
 		barButtonPlay.setImageResource(R.drawable.playback_pause);
 		if (ttsPostsManager == null && !playAfterStop) {
 
-			// TODO layerDrawable MOD
 			discussionPosts.get(position).setPlaying(true);
 
 			ttsPostsManager = new TTSPostsManager(discussionPosts, position,
@@ -419,52 +412,8 @@ public class ExtMobilisTTSActivity extends SherlockFragmentActivity implements
 		case R.id.button_stop:
 			removePlayControll();
 			break;
-
-		// case R.id.expand:
-		// contentPostIsExpanded = !contentPostIsExpanded;
-		// postsAdapter.notifyDataSetChanged();
-		// break;
-
-		// case R.id.mark:
-		// postsAdapter.toggleExpandedPostMarkedStatus();
-		// postsAdapter.notifyDataSetChanged();
-		// break;
-
-		// case R.id.play:
-		// playPost();to
-		// break;
-
-		// case R.id.reply:
-		// intent = new Intent(this, ResponseController.class);
-		// startActivity(intent);
-		// break;
-
-		// case R.id.details:
-		//
-		// Post post = postDAO.getPost(appState.selectedPost);
-		// intent = new Intent(this, PostDetailController.class);
-		// try {
-		// Bitmap userImage = postsAdapter.getUserImage((int) post
-		// .getUserId());
-		// intent.putExtra("image", userImage);
-		// } catch (ImageFileNotFoundException e) {
-		// Log.i("Exception", "Exception");
-		// }
-		//
-		// startActivity(intent);
-		// break;
-
 		default:
 			break;
-		}
-	}
-
-	private void showPlayerBAr() {
-		if (!playbackBarIsVisible) {
-			includePlayControll();
-		} else {
-			stop();
-			// play(positionSelected);
 		}
 	}
 
@@ -884,6 +833,5 @@ public class ExtMobilisTTSActivity extends SherlockFragmentActivity implements
 		}
 
 		invalidateOptionsMenu();
-		// TODO Mudança de actionBar
 	}
 }

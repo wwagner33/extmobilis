@@ -9,7 +9,6 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -41,7 +40,6 @@ public class Login extends Activity implements OnClickListener,
 	private CourseDAO courseDAO;
 	private MobilisPreferences prefs;
 	private DatabaseHelper helper = null;
-
 	private Connection connection;
 
 	@Override
@@ -66,11 +64,8 @@ public class Login extends Activity implements OnClickListener,
 				.makeProgressDialog(Constants.DIALOG_PROGRESS_STANDART);
 		prefs = MobilisPreferences.getInstance(this);
 		connection = new Connection(this);
-
 		jsonParser = new ParseJSON();
-
 		courseDAO = new CourseDAO(helper);
-
 		login = (EditText) findViewById(R.id.username);
 		password = (EditText) findViewById(R.id.password);
 		submit = (Button) findViewById(R.id.submit);
@@ -85,7 +80,6 @@ public class Login extends Activity implements OnClickListener,
 
 	public void restoreDialog() {
 		if (getLastNonConfigurationInstance() != null) {
-
 			dialog = (ProgressDialog) getLastNonConfigurationInstance();
 			dialog.show();
 		}
@@ -176,8 +170,6 @@ public class Login extends Activity implements OnClickListener,
 			switch (connectionId) {
 
 			case Constants.CONNECTION_POST_TOKEN:
-				Log.w("Token Connection", "OK");
-
 				ArrayList<String> tokenParsed = (ArrayList<String>) jsonParser
 						.parseJSON(result, Constants.PARSE_TOKEN_ID);
 				prefs.setToken(tokenParsed.get(0));
@@ -185,17 +177,13 @@ public class Login extends Activity implements OnClickListener,
 				break;
 
 			case Constants.CONNECTION_GET_COURSES:
-
 				ArrayList<Course> courses = (ArrayList<Course>) jsonParser
 						.parseJSON(result, Constants.PARSE_COURSES_ID);
-
 				courseDAO.clearCourses();
 				courseDAO
 						.addCourse(courses.toArray(new Course[courses.size()]));
-
 				intent = new Intent(getApplicationContext(),
 						CourseListController.class);
-
 				startActivity(intent);
 				break;
 

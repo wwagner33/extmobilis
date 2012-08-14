@@ -1,6 +1,5 @@
 package com.mobilis.interfaces;
 
-import android.app.ListActivity;
 import android.content.Intent;
 import android.support.v4.app.FragmentActivity;
 import android.view.Menu;

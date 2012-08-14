@@ -10,7 +10,6 @@ import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.StateListDrawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,7 +31,6 @@ import com.mobilis.dao.DiscussionDAO;
 import com.mobilis.dao.PostDAO;
 import com.mobilis.dialog.DialogMaker;
 import com.mobilis.interfaces.ConnectionCallback;
-import com.mobilis.interfaces.MobilisMenuListActivity;
 import com.mobilis.model.Discussion;
 import com.mobilis.model.Post;
 import com.mobilis.util.Constants;
@@ -148,7 +146,6 @@ public class DiscussionListController extends SherlockFragmentActivity
 	public Object onRetainCustomNonConfigurationInstance() {
 		if (progressDialog != null) {
 			if (progressDialog.isShowing()) {
-				Log.i("OnRetain2", "True");
 				progressDialog.dismiss();
 				return progressDialog;
 			}
@@ -226,9 +223,6 @@ public class DiscussionListController extends SherlockFragmentActivity
 
 				LinearLayout leftBar = (LinearLayout) convertView
 						.findViewById(R.id.left_bar);
-
-				Log.i("HASNEWPOSTS", "TRUE");
-
 				leftBar.setBackgroundColor(Color.YELLOW);
 			}
 
@@ -303,7 +297,6 @@ public class DiscussionListController extends SherlockFragmentActivity
 						.getIdsOfPostsWithoutImage(appState.selectedDiscussion);
 
 				progressDialog.dismiss();
-				Log.i("USER IDS", "" + ids.size());
 				MobilisPreferences status = MobilisPreferences
 						.getInstance(this);
 				status.ids = ids;
@@ -318,12 +311,9 @@ public class DiscussionListController extends SherlockFragmentActivity
 				for (int i = 0; i < values.size(); i++) {
 					if (postDAO.hasNewPosts(values.get(i).getId(), values
 							.get(i).getLastPostDate())) {
-						Log.i("TAG", "Existem posts novos");
-
 						values.get(i).setHasNewPosts(true);
 
 					} else {
-						Log.v("TAG", "Não há posts novos");
 					}
 				}
 
@@ -364,11 +354,9 @@ public class DiscussionListController extends SherlockFragmentActivity
 			startActivityForResult(intent, 0);
 
 		} else {
-			Log.w("Não Existem posts no banco", " ");
 			progressDialog.show();
 			obtainNewPosts(Constants.generateNewPostsTTSURL(discussionId,
 					Constants.oldDateString));
 		}
-
 	}
 }

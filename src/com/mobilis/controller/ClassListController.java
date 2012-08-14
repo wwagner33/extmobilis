@@ -6,7 +6,6 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -26,7 +25,6 @@ import com.mobilis.dao.DiscussionDAO;
 import com.mobilis.dao.PostDAO;
 import com.mobilis.dialog.DialogMaker;
 import com.mobilis.interfaces.ConnectionCallback;
-import com.mobilis.interfaces.MobilisMenuListActivity;
 import com.mobilis.model.Class;
 import com.mobilis.model.Discussion;
 import com.mobilis.util.Constants;
@@ -196,17 +194,13 @@ public class ClassListController extends SherlockFragmentActivity implements
 
 			case Constants.CONNECTION_GET_TOPICS:
 
-				Log.w("result", result);
-
 				if (result.length() <= 2) {
-
 					Toast.makeText(getApplicationContext(), "Fórum Vazio",
 							Toast.LENGTH_SHORT).show();
 					dialog.dismiss();
 				}
 
 				else {
-
 					ArrayList<Discussion> discussionValues = (ArrayList<Discussion>) jsonParser
 							.parseJSON(result, Constants.PARSE_TOPICS_ID);
 
@@ -226,7 +220,6 @@ public class ClassListController extends SherlockFragmentActivity implements
 							DiscussionListController.class);
 					dialog.dismiss();
 					startActivity(intent);
-
 				}
 				break;
 			default:
@@ -247,7 +240,6 @@ public class ClassListController extends SherlockFragmentActivity implements
 		if (topicDAO.existsDiscussionOnClass(classId)) {
 			intent = new Intent(this, DiscussionListController.class);
 			startActivity(intent);
-
 		}
 
 		else {

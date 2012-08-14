@@ -1,24 +1,20 @@
 package com.mobilis.controller;
 
-import java.io.File;
-
 import android.content.Context;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnErrorListener;
 import android.os.Handler;
-import android.util.Log;
 
 import com.mobilis.model.Post;
 import com.mobilis.util.Constants;
 
 public class PostPlayer implements Runnable, OnCompletionListener,
 		OnErrorListener {
-	private Post post;
 	private MediaPlayer mediaPlayer;
 	private Context context;
-	private int currentBlockIndex = 0; // Deve ser thread safe
-	private int lastAvailableBlockIndex = -1; // Deve ser thread safe
+	private int currentBlockIndex = 0;
+	private int lastAvailableBlockIndex = -1;
 	private int blocksNumber;
 	private boolean isPaused = false;
 	private Handler handler;
@@ -46,9 +42,7 @@ public class PostPlayer implements Runnable, OnCompletionListener,
 		this.isLastPost = isLastPost;
 		this.context = context;
 		this.handler = handler;
-		this.post = post;
 		blocksNumber = numberOfBlocks - 1;
-		// Log.v(TAG, "Post Character Lenght = " + post.getContent().length());
 		mediaPlayer = new MediaPlayer();
 		mediaPlayer.setOnCompletionListener(this);
 		mediaPlayer.setOnErrorListener(this);
@@ -69,22 +63,10 @@ public class PostPlayer implements Runnable, OnCompletionListener,
 	}
 
 	void play() {
-		// IOException, InterruptedException
 		synchronized (this) {
 			try {
 				if (currentBlockIndex <= lastAvailableBlockIndex) {
 					if (!mediaPlayer.isPlaying()) {
-						File file = new File(Constants.AUDIO_DEFAULT_PATH
-								+ post.getId() + "/" + currentBlockIndex
-								+ ".mp3");
-						mediaPlayer.setDataSource(Constants.AUDIO_DEFAULT_PATH
-								+ post.getId() + "/" + currentBlockIndex
-								+ ".mp3");
-						mediaPlayer.prepare();
-						mediaPlayer.start();
-					}
-				} else {
-					if (currentBlockIndex < blocksNumber) {
 						this.wait();
 					}
 				}
@@ -113,9 +95,7 @@ public class PostPlayer implements Runnable, OnCompletionListener,
 	@Override
 	public void run() {
 
-		Log.e(TAG, "Starting Player");
 		playingDuration = System.currentTimeMillis();
-
 		while (blocksNumber >= currentBlockIndex && !Thread.interrupted()) {
 			if (!mediaPlayer.isPlaying() && !isPaused) {
 				try {
@@ -155,10 +135,7 @@ public class PostPlayer implements Runnable, OnCompletionListener,
 		mp.stop();
 		mp.reset();
 		if (currentBlockIndex > blocksNumber) {
-
 			playingDuration = System.currentTimeMillis() - playingDuration;
-			Log.i(TAG, "Duração do áudio em segundos = "
-					+ (playingDuration / 1000));
 			mp.release();
 		}
 	}

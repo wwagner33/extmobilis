@@ -6,7 +6,6 @@ import java.util.ArrayList;
 
 import org.json.simple.JSONObject;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -492,8 +491,7 @@ public class ResponseController extends SherlockActivity implements
 				if (existsRecording) {
 					Log.i(TAG, "Exists Recording");
 					int postId = resultFromServer.get(1);
-					sendAudioPost(
-							Constants.generateAudioResponseURL(postId),
+					sendAudioPost(Constants.generateAudioResponseURL(postId),
 							recorder.getAudioFile(), appState.getToken());
 
 				} else {

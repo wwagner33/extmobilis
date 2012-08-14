@@ -19,7 +19,6 @@ public class InitialConfig extends Activity {
 	private Cursor cursor;
 	private Bundle extras;
 	private MobilisPreferences prefs;
-
 	private DatabaseHelper helper;
 
 	@Override
@@ -68,7 +67,6 @@ public class InitialConfig extends Activity {
 	}
 
 	public void setConfigurations() {
-		// Preferências padrão
 		SharedPreferences.Editor editor = prefs.getPreferences().edit();
 		editor.putBoolean("AutoLogin", true);
 		editor.commit();
