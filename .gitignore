@@ -1,9 +1,9 @@
 #Mobilis
 bin/*
 gen/*
-.settings/*
 .classpath
 src/com/mobilis/controller/Mobilis.java
-
+*~
+proguard-project.txt
 #Sherlock-Bar
 sherlock-bar-library/*
