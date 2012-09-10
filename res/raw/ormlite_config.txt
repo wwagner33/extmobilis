@@ -1,5 +1,5 @@
 #
-# generated on 2012/07/13 09:58:11
+# generated on 2012/09/10 02:53:01
 #
 # --table-start--
 dataClass=com.mobilis.model.Course
@@ -11,20 +11,8 @@ columnName=_id
 id=true
 # --field-end--
 # --field-start--
-fieldName=offerId
-columnName=offer_id
-# --field-end--
-# --field-start--
-fieldName=groupId
-columnName=group_id
-# --field-end--
-# --field-start--
 fieldName=allocationTagId
 columnName=allocation_tag_id
-# --field-end--
-# --field-start--
-fieldName=semester
-columnName=semester
 # --field-end--
 # --field-start--
 fieldName=name
