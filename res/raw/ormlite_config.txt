@@ -1,26 +1,6 @@
 #
-# generated on 2012/09/10 02:53:01
+# generated on 2012/11/06 02:07:03
 #
-# --table-start--
-dataClass=com.mobilis.model.Course
-tableName=courses
-# --table-fields-start--
-# --field-start--
-fieldName=_id
-columnName=_id
-id=true
-# --field-end--
-# --field-start--
-fieldName=allocationTagId
-columnName=allocation_tag_id
-# --field-end--
-# --field-start--
-fieldName=name
-columnName=name
-# --field-end--
-# --table-fields-end--
-# --table-end--
-#################################
 # --table-start--
 dataClass=com.mobilis.model.Discussion
 tableName=discussions
@@ -74,6 +54,46 @@ columnName=end_date
 # --table-end--
 #################################
 # --table-start--
+dataClass=com.mobilis.model.Class
+tableName=classes
+# --table-fields-start--
+# --field-start--
+fieldName=_id
+columnName=_id
+id=true
+# --field-end--
+# --field-start--
+fieldName=courseId
+columnName=course_id
+# --field-end--
+# --field-start--
+fieldName=code
+columnName=code
+# --field-end--
+# --field-start--
+fieldName=semester
+columnName=semester
+# --field-end--
+# --table-fields-end--
+# --table-end--
+#################################
+# --table-start--
+dataClass=com.mobilis.model.Course
+tableName=courses
+# --table-fields-start--
+# --field-start--
+fieldName=_id
+columnName=_id
+id=true
+# --field-end--
+# --field-start--
+fieldName=name
+columnName=name
+# --field-end--
+# --table-fields-end--
+# --table-end--
+#################################
+# --table-start--
 dataClass=com.mobilis.model.Post
 tableName=posts
 # --table-fields-start--
@@ -109,30 +129,6 @@ columnName=content
 # --field-start--
 fieldName=date
 columnName=date
-# --field-end--
-# --table-fields-end--
-# --table-end--
-#################################
-# --table-start--
-dataClass=com.mobilis.model.Class
-tableName=classes
-# --table-fields-start--
-# --field-start--
-fieldName=_id
-columnName=_id
-id=true
-# --field-end--
-# --field-start--
-fieldName=courseId
-columnName=course_id
-# --field-end--
-# --field-start--
-fieldName=code
-columnName=code
-# --field-end--
-# --field-start--
-fieldName=semester
-columnName=semester
 # --field-end--
 # --table-fields-end--
 # --table-end--

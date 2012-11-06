@@ -46,9 +46,6 @@ public class ParseJSON {
 				jsonObjects[i] = (JSONObject) jsonArray.get(i);
 				Course course = new Course();
 				course.set_id(((Long) jsonObjects[i].get("id")).intValue());
-				course.setAllocationTagId(Integer
-						.parseInt((String) jsonObjects[i]
-								.get("allocation_tag_id")));
 				course.setName((String) jsonObjects[i].get("name"));
 				courses.add(course);
 			}

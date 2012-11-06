@@ -7,7 +7,6 @@ import com.j256.ormlite.table.DatabaseTable;
 public class Course {
 
 	public static final String ID_FIELD_NAME = "_id";
-	public static final String ALLOCATION_TAG_ID_FIELD_NAME = "allocation_tag_id";
 	public static final String NAME_FIELD_NAME = "name";
 
 	public Course() {
@@ -16,19 +15,8 @@ public class Course {
 	@DatabaseField(id = true, columnName = ID_FIELD_NAME)
 	private int _id;
 
-	@DatabaseField(columnName = ALLOCATION_TAG_ID_FIELD_NAME)
-	private int allocationTagId;
-
 	@DatabaseField(columnName = NAME_FIELD_NAME)
 	private String name;
-
-	public int getAllocationTagId() {
-		return allocationTagId;
-	}
-
-	public void setAllocationTagId(int allocationTagId) {
-		this.allocationTagId = allocationTagId;
-	}
 
 	public String getName() {
 		return name;
