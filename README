@@ -1,6 +1,24 @@
-== Projeto Mobilis ==
+== Projeto extMobilis ==
 
-Equipe:
+A presente ferramenta, Mobilis VoiceForum faz parte de uma arquitetura de comunicação entre aplicações Multimídia móveis e Ambientes Virtuais de Aprendizagem (AVA), chamada Extensible Mobilis. Sua principal característica é permitir através de interface API ou Webservice a comunicação de smartphones com algumas das ferramentas pertencentes a um AVA, procurando potencializar o uso dos recursos multimídia do smartphone para melhorar a experiência do usuário.
+
+
+
+Equipe de Desenvolvimento:
+  Humberto Osório Ovídio Gomes
+  Lucas Abreu
   Paulo Costa
   Wedson Lima
-  Wellington Sarmento
+  Prof. Wellington W. F. Sarmento
+
+Equipe de Design e Usabilidade:
+  Andrei Bosco
+  Katryne Rabelo
+
+Modo de Instalação:
+
+Para Android - Deve ser baixado da pasta Download o aplicativo Mobilis no formato pkg e instalado no Android. O acesso direto ao aplicativo pode ser feito através da URL: www.github.com/wwagner33/extmobilis/download/mforum.pkg.
+
+
+
+
