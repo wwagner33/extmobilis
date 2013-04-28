@@ -1,20 +1,29 @@
 package com.mobilis.audio;
 
-import java.io.File;
 import java.io.IOException;
 
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
 
-import com.mobilis.util.Constants;
-
 public class AudioPlayer {
 	private MediaPlayer player;
+	private MediaPlayer.OnCompletionListener onCompletion;
 	private boolean isPrepared = false, isPaused = false;
 	public playOnBackgroundThread playerThread;
-	File recordedAudioPath = new File(Constants.PATH_RECORDINGS
-			+ Constants.RECORDING_FULLNAME);
-
+	private String filePath;
+	
+	@Deprecated
+	public AudioPlayer(String filePath) {
+		this.filePath = filePath;
+	}
+	
+	public AudioPlayer() {
+	}
+	
+	public void setFilePath(String filePath) {
+		this.filePath = filePath;
+	}
+	
 	public void playOwnAudio() throws IllegalArgumentException,
 			IllegalStateException, IOException {
 
@@ -28,8 +37,8 @@ public class AudioPlayer {
 
 		if (player == null) {
 			player = new MediaPlayer();
-			player.setDataSource(recordedAudioPath.getAbsolutePath());
 		}
+		player.setDataSource(filePath);
 		player.prepare();
 		isPrepared = true;
 
@@ -74,16 +83,28 @@ public class AudioPlayer {
 	}
 
 	public void play() throws IllegalStateException, IOException {
+		
+		if (!isPrepared)
+			prepare();
+		
 		if (player.isPlaying())
-
 			return;
 
 		else {
 			synchronized (this) {
+				if (hasCompletionListener()) {
+					player.setOnCompletionListener(onCompletion);
+				}
 				playerThread = new playOnBackgroundThread();
 				player.start();
 			}
 		}
+	}
+	
+	public void play(String filePath, MediaPlayer.OnCompletionListener onCompletion) throws IllegalStateException, IOException {
+		setFilePath(filePath);
+		this.onCompletion = onCompletion;
+		play();
 	}
 
 	public void setLooping(boolean isLooping) {
@@ -113,6 +134,13 @@ public class AudioPlayer {
 			isPaused = true;
 		}
 	}
+	
+	public void reset() {
+		if (player != null) {
+			player.reset();
+			isPrepared = false;
+		}
+	}
 
 	public int getProgress() {
 		return player.getCurrentPosition() / 1000;
@@ -130,4 +158,9 @@ public class AudioPlayer {
 
 		}
 	}
+	
+	private boolean hasCompletionListener() {
+		return onCompletion != null;
+	}
+	
 }

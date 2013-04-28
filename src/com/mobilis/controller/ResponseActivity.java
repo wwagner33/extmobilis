@@ -110,7 +110,6 @@ public class ResponseActivity extends SherlockActivity implements
 		stopWatch.setOnChronometerTickListener(this);
 		recordImage = (ImageView) findViewById(R.id.record_image);
 		recordImage.setOnClickListener(this);
-		player = new AudioPlayer();
 		charCount = (TextView) findViewById(R.id.char_number);
 		charCount.setText("0/" + Constants.TEXT_MAX_CHARACTER_LENGHT);
 		jsonParser = new ParseJSON();
@@ -218,14 +217,15 @@ public class ResponseActivity extends SherlockActivity implements
 
 		if (v.getId() == R.id.record_image) {
 
-			player = new AudioPlayer();
+			player = new AudioPlayer(Constants.PATH_RECORDINGS
+					+ Constants.RECORDING_FULLNAME);
 			audioDialog = new AudioDialog(this, player);
 			audioDialog.show();
 		}
 
 		if (v.getId() == R.id.criar_topico_submit) {
 
-			if (!existsRecording && message.getText().length() == 0) {
+			if ( message.getText().length() == 0) {
 
 				Toast.makeText(this, "Mensagem não pode ser vazia",
 						Toast.LENGTH_SHORT).show();
@@ -244,6 +244,7 @@ public class ResponseActivity extends SherlockActivity implements
 							.buildTextResponseWithoutParent(message.getText()
 									.toString());
 				}
+				
 
 				sendPost(postObject.toJSONString());
 			}

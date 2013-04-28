@@ -11,8 +11,6 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,7 +29,7 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
-import com.mobilis.audio.TTSPostsManager;
+import com.mobilis.audio.TTSManager;
 import com.mobilis.dao.DatabaseHelper;
 import com.mobilis.dao.DiscussionDAO;
 import com.mobilis.dao.PostDAO;
@@ -47,10 +45,10 @@ import com.mobilis.util.ParseJSON;
 import com.mobilis.ws.Connection;
 
 public class PostsActivity extends SherlockFragmentActivity implements
-		OnClickListener, ConnectionCallback, OnItemClickListener {
+		 ConnectionCallback, OnItemClickListener {
 
 	private Discussion discussion;
-	private ArrayList<Post> discussionPosts;
+	private ArrayList<Post> posts;
 	private ListView postsList;
 	private PostAdapter postsAdapter;
 	private View header;
@@ -59,17 +57,14 @@ public class PostsActivity extends SherlockFragmentActivity implements
 	private int footerId = 0;
 	private final int FUTURE_POST_ID = 1;
 	private final int REFRESH_ID = 2;
-	public int positionSelected = -1;
+	public int selectedPosition = -1;
 	private boolean headerClicked = false;
 	private boolean footerClicked = false;
 	private Connection wsSolar;
 	private PostDAO postDAO;
 	private DiscussionDAO discussionDAO;
-	private ImageButton barButtonPlay, prev, next, stop;
-	private TTSPostsManager ttsPostsManager;
-	private Thread threadTTSPostsManager;
+	private ImageButton play, prev, next, stop;
 	boolean playAfterStop = false;
-	private PostManagerHandler handlerPostManager = new PostManagerHandler();
 	private DialogMaker dialogMaker;
 	private ProgressDialog dialog;
 	private int previous;
@@ -77,17 +72,18 @@ public class PostsActivity extends SherlockFragmentActivity implements
 	private Intent intent;
 	private ParseJSON jsonParser;
 	private DatabaseHelper helper = null;
-	private static final String TAG = "TTS-ACTIVITY";
 	private boolean actionBarSelected = false;
-	private boolean playbackBarIsVisible = false;
 	private ActionBar actionBar;
 	private boolean headerIsAttached;
+	private TTSManager manager;
 
 	public void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.posts_new);
 
+		manager = new TTSManager(ttsEventListener);
+		
 		actionBar = getSupportActionBar();
 		actionBar.setHomeButtonEnabled(false);
 		actionBar.setDisplayShowHomeEnabled(false);
@@ -115,7 +111,7 @@ public class PostsActivity extends SherlockFragmentActivity implements
 		dialogMaker = new DialogMaker(this);
 		postDAO = new PostDAO(helper);
 		discussionDAO = new DiscussionDAO(helper);
-		discussionPosts = new ArrayList<Post>();
+		posts = new ArrayList<Post>();
 
 		discussion = discussionDAO.getDiscussion(appState.selectedDiscussion);
 
@@ -142,34 +138,139 @@ public class PostsActivity extends SherlockFragmentActivity implements
 
 		footerRefresh = inflater.inflate(R.layout.refresh_discussion_list_item,
 				postsList, false);
-
-		barButtonPlay = (ImageButton) findViewById(R.id.button_play);
-		barButtonPlay.setOnClickListener(this);
+		
+		play = (ImageButton) findViewById(R.id.button_play);
+		play.setOnClickListener(onClickPlay);
 
 		prev = (ImageButton) findViewById(R.id.button_prev);
-		prev.setOnClickListener(this);
+		prev.setOnClickListener(onClickPrevious);
 
 		next = (ImageButton) findViewById(R.id.button_next);
-		next.setOnClickListener(this);
+		next.setOnClickListener(onClickNext);
 
 		stop = (ImageButton) findViewById(R.id.button_stop);
-		stop.setOnClickListener(this);
+		stop.setOnClickListener(onClickStop);
 
 		if (getLastCustomNonConfigurationInstance() != null) {
 			loadPostsFromRetainedState();
 		} else
 			loadPostsFromDatabase();
 	}
+	
+	final TTSManager.TTSEventListener ttsEventListener= new TTSManager.TTSEventListener() {
+		
+		@Override
+		public void onFinishedPlaying() {
+			   if (selectedPosition != posts.size() - 1)
+	            {
+				   togglePostMarked(selectedPosition + 1);
+	               manager.start(posts.get(selectedPosition));
+	            }
+	            else
+	            {
+	            	togglePostMarked(selectedPosition);
+	            	removePlayControl();
+	            	setActionBarNotSelected();
+	            	actionBarSelected = false;
+	            }
+		}
+		
+		@Override
+		public void onError() {
+			// TODO
+		}
+	}; 
+	
+	public void togglePostMarked(int position) {
+		   
+           if (selectedPosition == position)
+           {
+               postsAdapter.untogglePostMarkedStatus(position);
+               setActionBarNotSelected();
+               actionBarSelected = false;
+               selectedPosition = -1;
+           }
+           else 
+           {
+        	   postsAdapter.togglePostMarkedStatus(position);
+               if (selectedPosition!=-1)
+            	   postsAdapter.untogglePostMarkedStatus(selectedPosition);
+               selectedPosition = position;
+               setActionBarSelected();
+               actionBarSelected = true;
+           }
+	}
+	
+	final View.OnClickListener onClickPlay = new View.OnClickListener() {
+		
+		@Override
+		public void onClick(View v) {
+			manager.start(posts.get(selectedPosition));
+		}
+	}; 
+	
+	final View.OnClickListener onClickPrevious = new View.OnClickListener() {
+		
+		@Override
+		public void onClick(View v) {
+			play.setImageResource(R.drawable.playback_pause);
+			  if (selectedPosition != 0)
+	            {
+				    togglePostMarked(selectedPosition -1);
+	                manager.releaseResources();
+	                manager.start(posts.get(selectedPosition));
+	            }
+		}
+	}; 
+	
+	final View.OnClickListener onClickNext = new View.OnClickListener() {
+		
+		@Override
+		public void onClick(View v) {
+			play.setImageResource(R.drawable.playback_pause);
+		     if (selectedPosition != posts.size() - 1)
+	            {
+	                togglePostMarked(selectedPosition + 1);
+	                manager.releaseResources();
+	                manager.start(posts.get(selectedPosition));
+	            }
+		}
+	}; 
+	
+	final View.OnClickListener onClickStop = new View.OnClickListener() {
+		
+		@Override
+		public void onClick(View v) {
+			play.setImageResource(R.drawable.playback_play);
+			removePlayControl();
+			manager.releaseResources();
+			postsAdapter.untogglePostMarkedStatus(selectedPosition);
+			setActionBarNotSelected();
+		}
+	}; 
+	
+	public void removePlayControl() {
+
+			play.setContentDescription(getResources().getString(
+					R.string.play));
+			play.setImageResource(R.drawable.playback_play);
+			play.setVisibility(View.GONE);
+			prev.setVisibility(View.GONE);
+			next.setVisibility(View.GONE);
+			prev.setVisibility(View.GONE);
+			stop.setVisibility(View.GONE);
+		}
 
 	@Override
 	public void onBackPressed() {
 
-		if (positionSelected != -1) {
-			postsAdapter.untogglePostMarkedStatus(positionSelected);
+		if (selectedPosition != -1) {
+			postsAdapter.untogglePostMarkedStatus(selectedPosition);
 			actionBarSelected = false;
-			positionSelected = -1;
+			selectedPosition = -1;
 			setActionBarNotSelected();
 			invalidateOptionsMenu();
+			removePlayControl();
 
 		} else
 			super.onBackPressed();
@@ -199,20 +300,14 @@ public class PostsActivity extends SherlockFragmentActivity implements
 			return true;
 
 		case R.id.play:
-			if (!playbackBarIsVisible) {
-				includePlayControll();
-			} else {
-				stop();
-				// play(positionSelected);
-			}
-			playbackBarIsVisible = true;
+			showPlayerControls();
 			return true;
 
 		case R.id.expand:
-			if (discussionPosts.get(positionSelected).isExpanded()) {
-				discussionPosts.get(positionSelected).setExpanded(false);
+			if (posts.get(selectedPosition).isExpanded()) {
+				posts.get(selectedPosition).setExpanded(false);
 			} else {
-				discussionPosts.get(positionSelected).setExpanded(true);
+				posts.get(selectedPosition).setExpanded(true);
 			}
 			postsAdapter.notifyDataSetChanged();
 			return true;
@@ -239,6 +334,7 @@ public class PostsActivity extends SherlockFragmentActivity implements
 		actionBar.setDisplayShowCustomEnabled(true);
 		actionBar.setBackgroundDrawable(new ColorDrawable(getResources()
 				.getColor(R.color.action_bar_active)));
+		invalidateOptionsMenu();
 
 	}
 
@@ -249,6 +345,7 @@ public class PostsActivity extends SherlockFragmentActivity implements
 		actionBar.setTitle("Postagens");
 		actionBar.setBackgroundDrawable(new ColorDrawable(getResources()
 				.getColor(R.color.action_bar_idle)));
+		invalidateOptionsMenu();
 	}
 
 	@Override
@@ -276,7 +373,7 @@ public class PostsActivity extends SherlockFragmentActivity implements
 			dialog.show();
 		}
 		if (retainedState[1] != null) {
-			discussionPosts = (ArrayList<Post>) retainedState[1];
+			posts = (ArrayList<Post>) retainedState[1];
 		}
 
 		if (retainedState[2] != null) {
@@ -288,7 +385,7 @@ public class PostsActivity extends SherlockFragmentActivity implements
 			previous = discussion.getPreviousPosts();
 		}
 
-		postsAdapter = new PostAdapter(discussionPosts, PostsActivity.this);
+		postsAdapter = new PostAdapter(posts, PostsActivity.this);
 
 		setHeader();
 		setFooter();
@@ -308,8 +405,8 @@ public class PostsActivity extends SherlockFragmentActivity implements
 			}
 		}
 
-		if (discussionPosts != null) {
-			retainedObjects[1] = discussionPosts;
+		if (posts != null) {
+			retainedObjects[1] = posts;
 		}
 
 		if (discussion != null) {
@@ -320,29 +417,6 @@ public class PostsActivity extends SherlockFragmentActivity implements
 
 		return retainedObjects;
 
-	}
-
-	private void play(int position) {
-
-		Log.i(TAG, "Posotion of post = " + position);
-
-		barButtonPlay.setContentDescription(getResources().getString(
-				R.string.pause));
-		barButtonPlay.setImageResource(R.drawable.playback_pause);
-		if (ttsPostsManager == null && !playAfterStop) {
-
-			discussionPosts.get(position).setPlaying(true);
-
-			ttsPostsManager = new TTSPostsManager(discussionPosts, position,
-					handlerPostManager, getApplicationContext());
-			threadTTSPostsManager = new Thread(ttsPostsManager);
-			threadTTSPostsManager.start();
-		} else if (ttsPostsManager != null) {
-			ttsPostsManager.playAfterPause();
-		} else if (playAfterStop) {
-			ttsPostsManager.playAfterStop();
-		}
-		playAfterStop = false;
 	}
 
 	protected void generateError(int what) {
@@ -363,76 +437,26 @@ public class PostsActivity extends SherlockFragmentActivity implements
 					getResources().getString(R.string.error_connection_failed),
 					Toast.LENGTH_SHORT).show();
 
-			barButtonPlay.setContentDescription(getResources().getString(
+			play.setContentDescription(getResources().getString(
 					R.string.play));
-			barButtonPlay.setImageResource(R.drawable.playback_play);
+			play.setImageResource(R.drawable.playback_play);
 			break;
 		case Constants.ERROR_PLAYING:
 			Toast.makeText(getApplicationContext(),
 					getResources().getString(R.string.error_playing),
 					Toast.LENGTH_SHORT).show();
-			barButtonPlay.setContentDescription(getResources().getString(
+			play.setContentDescription(getResources().getString(
 					R.string.play));
-			barButtonPlay.setImageResource(R.drawable.playback_play);
+			play.setImageResource(R.drawable.playback_play);
 			break;
-		}
-	}
-
-	@Override
-	public void onClick(View v) {
-		switch (v.getId()) {
-
-		case R.id.button_next:
-
-			if (ttsPostsManager != null) {
-				int position = ttsPostsManager.getCurrentPostIndex();
-				if (position < ttsPostsManager.getPostsSize() - 1) {
-					stop();
-					play(position + 1);
-				}
-			}
-			break;
-
-		case R.id.button_prev:
-			if (ttsPostsManager != null) {
-				int position = ttsPostsManager.getCurrentPostIndex();
-				if (position > 0) {
-					stop();
-					play(position - 1);
-				}
-			}
-			break;
-
-		case R.id.button_play:
-			playClick();
-			break;
-
-		case R.id.button_stop:
-			removePlayControll();
-			break;
-		default:
-			break;
-		}
-	}
-
-	private void playClick() {
-		if (barButtonPlay.getContentDescription().toString()
-				.equals(getResources().getString(R.string.play))) {
-			play(positionSelected);
-		} else if (barButtonPlay.getContentDescription().toString()
-				.equals(getResources().getString(R.string.pause))) {
-			barButtonPlay.setContentDescription(getResources().getString(
-					R.string.play));
-			barButtonPlay.setImageResource(R.drawable.playback_play);
-			ttsPostsManager.pause();
 		}
 	}
 
 	private void loadPostsFromDatabase() {
 		discussion = discussionDAO.getDiscussion(discussion.getId());
 		previous = discussion.getPreviousPosts();
-		discussionPosts = postDAO.getAllPostsFromDiscussion(discussion.getId());
-		postsAdapter = new PostAdapter(discussionPosts, PostsActivity.this);
+		posts = postDAO.getAllPostsFromDiscussion(discussion.getId());
+		postsAdapter = new PostAdapter(posts, PostsActivity.this);
 
 		setHeader();
 		setFooter();
@@ -545,7 +569,7 @@ public class PostsActivity extends SherlockFragmentActivity implements
 	}
 
 	private void loadPreviousPosts() {
-		String date = discussionPosts.get(0).getDateToString();
+		String date = posts.get(0).getDateToString();
 		wsSolar.getFromServer(Constants.CONNECTION_GET_HISTORY_POSTS,
 				Constants.generateHistoryPostTTSURL(discussion.getId(), date),
 				appState.getToken());
@@ -553,13 +577,13 @@ public class PostsActivity extends SherlockFragmentActivity implements
 
 	private void loadFuturePosts() {
 
-		int discussionSize = discussionPosts.size();
+		int discussionSize = posts.size();
 		String date;
 		if (discussionSize == 0) {
 			date = "19800217111000";
 
 		} else {
-			date = discussionPosts.get(discussionSize - 1).getDateToString();
+			date = posts.get(discussionSize - 1).getDateToString();
 		}
 		wsSolar.getFromServer(Constants.CONNECTION_GET_NEW_POSTS,
 				Constants.generateNewPostsTTSURL(discussion.getId(), date),
@@ -572,76 +596,12 @@ public class PostsActivity extends SherlockFragmentActivity implements
 				appState.getToken());
 	}
 
-	public void includePlayControll() {
-		barButtonPlay.setVisibility(View.VISIBLE);
+	public void showPlayerControls() {
+		play.setVisibility(View.VISIBLE);
 		prev.setVisibility(View.VISIBLE);
 		next.setVisibility(View.VISIBLE);
 		prev.setVisibility(View.VISIBLE);
 		stop.setVisibility(View.VISIBLE);
-		// playClick();
-	}
-
-	public void removePlayControll() {
-
-		if (playbackBarIsVisible) {
-			barButtonPlay.setContentDescription(getResources().getString(
-					R.string.play));
-			barButtonPlay.setImageResource(R.drawable.playback_play);
-			barButtonPlay.setVisibility(View.GONE);
-			prev.setVisibility(View.GONE);
-			next.setVisibility(View.GONE);
-			prev.setVisibility(View.GONE);
-			stop.setVisibility(View.GONE);
-			stop();
-			playbackBarIsVisible = false;
-		}
-	}
-
-	private void stop() {
-		Log.i("Stop", "Stopped");
-		if (threadTTSPostsManager != null && ttsPostsManager != null) {
-			ttsPostsManager.pause();
-			postsAdapter.untogglePostPlayingStatus(ttsPostsManager
-					.getCurrentPostIndex());
-			threadTTSPostsManager.interrupt();
-			ttsPostsManager.stop();
-			threadTTSPostsManager = null;
-			ttsPostsManager = null;
-			playAfterStop = false;
-			Log.w("playAfterStop", "FALSE");
-		}
-	}
-
-	public class PostManagerHandler extends Handler {
-
-		@Override
-		public void handleMessage(Message msg) {
-			super.handleMessage(msg);
-			untogglePostPlayingStatus(ttsPostsManager.getCurrentPostIndex());
-			removePlayControll();
-			if (msg.what < 0)
-				generateError(msg.what);
-		}
-
-		public void togglePostPlayingStatus(int postIndex) {
-			postsAdapter.togglePostPlayingStatus(postIndex);
-		}
-
-		public void untogglePostPlayingStatus(int postIndex) {
-			postsAdapter.untogglePostPlayingStatus(postIndex);
-		}
-
-		public void playedAllPosts() {
-			removePlayControll();
-		}
-
-		public void playNext() {
-			int position = ttsPostsManager.getCurrentPostIndex();
-			if (position < ttsPostsManager.getPostsSize() - 1) {
-				stop();
-				play(position + 1);
-			}
-		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -657,8 +617,8 @@ public class PostsActivity extends SherlockFragmentActivity implements
 
 		if (!(headerClicked || footerClicked)) {
 
-			discussionPosts = loadedposts;
-			postsAdapter = new PostAdapter(discussionPosts, PostsActivity.this);
+			posts = loadedposts;
+			postsAdapter = new PostAdapter(posts, PostsActivity.this);
 			postDAO.insertPosts(
 					loadedposts.toArray(new Post[loadedposts.size()]),
 					appState.selectedDiscussion);
@@ -689,8 +649,8 @@ public class PostsActivity extends SherlockFragmentActivity implements
 					previous = discussion.getPreviousPosts();
 				}
 
-				discussionPosts.addAll(0, loadedPosts);
-				postsAdapter = new PostAdapter(discussionPosts,
+				posts.addAll(0, loadedPosts);
+				postsAdapter = new PostAdapter(posts,
 						PostsActivity.this);
 				setHeader();
 				headerClicked = false;
@@ -714,7 +674,7 @@ public class PostsActivity extends SherlockFragmentActivity implements
 					return;
 				}
 
-				discussionPosts.addAll(loadedposts);
+				posts.addAll(loadedposts);
 				ArrayList<Post> postsFromDB = postDAO
 						.getAllPostsFromDiscussion(discussion.getId());
 				if (postsFromDB.size() - loadedposts.size() != 0) {
@@ -746,13 +706,6 @@ public class PostsActivity extends SherlockFragmentActivity implements
 			}
 		}
 		postsAdapter.notifyDataSetChanged();
-	}
-
-	@Override
-	protected void onStop() {
-		super.onStop();
-		if (ttsPostsManager != null)
-			ttsPostsManager.stop();
 	}
 
 	@Override
@@ -799,29 +752,27 @@ public class PostsActivity extends SherlockFragmentActivity implements
 			long id) {
 
 		int arrayPosition = position;
-		Log.i(TAG, "Position  = " + position);
 		if (headerIsAttached) {
 			arrayPosition--;
 		}
-		Log.e(TAG, "ArrayPosition  = " + arrayPosition);
 
-		if (positionSelected == -1) {
+		if (selectedPosition == -1) {
 			postsAdapter.togglePostMarkedStatus(arrayPosition);
-			positionSelected = arrayPosition;
+			selectedPosition = arrayPosition;
 			actionBarSelected = true;
 			appState.selectedPost = (Integer) postsAdapter
 					.getItem(arrayPosition);
 			setActionBarSelected();
-		} else if (positionSelected == arrayPosition) {
+		} else if (selectedPosition == arrayPosition) {
 			postsAdapter.untogglePostMarkedStatus(arrayPosition);
 			actionBarSelected = false;
-			positionSelected = -1;
+			selectedPosition = -1;
 			appState.selectedPost = -1;
 			setActionBarNotSelected();
 		} else {
 			postsAdapter.togglePostMarkedStatus(arrayPosition);
-			postsAdapter.untogglePostMarkedStatus(positionSelected);
-			positionSelected = arrayPosition;
+			postsAdapter.untogglePostMarkedStatus(selectedPosition);
+			selectedPosition = arrayPosition;
 			appState.selectedPost = (Integer) postsAdapter
 					.getItem(arrayPosition);
 			actionBarSelected = true;

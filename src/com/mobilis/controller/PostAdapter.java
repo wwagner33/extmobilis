@@ -283,7 +283,7 @@ public class PostAdapter extends BaseAdapter {
 	}
 
 	public void toggleExpandedPostMarkedStatus() {
-		Post post = posts.get(activity.positionSelected);
+		Post post = posts.get(activity.selectedPosition);
 		postDao.updatePost(post);
 	}
 

@@ -1,6 +1,6 @@
 #Mobilis
-bin/*
-gen/*
+bin/
+gen/
 .classpath
 src/com/mobilis/controller/Mobilis.java
 *~
