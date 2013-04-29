@@ -87,25 +87,30 @@ public class ParseJSON {
 				SimpleDateFormat serverFormat = DateUtils.getServerFormat();
 
 				try {
-					Date lastPostDate = serverFormat
-							.parse((String) jsonObjects[i]
-									.get("last_post_date"));
+					Date lastPostDate;
+					lastPostDate = serverFormat.parse((String) jsonObjects[i]
+							.get("last_post_date"));
 					String lastPostDateFormatted = dbFormat
 							.format(lastPostDate);
 					discussion.setLastPostDate(lastPostDateFormatted);
+				} catch (Exception e1) {
+				}
 
-					Date startDate = serverFormat.parse((String) jsonObjects[i]
+				try {
+					Date startDate;
+					startDate = serverFormat.parse((String) jsonObjects[i]
 							.get("start_date"));
 					discussion.setStartDate(startDate);
+				} catch (Exception e1) {
+				}
 
+				try {
 					Date endDate = serverFormat.parse((String) jsonObjects[i]
 							.get("end_date"));
 					discussion.setEndDate(endDate);
-
-				} catch (ParseException e) {
-					throw new RuntimeException();
-				} catch (NullPointerException e) {
+				} catch (Exception e) {
 				}
+
 				discussions.add(discussion);
 			}
 			return discussions;
