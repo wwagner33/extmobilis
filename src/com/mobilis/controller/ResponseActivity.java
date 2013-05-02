@@ -225,6 +225,10 @@ public class ResponseActivity extends SherlockActivity implements
 
 		if (v.getId() == R.id.criar_topico_submit) {
 
+			if ((existsRecording) && (message.getText().length() == 0)) {
+				message.setText("[Áudio em anexo]");
+			}
+			
 			if ( message.getText().length() == 0) {
 
 				Toast.makeText(this, "Mensagem não pode ser vazia",
