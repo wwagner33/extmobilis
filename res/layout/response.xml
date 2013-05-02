@@ -33,6 +33,7 @@
         android:layout_margin="16dp"
         android:layout_weight="1"
         android:background="#00000000"
+        android:textColor="#000000"
         android:gravity="top|left"
         android:hint="@string/answer_topic_edittext_hint" />
 
