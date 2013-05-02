@@ -114,7 +114,7 @@ public class PostsActivity extends SherlockFragmentActivity implements
 		posts = new ArrayList<Post>();
 
 		discussion = discussionDAO.getDiscussion(appState.selectedDiscussion);
-
+		
 		SimpleDateFormat exhibFormat = DateUtils.getExhibitionFormat();
 		String startDate = exhibFormat.format(discussion.getStartDate());
 		String endDate = exhibFormat.format(discussion.getEndDate());
@@ -155,6 +155,9 @@ public class PostsActivity extends SherlockFragmentActivity implements
 			loadPostsFromRetainedState();
 		} else
 			loadPostsFromDatabase();
+				
+		setHeader();
+		setFooter();
 	}
 	
 	final TTSManager.TTSEventListener ttsEventListener= new TTSManager.TTSEventListener() {
@@ -576,7 +579,6 @@ public class PostsActivity extends SherlockFragmentActivity implements
 	}
 
 	private void loadFuturePosts() {
-
 		int discussionSize = posts.size();
 		String date;
 		if (discussionSize == 0) {

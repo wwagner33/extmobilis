@@ -78,11 +78,13 @@ public class TTSManager {
           String content = post.getContent().trim();
           int end = content.length();
 
+          String blockContent = post.header();
+
           while (end > 0) 
           {
               int cut = Math.min(content.length(), MIN_BLOCK_LENGTH);
-              
-              String blockContent = content.substring(0, cut);
+
+              blockContent += content.substring(0, cut);
 
               content = content.substring(cut);
               int occurrenceOfDot = content.indexOf(".") == -1 ? 999 : content
@@ -122,6 +124,7 @@ public class TTSManager {
                   blocks.add(blockContent);
               }
          }
+
           Ln.i("Block Size = " + blocks.size());
           blocksAvaliability = new boolean[blocks.size()];
       }

@@ -1,8 +1,11 @@
 package com.mobilis.model;
 
+import java.text.DateFormatSymbols;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
@@ -165,4 +168,53 @@ public class Post {
 	public void setExpanded(boolean isExpanded) {
 		this.isExpanded = isExpanded;
 	}
+
+	public String header() {
+		return getUserNick() + " em " + generateDateHeader();
+	}
+	
+	public String generateDateHeader() {
+		String header = "";
+		String date = getDate();
+		int year = Integer.parseInt(date.substring(0, 4));
+		int month = Integer.parseInt(date.substring(5, 7));
+		int day = Integer.parseInt(date.substring(8, 10));
+		int hour = Integer.parseInt(date.substring(11, 13));
+		int minute = Integer.parseInt(date.substring(14, 16));
+		Calendar c = Calendar.getInstance();
+		if (year == c.get(Calendar.YEAR)) {
+			if (month == c.get(Calendar.MONTH) + 1) {
+				if (day == c.get(Calendar.DATE)) {
+					if (hour == c.get(Calendar.HOUR_OF_DAY)) {
+						int m = (c.get(Calendar.MINUTE) - minute);
+						header = header.concat("Há " + m + " minuto" + ((m != 1 && m != -1) ? "s" : ""));
+					} else {
+						header = header.concat("Às " + hour + " horas");
+					}
+				} else {
+					if (day == c.get(Calendar.DATE) - 1)
+						header = header.concat("Ontem");
+					else
+						header = header.concat("Dia " + day + " às " + hour
+								+ " horas");
+				}
+			} else {
+				header = header.concat("Dia "
+						+ day
+						+ " de "
+						+ new DateFormatSymbols(Locale.getDefault())
+								.getMonths()[month - 1]);
+			}
+		} else {
+			header = header
+					.concat("Dia "
+							+ day
+							+ " de "
+							+ new DateFormatSymbols(Locale.getDefault())
+									.getMonths()[month - 1] + " de " + year);
+		}
+		return header;
+	}
+	
+	
 }

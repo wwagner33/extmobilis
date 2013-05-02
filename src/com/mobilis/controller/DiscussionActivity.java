@@ -39,8 +39,8 @@ import com.mobilis.util.MobilisPreferences;
 import com.mobilis.util.ParseJSON;
 import com.mobilis.ws.Connection;
 
-public class DiscussionActivity extends SherlockFragmentActivity
-		implements ConnectionCallback, OnItemClickListener {
+public class DiscussionActivity extends SherlockFragmentActivity implements
+		ConnectionCallback, OnItemClickListener {
 
 	private Intent intent;
 	private ParseJSON jsonParser;
@@ -348,15 +348,15 @@ public class DiscussionActivity extends SherlockFragmentActivity
 
 		appState.selectedDiscussion = discussionId;
 
-		if (postDAO.postsExistOnDiscusison(discussionId)) {
-			intent = new Intent(this, PostsActivity.class);
-			progressDialog.dismiss();
-			startActivityForResult(intent, 0);
-
-		} else {
-			progressDialog.show();
-			obtainNewPosts(Constants.generateNewPostsTTSURL(discussionId,
-					Constants.oldDateString));
-		}
+		// if (postDAO.postsExistOnDiscusison(discussionId)) {
+		// intent = new Intent(this, PostsActivity.class);
+		// progressDialog.dismiss();
+		// startActivityForResult(intent, 0);
+		//
+		// } else {
+		progressDialog.show();
+		obtainNewPosts(Constants.generateNewPostsTTSURL(discussionId,
+				Constants.oldDateString));
+		// }
 	}
 }

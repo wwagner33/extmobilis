@@ -168,7 +168,7 @@ public class PostAdapter extends BaseAdapter {
 				holder.userNick.setText(post.getUserNick());
 			}
 			if (holder.postDate != null) {
-				holder.postDate.setText(generateDateHeader(position));
+				holder.postDate.setText(post.generateDateHeader());
 			}
 			if (holder.postContent != null) {
 				String content = post.getContent();
@@ -211,50 +211,6 @@ public class PostAdapter extends BaseAdapter {
 	public void untogglePostMarkedStatus(int postIndex) {
 		posts.get(postIndex).setMarked(false);
 		notifyDataSetChanged();
-	}
-
-	private String generateDateHeader(int postIndex) {
-		String header = "";
-		String date = posts.get(postIndex).getDate();
-		int year = Integer.parseInt(date.substring(0, 4));
-		int month = Integer.parseInt(date.substring(5, 7));
-		int day = Integer.parseInt(date.substring(8, 10));
-		int hour = Integer.parseInt(date.substring(11, 13));
-		int minute = Integer.parseInt(date.substring(14, 16));
-		Calendar c = Calendar.getInstance();
-		if (year == c.get(Calendar.YEAR)) {
-			if (month == c.get(Calendar.MONTH) + 1) {
-				if (day == c.get(Calendar.DATE)) {
-					if (hour == c.get(Calendar.HOUR_OF_DAY)) {
-						header = header.concat("Há "
-								+ (c.get(Calendar.MINUTE) - minute)
-								+ " minutos");
-					} else {
-						header = header.concat("Às " + hour + " horas");
-					}
-				} else {
-					if (day == c.get(Calendar.DATE) - 1)
-						header = header.concat("Ontem");
-					else
-						header = header.concat("Dia " + day + " às " + hour
-								+ " horas");
-				}
-			} else {
-				header = header.concat("Dia "
-						+ day
-						+ " de "
-						+ new DateFormatSymbols(Locale.getDefault())
-								.getMonths()[month - 1]);
-			}
-		} else {
-			header = header
-					.concat("Dia "
-							+ day
-							+ " de "
-							+ new DateFormatSymbols(Locale.getDefault())
-									.getMonths()[month - 1] + " de " + year);
-		}
-		return header;
 	}
 
 	public Bitmap getUserImage(int userId) throws FileNotFoundException {
