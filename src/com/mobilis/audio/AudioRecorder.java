@@ -26,11 +26,15 @@ public class AudioRecorder {
 	public AudioRecorder() {
 
 		recorder = new MediaRecorder();
+		setRecordOnBackground();
+
+	}
+
+	private void setRecordOnBackground() {
 		recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
 		recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
 		recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
 		recordOnBackgroundThread = new RecordOnBackground();
-
 	}
 
 	public void startRecording(String fileName) throws IllegalStateException,
@@ -42,13 +46,10 @@ public class AudioRecorder {
 
 		if (isReseted) {
 			recorder.reset();
-			recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-			recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-			recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-			recordOnBackgroundThread = new RecordOnBackground();
+			setRecordOnBackground();
 		}
 
-		audioFile = new File(path, Constants.RECORDING_FILENAME + ".3gp");
+		audioFile = new File(path, Constants.RECORDING_FULLNAME);
 		recorder.setOutputFile(audioFile.getAbsolutePath());
 
 		recorder.prepare();

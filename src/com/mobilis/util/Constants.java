@@ -64,7 +64,8 @@ public class Constants {
 
 	public static final String RECORDING_FILENAME = "recording";
 	public static final String RECORDING_EXTENSION = ".3gp";
-	public static final String RECORDING_FULLNAME = "recording.3gp";
+	public static final String RECORDING_FULLNAME = RECORDING_FILENAME + RECORDING_EXTENSION;
+	public static final String RECORDING_MIME_TYPE = "audio/3gpp";
 
 	public static final int TYPE_CONNECTION_POST = 300;
 	public static final int TYPE_CONNECTION_GET = 301;

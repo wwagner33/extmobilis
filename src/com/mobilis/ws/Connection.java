@@ -219,9 +219,9 @@ public class Connection {
 		MultipartEntity entity = new MultipartEntity();
 
 		File file = new File(Environment.getExternalStorageDirectory()
-				.getAbsolutePath() + "/Mobilis/Recordings/recording.3gp");
+				.getAbsolutePath() + "/Mobilis/Recordings/" + Constants.RECORDING_FULLNAME);
 
-		entity.addPart("post_file", new FileBody(file, "audio/3gpp", "UTF-8"));
+		entity.addPart("post_file", new FileBody(file, Constants.RECORDING_MIME_TYPE, "UTF-8"));
 
 		post.setEntity(entity);
 
