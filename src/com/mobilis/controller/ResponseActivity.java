@@ -225,18 +225,14 @@ public class ResponseActivity extends SherlockActivity implements
 
 		if (v.getId() == R.id.criar_topico_submit) {
 
-			if ((existsRecording) && (message.getText().length() == 0)) {
-				message.setText("[Áudio em anexo]");
+			if (existsRecording) {
+				message.append("\n[Áudio em anexo]");
 			}
-			
-			if ( message.getText().length() == 0) {
 
+			if (message.getText().length() == 0) {
 				Toast.makeText(this, "Mensagem não pode ser vazia",
 						Toast.LENGTH_SHORT).show();
-
-			}
-
-			else {
+			} else {
 				if (appState.selectedPost > -1) {
 					postObject = jsonParser
 							.buildTextResponseWithParentObject(message
@@ -248,8 +244,6 @@ public class ResponseActivity extends SherlockActivity implements
 							.buildTextResponseWithoutParent(message.getText()
 									.toString());
 				}
-				
-
 				sendPost(postObject.toJSONString());
 			}
 		}
