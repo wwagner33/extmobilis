@@ -74,10 +74,10 @@ public class TTSManager {
 
 	private void createBlocks(Post post) {
 		blocks = new ArrayList<String>();
-		String content = post.getContent().trim();
+		String content = post.header() + post.getContent().trim();
 		int end = content.length();
-
-		String blockContent = post.header();
+				
+		String blockContent = "";
 
 		while (end > 0) {
 			int cut = Math.min(content.length(), MIN_BLOCK_LENGTH);

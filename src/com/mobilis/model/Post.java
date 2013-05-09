@@ -170,7 +170,7 @@ public class Post {
 	}
 
 	public String header() {
-		return getUserNick() + " em " + generateDateHeader();
+		return getUserNick() + ", " + generateDateHeader()+ ". ";
 	}
 
 	public String generateDateHeader() {
