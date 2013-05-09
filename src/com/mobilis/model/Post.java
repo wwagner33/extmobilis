@@ -172,7 +172,7 @@ public class Post {
 	public String header() {
 		return getUserNick() + " em " + generateDateHeader();
 	}
-	
+
 	public String generateDateHeader() {
 		String header = "";
 		String date = getDate();
@@ -187,7 +187,8 @@ public class Post {
 				if (day == c.get(Calendar.DATE)) {
 					if (hour == c.get(Calendar.HOUR_OF_DAY)) {
 						int m = (c.get(Calendar.MINUTE) - minute);
-						header = header.concat("Há " + m + " minuto" + ((m != 1 && m != -1) ? "s" : ""));
+						header = header.concat("Há " + m + " minuto"
+								+ ((m != 1 && m != -1) ? "s" : ""));
 					} else {
 						header = header.concat("Às " + hour + " horas");
 					}
@@ -215,6 +216,5 @@ public class Post {
 		}
 		return header;
 	}
-	
-	
+
 }
