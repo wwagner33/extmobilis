@@ -298,7 +298,7 @@ public class ResponseActivity extends SherlockActivity implements
 					e.printStackTrace();
 
 				} catch (IOException e) {
-					record.setImageResource(R.drawable.gravar_off);
+					record.setImageResource(R.drawable.gravador_parado);
 					stopWatch.stop();
 					timeUp.setText("00:00");
 
@@ -309,7 +309,7 @@ public class ResponseActivity extends SherlockActivity implements
 				}
 
 				catch (Exception e) {
-					record.setImageResource(R.drawable.gravar_off);
+					record.setImageResource(R.drawable.gravador_parado);
 					stopWatch.stop();
 					timeUp.setText("00:00");
 

@@ -315,6 +315,18 @@ public class PostsActivity extends SherlockFragmentActivity implements
 			postsAdapter.notifyDataSetChanged();
 			return true;
 
+		case R.id.menu_config:
+			intent = new Intent(this, ConfigActivity.class);
+			startActivity(intent);
+			return true;
+
+		case R.id.menu_logout:
+			appState.setToken(null);
+			intent = new Intent(this, LoginActivity.class);
+			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			startActivity(intent);
+			return true;
+
 		case R.id.mark:
 			// TODO mark
 			return true;
