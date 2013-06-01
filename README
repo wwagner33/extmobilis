@@ -1,7 +1,10 @@
 == Projeto extMobilis ==
 
-A presente ferramenta, Mobilis VoiceForum faz parte de uma arquitetura de comunicação entre aplicações Multimídia móveis e Ambientes Virtuais de Aprendizagem (AVA), chamada Extensible Mobilis. Sua principal característica é permitir através de interface API ou Webservice a comunicação de smartphones com algumas das ferramentas pertencentes a um AVA, procurando potencializar o uso dos recursos multimídia do smartphone para melhorar a experiência do usuário.
+A presente ferramenta, Solar Mobilis faz parte de uma arquitetura de comunicação entre aplicações Multimídia móveis e Ambientes Virtuais de Aprendizagem (AVA), chamada Extensible Mobilis. Sua principal característica é permitir através de interface API ou Webservice a comunicação de smartphones com algumas das ferramentas pertencentes a um AVA, procurando potencializar o uso dos recursos multimídia do smartphone para melhorar a experiência do usuário. Ela é baseada na arquitetura Extended Mobilis criada pelo Prof. Wellington Wagner F. Sarmento e sua equipe de pesquisa e desenvolvimento.
 
+Idealização
+ Prof. Wellington W. F. Sarmento
+ Prof. Henrique S. L. Pequeno
 
 
 Equipe de Desenvolvimento:
@@ -18,6 +21,8 @@ Equipe de Design e Usabilidade:
 Modo de Instalação:
 
 Para Android - Deve ser baixado da pasta Download o aplicativo Mobilis no formato apk e instalado no Android. O acesso direto ao aplicativo pode ser feito através da URL: https://github.com/wwagner33/extmobilis/tree/master/download/Mobilis.apk.
+
+Esta aplicação está sob licença GPLv3 (http://www.gnu.org/licenses/gpl-3.0.html).
 
 
 
