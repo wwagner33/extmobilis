@@ -1,26 +1,39 @@
 package com.example.solarmobilis;
 
+import org.json.JSONObject;
+
 import android.app.Activity;
+import android.util.Log;
 import android.view.Menu;
 import android.widget.EditText;
-import android.widget.Toast;
 
+import com.googlecode.androidannotations.annotations.Background;
 import com.googlecode.androidannotations.annotations.Click;
 import com.googlecode.androidannotations.annotations.EActivity;
 import com.googlecode.androidannotations.annotations.ViewById;
+import com.googlecode.androidannotations.annotations.rest.RestService;
 
 @EActivity(R.layout.activity_login)
-public class LoginActivity extends Activity {
+public class LoginActivity extends Activity{
+	
+	@RestService
+	SolarClient solarClient;
+	
+	@Background
+	void getDisciplinas(){
+		JSONObject disc = solarClient.getCurriculumAndList();
+		Log.i("Disciplinas", disc.toString());
+	}
 
-	@ViewById(R.id.editText1)
+	@ViewById(R.id.editTextUser)
 	EditText usuario;
-	@ViewById(R.id.editText2)
+	@ViewById(R.id.editTextPassword)
 	EditText senha;
 
-	@Click(R.id.button1)
+	@Click(R.id.submit)
 	void submit(){
 		if (!(usuario.getText().toString().trim().length() == 0 || senha.getText().toString().trim().length() == 0)){
-			Toast.makeText(LoginActivity.this, "bem vindo: "+ usuario.getText().toString() +" senha: " + senha.getText().toString(), Toast.LENGTH_LONG).show();
+			getDisciplinas();
 		}
 	}
 

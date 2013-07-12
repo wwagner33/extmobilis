@@ -21,7 +21,7 @@
         android:layout_alignLeft="@+id/textView2"
         android:layout_below="@+id/textView2"
         android:layout_marginTop="63dp"
-        android:text="Usuário" />
+        android:text="@string/user" />
 
     <TextView
         android:id="@+id/textView3"
@@ -30,10 +30,10 @@
         android:layout_alignLeft="@+id/textView1"
         android:layout_below="@+id/textView1"
         android:layout_marginTop="26dp"
-        android:text="Senha" />
+        android:text="@string/password" />
 
     <EditText
-        android:id="@+id/editText2"
+        android:id="@+id/editTextPassword"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/textView3"
@@ -42,7 +42,7 @@
         android:inputType="textPassword" />
 
     <EditText
-        android:id="@+id/editText1"
+        android:id="@+id/editTextUser"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignBaseline="@+id/textView1"
@@ -51,11 +51,11 @@
         android:ems="10" />
 
     <Button
-        android:id="@+id/button1"
+        android:id="@+id/submit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/editText2"
+        android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-        android:text="Logar" />
+        android:text="@string/login" />
 
 </RelativeLayout>
