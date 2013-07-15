@@ -1,15 +1,40 @@
 package br.ufc.virtual.solarmobilis;
 
-import android.os.Bundle;
+import org.json.JSONObject;
+
 import android.app.Activity;
+import android.util.Log;
 import android.view.Menu;
+import android.widget.EditText;
 
-public class LoginActivity extends Activity {
+import com.googlecode.androidannotations.annotations.Background;
+import com.googlecode.androidannotations.annotations.Click;
+import com.googlecode.androidannotations.annotations.EActivity;
+import com.googlecode.androidannotations.annotations.ViewById;
+import com.googlecode.androidannotations.annotations.rest.RestService;
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_login);
+@EActivity(R.layout.activity_login)
+public class LoginActivity extends Activity{
+	
+	@RestService
+	SolarClient solarClient;
+	
+	@Background
+	void getDisciplinas(){
+		JSONObject disc = solarClient.getCurriculumAndList();
+		Log.i("Disciplinas", disc.toString());
+	}
+
+	@ViewById(R.id.editTextUser)
+	EditText usuario;
+	@ViewById(R.id.editTextPassword)
+	EditText senha;
+
+	@Click(R.id.submit)
+	void submit(){
+		if (!(usuario.getText().toString().trim().length() == 0 || senha.getText().toString().trim().length() == 0)){
+			getDisciplinas();
+		}
 	}
 
 	@Override
