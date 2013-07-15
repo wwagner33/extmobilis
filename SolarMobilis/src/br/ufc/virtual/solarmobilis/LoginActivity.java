@@ -19,9 +19,10 @@ public class LoginActivity extends Activity{
 	@RestService
 	SolarClient solarClient;
 	
+	
 	@Background
 	void getDisciplinas(){
-		JSONObject disc = solarClient.getCurriculumAndList();
+		Object disc = solarClient.getCurriculumAndList();
 		Log.i("Disciplinas", disc.toString());
 	}
 
