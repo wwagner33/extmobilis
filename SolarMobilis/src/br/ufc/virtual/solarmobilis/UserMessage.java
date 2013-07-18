@@ -1,6 +1,6 @@
 package br.ufc.virtual.solarmobilis;
 
-public class UserMessenge {
+public class UserMessage {
 
 	private User user = new User();
 
