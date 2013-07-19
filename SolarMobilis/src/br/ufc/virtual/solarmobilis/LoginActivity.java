@@ -24,7 +24,7 @@ public class LoginActivity extends Activity {
 
 	@ViewById(R.id.editTextUser)
 	EditText field_login;
-	
+
 	@ViewById(R.id.editTextPassword)
 	EditText field_passord;
 
@@ -40,7 +40,7 @@ public class LoginActivity extends Activity {
 			getToken();
 		}
 	}
-	
+
 	@Background
 	void getToken() {
 		Log.i("enviando", userMessage.toString());
