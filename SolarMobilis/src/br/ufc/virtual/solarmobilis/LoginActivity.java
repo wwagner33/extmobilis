@@ -5,11 +5,11 @@ import org.json.JSONObject;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.googlecode.androidannotations.annotations.Background;
 import com.googlecode.androidannotations.annotations.Click;
@@ -21,12 +21,13 @@ import com.googlecode.androidannotations.annotations.sharedpreferences.Pref;
 @EActivity(R.layout.activity_login)
 public class LoginActivity extends Activity {
 
+	@Pref
+	SolarMobilisPreferences_ preferences;
+
 	Object response_post;
-	public static final String PREF_TOKEN = "Prefences";
 	public JSONObject jsonobject;
 	public UserMessage userMessage = new UserMessage();
 	public User user = new User();
-	private Intent intent;
 
 	@RestService
 	SolarClient solarClient;
@@ -54,23 +55,16 @@ public class LoginActivity extends Activity {
 
 			getToken();
 
-			intent = new Intent(this, CourseListActivity.class);
-			startActivity(intent);
-			/* finish(); */
+		} else {
+			Toast.makeText(this, "O campo não pode estar vazio",
+					Toast.LENGTH_SHORT).show();
 
 		}
 	}
 
 	@Background
 	void getToken() {
-
-		SharedPreferences sharedpreferences = getSharedPreferences(PREF_TOKEN,
-				0);
-		SharedPreferences.Editor editor = sharedpreferences.edit();
-
 		response_post = solarClient.doLogin(userMessage);
-
-		Log.i("RESPOSTA", response_post.toString());
 
 		try {
 			jsonobject = new JSONObject(response_post.toString());
@@ -80,16 +74,20 @@ public class LoginActivity extends Activity {
 		}
 
 		try {
-			editor.putString("token", jsonobject.getJSONObject("session")
-					.getString("auth_token"));
+			preferences.token()
+					.put(jsonobject.getJSONObject("session").getString(
+							"auth_token"));
 		} catch (JSONException e) {
-
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
-		editor.commit();
+		if (preferences.token().get().length() != 0) {
+			Intent intent = new Intent(this, CourseListActivity_.class);
 
-		/*Log.i("msg", sharedpreferences.getString("token", ""));*/
+			startActivity(intent);
+			finish();
+		}
 
 	}
 
@@ -98,19 +96,6 @@ public class LoginActivity extends Activity {
 
 		getMenuInflater().inflate(R.menu.login, menu);
 		return true;
-	}
-
-	@Override
-	public void onBackPressed() {
-
-		super.onBackPressed();
-
-		Intent intent = new Intent(this, GatewayActivity_.class);
-
-		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-		intent.putExtra("FinishActivity", "YES");
-
-		startActivity(intent);
 	}
 
 }
