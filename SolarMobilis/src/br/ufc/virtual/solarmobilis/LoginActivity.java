@@ -4,7 +4,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestClientException;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -66,20 +65,12 @@ public class LoginActivity extends Activity {
 		}
 	}
 
-	@UiThread(delay = 2000)
+	@UiThread
 	void alerta(HttpStatus statuscode) {
 
-		/*
-		 * if(codigo.toString().equals("401")){ Toast.makeText(this,
-		 * "usuario não autorizado", Toast.LENGTH_SHORT).show();
-		 * Log.i("entrou?", "sim");
-		 * 
-		 * }
-		 */
+		int code = Integer.parseInt(statuscode.toString());
 
-		int  code= Integer.parseInt(statuscode.toString());
-
-		switch (code){
+		switch (code) {
 		case 401:
 			Toast.makeText(this, "usuario não autorizado", Toast.LENGTH_SHORT)
 					.show();
@@ -101,8 +92,8 @@ public class LoginActivity extends Activity {
 					.show();
 			break;
 		case 404:
-			Toast.makeText(this, "Endereço não encontrado",
-					Toast.LENGTH_SHORT).show();
+			Toast.makeText(this, "Endereço não encontrado", Toast.LENGTH_SHORT)
+					.show();
 			break;
 		default:
 			Toast.makeText(this, "Erro desconhecido", Toast.LENGTH_SHORT)
@@ -122,8 +113,6 @@ public class LoginActivity extends Activity {
 		} catch (HttpClientErrorException e) {
 
 			Log.i("ERRO", e.getStatusCode().toString());
-
-			
 
 			continuar = false;
 			alerta(e.getStatusCode());
