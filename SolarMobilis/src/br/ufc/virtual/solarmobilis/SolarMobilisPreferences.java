@@ -8,8 +8,6 @@ import com.googlecode.androidannotations.annotations.sharedpreferences.SharedPre
 @SharedPref(value = Scope.UNIQUE)
 public interface SolarMobilisPreferences {
 
-	
-	
 	String token();
 
 }

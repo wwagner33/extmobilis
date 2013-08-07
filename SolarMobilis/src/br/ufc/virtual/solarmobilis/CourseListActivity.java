@@ -15,21 +15,21 @@ public class CourseListActivity extends Activity {
 
 	@Pref
 	SolarMobilisPreferences_ preferences;
+
 	@RestService
 	SolarClient solarClient;
-	
-	Object response;
-	Object response2;
-	
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
 
-		
+	Object response;
+
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
 		chamadas();
-		
-		
+
 	}
+
+	
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -37,25 +37,18 @@ public class CourseListActivity extends Activity {
 		getMenuInflater().inflate(R.menu.course_list, menu);
 		return true;
 	}
-	
-	
-	@Background
-	void chamadas(){
-		
-		Log.i("TOKEN_DISCIPLINAS, TURMAS", preferences.token().get().toString());
-		
-		response = solarClient.getDisciplinas(preferences.token().get().toString());
 
-	     Log.i("RESPOSNSE_CURSO",response.toString());
-		
-		response2 = solarClient.getTurmas(preferences.token().get().toString());
-		
-		Log.i("RESPOSNSE_TURMAS",response2.toString());	
-		
-		
-		
-		
-		
+	@Background
+	void chamadas() {
+
+		Log.i("TOKEN_DISCIPLINAS, TURMAS", preferences.token().get().toString());
+
+		response = solarClient.getDisciplinas(preferences.token().get()
+				.toString());
+
+		Log.i("RESPOSNSE_CURSO", response.toString());
+
+
 	}
 
 }

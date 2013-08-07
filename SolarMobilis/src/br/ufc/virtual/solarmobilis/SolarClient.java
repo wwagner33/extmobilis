@@ -29,6 +29,8 @@ public interface SolarClient {
     @Get("curriculum_units/1/groups.json?auth_token={token}")
     Object getTurmas(String token);
     
+    @Get("groups//discussions.json?auth_token={token}")
+	Object getDiscussions(String token);
 	
 	
 	
