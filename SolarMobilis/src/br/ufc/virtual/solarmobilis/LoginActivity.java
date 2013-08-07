@@ -31,7 +31,7 @@ public class LoginActivity extends Activity {
 	public JSONObject jsonobject;
 	public UserMessage userMessage = new UserMessage();
 	public User user = new User();
-
+   
 	@RestService
 	SolarClient solarClient;
 
@@ -58,6 +58,10 @@ public class LoginActivity extends Activity {
 
 			getToken();
 
+			
+			
+			
+			
 		} else {
 			Toast.makeText(this, "O campo não pode estar vazio",
 					Toast.LENGTH_SHORT).show();
@@ -118,6 +122,9 @@ public class LoginActivity extends Activity {
 			alerta(e.getStatusCode());
 
 		}
+		
+		Log.i("MENSSAGEM", "PODE SIM");
+		
 
 		if (continuar == true) {
 
@@ -133,11 +140,15 @@ public class LoginActivity extends Activity {
 			try {
 				preferences.token().put(
 						jsonobject.getJSONObject("session").getString(
-								"auth_token"));
+								"auth_token")
+								);
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			
+			Log.i("Token_na_login", preferences.token().get().toString());
+			
 
 			if (preferences.token().get().length() != 0) {
 				Intent intent = new Intent(this, CourseListActivity_.class);
@@ -154,5 +165,12 @@ public class LoginActivity extends Activity {
 		getMenuInflater().inflate(R.menu.login, menu);
 		return true;
 	}
+	
+	
+	
+	
+	
+	
+	
 
 }
