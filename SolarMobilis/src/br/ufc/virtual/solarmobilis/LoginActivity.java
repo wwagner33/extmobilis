@@ -6,10 +6,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
+import android.view.Window;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -31,6 +33,7 @@ public class LoginActivity extends Activity {
 	public JSONObject jsonobject;
 	public UserMessage userMessage = new UserMessage();
 	public User user = new User();
+	private ProgressDialog dialog;
 
 	@RestService
 	SolarClient solarClient;
@@ -44,6 +47,7 @@ public class LoginActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
 	}
 
@@ -56,10 +60,13 @@ public class LoginActivity extends Activity {
 			user.setPassword(field_passord.getText().toString().trim());
 			userMessage.setUser(user);
 
+			dialog = ProgressDialog.show(this, "Aguarde", "Recebendo resposta",
+					true);
+
 			getToken();
 
 		} else {
-			Toast.makeText(this, "O campo não pode estar vazio",
+			Toast.makeText(this, "Nenum dos campos pode estar vázio",
 					Toast.LENGTH_SHORT).show();
 
 		}
@@ -72,8 +79,8 @@ public class LoginActivity extends Activity {
 
 		switch (code) {
 		case 401:
-			Toast.makeText(this, "usuario não autorizado", Toast.LENGTH_SHORT)
-					.show();
+			Toast.makeText(this, "Usuário ou senha inválido",
+					Toast.LENGTH_SHORT).show();
 
 			break;
 		case 0:
@@ -115,6 +122,7 @@ public class LoginActivity extends Activity {
 			Log.i("ERRO", e.getStatusCode().toString());
 
 			continuar = false;
+			dialog.dismiss();
 			alerta(e.getStatusCode());
 
 		}
@@ -141,6 +149,8 @@ public class LoginActivity extends Activity {
 
 			if (preferences.token().get().length() != 0) {
 				Intent intent = new Intent(this, CourseListActivity_.class);
+
+				dialog.dismiss();
 
 				startActivity(intent);
 				finish();
