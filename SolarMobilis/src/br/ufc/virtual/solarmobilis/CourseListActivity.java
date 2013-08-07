@@ -4,7 +4,9 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 
+import com.googlecode.androidannotations.annotations.Background;
 import com.googlecode.androidannotations.annotations.EActivity;
+import com.googlecode.androidannotations.annotations.rest.RestService;
 import com.googlecode.androidannotations.annotations.sharedpreferences.Pref;
 
 @EActivity(R.layout.activity_course_list)
@@ -13,9 +15,22 @@ public class CourseListActivity extends Activity {
 	@Pref
 	SolarMobilisPreferences_ preferences;
 
+	Object responseDiscussions;
+
+	@RestService
+	SolarClient solarClient;
+
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		getForuns();
+
+	}
+
+	@Background
+	void getForuns() {
+		responseDiscussions = solarClient.getDiscussions(preferences.token().get()
+				.toString());
 
 	}
 
