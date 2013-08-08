@@ -37,9 +37,10 @@ public class LoginActivity extends Activity {
 	public UserMessage userMessage = new UserMessage();
 	public User user = new User();
 	private ProgressDialog dialog;
-
-	@RestService
-	SolarClient solarClient;
+    SolarManager solarmanager;
+	
+//	@RestService
+//	SolarClient solarClient;
 
 	@ViewById(R.id.editTextUser)
 	EditText field_login;
@@ -78,6 +79,10 @@ public class LoginActivity extends Activity {
 	@UiThread
 	void alerta(HttpStatus statuscode) {
 
+		
+		
+		
+		
 		int code = Integer.parseInt(statuscode.toString());
 
 		switch (code) {
@@ -119,7 +124,7 @@ public class LoginActivity extends Activity {
 		boolean continuar = true;
 
 		try {
-			response_post = solarClient.doLogin(userMessage);
+			response_post = solarManager.getsolarClient().doLogin(userMessage);
 		} catch (HttpClientErrorException e) {
 
 			Log.i("ERRO", e.getStatusCode().toString());
