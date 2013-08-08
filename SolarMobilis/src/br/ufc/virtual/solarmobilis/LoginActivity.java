@@ -157,6 +157,7 @@ public class LoginActivity extends Activity {
 
 				startActivity(intent);
 				finish();
+				
 			}
 		}
 	}

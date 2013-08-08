@@ -30,7 +30,6 @@ public class CourseListActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		chamadas();
-
 	}
 
 	@OptionsItem(R.id.logout)
