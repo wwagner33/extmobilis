@@ -12,5 +12,6 @@
     <string name="title_activity_course_list">CourseListActivity</string>
     <string name="logo_description">Imagem logo do solar</string>
     <string name="iuvi_footer">Instituto Universidade Virtual - 2013</string>
+    <string name="logout">Logout</string>
 
 </resources>

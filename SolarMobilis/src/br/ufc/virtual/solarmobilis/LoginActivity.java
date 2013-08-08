@@ -10,7 +10,6 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
 import android.view.Window;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -34,7 +33,7 @@ public class LoginActivity extends Activity {
 	public UserMessage userMessage = new UserMessage();
 	public User user = new User();
 	private ProgressDialog dialog;
-   
+
 	@RestService
 	SolarClient solarClient;
 
@@ -65,10 +64,6 @@ public class LoginActivity extends Activity {
 
 			getToken();
 
-			
-			
-			
-			
 		} else {
 			Toast.makeText(this, "Nenum dos campos pode estar vázio",
 					Toast.LENGTH_SHORT).show();
@@ -130,9 +125,8 @@ public class LoginActivity extends Activity {
 			alerta(e.getStatusCode());
 
 		}
-		
+
 		Log.i("MENSSAGEM", "PODE SIM");
-		
 
 		if (continuar == true) {
 
@@ -153,9 +147,8 @@ public class LoginActivity extends Activity {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
+
 			Log.i("Token_na_login", preferences.token().get().toString());
-			
 
 			if (preferences.token().get().length() != 0) {
 				Intent intent = new Intent(this, CourseListActivity_.class);
@@ -167,19 +160,5 @@ public class LoginActivity extends Activity {
 			}
 		}
 	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-
-		getMenuInflater().inflate(R.menu.login, menu);
-		return true;
-	}
-	
-	
-	
-	
-	
-	
-	
 
 }
