@@ -1,6 +1,7 @@
 package br.ufc.virtual.solarmobilis;
 
 import org.springframework.http.converter.json.GsonHttpMessageConverter;
+import org.springframework.web.client.RestTemplate;
 
 import com.googlecode.androidannotations.annotations.rest.Get;
 import com.googlecode.androidannotations.annotations.rest.Post;
@@ -20,5 +21,7 @@ public interface SolarClient {
 
 	@Get("groups//discussions.json?auth_token={token}")
 	Object getDiscussions(String token);
+	
+	RestTemplate getRestTemplate();
 
 }
