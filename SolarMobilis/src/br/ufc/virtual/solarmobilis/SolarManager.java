@@ -1,7 +1,5 @@
 package br.ufc.virtual.solarmobilis;
 
-import java.net.SocketTimeoutException;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
@@ -14,7 +12,6 @@ import com.googlecode.androidannotations.annotations.AfterInject;
 import com.googlecode.androidannotations.annotations.EBean;
 import com.googlecode.androidannotations.annotations.RootContext;
 import com.googlecode.androidannotations.annotations.UiThread;
-import com.googlecode.androidannotations.annotations.rest.Post;
 import com.googlecode.androidannotations.annotations.rest.RestService;
 
 @EBean
@@ -65,32 +62,29 @@ public class SolarManager {
 
 		switch (code) {
 		case 401:
-			Toast.makeText(rootActivity, "Usuário ou senha inválido",
+			Toast.makeText(rootActivity, R.string.ERROR_AUTHENTICATION,
 					Toast.LENGTH_SHORT).show();
 
 			break;
 		case 0:
-			Toast.makeText(rootActivity, "Erro de Conexão", Toast.LENGTH_SHORT)
-					.show();
-			break;
-		case 699:
-			Toast.makeText(rootActivity, "Tempo limite de conexão atingido",
+			Toast.makeText(rootActivity, R.string.ERROR_CONECTION,
 					Toast.LENGTH_SHORT).show();
 			break;
+
 		case 400:
-			Toast.makeText(rootActivity, "Erro desconhecido",
+			Toast.makeText(rootActivity, R.string.ERROR_UNKNOWN,
 					Toast.LENGTH_SHORT).show();
 			break;
 		case 500:
-			Toast.makeText(rootActivity, "Servidor indisponível",
+			Toast.makeText(rootActivity, R.string.ERROR_SERVER,
 					Toast.LENGTH_SHORT).show();
 			break;
 		case 404:
-			Toast.makeText(rootActivity, "Endereço não encontrado",
+			Toast.makeText(rootActivity, R.string.ERROR_ADDRESS,
 					Toast.LENGTH_SHORT).show();
 			break;
 		default:
-			Toast.makeText(rootActivity, "Erro desconhecido",
+			Toast.makeText(rootActivity, R.string.ERROR_UNKNOWN,
 					Toast.LENGTH_SHORT).show();
 
 		}
