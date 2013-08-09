@@ -16,8 +16,6 @@ import com.googlecode.androidannotations.annotations.sharedpreferences.Pref;
 @EActivity(R.layout.activity_course_list)
 public class CourseListActivity extends Activity {
 
-	public static final int LOGOUT = 0;
-
 	@Pref
 	SolarMobilisPreferences_ preferences;
 

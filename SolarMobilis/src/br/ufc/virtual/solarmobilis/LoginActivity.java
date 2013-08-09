@@ -1,12 +1,7 @@
 package br.ufc.virtual.solarmobilis;
 
-
-
-import java.net.SocketTimeoutException;
-
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
 
@@ -30,7 +25,7 @@ import com.googlecode.androidannotations.annotations.sharedpreferences.Pref;
 
 @EActivity(R.layout.activity_login)
 public class LoginActivity extends Activity {
-	
+
 	@Bean
 	SolarManager solarManager;
 
@@ -38,17 +33,17 @@ public class LoginActivity extends Activity {
 	SolarMobilisPreferences_ preferences;
 
 	@RestService
-	SolarClient solarClient;	
-	
+	SolarClient solarClient;
+
 	Object response_post;
 	public JSONObject jsonobject;
 	public UserMessage userMessage = new UserMessage();
 	public User user = new User();
 	private ProgressDialog dialog;
-    SolarManager solarmanager;
-	
-//	@RestService
-//	SolarClient solarClient;
+	SolarManager solarmanager;
+
+	// @RestService
+	// SolarClient solarClient;
 
 	@ViewById(R.id.editTextUser)
 	EditText field_login;
@@ -75,9 +70,7 @@ public class LoginActivity extends Activity {
 			dialog = ProgressDialog.show(this, "Aguarde", "Recebendo resposta",
 					true);
 
-		
-				getToken();
-			
+			getToken();
 
 		} else {
 			Toast.makeText(this, "Nenum dos campos pode estar vázio",
@@ -86,86 +79,38 @@ public class LoginActivity extends Activity {
 		}
 	}
 
-	
-	
 	@UiThread
-	void AlertaTimeout(String message){
-		
-		Toast.makeText(this,message , Toast.LENGTH_SHORT).show();
-		
-	}
-	
-	
-	@UiThread
-	void alerta(HttpStatus statuscode) {
+	void AlertaTimeout(String message) {
 
-		
-		
-		
-		
-		int code = Integer.parseInt(statuscode.toString());
-
-		switch (code) {
-		case 401:
-			Toast.makeText(this, "Usuário ou senha inválido",
-					Toast.LENGTH_SHORT).show();
-
-			break;
-		case 0:
-			Toast.makeText(this, "Erro de Conexão", Toast.LENGTH_SHORT).show();
-			break;
-		case 699:
-			Toast.makeText(this, "Tempo limite de conexão atingido",
-					Toast.LENGTH_SHORT).show();
-			break;
-		case 400:
-			Toast.makeText(this, "Erro desconhecido", Toast.LENGTH_SHORT)
-					.show();
-			break;
-		case 500:
-			Toast.makeText(this, "Servidor indisponível", Toast.LENGTH_SHORT)
-					.show();
-			break;
-		case 404:
-			Toast.makeText(this, "Endereço não encontrado", Toast.LENGTH_SHORT)
-					.show();
-			break;
-		default:
-			Toast.makeText(this, "Erro desconhecido", Toast.LENGTH_SHORT)
-					.show();
-
-		}
+		Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
 
 	}
 
 	@Background
-	void getToken()  {
+	void getToken() {
 
 		boolean continuar = true;
 
 		try {
-			
+
 			response_post = solarManager.doLogin(user);
-			
-			
-			response_post = solarManager.getsolarClient().doLogin(userMessage);
+
 		} catch (HttpClientErrorException e) {
 
 			Log.i("ERRO", e.getStatusCode().toString());
 
 			continuar = false;
 			dialog.dismiss();
-			alerta(e.getStatusCode());
+			solarManager.errorHandler(e.getStatusCode());
 
-		}catch(ResourceAccessException e){
-			
+		} catch (ResourceAccessException e) {
+
 			continuar = false;
 			dialog.dismiss();
-		    AlertaTimeout("Tempo limite de conexão atingido");
-			
+
+			AlertaTimeout("Tempo limite de conexão atingido");
+
 		}
-		
-		
 
 		Log.i("MENSSAGEM", "PODE SIM");
 
@@ -198,7 +143,7 @@ public class LoginActivity extends Activity {
 
 				startActivity(intent);
 				finish();
-				
+
 			}
 		}
 	}
