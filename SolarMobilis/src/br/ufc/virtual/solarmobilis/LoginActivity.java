@@ -1,9 +1,14 @@
 package br.ufc.virtual.solarmobilis;
 
+
+
+import java.net.SocketTimeoutException;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.ResourceAccessException;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -32,14 +37,18 @@ public class LoginActivity extends Activity {
 	@Pref
 	SolarMobilisPreferences_ preferences;
 
+	@RestService
+	SolarClient solarClient;	
+	
 	Object response_post;
 	public JSONObject jsonobject;
 	public UserMessage userMessage = new UserMessage();
 	public User user = new User();
 	private ProgressDialog dialog;
-
-	@RestService
-	SolarClient solarClient;
+    SolarManager solarmanager;
+	
+//	@RestService
+//	SolarClient solarClient;
 
 	@ViewById(R.id.editTextUser)
 	EditText field_login;
@@ -66,7 +75,9 @@ public class LoginActivity extends Activity {
 			dialog = ProgressDialog.show(this, "Aguarde", "Recebendo resposta",
 					true);
 
-			getToken();
+		
+				getToken();
+			
 
 		} else {
 			Toast.makeText(this, "Nenum dos campos pode estar vázio",
@@ -75,9 +86,23 @@ public class LoginActivity extends Activity {
 		}
 	}
 
+	
+	
+	@UiThread
+	void AlertaTimeout(String message){
+		
+		Toast.makeText(this,message , Toast.LENGTH_SHORT).show();
+		
+	}
+	
+	
 	@UiThread
 	void alerta(HttpStatus statuscode) {
 
+		
+		
+		
+		
 		int code = Integer.parseInt(statuscode.toString());
 
 		switch (code) {
@@ -114,12 +139,16 @@ public class LoginActivity extends Activity {
 	}
 
 	@Background
-	void getToken() {
+	void getToken()  {
 
 		boolean continuar = true;
 
 		try {
-			response_post = solarClient.doLogin(userMessage);
+			
+			response_post = solarManager.doLogin(user);
+			
+			
+			response_post = solarManager.getsolarClient().doLogin(userMessage);
 		} catch (HttpClientErrorException e) {
 
 			Log.i("ERRO", e.getStatusCode().toString());
@@ -128,7 +157,15 @@ public class LoginActivity extends Activity {
 			dialog.dismiss();
 			alerta(e.getStatusCode());
 
+		}catch(ResourceAccessException e){
+			
+			continuar = false;
+			dialog.dismiss();
+		    AlertaTimeout("Tempo limite de conexão atingido");
+			
 		}
+		
+		
 
 		Log.i("MENSSAGEM", "PODE SIM");
 
