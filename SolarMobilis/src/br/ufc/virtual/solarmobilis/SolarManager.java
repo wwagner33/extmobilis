@@ -1,5 +1,7 @@
 package br.ufc.virtual.solarmobilis;
 
+import java.net.SocketTimeoutException;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
@@ -30,13 +32,13 @@ public class SolarManager {
 
 	
 	
-	public void  doLogin(User user){
+	public Object  doLogin(User user)/*throws SocketTimeoutException*/{
 		
 		UserMessage userMessage = new UserMessage();
 		
 		userMessage.setUser(user);
 		
-		solarClient.doLogin(userMessage);
+		return solarClient.doLogin(userMessage);
 		
 	}
 	
