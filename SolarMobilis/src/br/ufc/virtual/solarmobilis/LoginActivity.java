@@ -73,16 +73,16 @@ public class LoginActivity extends Activity {
 			getToken();
 
 		} else {
-			Toast.makeText(this, R.string.EMPTY_FIELD, Toast.LENGTH_SHORT)
-					.show();
+			Toast.makeText(this, "Nenum dos campos pode estar vázio",
+					Toast.LENGTH_SHORT).show();
 
 		}
 	}
 
 	@UiThread
-	void AlertaTimeout() {
+	void AlertaTimeout(String message) {
 
-		Toast.makeText(this, R.string.ERROR_TIMEOUT, Toast.LENGTH_SHORT).show();
+		Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
 
 	}
 
@@ -108,7 +108,7 @@ public class LoginActivity extends Activity {
 			continuar = false;
 			dialog.dismiss();
 
-			AlertaTimeout();
+			AlertaTimeout("Tempo limite de conexão atingido");
 
 		}
 

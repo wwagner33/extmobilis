@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import br.ufc.virtual.model.CurriculumUnitList;
 
 import com.googlecode.androidannotations.annotations.Background;
 import com.googlecode.androidannotations.annotations.EActivity;
@@ -22,7 +23,7 @@ public class CourseListActivity extends Activity {
 	@RestService
 	SolarClient solarClient;
 
-	Object response;
+	CurriculumUnitList response;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -43,10 +44,10 @@ public class CourseListActivity extends Activity {
 
 		Log.i("TOKEN_DISCIPLINAS, TURMAS", preferences.token().get().toString());
 
-		response = solarClient.getDisciplinas(preferences.token().get()
+		response = solarClient.getDiscipinas(preferences.token().get()
 				.toString());
 
-		Log.i("RESPOSNSE_CURSO", response.toString());
+		Log.i("LISTA", response.getList().get(0).getName());
 
 	}
 
