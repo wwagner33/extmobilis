@@ -13,6 +13,8 @@ import android.util.Log;
 import android.view.Window;
 import android.widget.EditText;
 import android.widget.Toast;
+import br.ufc.virtual.solarmobilis.model.User;
+import br.ufc.virtual.solarmobilis.model.UserMessage;
 
 import com.googlecode.androidannotations.annotations.Background;
 import com.googlecode.androidannotations.annotations.Bean;

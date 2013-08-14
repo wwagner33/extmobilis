@@ -6,7 +6,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import br.ufc.virtual.model.CurriculumUnitList;
+import br.ufc.virtual.solarmobilis.model.CurriculumUnitList;
 
 import com.googlecode.androidannotations.annotations.Background;
 import com.googlecode.androidannotations.annotations.Bean;

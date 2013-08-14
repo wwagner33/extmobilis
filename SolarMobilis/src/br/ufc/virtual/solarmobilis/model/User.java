@@ -1,4 +1,4 @@
-package br.ufc.virtual.solarmobilis;
+package br.ufc.virtual.solarmobilis.model;
 
 public class User {
 

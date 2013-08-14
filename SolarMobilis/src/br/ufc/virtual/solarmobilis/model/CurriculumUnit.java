@@ -1,4 +1,4 @@
-package br.ufc.virtual.model;
+package br.ufc.virtual.solarmobilis.model;
 
 public class CurriculumUnit {
 

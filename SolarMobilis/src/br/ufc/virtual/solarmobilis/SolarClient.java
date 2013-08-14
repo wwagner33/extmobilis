@@ -3,7 +3,8 @@ package br.ufc.virtual.solarmobilis;
 import org.springframework.http.converter.json.GsonHttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
-import br.ufc.virtual.model.CurriculumUnitList;
+import br.ufc.virtual.solarmobilis.model.CurriculumUnitList;
+import br.ufc.virtual.solarmobilis.model.UserMessage;
 
 import com.googlecode.androidannotations.annotations.rest.Get;
 import com.googlecode.androidannotations.annotations.rest.Post;

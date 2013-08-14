@@ -7,7 +7,9 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
 
 import android.app.Activity;
 import android.widget.Toast;
-import br.ufc.virtual.model.CurriculumUnitList;
+import br.ufc.virtual.solarmobilis.model.CurriculumUnitList;
+import br.ufc.virtual.solarmobilis.model.User;
+import br.ufc.virtual.solarmobilis.model.UserMessage;
 
 import com.googlecode.androidannotations.annotations.AfterInject;
 import com.googlecode.androidannotations.annotations.EBean;
