@@ -44,26 +44,19 @@ public class CourseListActivity extends Activity {
 
 	@Background
 	void getCurriculumUnits() {
-
 		Log.i("TOKEN_DISCIPLINAS, TURMAS", preferences.token().get().toString());
 
 		try {
 			response = solarManager.getCurriculumUnits(preferences.token()
 					.get().toString());
-
 			listaDeCursos();
-
 		} catch (ResourceAccessException e) {
-
 			solarManager.alertTimeout();
 		}
-
 	}
 
 	public void listaDeCursos() {
-
 		Log.i("LISTA", response.getCurriculumuUnits().get(0).getName());
-
 	}
 
 }

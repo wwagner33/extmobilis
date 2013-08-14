@@ -20,17 +20,14 @@ public class GatewayActivity extends Activity {
 
 		if (preferences.token().get().length() == 0) {
 			Intent intent = new Intent(this, LoginActivity_.class);
-
 			startActivity(intent);
 			finish();
-
 		} else {
 			Intent intent = new Intent(this, CourseListActivity_.class);
 			Log.i("Estado", "Preenchido - Curso");
 			startActivity(intent);
 			finish();
 		}
-
 	}
 
 }

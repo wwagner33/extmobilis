@@ -7,15 +7,12 @@ public class CurriculumUnit {
 	private String code;
 
 	public CurriculumUnit() {
-
 	}
 
 	public CurriculumUnit(String name, int id, String code) {
-
 		this.name = name;
 		this.id = id;
 		this.code = code;
-
 	}
 
 	public String getName() {

@@ -7,15 +7,13 @@ public class Group {
 	private String semester;
 
 	public Group() {
-
 	};
 
 	public Group(int id, String code, String semester) {
-
+		super();
 		this.id = id;
 		this.code = code;
 		this.semester = semester;
-
 	}
 
 	public int getId() {

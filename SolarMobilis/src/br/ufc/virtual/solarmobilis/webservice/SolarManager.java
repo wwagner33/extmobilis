@@ -33,24 +33,14 @@ public class SolarManager {
 	}
 
 	public Object doLogin(User user) {
-
 		UserMessage userMessage = new UserMessage();
-
 		userMessage.setUser(user);
-
 		return solarClient.doLogin(userMessage);
+	}
 
-	}
-	
-	public CurriculumUnitList getCurriculumUnits(String token){
-		
-		
+	public CurriculumUnitList getCurriculumUnits(String token) {
 		return solarClient.getCurriculumUnits(token);
-		
 	}
-	
-	
-	
 
 	private void setTimeout() {
 		ClientHttpRequestFactory requestFactory = solarClient.getRestTemplate()
@@ -65,7 +55,6 @@ public class SolarManager {
 					.setReadTimeout(10 * 1000);
 			((HttpComponentsClientHttpRequestFactory) requestFactory)
 					.setConnectTimeout(10 * 1000);
-
 		}
 	}
 
@@ -78,13 +67,11 @@ public class SolarManager {
 		case 401:
 			Toast.makeText(rootActivity, R.string.ERROR_AUTHENTICATION,
 					Toast.LENGTH_SHORT).show();
-
 			break;
 		case 0:
 			Toast.makeText(rootActivity, R.string.ERROR_CONECTION,
 					Toast.LENGTH_SHORT).show();
 			break;
-
 		case 400:
 			Toast.makeText(rootActivity, R.string.ERROR_UNKNOWN,
 					Toast.LENGTH_SHORT).show();
@@ -100,20 +87,16 @@ public class SolarManager {
 		default:
 			Toast.makeText(rootActivity, R.string.ERROR_UNKNOWN,
 					Toast.LENGTH_SHORT).show();
-
 		}
-
 	}
-	
+
 	@UiThread
 	public void alertTimeout() {
-
-		 Toast.makeText(rootActivity, R.string.ERROR_TIMEOUT, Toast.LENGTH_SHORT).show();
-
+		Toast.makeText(rootActivity, R.string.ERROR_TIMEOUT, Toast.LENGTH_SHORT)
+				.show();
 	}
 
 	public SolarClient getsolarClient() {
-		// TODO Auto-generated method stub
 		return solarClient;
 	}
 

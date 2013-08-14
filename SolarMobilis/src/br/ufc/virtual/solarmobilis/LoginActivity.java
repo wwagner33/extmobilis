@@ -45,9 +45,6 @@ public class LoginActivity extends Activity {
 	private ProgressDialog dialog;
 	SolarManager solarmanager;
 
-	// @RestService
-	// SolarClient solarClient;
-
 	@ViewById(R.id.editTextUser)
 	EditText field_login;
 
@@ -58,7 +55,6 @@ public class LoginActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
-
 	}
 
 	@Click(R.id.submit)
@@ -76,48 +72,35 @@ public class LoginActivity extends Activity {
 			getToken();
 
 		} else {
-			Toast.makeText(this, R.string.EMPTY_FIELD,
-					Toast.LENGTH_SHORT).show();
-
+			Toast.makeText(this, R.string.EMPTY_FIELD, Toast.LENGTH_SHORT)
+					.show();
 		}
 	}
 
 	@Background
 	void getToken() {
-
 		try {
-
 			response_post = solarManager.doLogin(user);
-			
 			saveToken();
-
 		} catch (HttpClientErrorException e) {
-
 			Log.i("ERRO", e.getStatusCode().toString());
-
 			dialog.dismiss();
 			solarManager.errorHandler(e.getStatusCode());
 
 		} catch (ResourceAccessException e) {
-
 			dialog.dismiss();
-
 			solarManager.alertTimeout();
-
 		}
 
 		Log.i("MENSSAGEM", "PODE SIM");
-
 	}
 
 	public void saveToken() {
-
 		Log.i("resposta", response_post.toString());
 
 		try {
 			jsonobject = new JSONObject(response_post.toString());
 		} catch (JSONException e) {
-
 			e.printStackTrace();
 		}
 
@@ -139,9 +122,7 @@ public class LoginActivity extends Activity {
 
 			startActivity(intent);
 			finish();
-
 		}
-
 	}
 
 }

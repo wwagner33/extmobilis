@@ -5,13 +5,13 @@ public class User {
 	private String password = null;
 	private String login = null;
 
+	public User() {
+	}
+
 	public User(String password, String login) {
 		super();
 		this.password = password;
 		this.login = login;
-	}
-
-	public User() {
 	}
 
 	public String getPassword() {
