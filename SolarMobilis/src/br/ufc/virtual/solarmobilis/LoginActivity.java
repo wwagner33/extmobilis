@@ -73,7 +73,7 @@ public class LoginActivity extends Activity {
 			getToken();
 
 		} else {
-			Toast.makeText(this, "Nenum dos campos pode estar vázio",
+			Toast.makeText(this, R.string.EMPTY_FIELD,
 					Toast.LENGTH_SHORT).show();
 
 		}
@@ -82,23 +82,21 @@ public class LoginActivity extends Activity {
 	@Background
 	void getToken() {
 
-		boolean continuar = true;
-
 		try {
 
 			response_post = solarManager.doLogin(user);
+			
+			saveToken();
 
 		} catch (HttpClientErrorException e) {
 
 			Log.i("ERRO", e.getStatusCode().toString());
 
-			continuar = false;
 			dialog.dismiss();
 			solarManager.errorHandler(e.getStatusCode());
 
 		} catch (ResourceAccessException e) {
 
-			continuar = false;
 			dialog.dismiss();
 
 			solarManager.alertTimeout();
@@ -107,38 +105,40 @@ public class LoginActivity extends Activity {
 
 		Log.i("MENSSAGEM", "PODE SIM");
 
-		if (continuar == true) {
+	}
 
-			Log.i("resposta", response_post.toString());
+	public void saveToken() {
 
-			try {
-				jsonobject = new JSONObject(response_post.toString());
-			} catch (JSONException e) {
+		Log.i("resposta", response_post.toString());
 
-				e.printStackTrace();
-			}
+		try {
+			jsonobject = new JSONObject(response_post.toString());
+		} catch (JSONException e) {
 
-			try {
-				preferences.token().put(
-						jsonobject.getJSONObject("session").getString(
-								"auth_token"));
-			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-			Log.i("Token_na_login", preferences.token().get().toString());
-
-			if (preferences.token().get().length() != 0) {
-				Intent intent = new Intent(this, CourseListActivity_.class);
-
-				dialog.dismiss();
-
-				startActivity(intent);
-				finish();
-
-			}
+			e.printStackTrace();
 		}
+
+		try {
+			preferences.token()
+					.put(jsonobject.getJSONObject("session").getString(
+							"auth_token"));
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		Log.i("Token_na_login", preferences.token().get().toString());
+
+		if (preferences.token().get().length() != 0) {
+			Intent intent = new Intent(this, CourseListActivity_.class);
+
+			dialog.dismiss();
+
+			startActivity(intent);
+			finish();
+
+		}
+
 	}
 
 }
