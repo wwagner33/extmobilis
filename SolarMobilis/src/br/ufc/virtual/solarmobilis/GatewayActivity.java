@@ -23,7 +23,7 @@ public class GatewayActivity extends Activity {
 			startActivity(intent);
 			finish();
 		} else {
-			Intent intent = new Intent(this, CourseListActivity_.class);
+			Intent intent = new Intent(this, CurriculumUnitsListActivity_.class);
 			Log.i("Estado", "Preenchido - Curso");
 			startActivity(intent);
 			finish();

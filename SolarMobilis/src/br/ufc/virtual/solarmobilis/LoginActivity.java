@@ -116,7 +116,7 @@ public class LoginActivity extends Activity {
 		Log.i("Token_na_login", preferences.token().get().toString());
 
 		if (preferences.token().get().length() != 0) {
-			Intent intent = new Intent(this, CourseListActivity_.class);
+			Intent intent = new Intent(this, CurriculumUnitsListActivity_.class);
 
 			dialog.dismiss();
 

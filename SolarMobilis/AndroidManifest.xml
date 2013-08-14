@@ -31,8 +31,8 @@
             android:label="@string/app_name" >
         </activity>
         <activity
-            android:name="br.ufc.virtual.solarmobilis.CourseListActivity_"
-            android:label="@string/title_activity_course_list" >
+            android:name="br.ufc.virtual.solarmobilis.CurriculumUnitsListActivity_"
+            android:label="@string/title_activity_curriculum_units_list" >
         </activity>
     </application>
 

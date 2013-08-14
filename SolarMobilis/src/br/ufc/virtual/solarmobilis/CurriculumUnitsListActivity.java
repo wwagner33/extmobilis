@@ -17,8 +17,8 @@ import com.googlecode.androidannotations.annotations.OptionsMenu;
 import com.googlecode.androidannotations.annotations.sharedpreferences.Pref;
 
 @OptionsMenu(R.menu.course_list)
-@EActivity(R.layout.activity_course_list)
-public class CourseListActivity extends Activity {
+@EActivity(R.layout.activity_curriculum_units_list)
+public class CurriculumUnitsListActivity extends Activity {
 
 	@Pref
 	SolarMobilisPreferences_ preferences;
