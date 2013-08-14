@@ -7,6 +7,7 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
 
 import android.app.Activity;
 import android.widget.Toast;
+import br.ufc.virtual.model.CurriculumUnitList;
 
 import com.googlecode.androidannotations.annotations.AfterInject;
 import com.googlecode.androidannotations.annotations.EBean;
@@ -37,6 +38,16 @@ public class SolarManager {
 		return solarClient.doLogin(userMessage);
 
 	}
+	
+	public CurriculumUnitList getCurriculumUnits(String token){
+		
+		
+		return solarClient.getCurriculumUnits(token);
+		
+	}
+	
+	
+	
 
 	private void setTimeout() {
 		ClientHttpRequestFactory requestFactory = solarClient.getRestTemplate()
@@ -88,6 +99,13 @@ public class SolarManager {
 					Toast.LENGTH_SHORT).show();
 
 		}
+
+	}
+	
+	@UiThread
+	void alertTimeout() {
+
+		 Toast.makeText(rootActivity, R.string.ERROR_TIMEOUT, Toast.LENGTH_SHORT).show();
 
 	}
 

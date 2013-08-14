@@ -2,16 +2,19 @@ package br.ufc.virtual.model;
 
 import java.util.List;
 
+import com.google.gson.annotations.SerializedName;
+
 public class CurriculumUnitList {
 
-	private List<CurriculumUnit> curriculum_units;
+	@SerializedName("curriculum_units")
+	private List<CurriculumUnit> curriculumuUnits;
 
-	public List<CurriculumUnit> getList() {
-		return curriculum_units;
+	public List<CurriculumUnit> getCurriculumuUnits() {
+		return curriculumuUnits;
 	}
 
-	public void setList(List<CurriculumUnit> list) {
-		this.curriculum_units = curriculum_units;
+	public void setCurriculumuUnits(List<CurriculumUnit> curriculumuUnits) {
+		this.curriculumuUnits = curriculumuUnits;
 	}
-	
+
 }

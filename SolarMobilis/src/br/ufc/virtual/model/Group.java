@@ -2,7 +2,7 @@ package br.ufc.virtual.model;
 
 public class Group {
 
-	private String id;
+	private int id;
 	private String code;
 	private String semester;
 
@@ -10,7 +10,7 @@ public class Group {
 
 	};
 
-	public Group(String id, String code, String semester) {
+	public Group(int id, String code, String semester) {
 
 		this.id = id;
 		this.code = code;
@@ -18,11 +18,11 @@ public class Group {
 
 	}
 
-	public String getId() {
+	public int getId() {
 		return id;
 	}
 
-	public void setId(String id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 

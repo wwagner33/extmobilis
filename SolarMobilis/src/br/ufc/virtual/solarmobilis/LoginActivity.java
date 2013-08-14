@@ -79,13 +79,6 @@ public class LoginActivity extends Activity {
 		}
 	}
 
-	@UiThread
-	void AlertaTimeout(String message) {
-
-		Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-
-	}
-
 	@Background
 	void getToken() {
 
@@ -108,7 +101,7 @@ public class LoginActivity extends Activity {
 			continuar = false;
 			dialog.dismiss();
 
-			AlertaTimeout("Tempo limite de conexão atingido");
+			solarManager.alertTimeout();
 
 		}
 

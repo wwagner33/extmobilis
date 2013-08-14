@@ -1,5 +1,7 @@
 package br.ufc.virtual.solarmobilis;
 
+import org.springframework.web.client.ResourceAccessException;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -7,6 +9,7 @@ import android.util.Log;
 import br.ufc.virtual.model.CurriculumUnitList;
 
 import com.googlecode.androidannotations.annotations.Background;
+import com.googlecode.androidannotations.annotations.Bean;
 import com.googlecode.androidannotations.annotations.EActivity;
 import com.googlecode.androidannotations.annotations.OptionsItem;
 import com.googlecode.androidannotations.annotations.OptionsMenu;
@@ -20,8 +23,8 @@ public class CourseListActivity extends Activity {
 	@Pref
 	SolarMobilisPreferences_ preferences;
 
-	@RestService
-	SolarClient solarClient;
+	@Bean
+	SolarManager solarManager;
 
 	CurriculumUnitList response;
 
@@ -44,10 +47,15 @@ public class CourseListActivity extends Activity {
 
 		Log.i("TOKEN_DISCIPLINAS, TURMAS", preferences.token().get().toString());
 
-		response = solarClient.getDiscipinas(preferences.token().get()
-				.toString());
+		try {
+			response = solarManager.getCurriculumUnits(preferences.token()
+					.get().toString());
+		} catch (ResourceAccessException e) {
 
-		Log.i("LISTA", response.getList().get(0).getName());
+			solarManager.alertTimeout();
+		}
+
+		Log.i("LISTA", response.getCurriculumuUnits().get(0).getName());
 
 	}
 

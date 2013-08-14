@@ -16,10 +16,10 @@ public interface SolarClient {
 	Object doLogin(UserMessage user);
 
 	@Get("curriculum_units/mobilis_list.json?auth_token={token}")
-	CurriculumUnitList getDiscipinas(String token);
+	CurriculumUnitList getCurriculumUnits(String token);
 
 	@Get("curriculum_units/1/groups.json?auth_token={token}")
-	Object getTurmas(String token);
+	Object getGroups(String token);
 
 	@Get("groups//discussions.json?auth_token={token}")
 	Object getDiscussions(String token);
