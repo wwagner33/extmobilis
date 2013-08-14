@@ -1,4 +1,4 @@
-package br.ufc.virtual.solarmobilis;
+package br.ufc.virtual.solarmobilis.webservice;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpRequestFactory;
@@ -7,6 +7,7 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
 
 import android.app.Activity;
 import android.widget.Toast;
+import br.ufc.virtual.solarmobilis.R;
 import br.ufc.virtual.solarmobilis.model.CurriculumUnitList;
 import br.ufc.virtual.solarmobilis.model.User;
 import br.ufc.virtual.solarmobilis.model.UserMessage;
@@ -105,7 +106,7 @@ public class SolarManager {
 	}
 	
 	@UiThread
-	void alertTimeout() {
+	public void alertTimeout() {
 
 		 Toast.makeText(rootActivity, R.string.ERROR_TIMEOUT, Toast.LENGTH_SHORT).show();
 

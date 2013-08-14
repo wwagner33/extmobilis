@@ -1,4 +1,4 @@
-package br.ufc.virtual.solarmobilis;
+package br.ufc.virtual.solarmobilis.webservice;
 
 import org.springframework.http.converter.json.GsonHttpMessageConverter;
 import org.springframework.web.client.RestTemplate;

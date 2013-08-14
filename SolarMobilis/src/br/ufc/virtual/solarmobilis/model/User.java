@@ -4,7 +4,6 @@ public class User {
 
 	private String password = null;
 	private String login = null;
-	private String codigo = null;
 
 	public User(String password, String login) {
 		super();
@@ -29,6 +28,6 @@ public class User {
 
 	public void setLogin(String login) {
 		this.login = login;
-	} 
+	}
 
 }

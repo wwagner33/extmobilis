@@ -7,13 +7,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import br.ufc.virtual.solarmobilis.model.CurriculumUnitList;
+import br.ufc.virtual.solarmobilis.webservice.SolarManager;
 
 import com.googlecode.androidannotations.annotations.Background;
 import com.googlecode.androidannotations.annotations.Bean;
 import com.googlecode.androidannotations.annotations.EActivity;
 import com.googlecode.androidannotations.annotations.OptionsItem;
 import com.googlecode.androidannotations.annotations.OptionsMenu;
-import com.googlecode.androidannotations.annotations.rest.RestService;
 import com.googlecode.androidannotations.annotations.sharedpreferences.Pref;
 
 @OptionsMenu(R.menu.course_list)
