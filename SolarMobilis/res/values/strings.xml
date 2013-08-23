@@ -12,6 +12,7 @@
     <string name="logo_description">Imagem logo do solar</string>
     <string name="iuvi_footer">Instituto Universidade Virtual - 2013</string>
     <string name="logout">Logout</string>
+    <string name="courses">Cursos disponiveis</string>
     
     <string name="ALERT_WAIT">Aguarde</string>
     <string name="ALERT_RESPONSE">Recebendo Resposta</string>
