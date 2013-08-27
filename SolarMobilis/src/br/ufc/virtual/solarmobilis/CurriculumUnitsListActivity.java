@@ -79,7 +79,7 @@ public class CurriculumUnitsListActivity extends Activity {
 		}
 
 		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-				R.layout.item_liste, R.id.item, courses);
+				R.layout.item_list, R.id.item, courses);
 		listView.setAdapter(adapter);
 
 	}
