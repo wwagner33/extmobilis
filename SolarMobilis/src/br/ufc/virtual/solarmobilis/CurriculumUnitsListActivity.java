@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import org.springframework.web.client.ResourceAccessException;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,6 +13,7 @@ import android.widget.Toast;
 import br.ufc.virtual.solarmobilis.model.CurriculumUnitList;
 import br.ufc.virtual.solarmobilis.webservice.SolarManager;
 
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.googlecode.androidannotations.annotations.Background;
 import com.googlecode.androidannotations.annotations.Bean;
 import com.googlecode.androidannotations.annotations.EActivity;
@@ -26,7 +26,7 @@ import com.googlecode.androidannotations.annotations.sharedpreferences.Pref;
 
 @OptionsMenu(R.menu.course_list)
 @EActivity
-public class CurriculumUnitsListActivity extends Activity {
+public class CurriculumUnitsListActivity extends SherlockFragmentActivity {
 
 	@Pref
 	SolarMobilisPreferences_ preferences;
@@ -49,7 +49,7 @@ public class CurriculumUnitsListActivity extends Activity {
 		getCurriculumUnits();
 	}
 
-	@OptionsItem(R.id.logout)
+	@OptionsItem(R.id.menu_logout)
 	void logout() {
 		preferences.token().put(null);
 		Intent intent = new Intent(this, LoginActivity_.class);
