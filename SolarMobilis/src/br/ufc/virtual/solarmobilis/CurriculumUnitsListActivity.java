@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.springframework.web.client.ResourceAccessException;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -40,11 +41,15 @@ public class CurriculumUnitsListActivity extends SherlockFragmentActivity {
 	ListView listView;
 
 	ArrayList<String> courses = new ArrayList<String>();
+	private ProgressDialog dialog;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_curriculum_units_list);
+
+		dialog = ProgressDialog.show(this, "Aguarde", "Recebendo resposta",
+				true);
 
 		getCurriculumUnits();
 	}
@@ -72,7 +77,7 @@ public class CurriculumUnitsListActivity extends SherlockFragmentActivity {
 
 	@UiThread
 	void updateList() {
-		Log.i("LISTA", response.getCurriculumuUnits().get(0).getName());
+		dialog.dismiss();
 
 		for (int i = 0; i < response.getCurriculumuUnits().size(); i++) {
 			courses.add(response.getCurriculumuUnits().get(i).getName());
