@@ -4,7 +4,7 @@ import android.os.Environment;
 
 public class Constants {
 
-	public static final String URL_SERVER = "http://apolo11.virtual.ufc.br/";
+	public static final String URL_SERVER = "http://apolo11teste.virtual.ufc.br/";
 	public static final String URL_TOKEN = "sessions";
 	public static final String URL_COURSES = "curriculum_units/list.json";
 	public static final String URL_GROUPS_PREFIX = "groups/";

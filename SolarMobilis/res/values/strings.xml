@@ -12,10 +12,9 @@
     <string name="logo_description">Imagem logo do solar</string>
     <string name="iuvi_footer">Instituto Universidade Virtual - 2013</string>
     <string name="logout">Logout</string>
-    <string name="courses">Cursos disponiveis</string>
+    <string name="courses_title">Cursos disponiveis</string>
     <string name="refresh">Atualizar</string>
     <string name="config">Configurações</string>
-    
     <string name="ALERT_WAIT">Aguarde</string>
     <string name="ALERT_RESPONSE">Recebendo Resposta</string>
     <string name="EMPTY_FIELD">Nenhum campo pode estar vázio</string>
@@ -23,7 +22,9 @@
     <string name="ERROR_CONECTION">Erro de conexão</string>
     <string name="ERROR_TIMEOUT">Tempo limite de conexão atingido</string>
     <string name="ERROR_UNKNOWN">Erro desconhecido</string>
-    <string name="ERROR_SERVER">Servidor indisponível</string> 
+    <string name="ERROR_SERVER">Servidor indisponível</string>
     <string name="ERROR_ADDRESS">Endereço não encontrado</string>
+    <string name="title_activity_groups_list">Turmas</string>
+    <string name="groups_title">Turmas disponiveis</string>
 
 </resources>

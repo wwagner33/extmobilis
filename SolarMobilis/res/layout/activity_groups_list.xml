@@ -2,8 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:orientation="vertical"
-    android:background="@android:color/white" >
+    android:background="@android:color/white"
+    android:orientation="vertical" >
 
     <RelativeLayout
         android:id="@+id/content"
@@ -16,7 +16,7 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginLeft="15dp"
-            android:text="@string/courses_title"
+            android:text="@string/groups_title"
             android:textStyle="bold" />
     </RelativeLayout>
 
@@ -27,6 +27,18 @@
         android:layout_alignParentBottom="true"
         android:background="@color/yellow_hightlight"
         android:orientation="vertical" />
+
+    <ListView
+        android:id="@+id/listView1"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_above="@id/highlight_bar"
+        android:layout_below="@id/content"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:divider="@null"
+        android:dividerHeight="4dp"
+        android:drawSelectorOnTop="false" />
 
     <ListView
         android:id="@+id/listView"

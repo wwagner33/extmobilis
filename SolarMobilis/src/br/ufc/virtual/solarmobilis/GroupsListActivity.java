@@ -10,15 +10,13 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
-import br.ufc.virtual.solarmobilis.model.CurriculumUnitList;
+import br.ufc.virtual.solarmobilis.model.GroupList;
 import br.ufc.virtual.solarmobilis.webservice.SolarManager;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.googlecode.androidannotations.annotations.Background;
 import com.googlecode.androidannotations.annotations.Bean;
 import com.googlecode.androidannotations.annotations.EActivity;
-import com.googlecode.androidannotations.annotations.ItemClick;
 import com.googlecode.androidannotations.annotations.OptionsItem;
 import com.googlecode.androidannotations.annotations.OptionsMenu;
 import com.googlecode.androidannotations.annotations.UiThread;
@@ -27,7 +25,7 @@ import com.googlecode.androidannotations.annotations.sharedpreferences.Pref;
 
 @OptionsMenu(R.menu.course_list)
 @EActivity
-public class CurriculumUnitsListActivity extends SherlockFragmentActivity {
+public class GroupsListActivity extends SherlockFragmentActivity {
 
 	@Pref
 	SolarMobilisPreferences_ preferences;
@@ -35,23 +33,23 @@ public class CurriculumUnitsListActivity extends SherlockFragmentActivity {
 	@Bean
 	SolarManager solarManager;
 
-	CurriculumUnitList response;
+	GroupList response;
 
 	@ViewById
-	ListView listView;
+	ListView listView1;
 
-	ArrayList<String> courses = new ArrayList<String>();
+	ArrayList<String> groups = new ArrayList<String>();
 	private ProgressDialog dialog;
 
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
+	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_curriculum_units_list);
-
+		setContentView(R.layout.activity_groups_list);
 		dialog = ProgressDialog.show(this, "Aguarde", "Recebendo resposta",
 				true);
 
-		getCurriculumUnits();
+		getGroups();
+
 	}
 
 	@OptionsItem(R.id.menu_logout)
@@ -63,45 +61,32 @@ public class CurriculumUnitsListActivity extends SherlockFragmentActivity {
 	}
 
 	@Background
-	void getCurriculumUnits() {
-		Log.i("TOKEN_DISCIPLINAS, TURMAS", preferences.token().get().toString());
+	void getGroups() {
+
+		Log.i("TOKEN TURMAS", preferences.token().get().toString());
 
 		try {
-			response = solarManager.getCurriculumUnits(preferences.token()
-					.get().toString());
+			response = solarManager.getGroups(preferences.token().get()
+					.toString(), preferences.curriculumUnitSelected().get());
 			updateList();
 		} catch (ResourceAccessException e) {
 			solarManager.alertTimeout();
 		}
+		Log.i("GROUPSLIST", response.getGroups().get(0).getCode());
 	}
 
 	@UiThread
 	void updateList() {
 		dialog.dismiss();
 
-		for (int i = 0; i < response.getCurriculumuUnits().size(); i++) {
-			courses.add(response.getCurriculumuUnits().get(i).getName());
+		for (int i = 0; i < response.getGroups().size(); i++) {
+			groups.add(response.getGroups().get(i).getCode());
 		}
 
 		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-				R.layout.item_list, R.id.item, courses);
-		listView.setAdapter(adapter);
+				R.layout.item_list, R.id.item, groups);
+		listView1.setAdapter(adapter);
 
-	}
-
-	@ItemClick
-	void listView(int items) {
-		Toast.makeText(
-				this,
-				"clicado: "
-						+ response.getCurriculumuUnits().get(items).getName(),
-				Toast.LENGTH_SHORT).show();
-
-		preferences.curriculumUnitSelected().put(
-				response.getCurriculumuUnits().get(items).getid());
-
-		Intent intent = new Intent(this, GroupsListActivity_.class);
-		startActivity(intent);
 	}
 
 }

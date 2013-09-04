@@ -9,6 +9,7 @@ import android.app.Activity;
 import android.widget.Toast;
 import br.ufc.virtual.solarmobilis.R;
 import br.ufc.virtual.solarmobilis.model.CurriculumUnitList;
+import br.ufc.virtual.solarmobilis.model.GroupList;
 import br.ufc.virtual.solarmobilis.model.User;
 import br.ufc.virtual.solarmobilis.model.UserMessage;
 
@@ -40,6 +41,10 @@ public class SolarManager {
 
 	public CurriculumUnitList getCurriculumUnits(String token) {
 		return solarClient.getCurriculumUnits(token);
+	}
+
+	public GroupList getGroups(String token, int id) {
+		return solarClient.getGroups(token, id);
 	}
 
 	private void setTimeout() {
