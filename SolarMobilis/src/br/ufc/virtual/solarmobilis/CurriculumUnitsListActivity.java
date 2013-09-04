@@ -62,6 +62,14 @@ public class CurriculumUnitsListActivity extends SherlockFragmentActivity {
 		finish();
 	}
 
+	@OptionsItem(R.id.menu_refresh)
+	void refresh() {
+		dialog = ProgressDialog.show(this, "Aguarde", "Recebendo resposta",
+				true);
+		courses.clear();
+		getCurriculumUnits();
+	}
+
 	@Background
 	void getCurriculumUnits() {
 		Log.i("TOKEN_DISCIPLINAS, TURMAS", preferences.token().get().toString());

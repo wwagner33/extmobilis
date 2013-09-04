@@ -60,6 +60,14 @@ public class GroupsListActivity extends SherlockFragmentActivity {
 		finish();
 	}
 
+	@OptionsItem(R.id.menu_refresh)
+	void refresh() {
+		dialog = ProgressDialog.show(this, "Aguarde", "Recebendo resposta",
+				true);
+		groups.clear();
+		getGroups();
+	}
+
 	@Background
 	void getGroups() {
 
