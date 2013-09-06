@@ -25,7 +25,7 @@ import com.googlecode.androidannotations.annotations.UiThread;
 import com.googlecode.androidannotations.annotations.ViewById;
 import com.googlecode.androidannotations.annotations.sharedpreferences.Pref;
 
-@OptionsMenu(R.menu.course_list)
+@OptionsMenu(R.menu.options_menu)
 @EActivity
 public class CurriculumUnitsListActivity extends SherlockFragmentActivity {
 
@@ -38,7 +38,7 @@ public class CurriculumUnitsListActivity extends SherlockFragmentActivity {
 	CurriculumUnitList response;
 
 	@ViewById
-	ListView listView;
+	ListView listViewCurriculumUnits;
 
 	ArrayList<String> courses = new ArrayList<String>();
 	private ProgressDialog dialog;
@@ -93,20 +93,20 @@ public class CurriculumUnitsListActivity extends SherlockFragmentActivity {
 
 		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
 				R.layout.item_list, R.id.item, courses);
-		listView.setAdapter(adapter);
+		listViewCurriculumUnits.setAdapter(adapter);
 
 	}
 
 	@ItemClick
-	void listView(int items) {
+	void listViewCurriculumUnits(int position) {
 		Toast.makeText(
 				this,
 				"clicado: "
-						+ response.getCurriculumuUnits().get(items).getName(),
-				Toast.LENGTH_SHORT).show();
+						+ response.getCurriculumuUnits().get(position)
+								.getName(), Toast.LENGTH_SHORT).show();
 
 		preferences.curriculumUnitSelected().put(
-				response.getCurriculumuUnits().get(items).getid());
+				response.getCurriculumuUnits().get(position).getid());
 
 		Intent intent = new Intent(this, GroupsListActivity_.class);
 		startActivity(intent);

@@ -29,19 +29,7 @@
         android:orientation="vertical" />
 
     <ListView
-        android:id="@+id/listView1"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_above="@id/highlight_bar"
-        android:layout_below="@id/content"
-        android:layout_marginLeft="15dp"
-        android:layout_marginRight="15dp"
-        android:divider="@null"
-        android:dividerHeight="4dp"
-        android:drawSelectorOnTop="false" />
-
-    <ListView
-        android:id="@+id/listView"
+        android:id="@+id/listViewGroups"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:layout_above="@id/highlight_bar"

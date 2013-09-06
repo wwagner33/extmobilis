@@ -39,6 +39,11 @@
             android:label="@string/title_activity_groups_list"
             android:theme="@style/Theme.Mobilis" >
         </activity>
+        <activity
+            android:name="br.ufc.virtual.solarmobilis.DiscussionListActivity_"
+            android:label="@string/title_activity_discussion_list" 
+            android:theme="@style/Theme.Mobilis" >
+        </activity>
     </application>
 
 </manifest>

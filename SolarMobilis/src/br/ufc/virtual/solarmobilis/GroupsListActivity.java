@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 import br.ufc.virtual.solarmobilis.model.GroupList;
 import br.ufc.virtual.solarmobilis.webservice.SolarManager;
 
@@ -17,13 +18,14 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.googlecode.androidannotations.annotations.Background;
 import com.googlecode.androidannotations.annotations.Bean;
 import com.googlecode.androidannotations.annotations.EActivity;
+import com.googlecode.androidannotations.annotations.ItemClick;
 import com.googlecode.androidannotations.annotations.OptionsItem;
 import com.googlecode.androidannotations.annotations.OptionsMenu;
 import com.googlecode.androidannotations.annotations.UiThread;
 import com.googlecode.androidannotations.annotations.ViewById;
 import com.googlecode.androidannotations.annotations.sharedpreferences.Pref;
 
-@OptionsMenu(R.menu.course_list)
+@OptionsMenu(R.menu.options_menu)
 @EActivity
 public class GroupsListActivity extends SherlockFragmentActivity {
 
@@ -36,7 +38,7 @@ public class GroupsListActivity extends SherlockFragmentActivity {
 	GroupList response;
 
 	@ViewById
-	ListView listView1;
+	ListView listViewGroups;
 
 	ArrayList<String> groups = new ArrayList<String>();
 	private ProgressDialog dialog;
@@ -93,8 +95,23 @@ public class GroupsListActivity extends SherlockFragmentActivity {
 
 		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
 				R.layout.item_list, R.id.item, groups);
-		listView1.setAdapter(adapter);
+		listViewGroups.setAdapter(adapter);
 
+	}
+
+	@ItemClick
+	void listViewGroups(int position) {
+
+		Toast.makeText(this,
+				"clicado: " + response.getGroups().get(position).getCode(),
+				Toast.LENGTH_SHORT).show();
+
+		preferences.groupSelected().put(
+				response.getGroups().get(position).getId());
+
+		Intent intent = new Intent(this, DiscussionListActivity_.class);
+		startActivity(intent);
+		
 	}
 
 }

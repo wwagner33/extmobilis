@@ -26,5 +26,8 @@
     <string name="ERROR_ADDRESS">Endereço não encontrado</string>
     <string name="title_activity_groups_list">Turmas</string>
     <string name="groups_title">Turmas disponiveis</string>
+    <string name="discussions_title">Fórums disponiveis</string>
+    <string name="title_activity_discussion_list">Fórums</string>
+    <string name="hello_world">Hello world!</string>
 
 </resources>

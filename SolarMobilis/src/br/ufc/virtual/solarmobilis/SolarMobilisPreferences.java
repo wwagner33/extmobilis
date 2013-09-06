@@ -7,7 +7,8 @@ import com.googlecode.androidannotations.annotations.sharedpreferences.SharedPre
 public interface SolarMobilisPreferences {
 
 	String token();
-	
+
 	int curriculumUnitSelected();
 
+	int groupSelected();
 }
