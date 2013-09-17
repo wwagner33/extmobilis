@@ -4,15 +4,14 @@ import java.util.List;
 
 public class DiscussionList {
 
-  private List<Discussion> discussions;
+	private List<Discussion> discussions;
 
-public List<Discussion> getDiscussions() {
-	return discussions;
-}
+	public List<Discussion> getDiscussions() {
+		return discussions;
+	}
 
-public void setDiscussions(List<Discussion> discussions) {
-	this.discussions = discussions;
-}
-	
+	public void setDiscussions(List<Discussion> discussions) {
+		this.discussions = discussions;
+	}
 
 }

@@ -8,8 +8,8 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import br.ufc.virtual.solarmobilis.model.DiscussionAdapter;
 import br.ufc.virtual.solarmobilis.model.DiscussionList;
 import br.ufc.virtual.solarmobilis.webservice.SolarManager;
 
@@ -17,6 +17,7 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.googlecode.androidannotations.annotations.Background;
 import com.googlecode.androidannotations.annotations.Bean;
 import com.googlecode.androidannotations.annotations.EActivity;
+import com.googlecode.androidannotations.annotations.ItemClick;
 import com.googlecode.androidannotations.annotations.OptionsItem;
 import com.googlecode.androidannotations.annotations.OptionsMenu;
 import com.googlecode.androidannotations.annotations.UiThread;
@@ -47,9 +48,7 @@ public class DiscussionListActivity extends SherlockFragmentActivity {
 
 		dialog = ProgressDialog.show(this, "Aguarde", "Recebendo resposta",
 				true);
-
 		getDiscussions();
-
 	}
 
 	@OptionsItem(R.id.menu_logout)
@@ -92,10 +91,32 @@ public class DiscussionListActivity extends SherlockFragmentActivity {
 			discussions.add(response.getDiscussions().get(i).getName());
 		}
 
-		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-				R.layout.item_list, R.id.item, discussions);
+		DiscussionAdapter adapter = new DiscussionAdapter(this,
+				R.layout.discussion_list, R.id.topic_name, discussions,
+				response);
 		listViewDiscussions.setAdapter(adapter);
+
+		Log.i("data", response.getDiscussions().get(1).getLastPostDate().trim());
 
 	}
 
+	@ItemClick
+	void listViewDiscussions(int position) {
+
+		Intent intent = new Intent(this, DiscussionsPostsActivity_.class);
+
+		intent.putExtra("discussionId", response.getDiscussions().get(position)
+				.getId());
+		intent.putExtra("discussionName",
+				response.getDiscussions().get(position).getName());
+		intent.putExtra("discussionLastPostDate", response.getDiscussions()
+				.get(position).getLastPostDate());
+		intent.putExtra("startDate", response.getDiscussions().get(position)
+				.getStartDate().substring(0, 10));
+		intent.putExtra("endDate", response.getDiscussions().get(position)
+				.getEndDate().substring(0, 10));
+
+		startActivity(intent);
+
+	}
 }

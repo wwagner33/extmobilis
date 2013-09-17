@@ -29,5 +29,14 @@
     <string name="discussions_title">Fórums disponiveis</string>
     <string name="title_activity_discussion_list">Fórums</string>
     <string name="hello_world">Hello world!</string>
+    <string name="title_activity_discussions_posts">Postagens</string>
+    <string name="play">Play</string>
+    <string name="next">Next</string>
+    <string name="prev">Prev</string>
+    <string name="stop">Stop</string>
+    <string name="temp_description">to delete</string>
+    <string name="nick_name">João da Silva Ferreira</string>
+    <string name="locale_date_format">dd/MM/yyyy</string>
+    <string name="sample_text">Tela de Posts para cada item. Exemplo de mensagem de usuário</string>
 
 </resources>
