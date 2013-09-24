@@ -19,7 +19,7 @@ public class DiscussionPosts {
 	public String content;
 	@SerializedName("updated_at")
 	public String updatedAt;
-	public List<String> attachments;
+	public List<Object> attachments;
 
 	public DiscussionPosts() {
 		super();
@@ -27,7 +27,7 @@ public class DiscussionPosts {
 
 	public DiscussionPosts(int id, int profileId, int discussionId, int userId,
 			String userNick, int level, String content, String updatedAt,
-			List<String> attachments) {
+			List<Object> attachments) {
 		super();
 		this.id = id;
 		this.profileId = profileId;
@@ -104,11 +104,11 @@ public class DiscussionPosts {
 		this.updatedAt = updatedAt;
 	}
 
-	public List<String> getAttachments() {
+	public List<Object> getAttachments() {
 		return attachments;
 	}
 
-	public void setAttachments(List<String> attachments) {
+	public void setAttachments(List<Object> attachments) {
 		this.attachments = attachments;
 	}
 

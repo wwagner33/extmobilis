@@ -8,12 +8,11 @@ import org.springframework.web.client.ResourceAccessException;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import br.ufc.virtual.solarmobilis.model.DiscussionPostList;
+import br.ufc.virtual.solarmobilis.model.Post;
+import br.ufc.virtual.solarmobilis.model.PostAdapter;
 import br.ufc.virtual.solarmobilis.webservice.SolarManager;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
@@ -39,8 +38,8 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 	@Bean
 	SolarManager solarManager;
 
-	@ViewById
-	ListView listViewDiscussionsPosts;
+	@ViewById(R.id.listViewDiscussionsPosts)
+	ListView listView;
 
 	@Extra("discussionId")
 	int discussionId;
@@ -57,13 +56,13 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 	@Extra("endDate")
 	String endDate;
 
-	@ViewById
-	TextView forum_title;
+	@ViewById(R.id.forum_title)
+	TextView forumTitle;
 
-	@ViewById
-	TextView forum_range;
+	@ViewById(R.id.forum_range)
+	TextView forumRange;
 
-	List<PostAdapter> posts = new ArrayList<PostAdapter>();
+	List<Post> posts = new ArrayList<Post>();
 	private ProgressDialog dialog;
 	private String oldDateString = "2000101010241010";
 
@@ -107,50 +106,21 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 	@UiThread
 	void updateList() {
 		dialog.dismiss();
-		forum_title.setText(discussionName);
-		forum_range.setText(startDate + " - " + endDate);
+		forumTitle.setText(discussionName);
+		forumRange.setText(startDate + " - " + endDate);
 
 		for (int i = 0; i < response.getPosts().size(); i++) {
 
-			posts.add(new PostAdapter(response.getPosts().get(i).getUserNick(),
+			posts.add(new Post(response.getPosts().get(i).getUserNick(),
 					response.getPosts().get(i).getContent(), response
 							.getPosts().get(i).getUpdatedAt()));
 		}
 
-		ArrayAdapter<PostAdapter> adapter = new MyListAdapter();
-		ListView list = (ListView) findViewById(R.id.listViewDiscussionsPosts);
-		list.setAdapter(adapter);
+		PostAdapter adapter = new PostAdapter(this,
+				R.layout.discussion_list_item, R.id.user_nick, posts);
+
+		listView.setAdapter(adapter);
 
 	}
 
-	private class MyListAdapter extends ArrayAdapter<PostAdapter> {
-		public MyListAdapter() {
-			super(DiscussionsPostsActivity.this, R.layout.discussion_list_item,
-					posts);
-		}
-
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
-			View item = convertView;
-			if (item == null) {
-				item = getLayoutInflater().inflate(
-						R.layout.discussion_list_item, parent, false);
-			}
-
-			PostAdapter currentCar = posts.get(position);
-
-			TextView nomeText = (TextView) item.findViewById(R.id.user_nick);
-			nomeText.setText(currentCar.getNome());
-
-			TextView dataText = (TextView) item.findViewById(R.id.post_date);
-			dataText.setText("" + currentCar.getData());
-
-			TextView postText = (TextView) item.findViewById(R.id.post_content);
-			postText.setText(currentCar.getPost());
-
-			return item;
-
-		}
-
-	}
 }
