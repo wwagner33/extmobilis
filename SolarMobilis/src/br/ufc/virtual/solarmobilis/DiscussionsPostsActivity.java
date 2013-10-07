@@ -129,7 +129,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 	
     void setFooter(){
     	
-    	  Log.i("Dentro do setFooter", String.valueOf(UnloadedFuturePosts) );
+    	 Log.i("Dentro do setFooter", String.valueOf(UnloadedFuturePosts) );
     	
     	if(UnloadedFuturePosts > 0){
     		
