@@ -96,15 +96,12 @@ public class DiscussionListActivity extends SherlockFragmentActivity {
 				response);
 		listViewDiscussions.setAdapter(adapter);
 
-		//Log.i("data", response.getDiscussions().get(1).getLastPostDate().trim());
-
 	}
 
 	@ItemClick
 	void listViewDiscussions(int position) {
 
 		Intent intent = new Intent(this, DiscussionsPostsActivity_.class);
-
 		intent.putExtra("discussionId", response.getDiscussions().get(position)
 				.getId());
 		intent.putExtra("discussionName",
@@ -112,10 +109,9 @@ public class DiscussionListActivity extends SherlockFragmentActivity {
 		intent.putExtra("discussionLastPostDate", response.getDiscussions()
 				.get(position).getLastPostDate());
 		intent.putExtra("startDate", response.getDiscussions().get(position)
-				.getStartDate().substring(0, 10));
+				.getStartDate());
 		intent.putExtra("endDate", response.getDiscussions().get(position)
-				.getEndDate().substring(0, 10));
-
+				.getEndDate());
 		startActivity(intent);
 
 	}

@@ -39,5 +39,11 @@
     <string name="nick_name">João da Silva Ferreira</string>
     <string name="locale_date_format">dd/MM/yyyy</string>
     <string name="sample_text">Tela de Posts para cada item. Exemplo de mensagem de usuário</string>
+    <string name="reply">responder</string>
+    <string name="action_expand">Expandir post</string>
+    <string name="action_playback">Tocar post</string>
+    <string name="action_favorite">Favoritar post</string>
+    <string name="action_reply">Responder post</string>
+    <string name="action_info">Ver detalhes do post</string>
 
 </resources>

@@ -1,5 +1,9 @@
 package br.ufc.virtual.solarmobilis.model;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import com.google.gson.annotations.SerializedName;
 
 public class Discussion {
@@ -55,6 +59,17 @@ public class Discussion {
 	}
 
 	public String getEndDate() {
+		SimpleDateFormat simpleFormat = new SimpleDateFormat(
+				"yyyy-MM-dd HH:mm:ss", java.util.Locale.getDefault());
+		try {
+			Date date = simpleFormat.parse(endDate);
+			SimpleDateFormat startDateFormat = new SimpleDateFormat(
+					"dd/MM/yyyy", java.util.Locale.getDefault());
+			endDate = startDateFormat.format(date);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return endDate;
 	}
 
@@ -95,6 +110,17 @@ public class Discussion {
 	}
 
 	public String getStartDate() {
+		SimpleDateFormat simpleFormat = new SimpleDateFormat(
+				"yyyy-MM-dd HH:mm:ss", java.util.Locale.getDefault());
+		try {
+			Date date = simpleFormat.parse(startDate);
+			SimpleDateFormat startDateFormat = new SimpleDateFormat(
+					"dd/MM/yyyy", java.util.Locale.getDefault());
+			startDate = startDateFormat.format(date);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return startDate;
 	}
 
