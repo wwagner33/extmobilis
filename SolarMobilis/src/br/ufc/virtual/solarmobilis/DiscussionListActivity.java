@@ -96,7 +96,7 @@ public class DiscussionListActivity extends SherlockFragmentActivity {
 				response);
 		listViewDiscussions.setAdapter(adapter);
 
-		Log.i("data", response.getDiscussions().get(1).getLastPostDate().trim());
+		//Log.i("data", response.getDiscussions().get(1).getLastPostDate().trim());
 
 	}
 

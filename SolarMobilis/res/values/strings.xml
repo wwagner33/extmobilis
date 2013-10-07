@@ -35,6 +35,7 @@
     <string name="prev">Prev</string>
     <string name="stop">Stop</string>
     <string name="temp_description">to delete</string>
+    <string name="not_loaded_posts_count">postagens</string>
     <string name="nick_name">João da Silva Ferreira</string>
     <string name="locale_date_format">dd/MM/yyyy</string>
     <string name="sample_text">Tela de Posts para cada item. Exemplo de mensagem de usuário</string>

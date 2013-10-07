@@ -1,6 +1,11 @@
 package br.ufc.virtual.solarmobilis.model;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+
+import android.util.Log;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -104,6 +109,34 @@ public class DiscussionPosts {
 		this.updatedAt = updatedAt;
 	}
 
+	//
+
+	public String getDateToString() {
+
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(
+				"yyyy-MM-dd'T'HH:mm:ss");
+
+		String formattedDate = null;
+
+		try {
+			Date convertedDate = simpleDateFormat.parse(updatedAt);
+
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
+
+			formattedDate = formatter.format(convertedDate);
+
+			
+
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return formattedDate;
+
+	}
+
+	//
 	public List<Object> getAttachments() {
 		return attachments;
 	}

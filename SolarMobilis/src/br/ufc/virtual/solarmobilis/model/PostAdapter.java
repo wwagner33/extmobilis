@@ -13,19 +13,19 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-public class PostAdapter extends ArrayAdapter<Post> {
+public class PostAdapter extends ArrayAdapter<DiscussionPosts> {
 
 	Context context;
 	int layoutResource;
-	ArrayList<Post> objects;
+	ArrayList<DiscussionPosts> objects;
 
 	public PostAdapter(Context context, int resource, int textViewResourceId,
-			List<Post> objects) {
+			List<DiscussionPosts> objects) {
 		super(context, resource, textViewResourceId, objects);
 
 		this.context = context;
 		this.layoutResource = resource;
-		this.objects = (ArrayList<Post>) objects;
+		this.objects = (ArrayList<DiscussionPosts>) objects;
 
 	}
 
@@ -55,9 +55,9 @@ public class PostAdapter extends ArrayAdapter<Post> {
 	            postitem = (PostItem)row.getTag();
 	        }
 		
-		postitem.name.setText(objects.get(position).getNome());
-		postitem.date.setText(objects.get(position).getData());
-		postitem.content.setText(objects.get(position).getPost());
+		postitem.name.setText(objects.get(position).getUserNick());
+		postitem.date.setText(objects.get(position).getUpdatedAt());
+		postitem.content.setText(objects.get(position).getContent());
 
 		return row;
 	}
