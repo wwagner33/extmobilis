@@ -130,16 +130,17 @@ public class DiscussionPosts {
 	public String getDateToPost() {
 		SimpleDateFormat simpleFormat = new SimpleDateFormat(
 				"yyyy-MM-dd'T'HH:mm:ss", java.util.Locale.getDefault());
+		String formattedDate = null;
 		try {
 			Date date = simpleFormat.parse(updatedAt);
 			SimpleDateFormat postDate = new SimpleDateFormat(
 					"'Dia' dd 'de' MMMM", java.util.Locale.getDefault());
-			updatedAt = postDate.format(date);
+			formattedDate = postDate.format(date);
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return updatedAt;
+		return formattedDate;
 
 	}
 
