@@ -152,6 +152,9 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 		   listVieWDiscussionPosts.removeFooterView(footerFuturePosts);
 		   listVieWDiscussionPosts.addFooterView(footerRefresh, null, true);
 		   UnloadedFuturePostsState = false;
+		   }else{
+			   listVieWDiscussionPosts.addFooterView(footerRefresh, null, true);
+			   
 		   }
 	   }
     	
