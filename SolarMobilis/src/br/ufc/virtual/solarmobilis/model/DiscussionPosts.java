@@ -130,9 +130,9 @@ public class DiscussionPosts {
 	public String getDateToPost() {
 		SimpleDateFormat simpleFormat = new SimpleDateFormat(
 				"yyyy-MM-dd'T'HH:mm:ss", java.util.Locale.getDefault());
-		
+
 		String formattedDate = null;
-		
+
 		try {
 			Date date = simpleFormat.parse(updatedAt);
 			SimpleDateFormat postDate = new SimpleDateFormat(

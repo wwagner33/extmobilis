@@ -81,10 +81,11 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
     boolean footerFuturePostsState;
 	
 	List<DiscussionPosts> posts = new ArrayList<DiscussionPosts>();
+	List<DiscussionPosts> newPosts = new ArrayList<DiscussionPosts>();
 	private ProgressDialog dialog;
 	private String oldDateString = "20001010102410";
 	private ActionBar actionBar;
-	private Boolean actionBarSelected = false;
+	private Boolean postSelected = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -93,7 +94,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 		dialog = ProgressDialog.show(this, "Aguarde", "Recebendo resposta",
 				true);
 		actionBar = getSupportActionBar();
-		
+
 		getPosts();
 
 		LayoutInflater inflater = getLayoutInflater();
@@ -163,6 +164,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 			} else if(footerUnloadedFuturePostsState == false && footerFuturePostsState == false) {
 				listVieWDiscussionPosts
 						.addFooterView(footerRefresh, null, true);
+				footerFuturePostsState = true;
 			}
 		}
 
@@ -178,7 +180,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 			oldDateString = "20001010102410";
 
 		} else {
-			oldDateString = posts.get(0).getDateToString();
+			oldDateString = posts.get(posts.size()-1).getDateToString();
 		}
 
 		response = solarManager.getPosts(preferences.token().get(),
@@ -189,8 +191,10 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 
 			Log.i("#" + i, response.getPosts().get(i).getContent());
 		}
-
-		posts.addAll(0, response.getPosts());
+        
+		newPosts = response.getPosts();
+		Collections.reverse(newPosts);
+		posts.addAll(posts.size(), /*response.getPosts()*/ newPosts);
 
 		for (int i = 0; i < posts.size(); i++) {
 
@@ -205,7 +209,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		menu.clear();
 		MenuInflater inflater = getSupportMenuInflater();
-		if (!actionBarSelected) {
+		if (!postSelected) {
 			inflater.inflate(R.menu.options_menu_action, menu);
 		} else {
 			inflater.inflate(R.menu.action_bar_selected, menu);
@@ -219,6 +223,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 	void logout() {
 		preferences.token().put(null);
 		Intent intent = new Intent(this, LoginActivity_.class);
+		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		startActivity(intent);
 		finish();
 	}
@@ -279,12 +284,12 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 	@ItemClick
 	void listViewDiscussionsPosts() {
 		Log.i("clicado", "clicado");
-		actionBarSelected = true;
-		setActionBar();
+		postSelected = true;
+		actionBarSelected();
 
 	}
 
-	void setActionBar() {
+	void actionBarSelected() {
 		actionBar.setHomeButtonEnabled(false);// --------> Pesquisar
 		actionBar.setDisplayShowHomeEnabled(false); // tira logo
 		actionBar.setDisplayShowTitleEnabled(false); // Tira titulo
@@ -294,6 +299,28 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 		actionBar.setBackgroundDrawable(new ColorDrawable(getResources()
 				.getColor(R.color.action_bar_active))); // Muda a cor
 		invalidateOptionsMenu(); // troca de menus xml --------> Pesquisar     
+	}
+
+	void actionBarNotSelected() {
+		actionBar.setDisplayShowHomeEnabled(true);
+		actionBar.setDisplayShowTitleEnabled(true);
+		actionBar.setDisplayUseLogoEnabled(true);
+		actionBar.setDisplayShowCustomEnabled(true);
+		actionBar.setBackgroundDrawable(new ColorDrawable(getResources()
+				.getColor(R.color.action_bar_idle)));
+	}
+
+	@Override
+	public void onBackPressed() {
+		if (!postSelected) {
+			super.onBackPressed();
+
+		} else {
+			postSelected = false;
+			actionBarNotSelected();
+			invalidateOptionsMenu();
+		}
+
 	}
 
 }
