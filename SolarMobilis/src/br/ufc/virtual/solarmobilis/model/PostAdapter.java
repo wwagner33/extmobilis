@@ -56,7 +56,7 @@ public class PostAdapter extends ArrayAdapter<DiscussionPosts> {
 	        }
 		
 		postitem.name.setText(objects.get(position).getUserNick());
-		postitem.date.setText(objects.get(position).getUpdatedAt());
+		postitem.date.setText(objects.get(position).getDateToPost());
 		postitem.content.setText(objects.get(position).getContent());
 
 		return row;

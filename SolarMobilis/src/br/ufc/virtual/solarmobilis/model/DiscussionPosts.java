@@ -5,7 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-import android.util.Log;
+import android.text.Html;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -94,6 +94,7 @@ public class DiscussionPosts {
 	}
 
 	public String getContent() {
+		content = Html.fromHtml(content).toString().trim();
 		return content;
 	}
 
@@ -109,34 +110,42 @@ public class DiscussionPosts {
 		this.updatedAt = updatedAt;
 	}
 
-	//
-
 	public String getDateToString() {
-
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(
-				"yyyy-MM-dd'T'HH:mm:ss");
-
+				"yyyy-MM-dd'T'HH:mm:ss", java.util.Locale.getDefault());
 		String formattedDate = null;
 
 		try {
 			Date convertedDate = simpleDateFormat.parse(updatedAt);
-
-			SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
-
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss",
+					java.util.Locale.getDefault());
 			formattedDate = formatter.format(convertedDate);
-
-			
-
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		return formattedDate;
+	}
 
+	public String getDateToPost() {
+		SimpleDateFormat simpleFormat = new SimpleDateFormat(
+				"yyyy-MM-dd'T'HH:mm:ss", java.util.Locale.getDefault());
+		
+		String formattedDate = null;
+		
+		try {
+			Date date = simpleFormat.parse(updatedAt);
+			SimpleDateFormat postDate = new SimpleDateFormat(
+					"'Dia' dd 'de' MMMM", java.util.Locale.getDefault());
+			formattedDate = postDate.format(date);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return formattedDate;
 
 	}
 
-	//
 	public List<Object> getAttachments() {
 		return attachments;
 	}

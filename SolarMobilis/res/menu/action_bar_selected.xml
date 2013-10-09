@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/expand"
+        android:icon="@drawable/action_expand"
+        android:showAsAction="always"
+        android:title="@string/action_expand"/>
+    <item
+        android:id="@+id/play"
+        android:icon="@drawable/action_playback"
+        android:showAsAction="always"
+        android:title="@string/action_playback"/>
+    <item
+        android:id="@+id/favorite"
+        android:icon="@drawable/action_favorite_empty"
+        android:showAsAction="always"
+        android:title="@string/action_favorite"/>
+    <item
+        android:id="@+id/reply"
+        android:icon="@drawable/action_reply"
+        android:showAsAction="always"
+        android:title="@string/action_reply"/>
+    <item
+        android:id="@+id/details"
+        android:icon="@drawable/action_info"
+        android:showAsAction="always"
+        android:title="@string/action_info"/>
+
+</menu>
