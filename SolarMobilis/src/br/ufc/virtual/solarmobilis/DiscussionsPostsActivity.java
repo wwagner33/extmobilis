@@ -18,7 +18,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import br.ufc.virtual.solarmobilis.model.DiscussionPostList;
-import br.ufc.virtual.solarmobilis.model.DiscussionPosts;
+import br.ufc.virtual.solarmobilis.model.DiscussionPost;
 import br.ufc.virtual.solarmobilis.model.PostAdapter;
 import br.ufc.virtual.solarmobilis.webservice.SolarManager;
 
@@ -78,10 +78,10 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 	int UnloadedFuturePosts;
 
 	boolean footerUnloadedFuturePostsState;
-    boolean footerFuturePostsState;
-	
-	List<DiscussionPosts> posts = new ArrayList<DiscussionPosts>();
-	List<DiscussionPosts> newPosts = new ArrayList<DiscussionPosts>();
+	boolean footerFuturePostsState;
+
+	List<DiscussionPost> posts = new ArrayList<DiscussionPost>();
+	List<DiscussionPost> newPosts = new ArrayList<DiscussionPost>();
 	private ProgressDialog dialog;
 	private String oldDateString = "20001010102410";
 	private ActionBar actionBar;
@@ -113,7 +113,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 
 				refresh_button();
 
-			/*Log.i("old date string do ultimo", oldDateString);*/
+				/* Log.i("old date string do ultimo", oldDateString); */
 
 			}
 		});
@@ -125,13 +125,12 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 
 				refresh_button();
 
-				/*Log.i("old date string do ultimo", oldDateString);*/
+				/* Log.i("old date string do ultimo", oldDateString); */
 
 			}
 		});
 
 	}
-
 
 	void setFooter() {
 
@@ -155,13 +154,15 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 
 		} else {
 
-			if (footerUnloadedFuturePostsState == true && footerFuturePostsState == false) {
+			if (footerUnloadedFuturePostsState == true
+					&& footerFuturePostsState == false) {
 				listVieWDiscussionPosts.removeFooterView(footerFuturePosts);
 				listVieWDiscussionPosts
 						.addFooterView(footerRefresh, null, true);
 				footerUnloadedFuturePostsState = false;
 				footerFuturePostsState = true;
-			} else if(footerUnloadedFuturePostsState == false && footerFuturePostsState == false) {
+			} else if (footerUnloadedFuturePostsState == false
+					&& footerFuturePostsState == false) {
 				listVieWDiscussionPosts
 						.addFooterView(footerRefresh, null, true);
 				footerFuturePostsState = true;
@@ -169,7 +170,6 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 		}
 
 	}
-
 
 	@Background
 	void refresh_button() {
@@ -180,7 +180,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 			oldDateString = "20001010102410";
 
 		} else {
-			oldDateString = posts.get(posts.size()-1).getDateToString();
+			oldDateString = posts.get(posts.size() - 1).getDateToString();
 		}
 
 		response = solarManager.getPosts(preferences.token().get(),
@@ -191,10 +191,10 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 
 			Log.i("#" + i, response.getPosts().get(i).getContent());
 		}
-        
+
 		newPosts = response.getPosts();
 		Collections.reverse(newPosts);
-		posts.addAll(posts.size(), /*response.getPosts()*/ newPosts);
+		posts.addAll(posts.size(), /* response.getPosts() */newPosts);
 
 		for (int i = 0; i < posts.size(); i++) {
 
@@ -236,6 +236,13 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 		getPosts();
 	}
 
+	@OptionsItem(R.id.menu_reply)
+	void reply() {
+		Intent intent = new Intent(this, ResponseActivity_.class);
+		intent.putExtra("discussionId", discussionId);
+		startActivity(intent);
+	}
+
 	@Background
 	void getPosts() {
 
@@ -265,7 +272,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 			Log.i("#" + i, response.getPosts().get(i).getUpdatedAt() + " "
 					+ response.getPosts().get(i).getDateToString());
 		}
-         Collections.reverse(posts);
+		Collections.reverse(posts);
 		PostAdapter adapter = new PostAdapter(this,
 				R.layout.discussion_list_item, R.id.user_nick, posts);
 
@@ -298,7 +305,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 		actionBar.setDisplayShowCustomEnabled(true); // Permite a customização
 		actionBar.setBackgroundDrawable(new ColorDrawable(getResources()
 				.getColor(R.color.action_bar_active))); // Muda a cor
-		invalidateOptionsMenu(); // troca de menus xml --------> Pesquisar     
+		invalidateOptionsMenu(); // troca de menus xml --------> Pesquisar
 	}
 
 	void actionBarNotSelected() {

@@ -7,6 +7,7 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
 
 import android.app.Activity;
 import android.widget.Toast;
+import br.ufc.virtual.solarmobilis.PostSender;
 import br.ufc.virtual.solarmobilis.R;
 import br.ufc.virtual.solarmobilis.model.CurriculumUnitList;
 import br.ufc.virtual.solarmobilis.model.DiscussionList;
@@ -55,6 +56,10 @@ public class SolarManager {
 
 	public DiscussionPostList getPosts(String token, int id, String date) {
 		return solarClient.getPosts(token, id, date);
+	}
+
+	public void sendPosts(PostSender postSender, Integer id) {
+		solarClient.sendPosts(postSender, id);
 	}
 
 	private void setTimeout() {
@@ -114,5 +119,6 @@ public class SolarManager {
 	public SolarClient getsolarClient() {
 		return solarClient;
 	}
+
 
 }

@@ -13,19 +13,19 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-public class PostAdapter extends ArrayAdapter<DiscussionPosts> {
+public class PostAdapter extends ArrayAdapter<DiscussionPost> {
 
 	Context context;
 	int layoutResource;
-	ArrayList<DiscussionPosts> objects;
+	ArrayList<DiscussionPost> objects;
 
 	public PostAdapter(Context context, int resource, int textViewResourceId,
-			List<DiscussionPosts> objects) {
+			List<DiscussionPost> objects) {
 		super(context, resource, textViewResourceId, objects);
 
 		this.context = context;
 		this.layoutResource = resource;
-		this.objects = (ArrayList<DiscussionPosts>) objects;
+		this.objects = (ArrayList<DiscussionPost>) objects;
 
 	}
 

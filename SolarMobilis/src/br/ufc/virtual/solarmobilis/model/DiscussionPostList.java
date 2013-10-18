@@ -5,7 +5,7 @@ import java.util.List;
 public class DiscussionPostList {
 	public int before;
 	public int after;
-	public List<DiscussionPosts> posts;
+	public List<DiscussionPost> posts;
 
 	public int getBefore() {
 		return before;
@@ -23,11 +23,11 @@ public class DiscussionPostList {
 		this.after = after;
 	}
 
-	public List<DiscussionPosts> getPosts() {
+	public List<DiscussionPost> getPosts() {
 		return posts;
 	}
 
-	public void setPosts(List<DiscussionPosts> posts) {
+	public void setPosts(List<DiscussionPost> posts) {
 		this.posts = posts;
 	}
 

@@ -3,6 +3,7 @@ package br.ufc.virtual.solarmobilis.webservice;
 import org.springframework.http.converter.json.GsonHttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
+import br.ufc.virtual.solarmobilis.PostSender;
 import br.ufc.virtual.solarmobilis.model.CurriculumUnitList;
 import br.ufc.virtual.solarmobilis.model.DiscussionList;
 import br.ufc.virtual.solarmobilis.model.DiscussionPostList;
@@ -30,6 +31,9 @@ public interface SolarClient {
 
 	@Get("discussions/{id}/posts/news/{date}.json?mobilis=true&auth_token={token}")
 	DiscussionPostList getPosts(String token, int id, String date);
+	
+	@Post("discussions/{discussionId}/posts")
+	void sendPosts(PostSender postSender, Integer discussionId);
 
 	RestTemplate getRestTemplate();
 

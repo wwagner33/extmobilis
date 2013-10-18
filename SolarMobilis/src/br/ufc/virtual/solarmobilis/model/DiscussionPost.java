@@ -9,30 +9,32 @@ import android.text.Html;
 
 import com.google.gson.annotations.SerializedName;
 
-public class DiscussionPosts {
+public class DiscussionPost {
 
-	public int id;
+	public Integer id;
 	@SerializedName("profile_id")
-	public int profileId;
+	public Integer profileId;
 	@SerializedName("discussion_id")
-	public int discussionId;
+	public Integer discussionId;
 	@SerializedName("user_id")
-	public int userId;
+	public Integer userId;
 	@SerializedName("user_nick")
 	public String userNick;
-	public int level;
+	public Integer level;
 	public String content;
 	@SerializedName("updated_at")
 	public String updatedAt;
 	public List<Object> attachments;
+	@SerializedName("parent_id")
+	public Integer parentId;
 
-	public DiscussionPosts() {
+	public DiscussionPost() {
 		super();
 	}
 
-	public DiscussionPosts(int id, int profileId, int discussionId, int userId,
-			String userNick, int level, String content, String updatedAt,
-			List<Object> attachments) {
+	public DiscussionPost(Integer id, Integer profileId, Integer discussionId,
+			Integer userId, String userNick, Integer level, String content,
+			String updatedAt, List<Object> attachments) {
 		super();
 		this.id = id;
 		this.profileId = profileId;
@@ -45,35 +47,35 @@ public class DiscussionPosts {
 		this.attachments = attachments;
 	}
 
-	public int getId() {
+	public Integer getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 
-	public int getProfileId() {
+	public Integer getProfileId() {
 		return profileId;
 	}
 
-	public void setProfileId(int profileId) {
+	public void setProfileId(Integer profileId) {
 		this.profileId = profileId;
 	}
 
-	public int getDiscussionId() {
+	public Integer getDiscussionId() {
 		return discussionId;
 	}
 
-	public void setDiscussionId(int discussionId) {
+	public void setDiscussionId(Integer discussionId) {
 		this.discussionId = discussionId;
 	}
 
-	public int getUserId() {
+	public Integer getUserId() {
 		return userId;
 	}
 
-	public void setUserId(int userId) {
+	public void setUserId(Integer userId) {
 		this.userId = userId;
 	}
 
@@ -85,11 +87,11 @@ public class DiscussionPosts {
 		this.userNick = userNick;
 	}
 
-	public int getLevel() {
+	public Integer getLevel() {
 		return level;
 	}
 
-	public void setLevel(int level) {
+	public void setLevel(Integer level) {
 		this.level = level;
 	}
 
@@ -152,6 +154,14 @@ public class DiscussionPosts {
 
 	public void setAttachments(List<Object> attachments) {
 		this.attachments = attachments;
+	}
+
+	public Integer getParentId() {
+		return parentId;
+	}
+
+	public void setParentId(Integer parentId) {
+		this.parentId = parentId;
 	}
 
 }

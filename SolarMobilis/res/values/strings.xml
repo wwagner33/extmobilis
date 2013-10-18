@@ -45,5 +45,8 @@
     <string name="action_favorite">Favoritar post</string>
     <string name="action_reply">Responder post</string>
     <string name="action_info">Ver detalhes do post</string>
+    <string name="title_activity_response">Response</string>
+    <string name="submit">Enviar</string>
+    <string name="message">Digite sua mensagem</string>
 
 </resources>
