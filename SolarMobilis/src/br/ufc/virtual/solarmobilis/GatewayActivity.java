@@ -6,9 +6,11 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.googlecode.androidannotations.annotations.EActivity;
+import com.googlecode.androidannotations.annotations.NoTitle;
 import com.googlecode.androidannotations.annotations.sharedpreferences.Pref;
 
-@EActivity()
+@NoTitle
+@EActivity
 public class GatewayActivity extends Activity {
 
 	@Pref

@@ -1,9 +1,13 @@
 package br.ufc.virtual.solarmobilis;
 
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.ResourceAccessException;
+
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.EditText;
+import android.widget.Toast;
 import br.ufc.virtual.solarmobilis.model.DiscussionPost;
 import br.ufc.virtual.solarmobilis.webservice.SolarManager;
 
@@ -14,7 +18,7 @@ import com.googlecode.androidannotations.annotations.EActivity;
 import com.googlecode.androidannotations.annotations.Extra;
 import com.googlecode.androidannotations.annotations.ViewById;
 
-@EActivity
+@EActivity(R.layout.activity_response)
 public class ResponseActivity extends Activity {
 
 	@Bean
@@ -32,28 +36,36 @@ public class ResponseActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_response);
 
-		Log.i("id", String.valueOf(discussionId));
 	}
 
-	@Click(R.id.replySubmit)
+	@Click(R.id.submitReply)
 	void submit() {
-
 		discussionPost.setContent(reply.getText().toString());
 		discussionPost.setDiscussionId(discussionId);
-
-		Log.i("1", discussionPost.getContent());
-		Log.i("2", String.valueOf(discussionPost.getDiscussionId()));
-		// Log.i("3", String.valueOf(discussionPost.getParentId()));
-
 		postSender.setDiscussionPost(discussionPost);
 
+		sendPost();
+//		Toast.makeText(this, R.string.send_post_sucess, Toast.LENGTH_SHORT)
+//				.show();
+//		finish();
 	}
 
 	@Background
 	void sendPost() {
-		solarManager.sendPosts(postSender, discussionId);
+
+		try {
+			solarManager.sendPosts(postSender, discussionId);
+			Log.i("Enviou", "sim");
+
+		} catch (HttpClientErrorException e) {
+			Log.i("ERRO", e.getStatusCode().toString());
+			solarManager.errorHandler(e.getStatusCode());
+
+		} catch (ResourceAccessException e) {
+			solarManager.alertTimeout();
+		}
+
 	}
 
 }

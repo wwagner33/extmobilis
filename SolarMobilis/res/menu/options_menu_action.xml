@@ -10,7 +10,7 @@
         android:showAsAction="never"
         android:title="@string/config"/>
     <item 
-        android:id="@+id/menu_reply"
+        android:id="@+id/menu_response"
         android:showAsAction="always"
         android:icon="@drawable/action_reply_forum"
         android:title="@string/reply"/>

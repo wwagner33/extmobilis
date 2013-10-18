@@ -236,8 +236,8 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 		getPosts();
 	}
 
-	@OptionsItem(R.id.menu_reply)
-	void reply() {
+	@OptionsItem(R.id.menu_response)
+	void response() {
 		Intent intent = new Intent(this, ResponseActivity_.class);
 		intent.putExtra("discussionId", discussionId);
 		startActivity(intent);

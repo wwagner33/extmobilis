@@ -26,8 +26,8 @@
     <string name="ERROR_ADDRESS">Endereço não encontrado</string>
     <string name="title_activity_groups_list">Turmas</string>
     <string name="groups_title">Turmas disponiveis</string>
-    <string name="discussions_title">Fórums disponiveis</string>
-    <string name="title_activity_discussion_list">Fórums</string>
+    <string name="discussions_title">Fóruns disponiveis</string>
+    <string name="title_activity_discussion_list">Fóruns</string>
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_discussions_posts">Postagens</string>
     <string name="play">Play</string>
@@ -45,8 +45,15 @@
     <string name="action_favorite">Favoritar post</string>
     <string name="action_reply">Responder post</string>
     <string name="action_info">Ver detalhes do post</string>
-    <string name="title_activity_response">Response</string>
+    <string name="title_activity_response">Enviar novo post</string>
     <string name="submit">Enviar</string>
-    <string name="message">Digite sua mensagem</string>
+    <string name="edit_text_Response">Corpo da mensagem</string>
+    <string name="listen_to">Ouvir</string>
+    <string name="x">X</string>
+    <string name="record_image_description">Imagem que indica que há gravação de áudio</string>
+    <string name="char_count_default_value">0</string>
+    <string name="recod_button_description">Botão de gravação</string>
+    <string name="counter_default_value">00:00</string>
+    <string name="send_post_sucess">Post enviado</string>
 
 </resources>

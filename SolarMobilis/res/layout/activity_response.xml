@@ -1,28 +1,113 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="@color/white" >
+    android:background="@android:color/white"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:id="@+id/audio_preview_bar"
+        android:layout_width="fill_parent"
+        android:layout_height="60dp"
+        android:visibility="gone" >
+
+        <Button
+            android:id="@+id/preview_recording"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:text="@string/listen_to" />
+
+        <Button
+            android:id="@+id/delete_recording"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/x" />
+    </RelativeLayout>
 
     <EditText
         android:id="@+id/editTextReply"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:hint="@string/message"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:ems="10" >
-
-        <requestFocus />
+        android:layout_width="fill_parent"
+        android:layout_height="0dip"
+        android:layout_margin="16dp"
+        android:layout_weight="1"
+        android:background="#00000000"
+        android:gravity="top|left"
+        android:hint="@string/edit_text_Response"
+        android:textColor="#000000" >
     </EditText>
 
-    <Button
-        android:id="@+id/replySubmit"
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:id="@+id/recording_bar"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/editTextReply"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="62dp"
-        android:text="@string/submit" />
+        android:orientation="horizontal" >
 
-</RelativeLayout>
+        <ImageView
+            android:id="@+id/record_image"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_centerHorizontal="true"
+            android:clickable="true"
+            android:contentDescription="@string/record_image_description"
+            android:src="@drawable/ic_lock_silent_mode_off"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/char_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@id/record_image"
+            android:layout_alignParentRight="true"
+            android:layout_centerHorizontal="false"
+            android:layout_marginRight="3dp"
+            android:text="@string/char_count_default_value" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/teste2"
+        android:layout_width="fill_parent"
+        android:layout_height="40dp"
+        android:background="#ebebeb" >
+
+        <!-- android:layout_height="40dp" -->
+
+        <ImageButton
+            android:id="@+id/btn_gravar"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="3dp"
+            android:layout_marginTop="4dp"
+            android:contentDescription="@string/recod_button_description"
+            android:scaleType="centerInside"
+            android:src="@drawable/gravador_parado" />
+
+        <Button
+            android:id="@+id/submitReply"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:layout_alignParentRight="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="3dp"
+            android:text="@string/submit" />
+
+        <TextView
+            android:id="@+id/recording_lenght"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="11dp"
+            android:layout_toRightOf="@id/btn_gravar"
+            android:text="@string/counter_default_value"
+            android:textColor="@color/black"
+            android:visibility="gone" />
+
+        <Chronometer
+            android:id="@+id/recording_chronometer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
+    </RelativeLayout>
+
+</LinearLayout>
