@@ -7,7 +7,6 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.EditText;
-import android.widget.Toast;
 import br.ufc.virtual.solarmobilis.model.DiscussionPost;
 import br.ufc.virtual.solarmobilis.webservice.SolarManager;
 

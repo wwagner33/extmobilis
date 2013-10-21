@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
 
 import android.app.ProgressDialog;
@@ -255,7 +256,14 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 			Log.i("after", String.valueOf(response.getAfter()));
 			updateList();
 			setFooter();
+			
+		} catch (HttpClientErrorException e) {
+			Log.i("ERRO", e.getStatusCode().toString());
+			dialog.dismiss();
+			solarManager.errorHandler(e.getStatusCode());
+
 		} catch (ResourceAccessException e) {
+			dialog.dismiss();
 			solarManager.alertTimeout();
 		}
 	}

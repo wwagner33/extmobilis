@@ -77,6 +77,7 @@ public class DiscussionListActivity extends SherlockFragmentActivity {
 			response = solarManager.getDiscussions(preferences.token().get()
 					.toString(), preferences.groupSelected().get());
 			updateList();
+
 		} catch (HttpClientErrorException e) {
 			Log.i("ERRO", e.getStatusCode().toString());
 			dialog.dismiss();

@@ -2,6 +2,7 @@ package br.ufc.virtual.solarmobilis;
 
 import java.util.ArrayList;
 
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
 
 import android.app.ProgressDialog;
@@ -78,7 +79,14 @@ public class CurriculumUnitsListActivity extends SherlockFragmentActivity {
 			response = solarManager.getCurriculumUnits(preferences.token()
 					.get().toString());
 			updateList();
+			
+		} catch (HttpClientErrorException e) {
+			Log.i("ERRO", e.getStatusCode().toString());
+			dialog.dismiss();
+			solarManager.errorHandler(e.getStatusCode());
+
 		} catch (ResourceAccessException e) {
+			dialog.dismiss();
 			solarManager.alertTimeout();
 		}
 	}
