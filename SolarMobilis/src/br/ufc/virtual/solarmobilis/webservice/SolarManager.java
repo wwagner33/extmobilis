@@ -58,8 +58,8 @@ public class SolarManager {
 		return solarClient.getPosts(token, id, date);
 	}
 
-	public void sendPosts(PostSender postSender, Integer id) {
-		solarClient.sendPosts(postSender, id);
+	public void sendPost(PostSender postSender, Integer id, String token) {
+		solarClient.sendPost(postSender, id, token);
 	}
 
 	private void setTimeout() {

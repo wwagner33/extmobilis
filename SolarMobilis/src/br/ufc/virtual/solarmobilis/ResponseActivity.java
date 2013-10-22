@@ -16,9 +16,13 @@ import com.googlecode.androidannotations.annotations.Click;
 import com.googlecode.androidannotations.annotations.EActivity;
 import com.googlecode.androidannotations.annotations.Extra;
 import com.googlecode.androidannotations.annotations.ViewById;
+import com.googlecode.androidannotations.annotations.sharedpreferences.Pref;
 
 @EActivity(R.layout.activity_response)
 public class ResponseActivity extends Activity {
+
+	@Pref
+	SolarMobilisPreferences_ preferences;
 
 	@Bean
 	SolarManager solarManager;
@@ -45,16 +49,17 @@ public class ResponseActivity extends Activity {
 		postSender.setDiscussionPost(discussionPost);
 
 		sendPost();
-//		Toast.makeText(this, R.string.send_post_sucess, Toast.LENGTH_SHORT)
-//				.show();
-//		finish();
+		// Toast.makeText(this, R.string.send_post_sucess, Toast.LENGTH_SHORT)
+		// .show();
+		// finish();
 	}
 
 	@Background
 	void sendPost() {
 
 		try {
-			solarManager.sendPosts(postSender, discussionId);
+			solarManager.sendPost(postSender, discussionId, preferences
+					.token().get().toString());
 			Log.i("Enviou", "sim");
 
 		} catch (HttpClientErrorException e) {
