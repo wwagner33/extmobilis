@@ -96,7 +96,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 				true);
 		actionBar = getSupportActionBar();
 
-		getPosts();
+//		getPosts();
 
 		LayoutInflater inflater = getLayoutInflater();
 
@@ -131,6 +131,12 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 			}
 		});
 
+	}
+	
+	@Override
+	protected void onResume() {
+		getPosts();
+		super.onResume();
 	}
 
 	void setFooter() {
@@ -256,7 +262,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 			Log.i("after", String.valueOf(response.getAfter()));
 			updateList();
 			setFooter();
-			
+
 		} catch (HttpClientErrorException e) {
 			Log.i("ERRO", e.getStatusCode().toString());
 			dialog.dismiss();
@@ -337,5 +343,14 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 		}
 
 	}
+
+//	@Override
+//	protected void onResume() {
+//		//dialog = ProgressDialog.show(this, "Aguarde", "Recebendo resposta",
+//			//	true);
+//		//posts.clear();
+//		//getPosts();
+//		super.onResume();
+//	}
 
 }
