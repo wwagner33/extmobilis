@@ -14,7 +14,6 @@ import android.widget.EditText;
 import android.widget.Toast;
 import br.ufc.virtual.solarmobilis.model.User;
 import br.ufc.virtual.solarmobilis.model.UserMessage;
-import br.ufc.virtual.solarmobilis.webservice.SolarClient;
 import br.ufc.virtual.solarmobilis.webservice.SolarManager;
 
 import com.googlecode.androidannotations.annotations.Background;
@@ -23,7 +22,6 @@ import com.googlecode.androidannotations.annotations.Click;
 import com.googlecode.androidannotations.annotations.EActivity;
 import com.googlecode.androidannotations.annotations.NoTitle;
 import com.googlecode.androidannotations.annotations.ViewById;
-import com.googlecode.androidannotations.annotations.rest.RestService;
 import com.googlecode.androidannotations.annotations.sharedpreferences.Pref;
 
 @NoTitle
@@ -36,21 +34,18 @@ public class LoginActivity extends Activity {
 	@Pref
 	SolarMobilisPreferences_ preferences;
 
-	@RestService
-	SolarClient solarClient;
-
 	Object response_post;
-	public JSONObject jsonobject;
+	public JSONObject jsonObject;
 	public UserMessage userMessage = new UserMessage();
 	public User user = new User();
 	private ProgressDialog dialog;
 	SolarManager solarmanager;
 
 	@ViewById(R.id.editTextUser)
-	EditText field_login;
+	EditText fieldLogin;
 
 	@ViewById(R.id.editTextPassword)
-	EditText field_passord;
+	EditText fieldPassword;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -59,11 +54,11 @@ public class LoginActivity extends Activity {
 
 	@Click(R.id.submit)
 	void submit() {
-		if (!(field_login.getText().toString().trim().length() == 0 || field_passord
+		if (!(fieldLogin.getText().toString().trim().length() == 0 || fieldPassword
 				.getText().toString().trim().length() == 0)) {
 
-			user.setLogin(field_login.getText().toString().trim());
-			user.setPassword(field_passord.getText().toString().trim());
+			user.setLogin(fieldLogin.getText().toString().trim());
+			user.setPassword(fieldPassword.getText().toString().trim());
 			userMessage.setUser(user);
 
 			dialog = ProgressDialog.show(this, "Aguarde", "Recebendo resposta",
@@ -91,7 +86,6 @@ public class LoginActivity extends Activity {
 			dialog.dismiss();
 			solarManager.alertTimeout();
 		}
-
 		Log.i("MENSSAGEM", "PODE SIM");
 	}
 
@@ -99,17 +93,16 @@ public class LoginActivity extends Activity {
 		Log.i("resposta", response_post.toString());
 
 		try {
-			jsonobject = new JSONObject(response_post.toString());
+			jsonObject = new JSONObject(response_post.toString());
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
 
 		try {
 			preferences.token()
-					.put(jsonobject.getJSONObject("session").getString(
+					.put(jsonObject.getJSONObject("session").getString(
 							"auth_token"));
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
