@@ -4,9 +4,11 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.EditText;
+import android.widget.Toast;
 import br.ufc.virtual.solarmobilis.model.DiscussionPost;
 import br.ufc.virtual.solarmobilis.webservice.SolarManager;
 
@@ -15,6 +17,7 @@ import com.googlecode.androidannotations.annotations.Bean;
 import com.googlecode.androidannotations.annotations.Click;
 import com.googlecode.androidannotations.annotations.EActivity;
 import com.googlecode.androidannotations.annotations.Extra;
+import com.googlecode.androidannotations.annotations.UiThread;
 import com.googlecode.androidannotations.annotations.ViewById;
 import com.googlecode.androidannotations.annotations.sharedpreferences.Pref;
 
@@ -36,6 +39,8 @@ public class ResponseActivity extends Activity {
 	@Extra("discussionId")
 	Integer discussionId;
 
+	private ProgressDialog dialog;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -48,28 +53,43 @@ public class ResponseActivity extends Activity {
 		discussionPost.setDiscussionId(discussionId);
 		postSender.setDiscussionPost(discussionPost);
 
+		dialog = ProgressDialog.show(this, "Aguarde", "Recebendo resposta",
+				true);
+
 		sendPost();
-		// Toast.makeText(this, R.string.send_post_sucess, Toast.LENGTH_SHORT)
-		// .show();
-		// finish();
 	}
 
 	@Background
 	void sendPost() {
 
 		try {
-			solarManager.sendPost(postSender, discussionId, preferences
-					.token().get().toString());
-			Log.i("Enviou", "sim");
+			solarManager.sendPost(postSender, discussionId, preferences.token()
+					.get().toString());
+
+			dialog.dismiss();
+			toast();
 
 		} catch (HttpClientErrorException e) {
 			Log.i("ERRO", e.getStatusCode().toString());
+			dialog.dismiss();
 			solarManager.errorHandler(e.getStatusCode());
 
 		} catch (ResourceAccessException e) {
+			dialog.dismiss();
 			solarManager.alertTimeout();
 		}
 
+	}
+
+	@UiThread
+	void toast() {
+		Toast.makeText(this, R.string.send_post_sucess, Toast.LENGTH_SHORT)
+				.show();
+
+		// Intent intent = new Intent(this, DiscussionsPostsActivity_.class);
+		// intent.putExtra("discussionId", discussionId);
+		// startActivity(intent);
+		finish();
 	}
 
 }
