@@ -6,9 +6,6 @@
     android:orientation="vertical"
     android:paddingBottom="@dimen/small_space" >
 
-    <!-- android:background="@drawable/picture_post_frame" -->
-    <!-- android:scaleType="centerInside" -->
-
     <ImageView
         android:id="@+id/user_photo"
         android:layout_width="48dp"

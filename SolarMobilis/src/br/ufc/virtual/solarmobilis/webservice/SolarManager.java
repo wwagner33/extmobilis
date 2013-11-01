@@ -62,6 +62,12 @@ public class SolarManager {
 		solarClient.sendPost(postSender, id, token);
 	}
 
+	public String getUserImageUrl(int userId, String token) {
+		return ("http://apolo11teste.virtual.ufc.br/users/" + userId
+				+ "/photo.json?auth_token=" + token);
+
+	}
+
 	private void setTimeout() {
 		ClientHttpRequestFactory requestFactory = solarClient.getRestTemplate()
 				.getRequestFactory();
@@ -119,6 +125,5 @@ public class SolarManager {
 	public SolarClient getsolarClient() {
 		return solarClient;
 	}
-
 
 }

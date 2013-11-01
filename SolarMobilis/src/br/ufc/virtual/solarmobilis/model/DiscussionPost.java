@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import android.graphics.Bitmap;
 import android.text.Html;
 
 import com.google.gson.annotations.SerializedName;
@@ -27,6 +28,7 @@ public class DiscussionPost {
 	public List<Object> attachments;
 	@SerializedName("parent_id")
 	public Integer parentId;
+	public Bitmap userImage;
 
 	public DiscussionPost() {
 		super();
@@ -162,6 +164,14 @@ public class DiscussionPost {
 
 	public void setParentId(Integer parentId) {
 		this.parentId = parentId;
+	}
+
+	public Bitmap getUserImage() {
+		return userImage;
+	}
+
+	public void setUserImage(Bitmap userImage) {
+		this.userImage = userImage;
 	}
 
 }

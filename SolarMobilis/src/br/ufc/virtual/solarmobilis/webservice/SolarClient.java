@@ -31,7 +31,7 @@ public interface SolarClient {
 
 	@Get("discussions/{id}/posts/news/{date}.json?mobilis=true&auth_token={token}")
 	DiscussionPostList getPosts(String token, int id, String date);
-	
+
 	@Post("discussions/{discussionId}/posts.json?auth_token={token}")
 	void sendPost(PostSender postSender, Integer discussionId, String token);
 
