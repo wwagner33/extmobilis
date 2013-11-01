@@ -37,7 +37,6 @@ import com.googlecode.androidannotations.annotations.UiThread;
 import com.googlecode.androidannotations.annotations.ViewById;
 import com.googlecode.androidannotations.annotations.sharedpreferences.Pref;
 
-//@OptionsMenu(R.menu.options_menu)
 @EActivity
 public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 
@@ -77,16 +76,16 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 	View footerFuturePosts;
 
 	int UnloadedFuturePosts;
-
 	boolean footerUnloadedFuturePostsState;
 	boolean footerFuturePostsState;
-
 	List<DiscussionPost> posts = new ArrayList<DiscussionPost>();
 	List<DiscussionPost> newPosts = new ArrayList<DiscussionPost>();
 	private ProgressDialog dialog;
 	private String oldDateString = "20001010102410";
 	private ActionBar actionBar;
 	private Boolean postSelected = false;
+	private Bitmap userImage;
+	private Bitmap userImageEmpty;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -95,27 +94,17 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 		dialog = ProgressDialog.show(this, "Aguarde", "Recebendo resposta",
 				true);
 		actionBar = getSupportActionBar();
-
-//		getPosts();
-
 		LayoutInflater inflater = getLayoutInflater();
-
 		footerFuturePosts = inflater.inflate(
 				R.layout.load_available_posts_item, listVieWDiscussionPosts,
 				false);
-
 		footerRefresh = inflater.inflate(R.layout.refresh_discussion_list_item,
 				listVieWDiscussionPosts, false);
-
 		footerRefresh.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-
 				refresh_button();
-
-				/* Log.i("old date string do ultimo", oldDateString); */
-
 			}
 		});
 
@@ -123,11 +112,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 
 			@Override
 			public void onClick(View v) {
-
 				refresh_button();
-
-				/* Log.i("old date string do ultimo", oldDateString); */
-
 			}
 		});
 
@@ -135,6 +120,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 	
 	@Override
 	protected void onResume() {
+		posts.clear();
 		getPosts();
 		super.onResume();
 	}
@@ -144,7 +130,6 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 		Log.i("Dentro do setFooter", String.valueOf(UnloadedFuturePosts));
 
 		if (UnloadedFuturePosts > 0) {
-
 			((TextView) footerFuturePosts
 					.findViewById(R.id.load_available_posts))
 					.setText(UnloadedFuturePosts
@@ -154,7 +139,6 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 
 			((ImageView) footerFuturePosts.findViewById(R.id.blue_line))
 					.setVisibility(View.VISIBLE);
-
 			footerUnloadedFuturePostsState = true;
 			listVieWDiscussionPosts
 					.addFooterView(footerFuturePosts, null, true);
@@ -201,7 +185,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 
 		newPosts = response.getPosts();
 		Collections.reverse(newPosts);
-		posts.addAll(posts.size(), /* response.getPosts() */newPosts);
+		posts.addAll(posts.size(), newPosts);
 
 		for (int i = 0; i < posts.size(); i++) {
 
@@ -254,12 +238,18 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 	void getPosts() {
 
 		try {
-			response = solarManager.getPosts(preferences.token().get(),
-					discussionId, oldDateString);
+			discussionPostList = solarManager.getPosts(preferences.token()
+					.get(), discussionId, oldDateString);
+			List<DiscussionPost> posts = discussionPostList.getPosts();
+			for (DiscussionPost discussionPost2 : posts) {
+				getUserImage(discussionPost2);
+			}
 
-			UnloadedFuturePosts = response.getAfter();
-
-			Log.i("after", String.valueOf(response.getAfter()));
+			UnloadedFuturePosts = discussionPostList.getAfter();
+			Log.i("after", String.valueOf(discussionPostList.getAfter()));
+			Log.i("id usuario",
+					String.valueOf(discussionPostList.getPosts().get(1)
+							.getUserId()));
 			updateList();
 			setFooter();
 
@@ -272,6 +262,39 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 			dialog.dismiss();
 			solarManager.alertTimeout();
 		}
+	}
+
+	@Background
+	public void getUserImage(DiscussionPost discussionPost) {
+		userImage = null;
+		userImageEmpty = BitmapFactory.decodeResource(getResources(),
+				R.drawable.no_picture);
+
+		String url = solarManager.getUserImageUrl(discussionPost.getUserId(),
+				preferences.token().get());
+
+		try {
+			URL aURL = new URL(url);
+			URLConnection connection = aURL.openConnection();
+			connection.connect();
+			InputStream iS = connection.getInputStream();
+			BufferedInputStream bIS = new BufferedInputStream(iS);
+			userImage = BitmapFactory.decodeStream(bIS);
+			bIS.close();
+			iS.close();
+
+		} catch (IOException e) {
+			Log.e("User Image", "Error download");
+			userImage = null;
+			
+		}
+
+		if (userImage != null) {
+			discussionPost.setUserImage(userImage);
+		} else {
+			discussionPost.setUserImage(userImageEmpty);
+		}
+
 	}
 
 	@UiThread
@@ -311,15 +334,15 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 	}
 
 	void actionBarSelected() {
-		actionBar.setHomeButtonEnabled(false);// --------> Pesquisar
-		actionBar.setDisplayShowHomeEnabled(false); // tira logo
-		actionBar.setDisplayShowTitleEnabled(false); // Tira titulo
-		actionBar.setDisplayUseLogoEnabled(false); // tira logo
-		actionBar.setDisplayHomeAsUpEnabled(false); // --------> Pesquisar
-		actionBar.setDisplayShowCustomEnabled(true); // Permite a customização
+		actionBar.setHomeButtonEnabled(false);
+		actionBar.setDisplayShowHomeEnabled(false);
+		actionBar.setDisplayShowTitleEnabled(false);
+		actionBar.setDisplayUseLogoEnabled(false);
+		actionBar.setDisplayHomeAsUpEnabled(false);
+		actionBar.setDisplayShowCustomEnabled(true);
 		actionBar.setBackgroundDrawable(new ColorDrawable(getResources()
-				.getColor(R.color.action_bar_active))); // Muda a cor
-		invalidateOptionsMenu(); // troca de menus xml --------> Pesquisar
+				.getColor(R.color.action_bar_active)));
+		invalidateOptionsMenu();
 	}
 
 	void actionBarNotSelected() {
@@ -341,16 +364,5 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 			actionBarNotSelected();
 			invalidateOptionsMenu();
 		}
-
 	}
-
-//	@Override
-//	protected void onResume() {
-//		//dialog = ProgressDialog.show(this, "Aguarde", "Recebendo resposta",
-//			//	true);
-//		//posts.clear();
-//		//getPosts();
-//		super.onResume();
-//	}
-
 }
