@@ -6,9 +6,12 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.widget.Toast;
+import br.ufc.virtual.solarmobilis.LoginActivity_;
 import br.ufc.virtual.solarmobilis.PostSender;
 import br.ufc.virtual.solarmobilis.R;
+import br.ufc.virtual.solarmobilis.SolarMobilisPreferences_;
 import br.ufc.virtual.solarmobilis.model.CurriculumUnitList;
 import br.ufc.virtual.solarmobilis.model.DiscussionList;
 import br.ufc.virtual.solarmobilis.model.DiscussionPostList;
@@ -21,6 +24,7 @@ import com.googlecode.androidannotations.annotations.EBean;
 import com.googlecode.androidannotations.annotations.RootContext;
 import com.googlecode.androidannotations.annotations.UiThread;
 import com.googlecode.androidannotations.annotations.rest.RestService;
+import com.googlecode.androidannotations.annotations.sharedpreferences.Pref;
 
 @EBean
 public class SolarManager {
@@ -30,6 +34,9 @@ public class SolarManager {
 
 	@RestService
 	SolarClient solarClient;
+
+	@Pref
+	SolarMobilisPreferences_ preferences;
 
 	@AfterInject
 	public void config() {
@@ -93,6 +100,10 @@ public class SolarManager {
 		case 401:
 			Toast.makeText(rootActivity, R.string.ERROR_AUTHENTICATION,
 					Toast.LENGTH_SHORT).show();
+			if (preferences.token().get().length() != 0) {
+				logout();
+			}
+
 			break;
 		case 0:
 			Toast.makeText(rootActivity, R.string.ERROR_CONECTION,
@@ -114,6 +125,13 @@ public class SolarManager {
 			Toast.makeText(rootActivity, R.string.ERROR_UNKNOWN,
 					Toast.LENGTH_SHORT).show();
 		}
+	}
+
+	public void logout() {
+		preferences.token().put(null);
+		Intent intent = new Intent(rootActivity, LoginActivity_.class);
+		rootActivity.startActivity(intent);
+		rootActivity.finish();
 	}
 
 	@UiThread

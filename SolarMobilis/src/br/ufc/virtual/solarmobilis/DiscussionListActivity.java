@@ -54,10 +54,7 @@ public class DiscussionListActivity extends SherlockFragmentActivity {
 
 	@OptionsItem(R.id.menu_logout)
 	void logout() {
-		preferences.token().put(null);
-		Intent intent = new Intent(this, LoginActivity_.class);
-		startActivity(intent);
-		finish();
+		solarManager.logout();
 	}
 
 	@OptionsItem(R.id.menu_refresh)
