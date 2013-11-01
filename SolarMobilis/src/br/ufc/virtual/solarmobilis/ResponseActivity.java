@@ -85,10 +85,6 @@ public class ResponseActivity extends Activity {
 	void toast() {
 		Toast.makeText(this, R.string.send_post_sucess, Toast.LENGTH_SHORT)
 				.show();
-
-		// Intent intent = new Intent(this, DiscussionsPostsActivity_.class);
-		// intent.putExtra("discussionId", discussionId);
-		// startActivity(intent);
 		finish();
 	}
 

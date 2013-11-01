@@ -1,5 +1,10 @@
 package br.ufc.virtual.solarmobilis;
 
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -9,6 +14,8 @@ import org.springframework.web.client.ResourceAccessException;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,8 +25,8 @@ import android.view.View.OnClickListener;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import br.ufc.virtual.solarmobilis.model.DiscussionPostList;
 import br.ufc.virtual.solarmobilis.model.DiscussionPost;
+import br.ufc.virtual.solarmobilis.model.DiscussionPostList;
 import br.ufc.virtual.solarmobilis.model.PostAdapter;
 import br.ufc.virtual.solarmobilis.webservice.SolarManager;
 
@@ -40,7 +47,7 @@ import com.googlecode.androidannotations.annotations.sharedpreferences.Pref;
 @EActivity
 public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 
-	DiscussionPostList response;
+	DiscussionPostList discussionPostList;
 
 	@Pref
 	SolarMobilisPreferences_ preferences;
@@ -174,16 +181,16 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 			oldDateString = posts.get(posts.size() - 1).getDateToString();
 		}
 
-		response = solarManager.getPosts(preferences.token().get(),
+		discussionPostList = solarManager.getPosts(preferences.token().get(),
 				discussionId, oldDateString);
-		UnloadedFuturePosts = response.getAfter();
+		UnloadedFuturePosts = discussionPostList.getAfter();
 
-		for (int i = 0; i < response.getPosts().size(); i++) {
+		for (int i = 0; i < discussionPostList.getPosts().size(); i++) {
 
-			Log.i("#" + i, response.getPosts().get(i).getContent());
+			Log.i("#" + i, discussionPostList.getPosts().get(i).getContent());
 		}
 
-		newPosts = response.getPosts();
+		newPosts = discussionPostList.getPosts();
 		Collections.reverse(newPosts);
 		posts.addAll(posts.size(), newPosts);
 
@@ -303,11 +310,11 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 		forumTitle.setText(discussionName);
 		forumRange.setText(startDate + " - " + endDate);
 
-		posts = response.getPosts();
-		for (int i = 0; i < response.getPosts().size(); i++) {
+		posts = discussionPostList.getPosts();
+		for (int i = 0; i < discussionPostList.getPosts().size(); i++) {
 
-			Log.i("#" + i, response.getPosts().get(i).getUpdatedAt() + " "
-					+ response.getPosts().get(i).getDateToString());
+			Log.i("#" + i, discussionPostList.getPosts().get(i).getUpdatedAt() + " "
+					+ discussionPostList.getPosts().get(i).getDateToString());
 		}
 		Collections.reverse(posts);
 		PostAdapter adapter = new PostAdapter(this,
