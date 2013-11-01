@@ -71,8 +71,7 @@ public class DiscussionListActivity extends SherlockFragmentActivity {
 		Log.i("TOKEN TURMAS", preferences.token().get().toString());
 
 		try {
-			response = solarManager.getDiscussions(preferences.token().get()
-					.toString(), preferences.groupSelected().get());
+			response = solarManager.getDiscussions(preferences.groupSelected().get());
 			updateList();
 
 		} catch (HttpClientErrorException e) {

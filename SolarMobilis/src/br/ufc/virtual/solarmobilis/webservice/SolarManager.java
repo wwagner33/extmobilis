@@ -49,29 +49,29 @@ public class SolarManager {
 		return solarClient.doLogin(userMessage);
 	}
 
-	public CurriculumUnitList getCurriculumUnits(String token) {
-		return solarClient.getCurriculumUnits(token);
+	public CurriculumUnitList getCurriculumUnits() {
+		return solarClient.getCurriculumUnits(preferences.token().get());
 	}
 
-	public GroupList getGroups(String token, int id) {
-		return solarClient.getGroups(token, id);
+	public GroupList getGroups(int id) {
+		return solarClient.getGroups(preferences.token().get(), id);
 	}
 
-	public DiscussionList getDiscussions(String token, int id) {
-		return solarClient.getDiscussions(token, id);
+	public DiscussionList getDiscussions(int id) {
+		return solarClient.getDiscussions(preferences.token().get(), id);
 	}
 
-	public DiscussionPostList getPosts(String token, int id, String date) {
-		return solarClient.getPosts(token, id, date);
+	public DiscussionPostList getPosts(int id, String date) {
+		return solarClient.getPosts(preferences.token().get(), id, date);
 	}
 
-	public void sendPost(PostSender postSender, Integer id, String token) {
-		solarClient.sendPost(postSender, id, token);
+	public void sendPost(PostSender postSender, Integer id) {
+		solarClient.sendPost(postSender, id, preferences.token().get());
 	}
 
-	public String getUserImageUrl(int userId, String token) {
+	public String getUserImageUrl(int userId) {
 		return ("http://apolo11teste.virtual.ufc.br/users/" + userId
-				+ "/photo.json?auth_token=" + token);
+				+ "/photo.json?auth_token=" + preferences.token().get());
 
 	}
 

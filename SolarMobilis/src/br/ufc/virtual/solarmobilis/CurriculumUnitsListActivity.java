@@ -73,8 +73,7 @@ public class CurriculumUnitsListActivity extends SherlockFragmentActivity {
 		Log.i("TOKEN_DISCIPLINAS, TURMAS", preferences.token().get().toString());
 
 		try {
-			response = solarManager.getCurriculumUnits(preferences.token()
-					.get().toString());
+			response = solarManager.getCurriculumUnits();
 			updateList();
 			
 		} catch (HttpClientErrorException e) {

@@ -124,7 +124,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 		});
 
 	}
-	
+
 	@Override
 	protected void onResume() {
 		posts.clear();
@@ -181,8 +181,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 			oldDateString = posts.get(posts.size() - 1).getDateToString();
 		}
 
-		discussionPostList = solarManager.getPosts(preferences.token().get(),
-				discussionId, oldDateString);
+		discussionPostList = solarManager.getPosts(discussionId, oldDateString);
 		UnloadedFuturePosts = discussionPostList.getAfter();
 
 		for (int i = 0; i < discussionPostList.getPosts().size(); i++) {
@@ -241,8 +240,8 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 	void getPosts() {
 
 		try {
-			discussionPostList = solarManager.getPosts(preferences.token()
-					.get(), discussionId, oldDateString);
+			discussionPostList = solarManager.getPosts(discussionId,
+					oldDateString);
 			List<DiscussionPost> posts = discussionPostList.getPosts();
 			for (DiscussionPost discussionPost2 : posts) {
 				getUserImage(discussionPost2);
@@ -273,8 +272,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 		userImageEmpty = BitmapFactory.decodeResource(getResources(),
 				R.drawable.no_picture);
 
-		String url = solarManager.getUserImageUrl(discussionPost.getUserId(),
-				preferences.token().get());
+		String url = solarManager.getUserImageUrl(discussionPost.getUserId());
 
 		try {
 			URL aURL = new URL(url);
@@ -289,7 +287,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 		} catch (IOException e) {
 			Log.e("User Image", "Error download");
 			userImage = null;
-			
+
 		}
 
 		if (userImage != null) {
@@ -309,7 +307,8 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 		posts = discussionPostList.getPosts();
 		for (int i = 0; i < discussionPostList.getPosts().size(); i++) {
 
-			Log.i("#" + i, discussionPostList.getPosts().get(i).getUpdatedAt() + " "
+			Log.i("#" + i, discussionPostList.getPosts().get(i).getUpdatedAt()
+					+ " "
 					+ discussionPostList.getPosts().get(i).getDateToString());
 		}
 		Collections.reverse(posts);

@@ -63,8 +63,7 @@ public class ResponseActivity extends Activity {
 	void sendPost() {
 
 		try {
-			solarManager.sendPost(postSender, discussionId, preferences.token()
-					.get().toString());
+			solarManager.sendPost(postSender, discussionId);
 
 			dialog.dismiss();
 			toast();
