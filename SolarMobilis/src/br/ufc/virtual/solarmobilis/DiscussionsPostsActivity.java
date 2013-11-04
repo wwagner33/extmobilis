@@ -83,6 +83,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 	View footerFuturePosts;
 
 	int UnloadedFuturePosts;
+	int selectedPosition = -1;
 	boolean footerUnloadedFuturePostsState;
 	boolean footerFuturePostsState;
 	List<DiscussionPost> posts = new ArrayList<DiscussionPost>();
@@ -90,9 +91,11 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 	private ProgressDialog dialog;
 	private String oldDateString = "20001010102410";
 	private ActionBar actionBar;
-	private Boolean postSelected = false;
+	private boolean postSelected = false;
+	private boolean ActionBarStatus = false;
 	private Bitmap userImage;
 	private Bitmap userImageEmpty;
+	PostAdapter adapter;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -243,15 +246,14 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 			discussionPostList = solarManager.getPosts(discussionId,
 					oldDateString);
 			List<DiscussionPost> posts = discussionPostList.getPosts();
-			for (DiscussionPost discussionPost2 : posts) {
-				getUserImage(discussionPost2);
+			for (DiscussionPost discussionPost : posts) {
+				discussionPost.setUserImageURL(solarManager
+						.getUserImageUrl(discussionPost.getUserId()));
 			}
 
 			UnloadedFuturePosts = discussionPostList.getAfter();
 			Log.i("after", String.valueOf(discussionPostList.getAfter()));
-			Log.i("id usuario",
-					String.valueOf(discussionPostList.getPosts().get(1)
-							.getUserId()));
+
 			updateList();
 			setFooter();
 
@@ -264,38 +266,6 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 			dialog.dismiss();
 			solarManager.alertTimeout();
 		}
-	}
-
-	@Background
-	public void getUserImage(DiscussionPost discussionPost) {
-		userImage = null;
-		userImageEmpty = BitmapFactory.decodeResource(getResources(),
-				R.drawable.no_picture);
-
-		String url = solarManager.getUserImageUrl(discussionPost.getUserId());
-
-		try {
-			URL aURL = new URL(url);
-			URLConnection connection = aURL.openConnection();
-			connection.connect();
-			InputStream iS = connection.getInputStream();
-			BufferedInputStream bIS = new BufferedInputStream(iS);
-			userImage = BitmapFactory.decodeStream(bIS);
-			bIS.close();
-			iS.close();
-
-		} catch (IOException e) {
-			Log.e("User Image", "Error download");
-			userImage = null;
-
-		}
-
-		if (userImage != null) {
-			discussionPost.setUserImage(userImage);
-		} else {
-			discussionPost.setUserImage(userImageEmpty);
-		}
-
 	}
 
 	@UiThread
@@ -312,8 +282,8 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 					+ discussionPostList.getPosts().get(i).getDateToString());
 		}
 		Collections.reverse(posts);
-		PostAdapter adapter = new PostAdapter(this,
-				R.layout.discussion_list_item, R.id.user_nick, posts);
+		adapter = new PostAdapter(this, R.layout.discussion_list_item,
+				R.id.user_nick, posts);
 
 		listVieWDiscussionPosts.setAdapter(adapter);
 
@@ -321,21 +291,52 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 
 	@UiThread
 	void reUpdateList() {
-		PostAdapter adapter = new PostAdapter(this,
-				R.layout.discussion_list_item, R.id.user_nick, posts);
+		adapter = new PostAdapter(this, R.layout.discussion_list_item,
+				R.id.user_nick, posts);
 
 		listVieWDiscussionPosts.setAdapter(adapter);
 	}
 
 	@ItemClick
-	void listViewDiscussionsPosts() {
-		Log.i("clicado", "clicado");
-		postSelected = true;
-		actionBarSelected();
+	void listViewDiscussionsPosts(int position) {
+		Log.i("clicado (activity de posts)", "ENTROU NO LISTNER");
+		Log.i("clicado (activity de posts)", "clicado no " + position);
+		togglePostMarked(position);
 
 	}
 
-	void actionBarSelected() {
+	public void togglePostMarked(int position) {
+
+		if (selectedPosition == position) {
+
+			posts.get(position).setMarked(false);
+			adapter.notifyDataSetChanged();
+
+			postSelected = false;
+			setActionBarNotSelected();
+			ActionBarStatus = false;
+			selectedPosition = -1;
+
+		} else {
+
+			posts.get(position).setMarked(true);
+			adapter.notifyDataSetChanged();
+
+			if (selectedPosition != -1) {
+				posts.get(selectedPosition).setMarked(false);
+				adapter.notifyDataSetChanged();
+			}
+
+			selectedPosition = position;
+			setActionBarSelected();
+			ActionBarStatus = true;
+			postSelected = true;
+
+		}
+
+	}
+
+	void setActionBarSelected() {
 		actionBar.setHomeButtonEnabled(false);
 		actionBar.setDisplayShowHomeEnabled(false);
 		actionBar.setDisplayShowTitleEnabled(false);
@@ -347,13 +348,14 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 		invalidateOptionsMenu();
 	}
 
-	void actionBarNotSelected() {
+	void setActionBarNotSelected() {
 		actionBar.setDisplayShowHomeEnabled(true);
 		actionBar.setDisplayShowTitleEnabled(true);
 		actionBar.setDisplayUseLogoEnabled(true);
 		actionBar.setDisplayShowCustomEnabled(true);
 		actionBar.setBackgroundDrawable(new ColorDrawable(getResources()
 				.getColor(R.color.action_bar_idle)));
+		invalidateOptionsMenu();
 	}
 
 	@Override
@@ -363,7 +365,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 
 		} else {
 			postSelected = false;
-			actionBarNotSelected();
+			setActionBarNotSelected();
 			invalidateOptionsMenu();
 		}
 	}

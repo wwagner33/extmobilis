@@ -5,6 +5,7 @@ import java.util.List;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +18,7 @@ public class PostAdapter extends ArrayAdapter<DiscussionPost> {
 
 	Context context;
 	int layoutResource;
-	ArrayList<DiscussionPost> objects;
+	ArrayList<DiscussionPost> posts;
 
 	public PostAdapter(Context context, int resource, int textViewResourceId,
 			List<DiscussionPost> objects) {
@@ -25,7 +26,7 @@ public class PostAdapter extends ArrayAdapter<DiscussionPost> {
 
 		this.context = context;
 		this.layoutResource = resource;
-		this.objects = (ArrayList<DiscussionPost>) objects;
+		this.posts = (ArrayList<DiscussionPost>) objects;
 
 	}
 
@@ -33,7 +34,7 @@ public class PostAdapter extends ArrayAdapter<DiscussionPost> {
 	public View getView(int position, View convertView, ViewGroup parent) {
 
 		View row = convertView;
-		PostItem postitem = null;
+		PostItem postItem = null;
 
 		if (row == null) {
 
@@ -41,23 +42,33 @@ public class PostAdapter extends ArrayAdapter<DiscussionPost> {
 
 			row = inflater.inflate(layoutResource, parent, false);
 
-			postitem = new PostItem();
+			postItem = new PostItem();
 
-			postitem.name = (TextView) row.findViewById(R.id.user_nick);
-			postitem.date = (TextView) row.findViewById(R.id.post_date);
-			postitem.content = (TextView) row.findViewById(R.id.post_content);
-			postitem.image = (ImageView) row.findViewById(R.id.user_photo);
+			postItem.name = (TextView) row.findViewById(R.id.user_nick);
+			postItem.date = (TextView) row.findViewById(R.id.post_date);
+			postItem.content = (TextView) row.findViewById(R.id.post_content);
+			postItem.image = (ImageView) row.findViewById(R.id.user_photo);
 
-			row.setTag(postitem);
+			row.setTag(postItem);
 
 		} else {
-			postitem = (PostItem) row.getTag();
+			postItem = (PostItem) row.getTag();
 		}
 
-		postitem.name.setText(objects.get(position).getUserNick());
-		postitem.date.setText(objects.get(position).getDateToPost());
-		postitem.content.setText(objects.get(position).getContent());
-		postitem.image.setImageBitmap(objects.get(position).getUserImage());
+		postItem.name.setText(posts.get(position).getUserNick());
+		postItem.date.setText(posts.get(position).getDateToPost());
+		postItem.content.setText(posts.get(position).getContent());
+
+		Picasso.with(context).load(posts.get(position).getUserImageURL())
+				.placeholder(R.drawable.no_picture)
+				.error(R.drawable.no_picture).into(postItem.image);
+
+		if (posts.get(position).isMarked) {
+			row.setBackgroundColor(0xFFF0E68C);
+		} else {
+
+			row.setBackgroundColor(Color.WHITE);
+		}
 
 		return row;
 	}

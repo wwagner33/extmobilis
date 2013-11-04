@@ -29,6 +29,8 @@ public class DiscussionPost {
 	@SerializedName("parent_id")
 	public Integer parentId;
 	public Bitmap userImage;
+	public boolean isMarked = false;
+	private String userImageURL;
 
 	public DiscussionPost() {
 		super();
@@ -172,6 +174,22 @@ public class DiscussionPost {
 
 	public void setUserImage(Bitmap userImage) {
 		this.userImage = userImage;
+	}
+
+	public boolean isMarked() {
+		return isMarked;
+	}
+
+	public void setMarked(boolean isMarked) {
+		this.isMarked = isMarked;
+	}
+
+	public String getUserImageURL() {
+		return userImageURL;
+	}
+
+	public void setUserImageURL(String userImageURL) {
+		this.userImageURL = userImageURL;
 	}
 
 }
