@@ -29,6 +29,7 @@ public class DiscussionPost {
 	@SerializedName("parent_id")
 	public Integer parentId;
 	public Bitmap userImage;
+	private String userImageURL;
 
 	public DiscussionPost() {
 		super();
@@ -172,6 +173,14 @@ public class DiscussionPost {
 
 	public void setUserImage(Bitmap userImage) {
 		this.userImage = userImage;
+	}
+
+	public String getUserImageURL() {
+		return userImageURL;
+	}
+
+	public void setUserImageURL(String userImageURL) {
+		this.userImageURL = userImageURL;
 	}
 
 }

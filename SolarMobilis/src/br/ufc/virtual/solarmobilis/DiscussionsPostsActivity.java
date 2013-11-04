@@ -92,7 +92,6 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 	private ActionBar actionBar;
 	private Boolean postSelected = false;
 	private Bitmap userImage;
-	private Bitmap userImageEmpty;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -243,15 +242,14 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 			discussionPostList = solarManager.getPosts(discussionId,
 					oldDateString);
 			List<DiscussionPost> posts = discussionPostList.getPosts();
-			for (DiscussionPost discussionPost2 : posts) {
-				getUserImage(discussionPost2);
+			for (DiscussionPost discussionPost : posts) {
+				discussionPost.setUserImageURL(solarManager
+						.getUserImageUrl(discussionPost.getUserId()));
 			}
 
 			UnloadedFuturePosts = discussionPostList.getAfter();
 			Log.i("after", String.valueOf(discussionPostList.getAfter()));
-			Log.i("id usuario",
-					String.valueOf(discussionPostList.getPosts().get(1)
-							.getUserId()));
+
 			updateList();
 			setFooter();
 
@@ -264,38 +262,6 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 			dialog.dismiss();
 			solarManager.alertTimeout();
 		}
-	}
-
-	@Background
-	public void getUserImage(DiscussionPost discussionPost) {
-		userImage = null;
-		userImageEmpty = BitmapFactory.decodeResource(getResources(),
-				R.drawable.no_picture);
-
-		String url = solarManager.getUserImageUrl(discussionPost.getUserId());
-
-		try {
-			URL aURL = new URL(url);
-			URLConnection connection = aURL.openConnection();
-			connection.connect();
-			InputStream iS = connection.getInputStream();
-			BufferedInputStream bIS = new BufferedInputStream(iS);
-			userImage = BitmapFactory.decodeStream(bIS);
-			bIS.close();
-			iS.close();
-
-		} catch (IOException e) {
-			Log.e("User Image", "Error download");
-			userImage = null;
-
-		}
-
-		if (userImage != null) {
-			discussionPost.setUserImage(userImage);
-		} else {
-			discussionPost.setUserImage(userImageEmpty);
-		}
-
 	}
 
 	@UiThread
