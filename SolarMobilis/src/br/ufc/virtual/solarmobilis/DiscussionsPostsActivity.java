@@ -94,7 +94,6 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 	private boolean postSelected = false;
 	private boolean ActionBarStatus = false;
 	private Bitmap userImage;
-	private Bitmap userImageEmpty;
 	PostAdapter adapter;
 
 	@Override

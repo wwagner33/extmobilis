@@ -226,11 +226,11 @@ public class ResponseActivity extends SherlockActivity implements
 		if (v.getId() == R.id.criar_topico_submit) {
 
 			if (existsRecording) {
-				message.append("\n[Áudio em anexo]");
+				message.append("\n[Ã�udio em anexo]");
 			}
 
 			if (message.getText().length() == 0) {
-				Toast.makeText(this, "Mensagem não pode ser vazia",
+				Toast.makeText(this, "Mensagem nÃ£o pode ser vazia",
 						Toast.LENGTH_SHORT).show();
 			} else {
 				if (appState.selectedPost > -1) {
@@ -244,6 +244,7 @@ public class ResponseActivity extends SherlockActivity implements
 							.buildTextResponseWithoutParent(message.getText()
 									.toString());
 				}
+				Log.i("json",postObject.toJSONString());
 				sendPost(postObject.toJSONString());
 			}
 		}
@@ -258,7 +259,7 @@ public class ResponseActivity extends SherlockActivity implements
 							.clearFlags(
 									android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-					Toast.makeText(this, "gravação concluída",
+					Toast.makeText(this, "gravaÃ§Ã£o concluÃ­da",
 							Toast.LENGTH_SHORT).show();
 					recorder.stopRecording();
 					stopWatch.stop();
@@ -389,7 +390,7 @@ public class ResponseActivity extends SherlockActivity implements
 			if ((toastTimer - System.currentTimeMillis()) <= -2500) {
 				Toast.makeText(
 						this,
-						"Mensagem deve conter no máximo "
+						"Mensagem deve conter no mÃ¡ximo "
 								+ Constants.TEXT_MAX_CHARACTER_LENGHT
 								+ " caracteres", Toast.LENGTH_SHORT).show();
 				toastTimer = System.currentTimeMillis();
@@ -412,7 +413,7 @@ public class ResponseActivity extends SherlockActivity implements
 		file.delete();
 		existsRecording = false;
 		recordImage.setVisibility(View.GONE);
-		Toast.makeText(this, "Gravação deletada com sucesso",
+		Toast.makeText(this, "GravaÃ§Ã£o deletada com sucesso",
 				Toast.LENGTH_SHORT).show();
 
 	}
@@ -440,7 +441,7 @@ public class ResponseActivity extends SherlockActivity implements
 			switch (connectionId) {
 			case Constants.CONNECTION_POST_AUDIO:
 				Toast.makeText(getApplicationContext(),
-						"Erro no envio de áudio", Toast.LENGTH_SHORT).show();
+						"Erro no envio de Ã¡udio", Toast.LENGTH_SHORT).show();
 				Intent intent = new Intent(getApplicationContext(),
 						PostsActivity.class);
 				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

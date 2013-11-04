@@ -14,6 +14,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import br.ufc.virtual.solarmobilis.R;
 
+import com.squareup.picasso.Picasso;
+
 public class PostAdapter extends ArrayAdapter<DiscussionPost> {
 
 	Context context;

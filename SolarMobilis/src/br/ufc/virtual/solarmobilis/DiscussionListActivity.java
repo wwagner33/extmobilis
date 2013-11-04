@@ -106,6 +106,7 @@ public class DiscussionListActivity extends SherlockFragmentActivity {
 	void listViewDiscussions(int position) {
 
 		Intent intent = new Intent(this, DiscussionsPostsActivity_.class);
+		//intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		intent.putExtra("discussionId", response.getDiscussions().get(position)
 				.getId());
 		intent.putExtra("discussionName",

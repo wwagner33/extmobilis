@@ -114,6 +114,7 @@ public class GroupsListActivity extends SherlockFragmentActivity {
 				response.getGroups().get(position).getId());
 
 		Intent intent = new Intent(this, DiscussionListActivity_.class);
+		//intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		startActivity(intent);
 
 	}
