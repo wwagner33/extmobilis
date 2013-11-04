@@ -114,7 +114,6 @@ public class LoginActivity extends Activity {
 			dialog.dismiss();
 
 			startActivity(intent);
-			finish();
 		}
 	}
 
