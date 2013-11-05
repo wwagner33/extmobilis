@@ -1,10 +1,5 @@
 package br.ufc.virtual.solarmobilis;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -15,7 +10,6 @@ import org.springframework.web.client.ResourceAccessException;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
@@ -42,6 +36,7 @@ import com.googlecode.androidannotations.annotations.ItemClick;
 import com.googlecode.androidannotations.annotations.OptionsItem;
 import com.googlecode.androidannotations.annotations.UiThread;
 import com.googlecode.androidannotations.annotations.ViewById;
+import com.googlecode.androidannotations.annotations.res.StringRes;
 import com.googlecode.androidannotations.annotations.sharedpreferences.Pref;
 
 @EActivity
@@ -79,6 +74,12 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 	@ViewById(R.id.forum_range)
 	TextView forumRange;
 
+	@StringRes(R.string.dialog_wait)
+	String dialogWait;
+
+	@StringRes(R.string.dialog_message)
+	String dialogMessage;
+
 	View footerRefresh;
 	View footerFuturePosts;
 
@@ -100,8 +101,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_discussions_posts);
-		dialog = ProgressDialog.show(this, "Aguarde", "Recebendo resposta",
-				true);
+		makeDialog();
 		actionBar = getSupportActionBar();
 		LayoutInflater inflater = getLayoutInflater();
 		footerFuturePosts = inflater.inflate(
@@ -132,6 +132,11 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 		posts.clear();
 		getPosts();
 		super.onResume();
+	}
+
+	@UiThread
+	public void makeDialog() {
+		dialog = ProgressDialog.show(this, dialogWait, dialogMessage, true);
 	}
 
 	void setFooter() {
@@ -173,6 +178,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 
 	@Background
 	void refresh_button() {
+		makeDialog();
 
 		int discussionSize = posts.size();
 
@@ -225,8 +231,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 
 	@OptionsItem(R.id.menu_refresh)
 	void refresh() {
-		dialog = ProgressDialog.show(this, "Aguarde", "Recebendo resposta",
-				true);
+		makeDialog();
 		posts.clear();
 		getPosts();
 	}
@@ -290,6 +295,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 
 	@UiThread
 	void reUpdateList() {
+		dialog.dismiss();
 		adapter = new PostAdapter(this, R.layout.discussion_list_item,
 				R.id.user_nick, posts);
 
@@ -368,7 +374,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 			postSelected = false;
 			setActionBarNotSelected();
 			invalidateOptionsMenu();
-		
+
 		}
 	}
 }
