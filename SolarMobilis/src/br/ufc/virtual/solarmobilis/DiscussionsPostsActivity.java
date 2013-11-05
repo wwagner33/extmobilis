@@ -363,9 +363,12 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 			super.onBackPressed();
 
 		} else {
+			posts.get(selectedPosition).setMarked(false);
+			adapter.notifyDataSetChanged();
 			postSelected = false;
 			setActionBarNotSelected();
 			invalidateOptionsMenu();
+		
 		}
 	}
 }
