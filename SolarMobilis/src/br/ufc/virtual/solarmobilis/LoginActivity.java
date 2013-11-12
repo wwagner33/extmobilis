@@ -3,6 +3,7 @@ package br.ufc.virtual.solarmobilis;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.ResourceAccessException;
 
 import android.app.Activity;
@@ -77,14 +78,14 @@ public class LoginActivity extends Activity {
 		try {
 			response_post = solarManager.doLogin(user);
 			saveToken();
-		} catch (HttpClientErrorException e) {
-			Log.i("ERRO", e.getStatusCode().toString());
-			dialog.dismiss();
+		} catch (HttpStatusCodeException e) {
+			Log.i("ERRO HttpStatusCodeException", e.getStatusCode().toString());
 			solarManager.errorHandler(e.getStatusCode());
-
-		} catch (ResourceAccessException e) {
+		} catch (Exception e) {
+			Log.i("ERRO Exception", e.getMessage());
+			solarManager.alertNoConnection();
+		} finally {
 			dialog.dismiss();
-			solarManager.alertTimeout();
 		}
 		Log.i("MENSSAGEM", "PODE SIM");
 	}

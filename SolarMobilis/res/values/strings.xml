@@ -22,8 +22,9 @@
     <string name="ERROR_CONECTION">Erro de conexão</string>
     <string name="ERROR_TIMEOUT">Tempo limite de conexão atingido</string>
     <string name="ERROR_UNKNOWN">Erro desconhecido</string>
-    <string name="ERROR_SERVER">Servidor indisponível</string>
+    <string name="ERROR_SERVER">Ocorreu um erro no servidor</string>
     <string name="ERROR_ADDRESS">Endereço não encontrado</string>
+    <string name="ERROR_NO_CONECTION">Falha na conexão</string>
     <string name="title_activity_groups_list">Turmas</string>
     <string name="groups_title">Turmas disponiveis</string>
     <string name="discussions_title">Fóruns disponiveis</string>

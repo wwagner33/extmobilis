@@ -71,23 +71,29 @@ public class SolarManager {
 
 	public String getUserImageUrl(int userId) {
 		return ("http://apolo11teste.virtual.ufc.br/users/" + userId
-				+ "/photo.json?auth_token=" + preferences.token().get());
+				+ "/photo?auth_token=" + preferences.token().get());
 
 	}
 
 	private void setTimeout() {
+		setTimeout(10);
+	}
+
+	private void setTimeout(int seconds) {
+
+		int mil = 1000;
 		ClientHttpRequestFactory requestFactory = solarClient.getRestTemplate()
 				.getRequestFactory();
 		if (requestFactory instanceof SimpleClientHttpRequestFactory) {
 			((SimpleClientHttpRequestFactory) requestFactory)
-					.setConnectTimeout(10 * 1000);
+					.setConnectTimeout(seconds * mil);
 			((SimpleClientHttpRequestFactory) requestFactory)
-					.setReadTimeout(10 * 1000);
+					.setReadTimeout(seconds * mil);
 		} else if (requestFactory instanceof HttpComponentsClientHttpRequestFactory) {
 			((HttpComponentsClientHttpRequestFactory) requestFactory)
-					.setReadTimeout(10 * 1000);
+					.setReadTimeout(seconds * mil);
 			((HttpComponentsClientHttpRequestFactory) requestFactory)
-					.setConnectTimeout(10 * 1000);
+					.setConnectTimeout(seconds * mil);
 		}
 	}
 
@@ -98,32 +104,29 @@ public class SolarManager {
 
 		switch (code) {
 		case 401:
-			Toast.makeText(rootActivity, R.string.ERROR_AUTHENTICATION,
-					Toast.LENGTH_SHORT).show();
+			toast(R.string.ERROR_AUTHENTICATION);
 			if (preferences.token().get().length() != 0) {
 				logout();
 			}
-
 			break;
 		case 0:
-			Toast.makeText(rootActivity, R.string.ERROR_CONECTION,
-					Toast.LENGTH_SHORT).show();
+			toast(R.string.ERROR_CONECTION);
 			break;
 		case 400:
-			Toast.makeText(rootActivity, R.string.ERROR_UNKNOWN,
-					Toast.LENGTH_SHORT).show();
+			toast(R.string.ERROR_UNKNOWN);
 			break;
 		case 500:
-			Toast.makeText(rootActivity, R.string.ERROR_SERVER,
-					Toast.LENGTH_SHORT).show();
+			toast(R.string.ERROR_SERVER);
+
 			break;
 		case 404:
-			Toast.makeText(rootActivity, R.string.ERROR_ADDRESS,
-					Toast.LENGTH_SHORT).show();
+			toast(R.string.ERROR_ADDRESS);
+			break;
+		case 408:
+			toast(R.string.ERROR_TIMEOUT);
 			break;
 		default:
-			Toast.makeText(rootActivity, R.string.ERROR_UNKNOWN,
-					Toast.LENGTH_SHORT).show();
+			toast(R.string.ERROR_UNKNOWN);
 		}
 	}
 
@@ -136,13 +139,17 @@ public class SolarManager {
 	}
 
 	@UiThread
-	public void alertTimeout() {
-		Toast.makeText(rootActivity, R.string.ERROR_TIMEOUT, Toast.LENGTH_SHORT)
-				.show();
+	public void alertNoConnection() {
+		toast(R.string.ERROR_NO_CONECTION);
 	}
 
 	public SolarClient getsolarClient() {
 		return solarClient;
+	}
+
+	public void toast(int resourceMessageID) {
+		Toast.makeText(rootActivity, resourceMessageID, Toast.LENGTH_SHORT)
+				.show();
 	}
 
 }

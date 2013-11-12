@@ -1,7 +1,10 @@
 package br.ufc.virtual.solarmobilis;
 
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestClientException;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -44,7 +47,6 @@ public class ResponseActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
 	}
 
 	@Click(R.id.submitReply)
@@ -53,31 +55,25 @@ public class ResponseActivity extends Activity {
 		discussionPost.setDiscussionId(discussionId);
 		postSender.setDiscussionPost(discussionPost);
 
-		dialog = ProgressDialog.show(this, "Aguarde", "Recebendo resposta",
-				true);
+		dialog = ProgressDialog.show(this, "Aguarde", "Enviando", true);
 
 		sendPost();
 	}
 
 	@Background
 	void sendPost() {
-
 		try {
 			solarManager.sendPost(postSender, discussionId);
-
-			dialog.dismiss();
 			toast();
-
-		} catch (HttpClientErrorException e) {
-			Log.i("ERRO", e.getStatusCode().toString());
-			dialog.dismiss();
+		} catch (HttpStatusCodeException e) {
+			Log.i("ERRO HttpStatusCodeException", e.getStatusCode().toString());
 			solarManager.errorHandler(e.getStatusCode());
-
-		} catch (ResourceAccessException e) {
+		} catch (Exception e) {
+			Log.i("ERRO Exception", e.getMessage());
+			solarManager.alertNoConnection();
+		} finally {
 			dialog.dismiss();
-			solarManager.alertTimeout();
 		}
-
 	}
 
 	@UiThread

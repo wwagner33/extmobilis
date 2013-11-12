@@ -29,8 +29,7 @@ public class DiscussionPost {
 	@SerializedName("parent_id")
 	public Integer parentId;
 	public Bitmap userImage;
-
-	public transient Boolean isMarked = false;
+	public transient boolean isMarked = false;
 	private String userImageURL;
 
 	public DiscussionPost() {
@@ -177,11 +176,11 @@ public class DiscussionPost {
 		this.userImage = userImage;
 	}
 
-	public Boolean isMarked() {
+	public boolean isMarked() {
 		return isMarked;
 	}
 
-	public void setMarked(Boolean isMarked) {
+	public void setMarked(boolean isMarked) {
 		this.isMarked = isMarked;
 	}
 

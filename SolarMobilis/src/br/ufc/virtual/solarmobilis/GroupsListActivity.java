@@ -3,6 +3,7 @@ package br.ufc.virtual.solarmobilis;
 import java.util.ArrayList;
 
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.ResourceAccessException;
 
 import android.app.ProgressDialog;
@@ -74,25 +75,23 @@ public class GroupsListActivity extends SherlockFragmentActivity {
 		Log.i("TOKEN TURMAS", preferences.token().get().toString());
 
 		try {
-			response = solarManager.getGroups(preferences.curriculumUnitSelected().get());
+			response = solarManager.getGroups(preferences
+					.curriculumUnitSelected().get());
 			updateList();
-			
-		} catch (HttpClientErrorException e) {
-			Log.i("ERRO", e.getStatusCode().toString());
-			dialog.dismiss();
+		} catch (HttpStatusCodeException e) {
+			Log.i("ERRO HttpStatusCodeException", e.getStatusCode().toString());
 			solarManager.errorHandler(e.getStatusCode());
-
-		} catch (ResourceAccessException e) {
+		} catch (Exception e) {
+			Log.i("ERRO Exception", e.getMessage());
+			solarManager.alertNoConnection();
+		} finally {
 			dialog.dismiss();
-			solarManager.alertTimeout();
 		}
 		Log.i("GROUPSLIST", response.getGroups().get(0).getCode());
 	}
 
 	@UiThread
 	void updateList() {
-		dialog.dismiss();
-
 		for (int i = 0; i < response.getGroups().size(); i++) {
 			groups.add(response.getGroups().get(i).getCode());
 		}
@@ -100,7 +99,6 @@ public class GroupsListActivity extends SherlockFragmentActivity {
 		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
 				R.layout.item_list, R.id.item, groups);
 		listViewGroups.setAdapter(adapter);
-
 	}
 
 	@ItemClick
@@ -114,7 +112,8 @@ public class GroupsListActivity extends SherlockFragmentActivity {
 				response.getGroups().get(position).getId());
 
 		Intent intent = new Intent(this, DiscussionListActivity_.class);
-		//intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		// intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
+		// Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		startActivity(intent);
 
 	}

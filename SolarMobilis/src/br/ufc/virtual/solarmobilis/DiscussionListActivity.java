@@ -3,6 +3,7 @@ package br.ufc.virtual.solarmobilis;
 import java.util.ArrayList;
 
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.ResourceAccessException;
 
 import android.app.ProgressDialog;
@@ -67,30 +68,24 @@ public class DiscussionListActivity extends SherlockFragmentActivity {
 
 	@Background
 	void getDiscussions() {
-
-		Log.i("TOKEN TURMAS", preferences.token().get().toString());
-
 		try {
-			response = solarManager.getDiscussions(preferences.groupSelected().get());
+			response = solarManager.getDiscussions(preferences.groupSelected()
+					.get());
 			updateList();
-
-		} catch (HttpClientErrorException e) {
-			Log.i("ERRO", e.getStatusCode().toString());
-			dialog.dismiss();
+		} catch (HttpStatusCodeException e) {
+			Log.i("ERRO HttpStatusCodeException", e.getStatusCode().toString());
 			solarManager.errorHandler(e.getStatusCode());
-
-		} catch (ResourceAccessException e) {
+		} catch (Exception e) {
+			Log.i("ERRO Exception", e.getMessage());
+			solarManager.alertNoConnection();
+		} finally {
 			dialog.dismiss();
-			solarManager.alertTimeout();
 		}
-		Log.i("DISCUSSIONLIST", response.getDiscussions().get(0).getName());
-
+		// Log.i("DISCUSSIONLIST", response.getDiscussions().get(0).getName());
 	}
 
 	@UiThread
 	void updateList() {
-		dialog.dismiss();
-
 		for (int i = 0; i < response.getDiscussions().size(); i++) {
 			discussions.add(response.getDiscussions().get(i).getName());
 		}
@@ -99,14 +94,14 @@ public class DiscussionListActivity extends SherlockFragmentActivity {
 				R.layout.discussion_list, R.id.topic_name, discussions,
 				response);
 		listViewDiscussions.setAdapter(adapter);
-
 	}
 
 	@ItemClick
 	void listViewDiscussions(int position) {
 
 		Intent intent = new Intent(this, DiscussionsPostsActivity_.class);
-		//intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		// intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
+		// Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		intent.putExtra("discussionId", response.getDiscussions().get(position)
 				.getId());
 		intent.putExtra("discussionName",
