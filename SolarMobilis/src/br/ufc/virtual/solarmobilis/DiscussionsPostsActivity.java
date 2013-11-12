@@ -4,8 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.HttpStatusCodeException;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -31,6 +30,7 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.googlecode.androidannotations.annotations.Background;
 import com.googlecode.androidannotations.annotations.Bean;
+import com.googlecode.androidannotations.annotations.Click;
 import com.googlecode.androidannotations.annotations.EActivity;
 import com.googlecode.androidannotations.annotations.Extra;
 import com.googlecode.androidannotations.annotations.ItemClick;
@@ -96,7 +96,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 	View footerRefresh;
 	View footerFuturePosts;
 
-	int UnloadedFuturePosts;
+	int unloadedFuturePostsCount;
 	int selectedPosition = -1;
 	boolean footerUnloadedFuturePostsState;
 	boolean footerFuturePostsState;
@@ -126,7 +126,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 
 			@Override
 			public void onClick(View v) {
-				refresh_button();
+				refreshPostsList();
 			}
 		});
 
@@ -134,7 +134,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 
 			@Override
 			public void onClick(View v) {
-				refresh_button();
+				refreshPostsList();
 			}
 		});
 
@@ -154,12 +154,12 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 
 	void setFooter() {
 
-		Log.i("Dentro do setFooter", String.valueOf(UnloadedFuturePosts));
+		Log.i("Dentro do setFooter", String.valueOf(unloadedFuturePostsCount));
 
-		if (UnloadedFuturePosts > 0) {
+		if (unloadedFuturePostsCount > 0) {
 			((TextView) footerFuturePosts
 					.findViewById(R.id.load_available_posts))
-					.setText(UnloadedFuturePosts
+					.setText(unloadedFuturePostsCount
 							+ " "
 							+ getApplicationContext().getResources().getString(
 									R.string.not_loaded_posts_count));
@@ -189,36 +189,45 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 
 	}
 
+	@Click({ R.id.refresh_button })
 	@Background
-	void refresh_button() {
+	void refreshPostsList() {
 		makeDialog();
+		try {
 
-		int discussionSize = posts.size();
+			int discussionSize = posts.size();
+			if (discussionSize == 0) {
+				oldDateString = "20001010102410";
+			} else {
+				oldDateString = posts.get(posts.size() - 1).getDateToString();
+			}
 
-		if (discussionSize == 0) {
-			oldDateString = "20001010102410";
+			discussionPostList = solarManager.getPosts(discussionId,
+					oldDateString);
+			unloadedFuturePostsCount = discussionPostList.getAfter();
 
-		} else {
-			oldDateString = posts.get(posts.size() - 1).getDateToString();
+			for (int i = 0; i < discussionPostList.getPosts().size(); i++) {
+				Log.i("#" + i, discussionPostList.getPosts().get(i)
+						.getContent());
+			}
+
+			newPosts = discussionPostList.getPosts();
+			Collections.reverse(newPosts);
+			posts.addAll(posts.size(), newPosts);
+
+			for (int i = 0; i < posts.size(); i++) {
+				Log.i("#" + i, posts.get(i).getContent());
+			}
+
+		} catch (HttpStatusCodeException e) {
+			Log.i("ERRO HttpClientErrorException", e.getStatusCode().toString());
+			solarManager.errorHandler(e.getStatusCode());
+		} catch (Exception e) {
+			Log.i("ERRO ResourceAccessException", e.getMessage());
+			solarManager.alertNoConnection();
+		} finally {
+			dialog.dismiss();
 		}
-
-		discussionPostList = solarManager.getPosts(discussionId, oldDateString);
-		UnloadedFuturePosts = discussionPostList.getAfter();
-
-		for (int i = 0; i < discussionPostList.getPosts().size(); i++) {
-
-			Log.i("#" + i, discussionPostList.getPosts().get(i).getContent());
-		}
-
-		newPosts = discussionPostList.getPosts();
-		Collections.reverse(newPosts);
-		posts.addAll(posts.size(), newPosts);
-
-		for (int i = 0; i < posts.size(); i++) {
-
-			Log.i("#" + i, posts.get(i).getContent());
-		}
-
 		reUpdateList();
 		setFooter();
 	}
@@ -252,12 +261,10 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 
 	@OptionsItem(R.id.play)
 	void showPlayControls() {
-
 		play.setVisibility(View.VISIBLE);
 		prev.setVisibility(View.VISIBLE);
 		next.setVisibility(View.VISIBLE);
 		stop.setVisibility(View.VISIBLE);
-
 	}
 
 	//
@@ -274,20 +281,19 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 						.getUserImageUrl(discussionPost.getUserId()));
 			}
 
-			UnloadedFuturePosts = discussionPostList.getAfter();
+			unloadedFuturePostsCount = discussionPostList.getAfter();
 			Log.i("after", String.valueOf(discussionPostList.getAfter()));
 
 			updateList();
 			setFooter();
-
-		} catch (HttpClientErrorException e) {
-			Log.i("ERRO", e.getStatusCode().toString());
-			dialog.dismiss();
+		} catch (HttpStatusCodeException e) {
+			Log.i("ERRO HttpStatusCodeException", e.getStatusCode().toString());
 			solarManager.errorHandler(e.getStatusCode());
-
-		} catch (ResourceAccessException e) {
-			dialog.dismiss();
+		} catch (Exception e) {
+			Log.i("ERRO Exception", e.getMessage());
 			solarManager.alertNoConnection();
+		} finally {
+			dialog.dismiss();
 		}
 	}
 
