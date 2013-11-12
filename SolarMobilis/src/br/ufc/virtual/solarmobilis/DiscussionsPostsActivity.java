@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -73,6 +74,18 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 
 	@ViewById(R.id.forum_range)
 	TextView forumRange;
+
+	@ViewById(R.id.button_play)
+	ImageButton play;
+
+	@ViewById(R.id.button_stop)
+	ImageButton stop;
+
+	@ViewById(R.id.button_prev)
+	ImageButton prev;
+
+	@ViewById(R.id.button_next)
+	ImageButton next;
 
 	@StringRes(R.string.dialog_wait)
 	String dialogWait;
@@ -224,16 +237,10 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 
 	}
 
+	//
 	@OptionsItem(R.id.menu_logout)
 	void logout() {
 		solarManager.logout();
-	}
-
-	@OptionsItem(R.id.menu_refresh)
-	void refresh() {
-		makeDialog();
-		posts.clear();
-		getPosts();
 	}
 
 	@OptionsItem(R.id.menu_response)
@@ -242,6 +249,18 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 		intent.putExtra("discussionId", discussionId);
 		startActivity(intent);
 	}
+
+	@OptionsItem(R.id.play)
+	void showPlayControls() {
+
+		play.setVisibility(View.VISIBLE);
+		prev.setVisibility(View.VISIBLE);
+		next.setVisibility(View.VISIBLE);
+		stop.setVisibility(View.VISIBLE);
+
+	}
+
+	//
 
 	@Background
 	void getPosts() {
@@ -371,10 +390,22 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 		} else {
 			posts.get(selectedPosition).setMarked(false);
 			adapter.notifyDataSetChanged();
+			selectedPosition = -1;
 			postSelected = false;
 			setActionBarNotSelected();
 			invalidateOptionsMenu();
-
+            removePlayControls();
 		}
 	}
+
+    void removePlayControls(){
+    	play.setVisibility(View.GONE);
+		prev.setVisibility(View.GONE);
+		next.setVisibility(View.GONE);
+	    stop.setVisibility(View.GONE);
+    	 }
+	
 }
+
+
+
