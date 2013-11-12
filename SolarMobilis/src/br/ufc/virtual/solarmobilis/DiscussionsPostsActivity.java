@@ -287,7 +287,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 
 		} catch (ResourceAccessException e) {
 			dialog.dismiss();
-			solarManager.alertTimeout();
+			solarManager.alertNoConnection();
 		}
 	}
 
@@ -394,18 +394,15 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 			postSelected = false;
 			setActionBarNotSelected();
 			invalidateOptionsMenu();
-            removePlayControls();
+			removePlayControls();
 		}
 	}
 
-    void removePlayControls(){
-    	play.setVisibility(View.GONE);
+	void removePlayControls() {
+		play.setVisibility(View.GONE);
 		prev.setVisibility(View.GONE);
 		next.setVisibility(View.GONE);
-	    stop.setVisibility(View.GONE);
-    	 }
-	
+		stop.setVisibility(View.GONE);
+	}
+
 }
-
-
-
