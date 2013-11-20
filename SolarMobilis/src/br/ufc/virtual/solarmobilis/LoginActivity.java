@@ -2,9 +2,7 @@ package br.ufc.virtual.solarmobilis;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpStatusCodeException;
-import org.springframework.web.client.ResourceAccessException;
 
 import android.app.Activity;
 import android.app.ProgressDialog;

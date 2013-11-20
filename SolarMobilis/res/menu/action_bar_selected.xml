@@ -7,7 +7,7 @@
         android:showAsAction="always"
         android:title="@string/action_expand"/>
     <item
-        android:id="@+id/play"
+        android:id="@+id/showPlayerControls"
         android:icon="@drawable/action_playback"
         android:showAsAction="always"
         android:title="@string/action_playback"/>

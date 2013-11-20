@@ -2,10 +2,7 @@ package br.ufc.virtual.solarmobilis;
 
 import java.util.ArrayList;
 
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.HttpStatusCodeException;
-import org.springframework.web.client.ResourceAccessException;
 
 import android.app.ProgressDialog;
 import android.content.Intent;

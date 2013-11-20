@@ -110,4 +110,13 @@ public class TextBlockenizer {
 																			// ==
 																			// ','
 	}
+
+	public int size() {
+		return blockBreaks.size() - 1;
+	}
+
+	public int getCurrentBlockPosition() {
+		return currentBlock;
+	}
+
 }

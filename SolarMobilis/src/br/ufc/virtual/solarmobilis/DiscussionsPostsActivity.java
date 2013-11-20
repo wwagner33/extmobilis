@@ -1,5 +1,6 @@
 package br.ufc.virtual.solarmobilis;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -8,8 +9,8 @@ import org.springframework.web.client.HttpStatusCodeException;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.drawable.ColorDrawable;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,6 +23,9 @@ import android.widget.TextView;
 import br.ufc.virtual.solarmobilis.model.DiscussionPost;
 import br.ufc.virtual.solarmobilis.model.DiscussionPostList;
 import br.ufc.virtual.solarmobilis.model.PostAdapter;
+import br.ufc.virtual.solarmobilis.util.TextBlockenizer;
+import br.ufc.virtual.solarmobilis.webservice.BingAudioDownloader;
+import br.ufc.virtual.solarmobilis.webservice.DownloaderListener;
 import br.ufc.virtual.solarmobilis.webservice.SolarManager;
 
 import com.actionbarsherlock.app.ActionBar;
@@ -41,7 +45,8 @@ import com.googlecode.androidannotations.annotations.res.StringRes;
 import com.googlecode.androidannotations.annotations.sharedpreferences.Pref;
 
 @EActivity
-public class DiscussionsPostsActivity extends SherlockFragmentActivity {
+public class DiscussionsPostsActivity extends SherlockFragmentActivity
+		implements DownloaderListener {
 
 	DiscussionPostList discussionPostList;
 
@@ -93,6 +98,10 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 	@StringRes(R.string.dialog_message)
 	String dialogMessage;
 
+	List<String> fileDescriptors = new ArrayList<String>();
+	BingAudioDownloader audioDownloader;
+	MediaPlayer mp = new MediaPlayer();
+
 	View footerRefresh;
 	View footerFuturePosts;
 
@@ -107,7 +116,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 	private ActionBar actionBar;
 	private boolean postSelected = false;
 	private boolean ActionBarStatus = false;
-	private Bitmap userImage;
+
 	PostAdapter adapter;
 
 	@Override
@@ -137,6 +146,9 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 				refreshPostsList();
 			}
 		});
+
+		audioDownloader = new BingAudioDownloader();
+		audioDownloader.setListener(this);
 
 	}
 
@@ -259,7 +271,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 		startActivity(intent);
 	}
 
-	@OptionsItem(R.id.play)
+	@OptionsItem(R.id.showPlayerControls)
 	void showPlayControls() {
 		play.setVisibility(View.VISIBLE);
 		prev.setVisibility(View.VISIBLE);
@@ -329,6 +341,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 
 	@ItemClick
 	void listViewDiscussionsPosts(int position) {
+
 		Log.i("clicado (activity de posts)", "ENTROU NO LISTNER");
 		Log.i("clicado (activity de posts)", "clicado no " + position);
 		togglePostMarked(position);
@@ -388,6 +401,26 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 		invalidateOptionsMenu();
 	}
 
+	@Click(R.id.button_play)
+	@Background
+	void play() {
+
+		Log.i("---->ultimo clicado", String.valueOf(selectedPosition));
+
+		TextBlockenizer text = new TextBlockenizer(posts.get(selectedPosition)
+				.getContent());
+
+		for (String block = text.getFirst(); block != ""; block = text
+				.getNext()) {
+
+			fileDescriptors.add("");
+			audioDownloader
+					.saveAudio(block, text.getCurrentBlockPosition() - 1);
+
+		}
+
+	}
+
 	@Override
 	public void onBackPressed() {
 		if (!postSelected) {
@@ -410,5 +443,64 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity {
 		next.setVisibility(View.GONE);
 		stop.setVisibility(View.GONE);
 	}
+
+	@Override
+	public void onDowloadFinish(String name, int i) {
+
+		fileDescriptors.set(i, name);
+
+		if (i == 0) {
+
+			try {
+				playAudio(i);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
+
+	}
+
+	/*---------------------------------*/
+	void playAudio(final int i) throws IllegalArgumentException,
+			SecurityException, IllegalStateException, IOException {
+
+		mp.reset();
+
+		mp.setDataSource(fileDescriptors.get(i));
+
+		mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+
+			@Override
+			public void onCompletion(MediaPlayer mp) {
+
+				if (i == (fileDescriptors.size() - 1)) {
+					Log.i("ultimo post", "Ultimo post tocado");
+					mp.stop();
+
+				} else if (fileDescriptors.get(i + 1) != null) {
+					Log.i("Tocar", "Proximo bloco");
+
+					try {
+						playAudio(i + 1);
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
+				} else {
+					Log.i("bloco", "bloco não baixado");
+				}
+
+			}
+		});
+
+		mp.prepare();
+		mp.start();
+
+	}
+
+	/*---------------------------------*/
 
 }
