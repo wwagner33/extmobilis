@@ -462,7 +462,6 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 
 	}
 
-	/*---------------------------------*/
 	void playAudio(final int i) throws IllegalArgumentException,
 			SecurityException, IllegalStateException, IOException {
 
@@ -490,7 +489,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 					}
 
 				} else {
-					Log.i("bloco", "bloco não baixado");
+					Log.i("bloco", "bloco nï¿½o baixado");
 				}
 
 			}
@@ -500,7 +499,4 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 		mp.start();
 
 	}
-
-	/*---------------------------------*/
-
 }
