@@ -442,7 +442,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 	if(selectedPosition == posts.size()-1){
 		
 		toaster.showToast("não existe posterior");
-		Log.i("Toast", "não existe posterior");
+		Log.i("Toast", "não existe post posterior");
 		
 	}else{
 	
@@ -463,7 +463,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 		if(selectedPosition == 0){
 			
 			toaster.showToast("não existe anterior");
-			Log.i("Toast", "não existe anterior");
+			Log.i("Toast", "não existe post anterior");
 			
 		}else{
 		
@@ -542,7 +542,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 		mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
 
 			@Override
-			public void onCompletion(MediaPlayer mp) {
+			  public void onCompletion(MediaPlayer mp) {
 
 				if (i == (fileDescriptors.size() - 1)) {
 					Log.i("ultimo post", "Ultimo post tocado");
