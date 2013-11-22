@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.TooManyListenersException;
 
 import org.springframework.web.client.HttpStatusCodeException;
 
@@ -24,6 +25,7 @@ import br.ufc.virtual.solarmobilis.model.DiscussionPost;
 import br.ufc.virtual.solarmobilis.model.DiscussionPostList;
 import br.ufc.virtual.solarmobilis.model.PostAdapter;
 import br.ufc.virtual.solarmobilis.util.TextBlockenizer;
+import br.ufc.virtual.solarmobilis.util.Toaster;
 import br.ufc.virtual.solarmobilis.webservice.BingAudioDownloader;
 import br.ufc.virtual.solarmobilis.webservice.DownloaderListener;
 import br.ufc.virtual.solarmobilis.webservice.SolarManager;
@@ -116,7 +118,10 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 	private ActionBar actionBar;
 	private boolean postSelected = false;
 	private boolean ActionBarStatus = false;
-
+	
+	@Bean
+    Toaster toaster;
+	
 	PostAdapter adapter;
 
 	@Override
@@ -348,6 +353,8 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 
 	}
 
+	
+	@UiThread
 	public void togglePostMarked(int position) {
 
 		if (selectedPosition == position) {
@@ -377,6 +384,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 
 		}
 
+		Log.i("toglle-marked", String.valueOf(selectedPosition));
 	}
 
 	void setActionBarSelected() {
@@ -402,12 +410,16 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 	}
 
 	@Click(R.id.button_play)
+	void play(){
+		play(selectedPosition);
+	}
+	
 	@Background
-	void play() {
+	void play(int pos) {
 
-		Log.i("---->ultimo clicado", String.valueOf(selectedPosition));
+		Log.i("---->ultimo clicado", String.valueOf(/*selectedPosition*/pos));
 
-		TextBlockenizer text = new TextBlockenizer(posts.get(selectedPosition)
+		TextBlockenizer text = new TextBlockenizer(posts.get(/*selectedPosition*/pos)
 				.getContent());
 
 		for (String block = text.getFirst(); block != ""; block = text
@@ -420,6 +432,63 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 		}
 
 	}
+	
+	
+	@Click(R.id.button_next)
+	/*@Background*/
+	void next(){
+		Log.i("Teste botão", "botao next");
+		
+	if(selectedPosition == posts.size()-1){
+		
+		toaster.showToast("não existe posterior");
+		Log.i("Toast", "não existe posterior");
+		
+	}else{
+	
+	togglePostMarked( selectedPosition+1);
+	
+	play(selectedPosition+1);
+	
+	Log.i("#selected-position-atual", String.valueOf(selectedPosition));
+	
+	}
+	}
+	
+	@Click(R.id.button_prev)
+	/*@Background*/
+	void previous(){
+		Log.i("Teste botão", "botao previous");
+		
+		if(selectedPosition == 0){
+			
+			toaster.showToast("não existe anterior");
+			Log.i("Toast", "não existe anterior");
+			
+		}else{
+		
+		Log.i("#bfselected-position-atual", String.valueOf(selectedPosition));
+		
+		
+		
+		togglePostMarked(selectedPosition-1);
+		
+		play(selectedPosition-1);
+		
+		Log.i("#selected-position-atual", String.valueOf(selectedPosition));
+	
+		}
+		}
+	
+	
+	@Click(R.id.button_stop)
+	@Background
+	void stop(){
+		
+		mp.stop();
+		
+	}
+	
 
 	@Override
 	public void onBackPressed() {

@@ -50,8 +50,8 @@ public class GatewayActivity extends Activity {
 
 	public void bingConfig() {
 
-		Speak.setClientId("CLIENT_ID");
-		Speak.setClientSecret("CLIENT_SECRET");
+		Speak.setClientId("MobilisTest");
+		Speak.setClientSecret("vrCAFui9YJJ4dxaRNYgeGJVioxC/oVnpICcVEw7W7zE=");
 
 	}
 
