@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.TooManyListenersException;
 
 import org.springframework.web.client.HttpStatusCodeException;
 
@@ -118,6 +117,8 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 	private ActionBar actionBar;
 	private boolean postSelected = false;
 	private boolean ActionBarStatus = false;
+	private boolean paused;
+	private boolean stoped = true;
 
 	@Bean
 	Toaster toaster;
@@ -263,7 +264,6 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 
 	}
 
-	//
 	@OptionsItem(R.id.menu_logout)
 	void logout() {
 		solarManager.logout();
@@ -283,8 +283,6 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 		next.setVisibility(View.VISIBLE);
 		stop.setVisibility(View.VISIBLE);
 	}
-
-	//
 
 	@Background
 	void getPosts() {
@@ -410,7 +408,24 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 
 	@Click(R.id.button_play)
 	void play() {
-		play(selectedPosition);
+
+		if (mp.isPlaying()) {
+			paused = true;
+			setImagePlayer();
+			mp.pause();
+
+		} else {
+			if (paused == true) {
+				paused = false;
+				setImagePlayer();
+				mp.start();
+			}
+			if (stoped == true) {
+				stoped = false;
+				setImagePlayer();
+				play(selectedPosition);
+			}
+		}
 	}
 
 	@Background
@@ -428,13 +443,20 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 			fileDescriptors.add("");
 			audioDownloader
 					.saveAudio(block, text.getCurrentBlockPosition() - 1);
+		}
+	}
 
+	@UiThread
+	void setImagePlayer() {
+		if (paused || stoped) {
+			play.setImageResource(R.drawable.playback_play);
+		} else {
+			play.setImageResource(R.drawable.playback_pause);
 		}
 
 	}
 
 	@Click(R.id.button_next)
-	/* @Background */
 	void next() {
 		Log.i("Teste botão", "botao next");
 
@@ -455,7 +477,6 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 	}
 
 	@Click(R.id.button_prev)
-	/* @Background */
 	void previous() {
 		Log.i("Teste botão", "botao previous");
 
@@ -481,9 +502,12 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 	@Click(R.id.button_stop)
 	@Background
 	void stop() {
+		if (mp.isPlaying()) {
+			stoped = true;
+			setImagePlayer();
+			mp.stop();
 
-		mp.stop();
-
+		}
 	}
 
 	@Override
@@ -522,18 +546,14 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-
 		}
-
 	}
 
 	void playAudio(final int i) throws IllegalArgumentException,
 			SecurityException, IllegalStateException, IOException {
 
 		mp.reset();
-
 		mp.setDataSource(fileDescriptors.get(i));
-
 		mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
 
 			@Override
@@ -542,6 +562,10 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 				if (i == (fileDescriptors.size() - 1)) {
 					Log.i("ultimo post", "Ultimo post tocado");
 					mp.stop();
+					stoped = true;
+					setImagePlayer();
+					fileDescriptors.clear();
+					audioDownloader.deleteFiles();
 
 				} else if (fileDescriptors.get(i + 1) != null) {
 					Log.i("Tocar", "Proximo bloco");
