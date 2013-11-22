@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.TooManyListenersException;
 
 import org.springframework.web.client.HttpStatusCodeException;
 
@@ -100,6 +99,9 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 	@StringRes(R.string.dialog_message)
 	String dialogMessage;
 
+	@Bean
+	Toaster toaster;
+
 	List<String> fileDescriptors = new ArrayList<String>();
 	BingAudioDownloader audioDownloader;
 	MediaPlayer mp = new MediaPlayer();
@@ -117,11 +119,6 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 	private String oldDateString = "20001010102410";
 	private ActionBar actionBar;
 	private boolean postSelected = false;
-	private boolean ActionBarStatus = false;
-
-	@Bean
-	Toaster toaster;
-
 	PostAdapter adapter;
 
 	@Override
@@ -154,7 +151,6 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 
 		audioDownloader = new BingAudioDownloader();
 		audioDownloader.setListener(this);
-
 	}
 
 	@Override
@@ -363,7 +359,6 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 
 			postSelected = false;
 			setActionBarNotSelected();
-			ActionBarStatus = false;
 			selectedPosition = -1;
 
 		} else {
@@ -378,7 +373,6 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 
 			selectedPosition = position;
 			setActionBarSelected();
-			ActionBarStatus = true;
 			postSelected = true;
 
 		}
@@ -436,12 +430,12 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 	@Click(R.id.button_next)
 	/* @Background */
 	void next() {
-		Log.i("Teste botão", "botao next");
+		Log.i("Teste botï¿½o", "botao next");
 
 		if (selectedPosition == posts.size() - 1) {
 
-			toaster.showToast("não existe posterior");
-			Log.i("Toast", "não existe post posterior");
+			toaster.showToast("nï¿½o existe posterior");
+			Log.i("Toast", "nï¿½o existe post posterior");
 
 		} else {
 
@@ -457,12 +451,12 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 	@Click(R.id.button_prev)
 	/* @Background */
 	void previous() {
-		Log.i("Teste botão", "botao previous");
+		Log.i("Teste botï¿½o", "botao previous");
 
 		if (selectedPosition == 0) {
 
-			toaster.showToast("não existe anterior");
-			Log.i("Toast", "não existe post anterior");
+			toaster.showToast("nï¿½o existe anterior");
+			Log.i("Toast", "nï¿½o existe post anterior");
 
 		} else {
 

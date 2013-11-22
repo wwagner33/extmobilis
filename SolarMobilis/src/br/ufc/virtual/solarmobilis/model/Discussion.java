@@ -61,16 +61,16 @@ public class Discussion {
 	public String getEndDate() {
 		SimpleDateFormat simpleFormat = new SimpleDateFormat(
 				"yyyy-MM-dd HH:mm:ss", java.util.Locale.getDefault());
+		String formatedDate = "";
 		try {
 			Date date = simpleFormat.parse(endDate);
 			SimpleDateFormat startDateFormat = new SimpleDateFormat(
 					"dd/MM/yyyy", java.util.Locale.getDefault());
-			endDate = startDateFormat.format(date);
+			formatedDate = startDateFormat.format(date);
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return endDate;
+		return formatedDate;
 	}
 
 	public void setEndDate(String endDate) {
@@ -110,18 +110,18 @@ public class Discussion {
 	}
 
 	public String getStartDate() {
+		String formatedDate = "";
 		SimpleDateFormat simpleFormat = new SimpleDateFormat(
 				"yyyy-MM-dd HH:mm:ss", java.util.Locale.getDefault());
 		try {
 			Date date = simpleFormat.parse(startDate);
 			SimpleDateFormat startDateFormat = new SimpleDateFormat(
 					"dd/MM/yyyy", java.util.Locale.getDefault());
-			startDate = startDateFormat.format(date);
+			formatedDate = startDateFormat.format(date);
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return startDate;
+		return formatedDate;
 	}
 
 	public void setStartDate(String startDate) {
