@@ -118,10 +118,10 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 	private ActionBar actionBar;
 	private boolean postSelected = false;
 	private boolean ActionBarStatus = false;
-	
+
 	@Bean
-    Toaster toaster;
-	
+	Toaster toaster;
+
 	PostAdapter adapter;
 
 	@Override
@@ -353,7 +353,6 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 
 	}
 
-	
 	@UiThread
 	public void togglePostMarked(int position) {
 
@@ -410,18 +409,19 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 	}
 
 	@Click(R.id.button_play)
-	void play(){
+	void play() {
 		play(selectedPosition);
 	}
-	
+
 	@Background
 	void play(int pos) {
 
-		Log.i("---->ultimo clicado", String.valueOf(/*selectedPosition*/pos));
+		Log.i("---->ultimo clicado", String.valueOf(pos));
+		String textToBreak = posts.get(pos).getUserNick() + ", "
+				+ posts.get(pos).getDateToPost() + ", "
+				+ posts.get(pos).getContent();
 
-		TextBlockenizer text = new TextBlockenizer(posts.get(/*selectedPosition*/pos)
-				.getContent());
-
+		TextBlockenizer text = new TextBlockenizer(textToBreak);
 		for (String block = text.getFirst(); block != ""; block = text
 				.getNext()) {
 
@@ -432,63 +432,59 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 		}
 
 	}
-	
-	
+
 	@Click(R.id.button_next)
-	/*@Background*/
-	void next(){
+	/* @Background */
+	void next() {
 		Log.i("Teste botão", "botao next");
-		
-	if(selectedPosition == posts.size()-1){
-		
-		toaster.showToast("não existe posterior");
-		Log.i("Toast", "não existe post posterior");
-		
-	}else{
-	
-	togglePostMarked( selectedPosition+1);
-	
-	play(selectedPosition+1);
-	
-	Log.i("#selected-position-atual", String.valueOf(selectedPosition));
-	
+
+		if (selectedPosition == posts.size() - 1) {
+
+			toaster.showToast("não existe posterior");
+			Log.i("Toast", "não existe post posterior");
+
+		} else {
+
+			togglePostMarked(selectedPosition + 1);
+
+			play(selectedPosition + 1);
+
+			Log.i("#selected-position-atual", String.valueOf(selectedPosition));
+
+		}
 	}
-	}
-	
+
 	@Click(R.id.button_prev)
-	/*@Background*/
-	void previous(){
+	/* @Background */
+	void previous() {
 		Log.i("Teste botão", "botao previous");
-		
-		if(selectedPosition == 0){
-			
+
+		if (selectedPosition == 0) {
+
 			toaster.showToast("não existe anterior");
 			Log.i("Toast", "não existe post anterior");
-			
-		}else{
-		
-		Log.i("#bfselected-position-atual", String.valueOf(selectedPosition));
-		
-		
-		
-		togglePostMarked(selectedPosition-1);
-		
-		play(selectedPosition-1);
-		
-		Log.i("#selected-position-atual", String.valueOf(selectedPosition));
-	
+
+		} else {
+
+			Log.i("#bfselected-position-atual",
+					String.valueOf(selectedPosition));
+
+			togglePostMarked(selectedPosition - 1);
+
+			play(selectedPosition - 1);
+
+			Log.i("#selected-position-atual", String.valueOf(selectedPosition));
+
 		}
-		}
-	
-	
+	}
+
 	@Click(R.id.button_stop)
 	@Background
-	void stop(){
-		
+	void stop() {
+
 		mp.stop();
-		
+
 	}
-	
 
 	@Override
 	public void onBackPressed() {
@@ -541,7 +537,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 		mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
 
 			@Override
-			  public void onCompletion(MediaPlayer mp) {
+			public void onCompletion(MediaPlayer mp) {
 
 				if (i == (fileDescriptors.size() - 1)) {
 					Log.i("ultimo post", "Ultimo post tocado");
