@@ -11,6 +11,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 import android.os.Environment;
+import android.util.Log;
 import br.ufc.virtual.solarmobilis.DiscussionsPostsActivity;
 import br.ufc.virtual.solarmobilis.util.BingURLCreator;
 
@@ -71,7 +72,7 @@ public class BingAudioDownloader {
 
 			downloaderListener.onDowloadFinish(audioFile.toString(), i);
 
-			// Log.i("Salvar arquivo", "Arquivo " + i + " salvo");
+			Log.i("Salvar arquivo", "Arquivo " + i + " salvo");
 
 			// tocarAudio(i);
 
@@ -82,6 +83,17 @@ public class BingAudioDownloader {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	public void deleteFiles() {
+		File file = new File(audioFilePath);
+		if (file.exists()) {
+			final File[] audioFiles = file.listFiles();
+			for (final File audioFile : audioFiles) {
+				audioFile.delete();
+			}
+		}
+		Log.i("Arquivos", "apagados");
 	}
 
 	public void setListener(DownloaderListener downloaderListener) {
