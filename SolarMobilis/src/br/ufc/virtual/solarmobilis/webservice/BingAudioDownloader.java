@@ -12,19 +12,18 @@ import java.net.URL;
 
 import android.os.Environment;
 import br.ufc.virtual.solarmobilis.DiscussionsPostsActivity;
+import br.ufc.virtual.solarmobilis.util.BingURLCreator;
 
 import com.googlecode.androidannotations.annotations.Background;
 import com.googlecode.androidannotations.annotations.EBean;
 import com.googlecode.androidannotations.annotations.RootContext;
-import com.memetix.mst.language.SpokenDialect;
-import com.memetix.mst.speak.Speak;
 
 @EBean
 public class BingAudioDownloader {
 
 	@RootContext
 	DiscussionsPostsActivity activity;
-	
+
 	String stringUrl;
 	URL url;
 	HttpURLConnection urlConnection;
@@ -35,25 +34,19 @@ public class BingAudioDownloader {
 
 	public BingAudioDownloader() {
 
-		
-		
 	}
 
 	@Background
 	public void saveAudio(String text, int i) {
 
-		
-		
-		
 		try {
-			stringUrl = Speak.execute(text, SpokenDialect.PORTUGUESE_BRAZIL);
+			stringUrl = BingURLCreator.getURL(text);
 			url = new URL(stringUrl);
 			urlConnection = (HttpURLConnection) url.openConnection();
 
 			InputStream stream = urlConnection.getInputStream();
 			saveFile(stream, i);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -77,8 +70,8 @@ public class BingAudioDownloader {
 			fos.close();
 
 			downloaderListener.onDowloadFinish(audioFile.toString(), i);
-			
-			//Log.i("Salvar arquivo", "Arquivo " + i + " salvo");
+
+			// Log.i("Salvar arquivo", "Arquivo " + i + " salvo");
 
 			// tocarAudio(i);
 
@@ -90,7 +83,8 @@ public class BingAudioDownloader {
 			e.printStackTrace();
 		}
 	}
-	public void setListener(DownloaderListener downloaderListener){
+
+	public void setListener(DownloaderListener downloaderListener) {
 		this.downloaderListener = downloaderListener;
 	}
 }

@@ -25,7 +25,6 @@ public class GatewayActivity extends Activity {
 		super.onCreate(savedInstanceState);
 
 		createFolder();
-		bingConfig();
 
 		if (preferences.token().get().length() == 0) {
 			Intent intent = new Intent(this, LoginActivity_.class);
@@ -48,11 +47,5 @@ public class GatewayActivity extends Activity {
 		}
 	}
 
-	public void bingConfig() {
-
-		Speak.setClientId("MobilisTest");
-		Speak.setClientSecret("vrCAFui9YJJ4dxaRNYgeGJVioxC/oVnpICcVEw7W7zE=");
-
-	}
 
 }
