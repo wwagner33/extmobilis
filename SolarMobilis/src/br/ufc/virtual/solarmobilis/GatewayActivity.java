@@ -11,7 +11,6 @@ import android.util.Log;
 import com.googlecode.androidannotations.annotations.EActivity;
 import com.googlecode.androidannotations.annotations.NoTitle;
 import com.googlecode.androidannotations.annotations.sharedpreferences.Pref;
-import com.memetix.mst.speak.Speak;
 
 @NoTitle
 @EActivity
@@ -46,6 +45,5 @@ public class GatewayActivity extends Activity {
 			Log.i("Pasta", "criada");
 		}
 	}
-
 
 }
