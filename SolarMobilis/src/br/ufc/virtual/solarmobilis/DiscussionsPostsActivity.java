@@ -1,5 +1,6 @@
 package br.ufc.virtual.solarmobilis;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -12,6 +13,7 @@ import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -123,6 +125,9 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 	private boolean stoped = true;
 
 	PostAdapter adapter;
+
+	File file = new File(Environment.getExternalStorageDirectory()
+			.getAbsolutePath() + "/Mobilis/TTS/");
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -462,7 +467,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 			Log.i("Toast", "n�o existe post posterior");
 
 		} else {
-
+			deleteAudioData();
 			togglePostMarked(selectedPosition + 1);
 
 			play(selectedPosition + 1);
@@ -482,7 +487,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 			Log.i("Toast", "n�o existe post anterior");
 
 		} else {
-
+			deleteAudioData();
 			Log.i("#bfselected-position-atual",
 					String.valueOf(selectedPosition));
 
@@ -502,6 +507,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 			stoped = true;
 			setImagePlayer();
 			mp.stop();
+			deleteAudioData();
 
 		}
 	}
@@ -544,6 +550,20 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 		}
 	}
 
+	public void deleteAudioData() {
+		fileDescriptors.clear();
+		Log.i("filedescriptors", "dados apagados apagados");
+
+		if (file.exists()) {
+			final File[] audioFiles = file.listFiles();
+			for (final File audioFile : audioFiles) {
+				audioFile.delete();
+			}
+			Log.i("Arquivos", "dados apagados apagados");
+		}
+
+	}
+
 	void playAudio(final int i) throws IllegalArgumentException,
 			SecurityException, IllegalStateException, IOException {
 
@@ -559,8 +579,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 					mp.stop();
 					stoped = true;
 					setImagePlayer();
-					fileDescriptors.clear();
-					audioDownloader.deleteFiles();
+					deleteAudioData();
 
 				} else if (fileDescriptors.get(i + 1) != null) {
 					Log.i("Tocar", "Proximo bloco");
