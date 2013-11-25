@@ -1,5 +1,6 @@
 package br.ufc.virtual.solarmobilis;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -12,6 +13,7 @@ import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -99,6 +101,9 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 	@StringRes(R.string.dialog_message)
 	String dialogMessage;
 
+	@Bean
+	Toaster toaster;
+
 	List<String> fileDescriptors = new ArrayList<String>();
 	BingAudioDownloader audioDownloader;
 	MediaPlayer mp = new MediaPlayer();
@@ -116,14 +121,13 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 	private String oldDateString = "20001010102410";
 	private ActionBar actionBar;
 	private boolean postSelected = false;
-	private boolean ActionBarStatus = false;
 	private boolean paused;
 	private boolean stoped = true;
 
-	@Bean
-	Toaster toaster;
-
 	PostAdapter adapter;
+
+	File file = new File(Environment.getExternalStorageDirectory()
+			.getAbsolutePath() + "/Mobilis/TTS/");
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -155,7 +159,6 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 
 		audioDownloader = new BingAudioDownloader();
 		audioDownloader.setListener(this);
-
 	}
 
 	@Override
@@ -361,7 +364,6 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 
 			postSelected = false;
 			setActionBarNotSelected();
-			ActionBarStatus = false;
 			selectedPosition = -1;
 
 		} else {
@@ -376,7 +378,6 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 
 			selectedPosition = position;
 			setActionBarSelected();
-			ActionBarStatus = true;
 			postSelected = true;
 
 		}
@@ -458,15 +459,15 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 
 	@Click(R.id.button_next)
 	void next() {
-		Log.i("Teste botão", "botao next");
+		Log.i("Teste botï¿½o", "botao next");
 
 		if (selectedPosition == posts.size() - 1) {
 
-			toaster.showToast("não existe posterior");
-			Log.i("Toast", "não existe post posterior");
+			toaster.showToast("nï¿½o existe posterior");
+			Log.i("Toast", "nï¿½o existe post posterior");
 
 		} else {
-
+			deleteAudioData();
 			togglePostMarked(selectedPosition + 1);
 
 			play(selectedPosition + 1);
@@ -478,15 +479,15 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 
 	@Click(R.id.button_prev)
 	void previous() {
-		Log.i("Teste botão", "botao previous");
+		Log.i("Teste botï¿½o", "botao previous");
 
 		if (selectedPosition == 0) {
 
-			toaster.showToast("não existe anterior");
-			Log.i("Toast", "não existe post anterior");
+			toaster.showToast("nï¿½o existe anterior");
+			Log.i("Toast", "nï¿½o existe post anterior");
 
 		} else {
-
+			deleteAudioData();
 			Log.i("#bfselected-position-atual",
 					String.valueOf(selectedPosition));
 
@@ -506,6 +507,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 			stoped = true;
 			setImagePlayer();
 			mp.stop();
+			deleteAudioData();
 
 		}
 	}
@@ -543,10 +545,23 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 			try {
 				playAudio(i);
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
+	}
+
+	public void deleteAudioData() {
+		fileDescriptors.clear();
+		Log.i("filedescriptors", "dados apagados apagados");
+
+		if (file.exists()) {
+			final File[] audioFiles = file.listFiles();
+			for (final File audioFile : audioFiles) {
+				audioFile.delete();
+			}
+			Log.i("Arquivos", "dados apagados apagados");
+		}
+
 	}
 
 	void playAudio(final int i) throws IllegalArgumentException,
@@ -564,8 +579,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 					mp.stop();
 					stoped = true;
 					setImagePlayer();
-					fileDescriptors.clear();
-					audioDownloader.deleteFiles();
+					deleteAudioData();
 
 				} else if (fileDescriptors.get(i + 1) != null) {
 					Log.i("Tocar", "Proximo bloco");
