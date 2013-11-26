@@ -46,8 +46,8 @@ public class DiscussionListActivity extends SherlockFragmentActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_discussion_list);
 
-		dialog = ProgressDialog.show(this, "Aguarde", "Recebendo resposta",
-				true);
+		dialog = ProgressDialog.show(this, getString(R.string.dialog_wait),
+				getString(R.string.dialog_message), true);
 		getDiscussions();
 	}
 
@@ -58,8 +58,8 @@ public class DiscussionListActivity extends SherlockFragmentActivity {
 
 	@OptionsItem(R.id.menu_refresh)
 	void refresh() {
-		dialog = ProgressDialog.show(this, "Aguarde", "Recebendo resposta",
-				true);
+		dialog = ProgressDialog.show(this, getString(R.string.dialog_wait),
+				getString(R.string.dialog_message), true);
 		discussions.clear();
 		getDiscussions();
 	}

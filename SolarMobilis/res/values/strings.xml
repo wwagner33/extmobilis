@@ -58,5 +58,6 @@
     <string name="send_post_sucess">Post enviado</string>
     <string name="dialog_wait">Aguarde</string>
     <string name="dialog_message">Recebendo resposta</string>
+    <string name="dialog_sending">Enviando</string>
 
 </resources>

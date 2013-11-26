@@ -51,7 +51,8 @@ public class ResponseActivity extends Activity {
 		discussionPost.setDiscussionId(discussionId);
 		postSender.setDiscussionPost(discussionPost);
 
-		dialog = ProgressDialog.show(this, "Aguarde", "Enviando", true);
+		dialog = ProgressDialog.show(this, getString(R.string.dialog_wait),
+				getString(R.string.dialog_sending), true);
 
 		sendPost();
 	}

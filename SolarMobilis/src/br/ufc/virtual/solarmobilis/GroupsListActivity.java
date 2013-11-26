@@ -47,8 +47,8 @@ public class GroupsListActivity extends SherlockFragmentActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_groups_list);
-		dialog = ProgressDialog.show(this, "Aguarde", "Recebendo resposta",
-				true);
+		dialog = ProgressDialog.show(this, getString(R.string.dialog_wait),
+				getString(R.string.dialog_message), true);
 
 		getGroups();
 
@@ -61,8 +61,8 @@ public class GroupsListActivity extends SherlockFragmentActivity {
 
 	@OptionsItem(R.id.menu_refresh)
 	void refresh() {
-		dialog = ProgressDialog.show(this, "Aguarde", "Recebendo resposta",
-				true);
+		dialog = ProgressDialog.show(this, getString(R.string.dialog_wait),
+				getString(R.string.dialog_message), true);
 		groups.clear();
 		getGroups();
 	}
