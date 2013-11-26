@@ -27,7 +27,8 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="40dp"
         android:ems="10"
-        android:hint="@string/user">
+        android:hint="@string/user"
+        android:inputType="textVisiblePassword|textNoSuggestions" >
 
         <requestFocus />
     </EditText>
@@ -39,7 +40,7 @@
         android:layout_alignLeft="@+id/editTextPassword"
         android:layout_below="@+id/editTextPassword"
         android:layout_marginTop="10dp"
-        android:text="@string/login"/>
+        android:text="@string/login" />
 
     <EditText
         android:id="@+id/editTextPassword"
@@ -61,6 +62,5 @@
         android:layout_marginBottom="15dp"
         android:text="@string/iuvi_footer"
         android:textColor="#ffffff" />
-    
 
 </RelativeLayout>
