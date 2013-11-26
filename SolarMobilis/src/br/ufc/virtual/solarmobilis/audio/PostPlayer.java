@@ -31,7 +31,8 @@ public class PostPlayer implements DownloaderListener {
 	public List<String> fileDescriptors = new ArrayList<String>();
 	public File file = new File(Environment.getExternalStorageDirectory()
 			.getAbsolutePath() + "/Mobilis/TTS/");
-
+public AudioPlayer audioPlayer = new AudioPlayer();
+	
 	public PostPlayer() {
 		audioDownloader = new BingAudioDownloader();
 		audioDownloader.setListener(this);
@@ -60,7 +61,7 @@ public class PostPlayer implements DownloaderListener {
 	}
 
 	@Override
-	public void onDowloadFinish(String name, int i) {
+	public void onDowloadFinish(String name, final int i) {
 		Log.i("ondownloadfinish", name + " " + String.valueOf(i));
 
 		fileDescriptors.set(i, name);
@@ -68,7 +69,9 @@ public class PostPlayer implements DownloaderListener {
 		if (i == 0) {
 
 			try {
+				
 				playAudio(i);
+				
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -79,9 +82,8 @@ public class PostPlayer implements DownloaderListener {
 	public void playAudio(final int i) throws IllegalArgumentException,
 			SecurityException, IllegalStateException, IOException {
 
-		mp.reset();
-		mp.setDataSource(fileDescriptors.get(i));
-		mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+		audioPlayer.reset();
+	    audioPlayer.play(fileDescriptors.get(i), new MediaPlayer.OnCompletionListener() {
 
 			@Override
 			public void onCompletion(MediaPlayer mp) {
@@ -108,20 +110,28 @@ public class PostPlayer implements DownloaderListener {
 			}
 		});
 
-		mp.prepare();
-		mp.start();
-
+		/*mp.prepare();
+		mp.start();*/
+    /* audioPlayer.prepare();*/
 	}
 
 	public void play() {
-		mp.start();
+		try {
+			audioPlayer.play();
+		} catch (IllegalStateException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		paused = false;
 		stoped = false;
 	}
 
 	public void pause() {
-		if (mp.isPlaying()) {
-			mp.pause();
+		if (audioPlayer.isPlaying()) {
+			audioPlayer.pause();
 			paused = true;
 		}
 	}
@@ -131,11 +141,15 @@ public class PostPlayer implements DownloaderListener {
 	}
 
 	public void stop() {
-		if (mp.isPlaying()) {
-			mp.stop();
+	
+			audioPlayer.stop();
 			stoped = true;
 			deleteAudioData();
-		}
+		
+			
+			/*Log.i("teste", "entrou no else");*/
+			
+		
 	}
 
 	public boolean isStoped() {
@@ -143,7 +157,7 @@ public class PostPlayer implements DownloaderListener {
 	}
 
 	public boolean isPlaying() {
-		return mp.isPlaying();
+		return audioPlayer.isPlaying();
 	}
 
 	public void setPostPlayerListener(PostPlayerListener postPlayerListener) {

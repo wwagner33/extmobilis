@@ -425,6 +425,9 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 
 	@UiThread
 	void setImagePlayer() {
+		
+		Log.i("setImagePlayer teste", "IsPaused : " + String.valueOf(postPlayer.isPaused()));
+		Log.i("setImagePlayer teste", "IsStoped : " + String.valueOf(postPlayer.isStoped()));
 		if (postPlayer.isPaused() || postPlayer.isStoped()) {
 			play.setImageResource(R.drawable.playback_play);
 		} else {
@@ -444,12 +447,15 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 
 		} else {
 
+			
+			
 			togglePostMarked(selectedPosition + 1);
 
 			postPlayer.play(posts.get(selectedPosition + 1));
 
 			Log.i("#selected-position-atual", String.valueOf(selectedPosition));
 
+			setImagePlayer();
 		}
 	}
 
@@ -466,12 +472,16 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 			Log.i("#bfselected-position-atual",
 					String.valueOf(selectedPosition));
 
+			
+			
 			togglePostMarked(selectedPosition - 1);
 
 			postPlayer.play(posts.get(selectedPosition - 1));
 
 			Log.i("#selected-position-atual", String.valueOf(selectedPosition));
 
+			setImagePlayer();
+			
 		}
 	}
 

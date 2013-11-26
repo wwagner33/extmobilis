@@ -5,11 +5,13 @@ import java.io.IOException;
 import android.media.MediaPlayer;
 
 public class AudioPlayer {
-	private MediaPlayer player;
+	
 	private MediaPlayer.OnCompletionListener onCompletion;
 	private boolean isPrepared = false, isPaused = false;
 	private String filePath;
-
+    private MediaPlayer player = new MediaPlayer();
+	
+	
 	@Deprecated
 	public AudioPlayer(String filePath) {
 		this.filePath = filePath;
@@ -32,10 +34,10 @@ public class AudioPlayer {
 
 	public void prepare() throws IllegalArgumentException,
 			IllegalStateException, IOException {
-
+        /*
 		if (player == null) {
 			player = new MediaPlayer();
-		}
+		} */
 		player.setDataSource(filePath);
 		player.prepare();
 		isPrepared = true;
@@ -77,7 +79,9 @@ public class AudioPlayer {
 	}
 
 	public boolean isPlaying() {
+		
 		return player.isPlaying();
+		
 	}
 
 	public void play() throws IllegalStateException, IOException {
