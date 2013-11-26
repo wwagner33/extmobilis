@@ -27,31 +27,43 @@
         </activity>
         <activity
             android:name="br.ufc.virtual.solarmobilis.LoginActivity_"
-            android:label="@string/app_name" >
+            android:configChanges="orientation|screenSize"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name="br.ufc.virtual.solarmobilis.CurriculumUnitsListActivity_"
+            android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_curriculum_units_list"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.Mobilis" >
         </activity>
         <activity
             android:name="br.ufc.virtual.solarmobilis.GroupsListActivity_"
+            android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_groups_list"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.Mobilis" >
         </activity>
         <activity
             android:name="br.ufc.virtual.solarmobilis.DiscussionListActivity_"
+            android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_discussion_list"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.Mobilis" >
         </activity>
         <activity
             android:name="br.ufc.virtual.solarmobilis.DiscussionsPostsActivity_"
+            android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_discussions_posts"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.Mobilis" >
         </activity>
         <activity
             android:name="br.ufc.virtual.solarmobilis.ResponseActivity_"
+            android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_response"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.Mobilis" >
         </activity>
     </application>

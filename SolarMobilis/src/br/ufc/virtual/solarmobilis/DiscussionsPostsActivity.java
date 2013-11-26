@@ -169,7 +169,8 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 	public void makeDialog() {
 		dialog = ProgressDialog.show(this, dialogWait, dialogMessage, true);
 	}
-
+	
+	@UiThread
 	void setFooter() {
 
 		Log.i("Dentro do setFooter", String.valueOf(unloadedFuturePostsCount));
@@ -361,6 +362,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 
 			postSelected = false;
 			setActionBarNotSelected();
+			removePlayControls();
 			selectedPosition = -1;
 
 		} else {
@@ -517,6 +519,6 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 
 	public void onCompletion() {
 		setImagePlayer();
-
+		next();
 	}
 }

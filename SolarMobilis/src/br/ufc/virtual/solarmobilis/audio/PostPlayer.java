@@ -31,8 +31,8 @@ public class PostPlayer implements DownloaderListener {
 	public List<String> fileDescriptors = new ArrayList<String>();
 	public File file = new File(Environment.getExternalStorageDirectory()
 			.getAbsolutePath() + "/Mobilis/TTS/");
-public AudioPlayer audioPlayer = new AudioPlayer();
-	
+	public AudioPlayer audioPlayer = new AudioPlayer();
+
 	public PostPlayer() {
 		audioDownloader = new BingAudioDownloader();
 		audioDownloader.setListener(this);
@@ -42,9 +42,9 @@ public AudioPlayer audioPlayer = new AudioPlayer();
 	@Background
 	public void play(DiscussionPost post) {
 		paused = false;
-		stoped = false;		
+		stoped = false;
 		deleteAudioData();
-		
+
 		String textToBreak = post.userNick + ", " + post.getDateToPost() + ", "
 				+ post.getContent();
 
@@ -69,9 +69,9 @@ public AudioPlayer audioPlayer = new AudioPlayer();
 		if (i == 0) {
 
 			try {
-				
+
 				playAudio(i);
-				
+
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -83,36 +83,38 @@ public AudioPlayer audioPlayer = new AudioPlayer();
 			SecurityException, IllegalStateException, IOException {
 
 		audioPlayer.reset();
-	    audioPlayer.play(fileDescriptors.get(i), new MediaPlayer.OnCompletionListener() {
+		audioPlayer.play(fileDescriptors.get(i),
+				new MediaPlayer.OnCompletionListener() {
 
-			@Override
-			public void onCompletion(MediaPlayer mp) {
+					@Override
+					public void onCompletion(MediaPlayer mp) {
 
-				if (i == (fileDescriptors.size() - 1)) {
-					Log.i("ultimo post", "Ultimo post tocado");
-					stop();
-					postPlayerListener.onCompletion();
+						if (i == (fileDescriptors.size() - 1)) {
+							Log.i("ultimo post", "Ultimo post tocado");
+							stop();
+							postPlayerListener.onCompletion();
 
-				} else if (fileDescriptors.get(i + 1) != null) {
-					Log.i("Tocar", "Proximo bloco");
+						} else if (fileDescriptors.get(i + 1) != null) {
+							Log.i("Tocar", "Proximo bloco");
 
-					try {
-						playAudio(i + 1);
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+							try {
+								playAudio(i + 1);
+							} catch (Exception e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+
+						} else {
+							Log.i("bloco", "bloco n�o baixado");
+						}
+
 					}
+				});
 
-				} else {
-					Log.i("bloco", "bloco n�o baixado");
-				}
-
-			}
-		});
-
-		/*mp.prepare();
-		mp.start();*/
-    /* audioPlayer.prepare();*/
+		/*
+		 * mp.prepare(); mp.start();
+		 */
+		/* audioPlayer.prepare(); */
 	}
 
 	public void play() {
@@ -141,15 +143,13 @@ public AudioPlayer audioPlayer = new AudioPlayer();
 	}
 
 	public void stop() {
-	
-			audioPlayer.stop();
-			stoped = true;
-			deleteAudioData();
-		
-			
-			/*Log.i("teste", "entrou no else");*/
-			
-		
+
+		audioPlayer.stop();
+		stoped = true;
+		deleteAudioData();
+
+		/* Log.i("teste", "entrou no else"); */
+
 	}
 
 	public boolean isStoped() {
@@ -157,7 +157,12 @@ public AudioPlayer audioPlayer = new AudioPlayer();
 	}
 
 	public boolean isPlaying() {
-		return audioPlayer.isPlaying();
+
+		if (mp != null) {
+			return mp.isPlaying();
+		}
+		return false;
+
 	}
 
 	public void setPostPlayerListener(PostPlayerListener postPlayerListener) {

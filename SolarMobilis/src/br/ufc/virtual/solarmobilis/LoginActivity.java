@@ -60,8 +60,8 @@ public class LoginActivity extends Activity {
 			user.setPassword(fieldPassword.getText().toString().trim());
 			userMessage.setUser(user);
 
-			dialog = ProgressDialog.show(this, "Aguarde", "Recebendo resposta",
-					true);
+			dialog = ProgressDialog.show(this, getString(R.string.dialog_wait),
+					getString(R.string.dialog_message), true);
 
 			getToken();
 
