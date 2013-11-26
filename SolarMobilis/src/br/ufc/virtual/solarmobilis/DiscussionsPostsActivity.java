@@ -362,6 +362,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 
 			postSelected = false;
 			setActionBarNotSelected();
+			removePlayControls();
 			selectedPosition = -1;
 
 		} else {
