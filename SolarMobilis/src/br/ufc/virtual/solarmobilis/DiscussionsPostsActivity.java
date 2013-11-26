@@ -1,7 +1,6 @@
 package br.ufc.virtual.solarmobilis;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -22,13 +21,12 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import br.ufc.virtual.solarmobilis.audio.PostPlayer;
 import br.ufc.virtual.solarmobilis.model.DiscussionPost;
 import br.ufc.virtual.solarmobilis.model.DiscussionPostList;
 import br.ufc.virtual.solarmobilis.model.PostAdapter;
-import br.ufc.virtual.solarmobilis.util.TextBlockenizer;
 import br.ufc.virtual.solarmobilis.util.Toaster;
-import br.ufc.virtual.solarmobilis.webservice.BingAudioDownloader;
-import br.ufc.virtual.solarmobilis.webservice.DownloaderListener;
+import br.ufc.virtual.solarmobilis.webservice.PostPlayerListener;
 import br.ufc.virtual.solarmobilis.webservice.SolarManager;
 
 import com.actionbarsherlock.app.ActionBar;
@@ -49,7 +47,7 @@ import com.googlecode.androidannotations.annotations.sharedpreferences.Pref;
 
 @EActivity
 public class DiscussionsPostsActivity extends SherlockFragmentActivity
-		implements DownloaderListener {
+		implements PostPlayerListener {
 
 	DiscussionPostList discussionPostList;
 
@@ -104,8 +102,10 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 	@Bean
 	Toaster toaster;
 
+	@Bean
+	PostPlayer postPlayer;
+
 	List<String> fileDescriptors = new ArrayList<String>();
-	BingAudioDownloader audioDownloader;
 	MediaPlayer mp = new MediaPlayer();
 
 	View footerRefresh;
@@ -121,8 +121,6 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 	private String oldDateString = "20001010102410";
 	private ActionBar actionBar;
 	private boolean postSelected = false;
-	private boolean paused;
-	private boolean stoped = true;
 
 	PostAdapter adapter;
 
@@ -157,8 +155,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 			}
 		});
 
-		audioDownloader = new BingAudioDownloader();
-		audioDownloader.setListener(this);
+		postPlayer.setPostPlayerListener(this);
 	}
 
 	@Override
@@ -410,46 +407,25 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 	@Click(R.id.button_play)
 	void play() {
 
-		if (mp.isPlaying()) {
-			paused = true;
+		if (postPlayer.isPlaying()) {
+			postPlayer.pause();
 			setImagePlayer();
-			mp.pause();
 
 		} else {
-			if (paused == true) {
-				paused = false;
+			if (postPlayer.isPaused()) {
+				postPlayer.play();
 				setImagePlayer();
-				mp.start();
 			}
-			if (stoped == true) {
-				stoped = false;
+			if (postPlayer.isStoped()) {
+				postPlayer.play(posts.get(selectedPosition));
 				setImagePlayer();
-				play(selectedPosition);
 			}
-		}
-	}
-
-	@Background
-	void play(int pos) {
-
-		Log.i("---->ultimo clicado", String.valueOf(pos));
-		String textToBreak = posts.get(pos).getUserNick() + ", "
-				+ posts.get(pos).getDateToPost() + ", "
-				+ posts.get(pos).getContent();
-
-		TextBlockenizer text = new TextBlockenizer(textToBreak);
-		for (String block = text.getFirst(); block != ""; block = text
-				.getNext()) {
-
-			fileDescriptors.add("");
-			audioDownloader
-					.saveAudio(block, text.getCurrentBlockPosition() - 1);
 		}
 	}
 
 	@UiThread
 	void setImagePlayer() {
-		if (paused || stoped) {
+		if (postPlayer.isPaused() || postPlayer.isStoped()) {
 			play.setImageResource(R.drawable.playback_play);
 		} else {
 			play.setImageResource(R.drawable.playback_pause);
@@ -467,10 +443,10 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 			Log.i("Toast", "n�o existe post posterior");
 
 		} else {
-			deleteAudioData();
+
 			togglePostMarked(selectedPosition + 1);
 
-			play(selectedPosition + 1);
+			postPlayer.play(posts.get(selectedPosition + 1));
 
 			Log.i("#selected-position-atual", String.valueOf(selectedPosition));
 
@@ -487,13 +463,12 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 			Log.i("Toast", "n�o existe post anterior");
 
 		} else {
-			deleteAudioData();
 			Log.i("#bfselected-position-atual",
 					String.valueOf(selectedPosition));
 
 			togglePostMarked(selectedPosition - 1);
 
-			play(selectedPosition - 1);
+			postPlayer.play(posts.get(selectedPosition - 1));
 
 			Log.i("#selected-position-atual", String.valueOf(selectedPosition));
 
@@ -503,13 +478,8 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 	@Click(R.id.button_stop)
 	@Background
 	void stop() {
-		if (mp.isPlaying()) {
-			stoped = true;
-			setImagePlayer();
-			mp.stop();
-			deleteAudioData();
-
-		}
+		postPlayer.stop();
+		setImagePlayer();
 	}
 
 	@Override
@@ -535,71 +505,8 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 		stop.setVisibility(View.GONE);
 	}
 
-	@Override
-	public void onDowloadFinish(String name, int i) {
-
-		fileDescriptors.set(i, name);
-
-		if (i == 0) {
-
-			try {
-				playAudio(i);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
-	public void deleteAudioData() {
-		fileDescriptors.clear();
-		Log.i("filedescriptors", "dados apagados apagados");
-
-		if (file.exists()) {
-			final File[] audioFiles = file.listFiles();
-			for (final File audioFile : audioFiles) {
-				audioFile.delete();
-			}
-			Log.i("Arquivos", "dados apagados apagados");
-		}
-
-	}
-
-	void playAudio(final int i) throws IllegalArgumentException,
-			SecurityException, IllegalStateException, IOException {
-
-		mp.reset();
-		mp.setDataSource(fileDescriptors.get(i));
-		mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-
-			@Override
-			public void onCompletion(MediaPlayer mp) {
-
-				if (i == (fileDescriptors.size() - 1)) {
-					Log.i("ultimo post", "Ultimo post tocado");
-					mp.stop();
-					stoped = true;
-					setImagePlayer();
-					deleteAudioData();
-
-				} else if (fileDescriptors.get(i + 1) != null) {
-					Log.i("Tocar", "Proximo bloco");
-
-					try {
-						playAudio(i + 1);
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-
-				} else {
-					Log.i("bloco", "bloco n�o baixado");
-				}
-
-			}
-		});
-
-		mp.prepare();
-		mp.start();
+	public void onCompletion() {
+		setImagePlayer();
 
 	}
 }

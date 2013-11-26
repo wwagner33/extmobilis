@@ -12,18 +12,13 @@ import java.net.URL;
 
 import android.os.Environment;
 import android.util.Log;
-import br.ufc.virtual.solarmobilis.DiscussionsPostsActivity;
 import br.ufc.virtual.solarmobilis.util.BingURLCreator;
 
 import com.googlecode.androidannotations.annotations.Background;
 import com.googlecode.androidannotations.annotations.EBean;
-import com.googlecode.androidannotations.annotations.RootContext;
 
 @EBean
 public class BingAudioDownloader {
-
-	@RootContext
-	DiscussionsPostsActivity activity;
 
 	String stringUrl;
 	URL url;

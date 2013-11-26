@@ -3,29 +3,25 @@ package br.ufc.virtual.solarmobilis.audio;
 import java.io.IOException;
 
 import android.media.MediaPlayer;
-import android.os.AsyncTask;
 
 public class AudioPlayer {
 	private MediaPlayer player;
 	private MediaPlayer.OnCompletionListener onCompletion;
 	private boolean isPrepared = false, isPaused = false;
-	/*public playOnBackgroundThread playerThread;*/
 	private String filePath;
-	
-	
-	
+
 	@Deprecated
 	public AudioPlayer(String filePath) {
 		this.filePath = filePath;
 	}
-	
+
 	public AudioPlayer() {
 	}
-	
+
 	public void setFilePath(String filePath) {
 		this.filePath = filePath;
 	}
-	
+
 	public void playOwnAudio() throws IllegalArgumentException,
 			IllegalStateException, IOException {
 
@@ -85,10 +81,10 @@ public class AudioPlayer {
 	}
 
 	public void play() throws IllegalStateException, IOException {
-		
+
 		if (!isPrepared)
 			prepare();
-		
+
 		if (player.isPlaying())
 			return;
 
@@ -97,13 +93,14 @@ public class AudioPlayer {
 				if (hasCompletionListener()) {
 					player.setOnCompletionListener(onCompletion);
 				}
-				/*playerThread = new playOnBackgroundThread();*/
 				player.start();
 			}
 		}
 	}
-	
-	public void play(String filePath, MediaPlayer.OnCompletionListener onCompletion) throws IllegalStateException, IOException {
+
+	public void play(String filePath,
+			MediaPlayer.OnCompletionListener onCompletion)
+			throws IllegalStateException, IOException {
 		setFilePath(filePath);
 		this.onCompletion = onCompletion;
 		play();
@@ -136,7 +133,7 @@ public class AudioPlayer {
 			isPaused = true;
 		}
 	}
-	
+
 	public void reset() {
 		if (player != null) {
 			player.reset();
@@ -148,21 +145,8 @@ public class AudioPlayer {
 		return player.getCurrentPosition() / 1000;
 	}
 
-	/*private class playOnBackgroundThread extends AsyncTask<Void, Integer, Void> {
-
-		@Override
-		protected Void doInBackground(Void... arg0) {
-			player.start();
-			while (player.isPlaying() || isPaused()) {
-				onProgressUpdate(player.getCurrentPosition());
-			}
-			return null;
-
-		}
-	}*/
-	
 	private boolean hasCompletionListener() {
 		return onCompletion != null;
 	}
-	
+
 }
