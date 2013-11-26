@@ -509,6 +509,6 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 
 	public void onCompletion() {
 		setImagePlayer();
-
+		next();
 	}
 }

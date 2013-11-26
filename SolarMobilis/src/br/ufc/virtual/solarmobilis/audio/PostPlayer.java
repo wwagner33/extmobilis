@@ -41,9 +41,9 @@ public class PostPlayer implements DownloaderListener {
 	@Background
 	public void play(DiscussionPost post) {
 		paused = false;
-		stoped = false;		
+		stoped = false;
 		deleteAudioData();
-		
+
 		String textToBreak = post.userNick + ", " + post.getDateToPost() + ", "
 				+ post.getContent();
 
@@ -131,11 +131,10 @@ public class PostPlayer implements DownloaderListener {
 	}
 
 	public void stop() {
-		if (mp.isPlaying()) {
-			mp.stop();
-			stoped = true;
-			deleteAudioData();
-		}
+		mp.stop();
+		stoped = true;
+		deleteAudioData();
+
 	}
 
 	public boolean isStoped() {
@@ -143,7 +142,10 @@ public class PostPlayer implements DownloaderListener {
 	}
 
 	public boolean isPlaying() {
-		return mp.isPlaying();
+		if (mp != null) {
+			return mp.isPlaying();
+		}
+		return false;
 	}
 
 	public void setPostPlayerListener(PostPlayerListener postPlayerListener) {
