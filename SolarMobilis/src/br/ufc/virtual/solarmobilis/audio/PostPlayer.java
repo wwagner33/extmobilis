@@ -21,7 +21,7 @@ import com.googlecode.androidannotations.annotations.EBean;
 @EBean
 public class PostPlayer implements DownloaderListener {
 
-	private boolean paused;
+	private boolean paused = false;
 	private boolean stoped = true;
 	public TextBlockenizer blockenizer;
 	public MediaPlayer mp = new MediaPlayer();
@@ -110,20 +110,13 @@ public class PostPlayer implements DownloaderListener {
 
 					}
 				});
-
-		/*
-		 * mp.prepare(); mp.start();
-		 */
-		/* audioPlayer.prepare(); */
 	}
 
 	public void play() {
 		try {
 			audioPlayer.play();
-		} catch (IllegalStateException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
+
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -132,10 +125,8 @@ public class PostPlayer implements DownloaderListener {
 	}
 
 	public void pause() {
-		if (audioPlayer.isPlaying()) {
-			audioPlayer.pause();
-			paused = true;
-		}
+		audioPlayer.pause();
+		paused = true;
 	}
 
 	public boolean isPaused() {
@@ -143,13 +134,10 @@ public class PostPlayer implements DownloaderListener {
 	}
 
 	public void stop() {
-
 		audioPlayer.stop();
 		stoped = true;
+		paused = false;
 		deleteAudioData();
-
-		/* Log.i("teste", "entrou no else"); */
-
 	}
 
 	public boolean isStoped() {
@@ -158,8 +146,8 @@ public class PostPlayer implements DownloaderListener {
 
 	public boolean isPlaying() {
 
-		if (mp != null) {
-			return mp.isPlaying();
+		if (audioPlayer != null) {
+			return audioPlayer.isPlaying();
 		}
 		return false;
 
