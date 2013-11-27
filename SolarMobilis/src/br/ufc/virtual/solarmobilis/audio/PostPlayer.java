@@ -7,6 +7,7 @@ import java.util.List;
 
 import android.media.MediaPlayer;
 import android.os.Environment;
+import android.text.Html;
 import android.util.Log;
 import br.ufc.virtual.solarmobilis.DiscussionsPostsActivity;
 import br.ufc.virtual.solarmobilis.model.DiscussionPost;
@@ -46,7 +47,7 @@ public class PostPlayer implements DownloaderListener {
 		deleteAudioData();
 
 		String textToBreak = post.userNick + ", " + post.getDateToPost() + ", "
-				+ post.getContent();
+				+ Html.fromHtml(post.getContent()).toString();
 
 		blockenizer = new TextBlockenizer(textToBreak);
 		for (String block = blockenizer.getFirst(); block != ""; block = blockenizer

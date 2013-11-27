@@ -169,7 +169,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 	public void makeDialog() {
 		dialog = ProgressDialog.show(this, dialogWait, dialogMessage, true);
 	}
-	
+
 	@UiThread
 	void setFooter() {
 
@@ -349,7 +349,6 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 		Log.i("clicado (activity de posts)", "ENTROU NO LISTNER");
 		Log.i("clicado (activity de posts)", "clicado no " + position);
 		togglePostMarked(position);
-
 	}
 
 	@UiThread
@@ -363,6 +362,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 			postSelected = false;
 			setActionBarNotSelected();
 			removePlayControls();
+			stop();
 			selectedPosition = -1;
 
 		} else {
@@ -379,6 +379,14 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 			setActionBarSelected();
 			postSelected = true;
 
+			if (posts.get(selectedPosition).getAttachments().isEmpty()) {
+				Log.w("Anexo", "não preenchido");
+
+			} else {
+				Log.w("Anexo", "preenchido");
+				Log.w("Anexo", posts.get(selectedPosition).getAttachments()
+						.toString());
+			}
 		}
 
 		Log.i("toglle-marked", String.valueOf(selectedPosition));
@@ -410,15 +418,18 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 	void play() {
 
 		if (postPlayer.isPlaying()) {
+			Log.i("estava tocando", "agora pausar");
 			postPlayer.pause();
 			setImagePlayer();
 
 		} else {
 			if (postPlayer.isPaused()) {
+				Log.i("estava pausado", "agora continuar");
 				postPlayer.play();
 				setImagePlayer();
 			}
 			if (postPlayer.isStoped()) {
+				Log.i("estava parado", "agora iniciar");
 				postPlayer.play(posts.get(selectedPosition));
 				setImagePlayer();
 			}
@@ -427,9 +438,11 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 
 	@UiThread
 	void setImagePlayer() {
-		
-		Log.i("setImagePlayer teste", "IsPaused : " + String.valueOf(postPlayer.isPaused()));
-		Log.i("setImagePlayer teste", "IsStoped : " + String.valueOf(postPlayer.isStoped()));
+
+		Log.i("setImagePlayer teste",
+				"IsPaused : " + String.valueOf(postPlayer.isPaused()));
+		Log.i("setImagePlayer teste",
+				"IsStoped : " + String.valueOf(postPlayer.isStoped()));
 		if (postPlayer.isPaused() || postPlayer.isStoped()) {
 			play.setImageResource(R.drawable.playback_play);
 		} else {
@@ -449,8 +462,6 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 
 		} else {
 
-			
-			
 			togglePostMarked(selectedPosition + 1);
 
 			postPlayer.play(posts.get(selectedPosition + 1));
@@ -474,8 +485,6 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 			Log.i("#bfselected-position-atual",
 					String.valueOf(selectedPosition));
 
-			
-			
 			togglePostMarked(selectedPosition - 1);
 
 			postPlayer.play(posts.get(selectedPosition - 1));
@@ -483,7 +492,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 			Log.i("#selected-position-atual", String.valueOf(selectedPosition));
 
 			setImagePlayer();
-			
+
 		}
 	}
 
@@ -507,6 +516,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 			setActionBarNotSelected();
 			invalidateOptionsMenu();
 			removePlayControls();
+			stop();
 		}
 	}
 

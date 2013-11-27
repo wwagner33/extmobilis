@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.List;
 
 import android.graphics.Bitmap;
-import android.text.Html;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -100,7 +99,7 @@ public class DiscussionPost {
 	}
 
 	public String getContent() {
-		content = Html.fromHtml(content).toString().trim();
+		// content = Html.fromHtml(content).toString()/*.trim()*/;
 		return content;
 	}
 
