@@ -15,12 +15,17 @@ import br.ufc.virtual.solarmobilis.util.TextBlockenizer;
 import br.ufc.virtual.solarmobilis.webservice.BingAudioDownloader;
 import br.ufc.virtual.solarmobilis.webservice.DownloaderListener;
 import br.ufc.virtual.solarmobilis.webservice.PostPlayerListener;
+import br.ufc.virtual.solarmobilis.webservice.SolarManager;
 
 import com.googlecode.androidannotations.annotations.Background;
+import com.googlecode.androidannotations.annotations.Bean;
 import com.googlecode.androidannotations.annotations.EBean;
 
 @EBean
 public class PostPlayer implements DownloaderListener {
+
+	@Bean
+	SolarManager solarManager;
 
 	private boolean paused = false;
 	private boolean stoped = true;
@@ -58,6 +63,21 @@ public class PostPlayer implements DownloaderListener {
 					blockenizer.getCurrentBlockPosition() - 1);
 		}
 
+		for (int i = 0; i < post.getAttachments().size(); i++) {
+			if (post.getAttachments().get(i).getType().equals("video/mp4")) {
+
+				String anexo = solarManager.getUrlAttachment(post
+						.getAttachments().get(i).getLink());
+				Log.i("link para download",
+						solarManager.getUrlAttachment(post.getAttachments()
+								.get(i).getLink()));
+
+				fileDescriptors.add("");
+				audioDownloader.saveFile(anexo, (fileDescriptors.size() - 1));
+
+			}
+		}
+
 		Log.i("arquivos", "baixados e criado");
 	}
 
@@ -91,8 +111,10 @@ public class PostPlayer implements DownloaderListener {
 					public void onCompletion(MediaPlayer mp) {
 
 						if (i == (fileDescriptors.size() - 1)) {
-							Log.i("ultimo post", "Ultimo post tocado");
-							stop();
+							Log.i("ultimo post", "Ultimo bloco tocado");
+							// stop();
+							stoped = true;
+							deleteAudioData();
 							postPlayerListener.onCompletion();
 
 						} else if (fileDescriptors.get(i + 1) != null) {
