@@ -117,12 +117,12 @@ public class DiscussionPost {
 
 	public String getDateToString() {
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(
-				"yyyy-MM-dd'T'HH:mm:ss", java.util.Locale.getDefault());
+				"yyyy-MM-dd'T'HH:mm:ss.SSS", java.util.Locale.getDefault());
 		String formattedDate = null;
 
 		try {
 			Date convertedDate = simpleDateFormat.parse(updatedAt);
-			SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss",
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmssSSS",
 					java.util.Locale.getDefault());
 			formattedDate = formatter.format(convertedDate);
 		} catch (ParseException e) {
