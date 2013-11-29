@@ -7,22 +7,17 @@ import org.springframework.web.client.HttpStatusCodeException;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
-import android.view.Menu;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 import br.ufc.virtual.solarmobilis.audio.AudioPlayer;
 import br.ufc.virtual.solarmobilis.model.DiscussionPost;
+import br.ufc.virtual.solarmobilis.model.SendPostResponse;
 import br.ufc.virtual.solarmobilis.webservice.SolarManager;
 
 import com.googlecode.androidannotations.annotations.Background;
@@ -68,6 +63,7 @@ public class ResponseActivity extends Activity {
 	Boolean start = true;
 	boolean mStartPlaying = true;
 	boolean mStartRecording = true;
+	File file;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -78,7 +74,7 @@ public class ResponseActivity extends Activity {
 	void recorderConfig() {
 		mFileName = Environment.getExternalStorageDirectory().getAbsolutePath();
 		mFileName += "/Mobilis/Recordings/mobilis_audio.mp4";
-		File file = new File(mFileName);
+		file = new File(mFileName);
 
 		if (file.exists()) {
 			file.delete();
@@ -176,7 +172,9 @@ public class ResponseActivity extends Activity {
 	@Background
 	void sendPost() {
 		try {
-			solarManager.sendPost(postSender, discussionId);
+			SendPostResponse sendPostResponse = solarManager.sendPost(postSender, discussionId);
+			if (file.exists())
+				sendPostAudio(sendPostResponse.getPostId());
 			toast();
 		} catch (HttpStatusCodeException e) {
 			Log.i("ERRO HttpStatusCodeException", e.getStatusCode().toString());
@@ -187,6 +185,10 @@ public class ResponseActivity extends Activity {
 		} finally {
 			dialog.dismiss();
 		}
+	}
+
+	private void sendPostAudio(Integer postId) {
+		
 	}
 
 	@UiThread

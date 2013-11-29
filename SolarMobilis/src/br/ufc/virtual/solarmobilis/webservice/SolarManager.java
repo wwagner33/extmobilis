@@ -16,6 +16,7 @@ import br.ufc.virtual.solarmobilis.model.CurriculumUnitList;
 import br.ufc.virtual.solarmobilis.model.DiscussionList;
 import br.ufc.virtual.solarmobilis.model.DiscussionPostList;
 import br.ufc.virtual.solarmobilis.model.GroupList;
+import br.ufc.virtual.solarmobilis.model.SendPostResponse;
 import br.ufc.virtual.solarmobilis.model.User;
 import br.ufc.virtual.solarmobilis.model.UserMessage;
 
@@ -65,8 +66,8 @@ public class SolarManager {
 		return solarClient.getPosts(preferences.token().get(), id, date);
 	}
 
-	public void sendPost(PostSender postSender, Integer id) {
-		solarClient.sendPost(postSender, id, preferences.token().get());
+	public SendPostResponse sendPost(PostSender postSender, Integer id) {
+		return solarClient.sendPost(postSender, id, preferences.token().get());
 	}
 
 	public String getUserImageUrl(int userId) {
@@ -75,7 +76,8 @@ public class SolarManager {
 	}
 
 	public String getUrlAttachment(String link) {
-		return ("http://apolo11teste.virtual.ufc.br" + link + "?auth_token=" + preferences.token().get());
+		return ("http://apolo11teste.virtual.ufc.br" + link + "?auth_token=" + preferences
+				.token().get());
 	}
 
 	private void setTimeout() {
