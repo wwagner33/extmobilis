@@ -96,17 +96,10 @@ public class CurriculumUnitsListActivity extends SherlockFragmentActivity {
 
 	@ItemClick
 	void listViewCurriculumUnits(int position) {
-		Toast.makeText(
-				this,
-				"clicado: "
-						+ response.getCurriculumuUnits().get(position)
-								.getName(), Toast.LENGTH_SHORT).show();
-
 		preferences.curriculumUnitSelected().put(
 				response.getCurriculumuUnits().get(position).getid());
 
 		Intent intent = new Intent(this, GroupsListActivity_.class);
 		startActivity(intent);
 	}
-
 }

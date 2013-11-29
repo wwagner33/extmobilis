@@ -99,6 +99,12 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 	@StringRes(R.string.dialog_message)
 	String dialogMessage;
 
+	@StringRes(R.string.post_list_last)
+	String lastPostMessage;
+
+	@StringRes(R.string.post_list_first)
+	String firstPostMessage;
+
 	@Bean
 	Toaster toaster;
 
@@ -170,7 +176,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 		dialog = ProgressDialog.show(this, dialogWait, dialogMessage, true);
 	}
 
-	@UiThread
+	// @UiThread
 	void setFooter() {
 
 		Log.i("Dentro do setFooter", String.valueOf(unloadedFuturePostsCount));
@@ -380,7 +386,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 			postSelected = true;
 
 			if (posts.get(selectedPosition).getAttachments().isEmpty()) {
-				Log.w("Anexo", "não preenchido");
+				Log.w("Anexo", "nï¿½o preenchido");
 
 			} else {
 				Log.w("Anexo", "preenchido");
@@ -456,18 +462,12 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 		Log.i("Teste botï¿½o", "botao next");
 
 		if (selectedPosition == posts.size() - 1) {
-
-			toaster.showToast("nï¿½o existe posterior");
-			Log.i("Toast", "nï¿½o existe post posterior");
-
+			toaster.showToast(lastPostMessage);
+			Log.i("Toast", lastPostMessage);
 		} else {
-
 			togglePostMarked(selectedPosition + 1);
-
 			postPlayer.play(posts.get(selectedPosition + 1));
-
 			Log.i("#selected-position-atual", String.valueOf(selectedPosition));
-
 			setImagePlayer();
 		}
 	}
@@ -477,22 +477,15 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 		Log.i("Teste botï¿½o", "botao previous");
 
 		if (selectedPosition == 0) {
-
-			toaster.showToast("nï¿½o existe anterior");
-			Log.i("Toast", "nï¿½o existe post anterior");
-
+			toaster.showToast(firstPostMessage);
+			Log.i("Toast", firstPostMessage);
 		} else {
 			Log.i("#bfselected-position-atual",
 					String.valueOf(selectedPosition));
-
 			togglePostMarked(selectedPosition - 1);
-
 			postPlayer.play(posts.get(selectedPosition - 1));
-
 			Log.i("#selected-position-atual", String.valueOf(selectedPosition));
-
 			setImagePlayer();
-
 		}
 	}
 
