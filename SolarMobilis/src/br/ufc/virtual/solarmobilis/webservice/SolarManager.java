@@ -72,7 +72,10 @@ public class SolarManager {
 	public String getUserImageUrl(int userId) {
 		return ("http://apolo11teste.virtual.ufc.br/users/" + userId
 				+ "/photo?auth_token=" + preferences.token().get());
+	}
 
+	public String getUrlAttachment(String link) {
+		return ("http://apolo11teste.virtual.ufc.br" + link + "?auth_token=" + preferences.token().get());
 	}
 
 	private void setTimeout() {
