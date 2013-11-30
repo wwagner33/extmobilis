@@ -1,9 +1,14 @@
 package br.ufc.virtual.solarmobilis.webservice;
 
+import java.io.File;
+
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -35,6 +40,9 @@ public class SolarManager {
 
 	@RestService
 	SolarClient solarClient;
+
+	@RestService
+	SolarClientPostFileSender solarClientPostFileSender;
 
 	@Pref
 	SolarMobilisPreferences_ preferences;
@@ -68,6 +76,13 @@ public class SolarManager {
 
 	public SendPostResponse sendPost(PostSender postSender, Integer id) {
 		return solarClient.sendPost(postSender, id, preferences.token().get());
+	}
+
+	public Object sendPostAudio(File postAudioFile, Integer postId) {
+		MultiValueMap<String, Object> parts = new LinkedMultiValueMap<String, Object>();
+		parts.add("post_file", new FileSystemResource(postAudioFile));
+		return solarClientPostFileSender.sendPostaudioFile(parts, postId,
+				preferences.token().get());
 	}
 
 	public String getUserImageUrl(int userId) {

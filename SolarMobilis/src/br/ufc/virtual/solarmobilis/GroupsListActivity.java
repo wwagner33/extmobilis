@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 import br.ufc.virtual.solarmobilis.model.GroupList;
 import br.ufc.virtual.solarmobilis.webservice.SolarManager;
 

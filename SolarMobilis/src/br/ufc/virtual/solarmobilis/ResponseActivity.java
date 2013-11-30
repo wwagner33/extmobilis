@@ -172,9 +172,12 @@ public class ResponseActivity extends Activity {
 	@Background
 	void sendPost() {
 		try {
-			SendPostResponse sendPostResponse = solarManager.sendPost(postSender, discussionId);
-			if (file.exists())
+			SendPostResponse sendPostResponse = solarManager.sendPost(
+					postSender, discussionId);
+			if (file.exists()) {
 				sendPostAudio(sendPostResponse.getPostId());
+				file.delete(); // TODO: Verificar se essa lógica fica
+			}
 			toast();
 		} catch (HttpStatusCodeException e) {
 			Log.i("ERRO HttpStatusCodeException", e.getStatusCode().toString());
@@ -188,7 +191,8 @@ public class ResponseActivity extends Activity {
 	}
 
 	private void sendPostAudio(Integer postId) {
-		
+		Object object = solarManager.sendPostAudio(file, postId);
+		object.toString();
 	}
 
 	@UiThread
