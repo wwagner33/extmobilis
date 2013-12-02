@@ -18,7 +18,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import br.ufc.virtual.solarmobilis.audio.PostPlayer;
@@ -170,11 +169,18 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 		dialog = ProgressDialog.show(this, dialogWait, dialogMessage, true);
 	}
 	
-	@UiThread
+	/*@UiThread*/
 	void setFooter() {
 
+		if(!footerFuturePostsState){
+			
+			listVieWDiscussionPosts.addFooterView(footerRefresh, null, true);
+			footerFuturePostsState = true;
+			
+		}
+		
 		Log.i("Dentro do setFooter", String.valueOf(unloadedFuturePostsCount));
-
+      /*
 		if (unloadedFuturePostsCount > 0) {
 			((TextView) footerFuturePosts
 					.findViewById(R.id.load_available_posts))
@@ -204,8 +210,8 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 						.addFooterView(footerRefresh, null, true);
 				footerFuturePostsState = true;
 			}
-		}
-
+		}*/
+         
 	}
 
 	@Click({ R.id.refresh_button })

@@ -116,7 +116,7 @@ public class DiscussionPost {
 		this.updatedAt = updatedAt;
 	}
 
-	public String getDateToString() {
+	/*public String getDateToString() {
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(
 				"yyyy-MM-dd'T'HH:mm:ss", java.util.Locale.getDefault());
 		String formattedDate = null;
@@ -131,7 +131,24 @@ public class DiscussionPost {
 			e.printStackTrace();
 		}
 		return formattedDate;
-	}
+	}*/
+	
+	public String getDateToString() {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(
+                        "yyyy-MM-dd'T'HH:mm:ss.SSS", java.util.Locale.getDefault());
+        String formattedDate = null;
+
+        try {
+                Date convertedDate = simpleDateFormat.parse(updatedAt);
+                SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss.SSS",
+                                java.util.Locale.getDefault());
+                formattedDate = formatter.format(convertedDate);
+        } catch (ParseException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+        }
+        return formattedDate;
+}
 
 	public String getDateToPost() {
 		SimpleDateFormat simpleFormat = new SimpleDateFormat(

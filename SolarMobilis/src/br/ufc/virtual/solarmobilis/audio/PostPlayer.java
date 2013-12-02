@@ -158,8 +158,8 @@ public class PostPlayer implements DownloaderListener {
 
 	public boolean isPlaying() {
 
-		if (mp != null) {
-			return mp.isPlaying();
+		if (audioDownloader != null) {
+			return audioPlayer.isPlaying();
 		}
 		return false;
 
