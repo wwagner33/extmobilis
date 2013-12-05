@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.List;
 
 import android.graphics.Bitmap;
-import android.text.Html;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -25,7 +24,7 @@ public class DiscussionPost {
 	public String content;
 	@SerializedName("updated_at")
 	public String updatedAt;
-	public List<Object> attachments;
+	public List<DiscussionPostAttachment> attachments;
 	@SerializedName("parent_id")
 	public Integer parentId;
 	public Bitmap userImage;
@@ -38,7 +37,7 @@ public class DiscussionPost {
 
 	public DiscussionPost(Integer id, Integer profileId, Integer discussionId,
 			Integer userId, String userNick, Integer level, String content,
-			String updatedAt, List<Object> attachments) {
+			String updatedAt, List<DiscussionPostAttachment> attachments) {
 		super();
 		this.id = id;
 		this.profileId = profileId;
@@ -100,7 +99,7 @@ public class DiscussionPost {
 	}
 
 	public String getContent() {
-		content = Html.fromHtml(content).toString().trim();
+		// content = Html.fromHtml(content).toString()/*.trim()*/;
 		return content;
 	}
 
@@ -118,12 +117,12 @@ public class DiscussionPost {
 
 	/*public String getDateToString() {
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(
-				"yyyy-MM-dd'T'HH:mm:ss", java.util.Locale.getDefault());
+				"yyyy-MM-dd'T'HH:mm:ss.SSS", java.util.Locale.getDefault());
 		String formattedDate = null;
 
 		try {
 			Date convertedDate = simpleDateFormat.parse(updatedAt);
-			SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss",
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmssSSS",
 					java.util.Locale.getDefault());
 			formattedDate = formatter.format(convertedDate);
 		} catch (ParseException e) {
@@ -169,11 +168,11 @@ public class DiscussionPost {
 
 	}
 
-	public List<Object> getAttachments() {
+	public List<DiscussionPostAttachment> getAttachments() {
 		return attachments;
 	}
 
-	public void setAttachments(List<Object> attachments) {
+	public void setAttachments(List<DiscussionPostAttachment> attachments) {
 		this.attachments = attachments;
 	}
 

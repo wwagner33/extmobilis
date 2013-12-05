@@ -7,6 +7,7 @@ import java.util.List;
 
 import android.media.MediaPlayer;
 import android.os.Environment;
+import android.text.Html;
 import android.util.Log;
 import br.ufc.virtual.solarmobilis.DiscussionsPostsActivity;
 import br.ufc.virtual.solarmobilis.model.DiscussionPost;
@@ -14,14 +15,19 @@ import br.ufc.virtual.solarmobilis.util.TextBlockenizer;
 import br.ufc.virtual.solarmobilis.webservice.BingAudioDownloader;
 import br.ufc.virtual.solarmobilis.webservice.DownloaderListener;
 import br.ufc.virtual.solarmobilis.webservice.PostPlayerListener;
+import br.ufc.virtual.solarmobilis.webservice.SolarManager;
 
 import com.googlecode.androidannotations.annotations.Background;
+import com.googlecode.androidannotations.annotations.Bean;
 import com.googlecode.androidannotations.annotations.EBean;
 
 @EBean
 public class PostPlayer implements DownloaderListener {
 
-	private boolean paused;
+	@Bean
+	SolarManager solarManager;
+
+	private boolean paused = false;
 	private boolean stoped = true;
 	public TextBlockenizer blockenizer;
 	public MediaPlayer mp = new MediaPlayer();
@@ -46,7 +52,7 @@ public class PostPlayer implements DownloaderListener {
 		deleteAudioData();
 
 		String textToBreak = post.userNick + ", " + post.getDateToPost() + ", "
-				+ post.getContent();
+				+ Html.fromHtml(post.getContent()).toString();
 
 		blockenizer = new TextBlockenizer(textToBreak);
 		for (String block = blockenizer.getFirst(); block != ""; block = blockenizer
@@ -55,6 +61,21 @@ public class PostPlayer implements DownloaderListener {
 			fileDescriptors.add("");
 			audioDownloader.saveAudio(block,
 					blockenizer.getCurrentBlockPosition() - 1);
+		}
+
+		for (int i = 0; i < post.getAttachments().size(); i++) {
+			if (post.getAttachments().get(i).getType().equals("video/mp4")) {
+
+				String anexo = solarManager.getUrlAttachment(post
+						.getAttachments().get(i).getLink());
+				Log.i("link para download",
+						solarManager.getUrlAttachment(post.getAttachments()
+								.get(i).getLink()));
+
+				fileDescriptors.add("");
+				audioDownloader.saveFile(anexo, (fileDescriptors.size() - 1));
+
+			}
 		}
 
 		Log.i("arquivos", "baixados e criado");
@@ -90,8 +111,10 @@ public class PostPlayer implements DownloaderListener {
 					public void onCompletion(MediaPlayer mp) {
 
 						if (i == (fileDescriptors.size() - 1)) {
-							Log.i("ultimo post", "Ultimo post tocado");
-							stop();
+							Log.i("ultimo post", "Ultimo bloco tocado");
+							// stop();
+							stoped = true;
+							deleteAudioData();
 							postPlayerListener.onCompletion();
 
 						} else if (fileDescriptors.get(i + 1) != null) {
@@ -110,20 +133,13 @@ public class PostPlayer implements DownloaderListener {
 
 					}
 				});
-
-		/*
-		 * mp.prepare(); mp.start();
-		 */
-		/* audioPlayer.prepare(); */
 	}
 
 	public void play() {
 		try {
 			audioPlayer.play();
-		} catch (IllegalStateException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
+
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -132,10 +148,8 @@ public class PostPlayer implements DownloaderListener {
 	}
 
 	public void pause() {
-		if (audioPlayer.isPlaying()) {
-			audioPlayer.pause();
-			paused = true;
-		}
+		audioPlayer.pause();
+		paused = true;
 	}
 
 	public boolean isPaused() {
@@ -143,13 +157,10 @@ public class PostPlayer implements DownloaderListener {
 	}
 
 	public void stop() {
-
 		audioPlayer.stop();
 		stoped = true;
+		paused = false;
 		deleteAudioData();
-
-		/* Log.i("teste", "entrou no else"); */
-
 	}
 
 	public boolean isStoped() {
@@ -158,7 +169,9 @@ public class PostPlayer implements DownloaderListener {
 
 	public boolean isPlaying() {
 
-		if (audioDownloader != null) {
+
+		if (audioPlayer != null) {
+
 			return audioPlayer.isPlaying();
 		}
 		return false;

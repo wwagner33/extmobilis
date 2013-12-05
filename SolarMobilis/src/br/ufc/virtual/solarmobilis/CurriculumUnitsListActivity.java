@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 import br.ufc.virtual.solarmobilis.model.CurriculumUnitList;
 import br.ufc.virtual.solarmobilis.webservice.SolarManager;
 
@@ -96,17 +95,10 @@ public class CurriculumUnitsListActivity extends SherlockFragmentActivity {
 
 	@ItemClick
 	void listViewCurriculumUnits(int position) {
-		Toast.makeText(
-				this,
-				"clicado: "
-						+ response.getCurriculumuUnits().get(position)
-								.getName(), Toast.LENGTH_SHORT).show();
-
 		preferences.curriculumUnitSelected().put(
 				response.getCurriculumuUnits().get(position).getid());
 
 		Intent intent = new Intent(this, GroupsListActivity_.class);
 		startActivity(intent);
 	}
-
 }

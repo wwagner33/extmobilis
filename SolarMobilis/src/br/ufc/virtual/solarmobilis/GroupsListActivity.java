@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 import br.ufc.virtual.solarmobilis.model.GroupList;
 import br.ufc.virtual.solarmobilis.webservice.SolarManager;
 
@@ -101,11 +100,6 @@ public class GroupsListActivity extends SherlockFragmentActivity {
 
 	@ItemClick
 	void listViewGroups(int position) {
-
-		Toast.makeText(this,
-				"clicado: " + response.getGroups().get(position).getCode(),
-				Toast.LENGTH_SHORT).show();
-
 		preferences.groupSelected().put(
 				response.getGroups().get(position).getId());
 
@@ -113,7 +107,6 @@ public class GroupsListActivity extends SherlockFragmentActivity {
 		// intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
 		// Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		startActivity(intent);
-
 	}
 
 }

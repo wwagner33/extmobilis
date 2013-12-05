@@ -8,6 +8,7 @@ import br.ufc.virtual.solarmobilis.model.CurriculumUnitList;
 import br.ufc.virtual.solarmobilis.model.DiscussionList;
 import br.ufc.virtual.solarmobilis.model.DiscussionPostList;
 import br.ufc.virtual.solarmobilis.model.GroupList;
+import br.ufc.virtual.solarmobilis.model.SendPostResponse;
 import br.ufc.virtual.solarmobilis.model.UserMessage;
 
 import com.googlecode.androidannotations.annotations.rest.Get;
@@ -33,7 +34,8 @@ public interface SolarClient {
 	DiscussionPostList getPosts(String token, int id, String date);
 
 	@Post("discussions/{discussionId}/posts.json?auth_token={token}")
-	void sendPost(PostSender postSender, Integer discussionId, String token);
+	SendPostResponse sendPost(PostSender postSender, Integer discussionId,
+			String token);
 
 	RestTemplate getRestTemplate();
 

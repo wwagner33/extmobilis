@@ -6,6 +6,7 @@ import java.util.List;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -59,7 +60,7 @@ public class PostAdapter extends ArrayAdapter<DiscussionPost> {
 
 		postItem.name.setText(posts.get(position).getUserNick());
 		postItem.date.setText(posts.get(position).getDateToPost());
-		postItem.content.setText(posts.get(position).getContent());
+		postItem.content.setText(Html.fromHtml(posts.get(position).getContent()).toString());
 
 		Picasso.with(context).load(posts.get(position).getUserImageURL())
 				.placeholder(R.drawable.no_picture)

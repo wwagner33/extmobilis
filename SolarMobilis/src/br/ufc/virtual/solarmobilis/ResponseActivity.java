@@ -1,14 +1,27 @@
 package br.ufc.virtual.solarmobilis;
 
+import java.io.File;
+import java.io.IOException;
+
 import org.springframework.web.client.HttpStatusCodeException;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.media.MediaPlayer;
+import android.media.MediaRecorder;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
+import android.view.View;
+import android.widget.Chronometer;
+import android.widget.Chronometer.OnChronometerTickListener;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
+import br.ufc.virtual.solarmobilis.audio.AudioPlayer;
 import br.ufc.virtual.solarmobilis.model.DiscussionPost;
+import br.ufc.virtual.solarmobilis.model.SendPostResponse;
 import br.ufc.virtual.solarmobilis.webservice.SolarManager;
 
 import com.googlecode.androidannotations.annotations.Background;
@@ -21,7 +34,7 @@ import com.googlecode.androidannotations.annotations.ViewById;
 import com.googlecode.androidannotations.annotations.sharedpreferences.Pref;
 
 @EActivity(R.layout.activity_response)
-public class ResponseActivity extends Activity {
+public class ResponseActivity extends Activity implements OnChronometerTickListener {
 
 	@Pref
 	SolarMobilisPreferences_ preferences;
@@ -35,14 +48,49 @@ public class ResponseActivity extends Activity {
 	@ViewById(R.id.editTextReply)
 	EditText reply;
 
+	@ViewById(R.id.record_button)
+	ImageButton recordButton;
+
+	@ViewById(R.id.play_button)
+	ImageButton playButton;
+
+	@ViewById(R.id.recording_chronometer)
+	Chronometer chronometer;
+	
+	@ViewById(R.id.recording_lenght)
+	TextView timeUp;
+	
 	@Extra("discussionId")
 	Integer discussionId;
 
 	private ProgressDialog dialog;
 
+	AudioPlayer player = new AudioPlayer();
+	private MediaRecorder mRecorder = null;
+	private MediaPlayer mPlayer = null;
+	private static String mFileName = null;
+	private static final String LOG_TAG = "AudioRecordTest";
+	Boolean start = true;
+	boolean mStartPlaying = true;
+	boolean mStartRecording = true;
+	File file;
+    long startTime;
+    Long countUp;
+    
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		recorderConfig();
+	}
+
+	void recorderConfig() {
+		mFileName = Environment.getExternalStorageDirectory().getAbsolutePath();
+		mFileName += "/Mobilis/Recordings/mobilis_audio.mp4";
+		file = new File(mFileName);
+
+		if (file.exists()) {
+			file.delete();
+		}
 	}
 
 	@Click(R.id.submitReply)
@@ -57,10 +105,106 @@ public class ResponseActivity extends Activity {
 		sendPost();
 	}
 
+	@Click(R.id.record_button)
+	void onRecordClick() {
+		onRecord(mStartRecording);
+		if (mStartRecording) {
+			
+			recordButton.setImageResource(R.drawable.gravador_gravando);
+		  
+			timeUp.setVisibility(View.VISIBLE);
+			startTime = System.currentTimeMillis();
+			chronometer.start();
+			
+			
+		} else {
+			recordButton.setImageResource(R.drawable.gravador_parado);
+		
+		    chronometer.stop();
+			timeUp.setText("00:00");
+			timeUp.setVisibility(View.GONE);
+		
+		}
+		mStartRecording = !mStartRecording;
+	}
+
+	void onRecord(boolean start) {
+		if (start) {
+			startRecording();
+		} else {
+			stopRecording();
+		}
+	}
+
+	private void startRecording() {
+		mRecorder = new MediaRecorder();
+		mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+		mRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+		mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+		mRecorder.setOutputFile(mFileName);
+		try {
+			mRecorder.prepare();
+			mRecorder.start();
+		} catch (IOException e) {
+			Log.e(LOG_TAG, "prepare() failed");
+		}
+
+		
+	}
+
+	private void stopRecording() {
+		mRecorder.stop();
+		mRecorder.reset();
+		mRecorder.release();
+		mRecorder = null;
+	}
+
+	@Click(R.id.play_button)
+	public void onPlayClick() {
+		
+		onPlay(mStartPlaying);
+		if (mStartPlaying) {
+			
+			// setText("Stop playing");
+		} else {
+			// setText("Start playing");
+		}
+		mStartPlaying = !mStartPlaying;
+	}
+
+	private void onPlay(boolean start) {
+		if (start) {
+			startPlaying();
+		} else {
+			stopPlaying();
+		}
+	}
+
+	private void startPlaying() {
+		mPlayer = new MediaPlayer();
+		try {
+			mPlayer.setDataSource(mFileName);
+			mPlayer.prepare();
+			mPlayer.start();
+		} catch (IOException e) {
+			Log.e(LOG_TAG, "prepare() failed");
+		}
+	}
+
+	private void stopPlaying() {
+		mPlayer.release();
+		mPlayer = null;
+	}
+
 	@Background
 	void sendPost() {
 		try {
-			solarManager.sendPost(postSender, discussionId);
+			SendPostResponse sendPostResponse = solarManager.sendPost(
+					postSender, discussionId);
+			if (file.exists()) {
+				sendPostAudio(sendPostResponse.getPostId());
+				file.delete(); // TODO: Verificar se essa lógica fica
+			}
 			toast();
 		} catch (HttpStatusCodeException e) {
 			Log.i("ERRO HttpStatusCodeException", e.getStatusCode().toString());
@@ -73,6 +217,11 @@ public class ResponseActivity extends Activity {
 		}
 	}
 
+	private void sendPostAudio(Integer postId) {
+		Object object = solarManager.sendPostAudio(file, postId);
+		object.toString();
+	}
+
 	@UiThread
 	void toast() {
 		Toast.makeText(this, R.string.send_post_sucess, Toast.LENGTH_SHORT)
@@ -80,4 +229,31 @@ public class ResponseActivity extends Activity {
 		finish();
 	}
 
+	@Override
+	public void onChronometerTick(Chronometer arg0) {
+		
+		long endTime = System.currentTimeMillis();
+		String asText = "";
+		String Text1 = "";
+		String Text2 = "";
+		countUp = (endTime - startTime) / 1000;
+
+		if (countUp / 60 <= 9) {
+			Text1 = "0" + (countUp / 60);
+		} else {
+			Text1 += (countUp / 60);
+		}
+
+		if (countUp % 60 <= 9) {
+			Text2 = "0" + (countUp % 60);
+		} else {
+			Text2 += (countUp % 60);
+		}
+
+		asText = Text1 + ":" + Text2;
+
+		timeUp.setText(asText);
+		
+		
+	}
 }

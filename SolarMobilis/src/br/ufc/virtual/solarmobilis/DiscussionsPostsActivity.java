@@ -98,6 +98,12 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 	@StringRes(R.string.dialog_message)
 	String dialogMessage;
 
+	@StringRes(R.string.post_list_last)
+	String lastPostMessage;
+
+	@StringRes(R.string.post_list_first)
+	String firstPostMessage;
+
 	@Bean
 	Toaster toaster;
 
@@ -168,8 +174,11 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 	public void makeDialog() {
 		dialog = ProgressDialog.show(this, dialogWait, dialogMessage, true);
 	}
+
+
+
 	
-	/*@UiThread*/
+	// @UiThread
 	void setFooter() {
 
 		if(!footerFuturePostsState){
@@ -355,7 +364,6 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 		Log.i("clicado (activity de posts)", "ENTROU NO LISTNER");
 		Log.i("clicado (activity de posts)", "clicado no " + position);
 		togglePostMarked(position);
-
 	}
 
 	@UiThread
@@ -369,6 +377,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 			postSelected = false;
 			setActionBarNotSelected();
 			removePlayControls();
+			stop();
 			selectedPosition = -1;
 
 		} else {
@@ -385,6 +394,14 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 			setActionBarSelected();
 			postSelected = true;
 
+			if (posts.get(selectedPosition).getAttachments().isEmpty()) {
+				Log.w("Anexo", "n�o preenchido");
+
+			} else {
+				Log.w("Anexo", "preenchido");
+				Log.w("Anexo", posts.get(selectedPosition).getAttachments()
+						.toString());
+			}
 		}
 
 		Log.i("toglle-marked", String.valueOf(selectedPosition));
@@ -416,15 +433,18 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 	void play() {
 
 		if (postPlayer.isPlaying()) {
+			Log.i("estava tocando", "agora pausar");
 			postPlayer.pause();
 			setImagePlayer();
 
 		} else {
 			if (postPlayer.isPaused()) {
+				Log.i("estava pausado", "agora continuar");
 				postPlayer.play();
 				setImagePlayer();
 			}
 			if (postPlayer.isStoped()) {
+				Log.i("estava parado", "agora iniciar");
 				postPlayer.play(posts.get(selectedPosition));
 				setImagePlayer();
 			}
@@ -433,9 +453,11 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 
 	@UiThread
 	void setImagePlayer() {
-		
-		Log.i("setImagePlayer teste", "IsPaused : " + String.valueOf(postPlayer.isPaused()));
-		Log.i("setImagePlayer teste", "IsStoped : " + String.valueOf(postPlayer.isStoped()));
+
+		Log.i("setImagePlayer teste",
+				"IsPaused : " + String.valueOf(postPlayer.isPaused()));
+		Log.i("setImagePlayer teste",
+				"IsStoped : " + String.valueOf(postPlayer.isStoped()));
 		if (postPlayer.isPaused() || postPlayer.isStoped()) {
 			play.setImageResource(R.drawable.playback_play);
 		} else {
@@ -449,20 +471,12 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 		Log.i("Teste bot�o", "botao next");
 
 		if (selectedPosition == posts.size() - 1) {
-
-			toaster.showToast("n�o existe posterior");
-			Log.i("Toast", "n�o existe post posterior");
-
+			toaster.showToast(lastPostMessage);
+			Log.i("Toast", lastPostMessage);
 		} else {
-
-			
-			
 			togglePostMarked(selectedPosition + 1);
-
 			postPlayer.play(posts.get(selectedPosition + 1));
-
 			Log.i("#selected-position-atual", String.valueOf(selectedPosition));
-
 			setImagePlayer();
 		}
 	}
@@ -472,24 +486,15 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 		Log.i("Teste bot�o", "botao previous");
 
 		if (selectedPosition == 0) {
-
-			toaster.showToast("n�o existe anterior");
-			Log.i("Toast", "n�o existe post anterior");
-
+			toaster.showToast(firstPostMessage);
+			Log.i("Toast", firstPostMessage);
 		} else {
 			Log.i("#bfselected-position-atual",
 					String.valueOf(selectedPosition));
-
-			
-			
 			togglePostMarked(selectedPosition - 1);
-
 			postPlayer.play(posts.get(selectedPosition - 1));
-
 			Log.i("#selected-position-atual", String.valueOf(selectedPosition));
-
 			setImagePlayer();
-			
 		}
 	}
 
@@ -513,6 +518,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 			setActionBarNotSelected();
 			invalidateOptionsMenu();
 			removePlayControls();
+			stop();
 		}
 	}
 

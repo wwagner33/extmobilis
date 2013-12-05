@@ -62,11 +62,11 @@
             android:layout_alignParentRight="true"
             android:layout_centerHorizontal="false"
             android:layout_marginRight="3dp"
-            android:text="@string/char_count_default_value" />
+            android:text="@string/char_count_default_value"
+            android:visibility="invisible" />
     </RelativeLayout>
 
     <RelativeLayout
-        android:id="@+id/teste2"
         android:layout_width="fill_parent"
         android:layout_height="40dp"
         android:background="#ebebeb" >
@@ -74,7 +74,7 @@
         <!-- android:layout_height="40dp" -->
 
         <ImageButton
-            android:id="@+id/btn_gravar"
+            android:id="@+id/record_button"
             android:layout_width="50dp"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
@@ -98,7 +98,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="11dp"
-            android:layout_toRightOf="@id/btn_gravar"
+            android:layout_toRightOf="@id/record_button"
             android:text="@string/counter_default_value"
             android:textColor="@color/black"
             android:visibility="gone" />
@@ -108,6 +108,18 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="gone" />
+
+        <ImageButton
+            android:id="@+id/play_button"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="3dp"
+            android:layout_marginTop="4dp"
+            android:layout_toRightOf="@+id/record_button"
+            android:contentDescription="@string/play_button_description"
+            android:scaleType="centerInside"
+            android:src="@drawable/gravador_parado" />
     </RelativeLayout>
 
 </LinearLayout>

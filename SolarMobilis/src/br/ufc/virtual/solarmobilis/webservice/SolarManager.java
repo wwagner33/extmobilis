@@ -1,9 +1,14 @@
 package br.ufc.virtual.solarmobilis.webservice;
 
+import java.io.File;
+
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -16,6 +21,7 @@ import br.ufc.virtual.solarmobilis.model.CurriculumUnitList;
 import br.ufc.virtual.solarmobilis.model.DiscussionList;
 import br.ufc.virtual.solarmobilis.model.DiscussionPostList;
 import br.ufc.virtual.solarmobilis.model.GroupList;
+import br.ufc.virtual.solarmobilis.model.SendPostResponse;
 import br.ufc.virtual.solarmobilis.model.User;
 import br.ufc.virtual.solarmobilis.model.UserMessage;
 
@@ -34,6 +40,9 @@ public class SolarManager {
 
 	@RestService
 	SolarClient solarClient;
+
+	@RestService
+	SolarClientPostFileSender solarClientPostFileSender;
 
 	@Pref
 	SolarMobilisPreferences_ preferences;
@@ -65,14 +74,25 @@ public class SolarManager {
 		return solarClient.getPosts(preferences.token().get(), id, date);
 	}
 
-	public void sendPost(PostSender postSender, Integer id) {
-		solarClient.sendPost(postSender, id, preferences.token().get());
+	public SendPostResponse sendPost(PostSender postSender, Integer id) {
+		return solarClient.sendPost(postSender, id, preferences.token().get());
+	}
+
+	public Object sendPostAudio(File postAudioFile, Integer postId) {
+		MultiValueMap<String, Object> parts = new LinkedMultiValueMap<String, Object>();
+		parts.add("post_file", new FileSystemResource(postAudioFile));
+		return solarClientPostFileSender.sendPostaudioFile(parts, postId,
+				preferences.token().get());
 	}
 
 	public String getUserImageUrl(int userId) {
 		return ("http://apolo11teste.virtual.ufc.br/users/" + userId
 				+ "/photo?auth_token=" + preferences.token().get());
+	}
 
+	public String getUrlAttachment(String link) {
+		return ("http://apolo11teste.virtual.ufc.br" + link + "?auth_token=" + preferences
+				.token().get());
 	}
 
 	private void setTimeout() {
