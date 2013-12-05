@@ -40,8 +40,13 @@ public class GatewayActivity extends Activity {
 	void createFolder() {
 		File file = new File(Environment.getExternalStorageDirectory()
 				.getAbsolutePath() + "/Mobilis/TTS/");
-		if (!file.exists()) {
+
+		File fileRec = new File(Environment.getExternalStorageDirectory()
+				.getAbsolutePath() + "/Mobilis/Recordings/");
+
+		if (!file.exists() || !fileRec.exists()) {
 			file.mkdirs();
+			fileRec.mkdirs();
 			Log.i("Pasta", "criada");
 		}
 	}

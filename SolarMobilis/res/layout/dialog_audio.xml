@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="300dp"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/courseListIdle"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp" >
+
+        <ImageView
+            android:id="@+id/image_audio"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentLeft="true"
+            android:contentDescription="@string/image_audio_description"
+            android:src="@drawable/ic_lock_silent_mode_off" />
+
+        <TextView
+            android:id="@+id/recording_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:layout_marginTop="5dp"
+            android:layout_toRightOf="@id/image_audio"
+            android:text="@string/recording_date"
+            android:textColor="@color/black" />
+
+        <TextView
+            android:id="@+id/recording_progress_teste"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/recording_date"
+            android:layout_marginLeft="15dp"
+            android:layout_marginTop="5dp"
+            android:layout_toRightOf="@id/image_audio"
+            android:text="@string/recording_progress_teste"
+            android:textColor="@color/black"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/recording_duration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/recording_date"
+            android:layout_marginLeft="15dp"
+            android:layout_marginTop="5dp"
+            android:layout_toRightOf="@id/image_audio"
+            android:text="@string/recording_duration"
+            android:textColor="@color/black" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/listen_area"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/audio_dialog_item_selector"
+        android:clickable="true" >
+
+        <TextView
+            android:id="@+id/img_listen"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="25dp"
+            android:layout_marginTop="10dp"
+            android:paddingBottom="7dp"
+            android:text="@string/listen_to"
+            android:textColor="@color/black" />
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/playback_area"
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:background="@drawable/audio_dialog_item_selector"
+        android:clickable="false"
+        android:visibility="gone" >
+
+        <ImageView
+            android:id="@+id/button_pause_blue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:clickable="true"
+            android:contentDescription="@string/button_pause_blue_description"
+            android:src="@drawable/button_pause_selector" />
+
+        <ImageView
+            android:id="@+id/stop_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/button_pause_blue"
+            android:clickable="true"
+            android:contentDescription="@string/stop_button_description"
+            android:src="@drawable/button_stop_selector" />
+
+        <SeekBar
+            android:id="@+id/player_bar"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="false"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="5dp"
+            android:layout_toRightOf="@id/stop_button" />
+    </RelativeLayout>
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:background="@color/courseListIdle"
+        android:contentDescription="@string/divider_line" />
+
+    <LinearLayout
+        android:id="@+id/delete_area"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/audio_dialog_item_selector"
+        android:clickable="true" >
+
+        <TextView
+            android:id="@+id/img_delete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="25dp"
+            android:layout_marginTop="10dp"
+            android:paddingBottom="10dp"
+            android:text="@string/delete"
+            android:textColor="@color/black" />
+    </LinearLayout>
+
+</LinearLayout>

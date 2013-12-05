@@ -103,12 +103,6 @@
             android:textColor="@color/black"
             android:visibility="gone" />
 
-        <Chronometer
-            android:id="@+id/recording_chronometer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="gone" />
-
         <ImageButton
             android:id="@+id/play_button"
             android:layout_width="50dp"
@@ -119,7 +113,18 @@
             android:layout_toRightOf="@+id/record_button"
             android:contentDescription="@string/play_button_description"
             android:scaleType="centerInside"
-            android:src="@drawable/gravador_parado" />
+            android:src="@drawable/gravador_parado"
+            android:visibility="gone" />
+
+        <Chronometer
+            android:id="@+id/recording_chronometer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="11dp"
+            android:layout_toRightOf="@id/record_button"
+            android:text="@string/counter_default_value"
+            android:textColor="@color/black"
+            android:visibility="gone" />
     </RelativeLayout>
 
 </LinearLayout>

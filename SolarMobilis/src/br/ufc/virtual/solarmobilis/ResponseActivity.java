@@ -11,30 +11,34 @@ import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.View;
 import android.widget.Chronometer;
-import android.widget.Chronometer.OnChronometerTickListener;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import br.ufc.virtual.solarmobilis.audio.AudioPlayer;
+import br.ufc.virtual.solarmobilis.dialog.AudioDialog;
+import br.ufc.virtual.solarmobilis.dialog.AudioDialog.onDeleteListener;
 import br.ufc.virtual.solarmobilis.model.DiscussionPost;
 import br.ufc.virtual.solarmobilis.model.SendPostResponse;
+import br.ufc.virtual.solarmobilis.util.Toaster;
 import br.ufc.virtual.solarmobilis.webservice.SolarManager;
-
 import com.googlecode.androidannotations.annotations.Background;
 import com.googlecode.androidannotations.annotations.Bean;
 import com.googlecode.androidannotations.annotations.Click;
 import com.googlecode.androidannotations.annotations.EActivity;
+import com.googlecode.androidannotations.annotations.EBean;
 import com.googlecode.androidannotations.annotations.Extra;
 import com.googlecode.androidannotations.annotations.UiThread;
 import com.googlecode.androidannotations.annotations.ViewById;
 import com.googlecode.androidannotations.annotations.sharedpreferences.Pref;
 
 @EActivity(R.layout.activity_response)
-public class ResponseActivity extends Activity implements OnChronometerTickListener {
+public class ResponseActivity extends Activity implements onDeleteListener{
 
 	@Pref
 	SolarMobilisPreferences_ preferences;
@@ -56,13 +60,19 @@ public class ResponseActivity extends Activity implements OnChronometerTickListe
 
 	@ViewById(R.id.recording_chronometer)
 	Chronometer chronometer;
-	
+
 	@ViewById(R.id.recording_lenght)
 	TextView timeUp;
+
+	@ViewById(R.id.record_image)
+	ImageView playRecord;
 	
 	@Extra("discussionId")
 	Integer discussionId;
 
+	@Bean
+	Toaster toaster;
+	
 	private ProgressDialog dialog;
 
 	AudioPlayer player = new AudioPlayer();
@@ -74,13 +84,12 @@ public class ResponseActivity extends Activity implements OnChronometerTickListe
 	boolean mStartPlaying = true;
 	boolean mStartRecording = true;
 	File file;
-    long startTime;
-    Long countUp;
-    
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		recorderConfig();
+		// chronometer = System.currentTimeMillis();
 	}
 
 	void recorderConfig() {
@@ -109,68 +118,89 @@ public class ResponseActivity extends Activity implements OnChronometerTickListe
 	void onRecordClick() {
 		onRecord(mStartRecording);
 		if (mStartRecording) {
-			
+
+			// setText("Stop recording");
 			recordButton.setImageResource(R.drawable.gravador_gravando);
-		  
-			timeUp.setVisibility(View.VISIBLE);
-			startTime = System.currentTimeMillis();
+			chronometer.setVisibility(View.VISIBLE);
+			chronometer.setBase(SystemClock.elapsedRealtime());
 			chronometer.start();
-			
-			
 		} else {
+			// setText("Start recording");
 			recordButton.setImageResource(R.drawable.gravador_parado);
-		
-		    chronometer.stop();
-			timeUp.setText("00:00");
-			timeUp.setVisibility(View.GONE);
-		
+			chronometer.setVisibility(View.GONE);
+			chronometer.stop();
+            playRecord.setVisibility(View.VISIBLE);
 		}
 		mStartRecording = !mStartRecording;
 	}
 
 	void onRecord(boolean start) {
 		if (start) {
-			startRecording();
+			try {
+				startRecording();
+				Log.i("gravacao", "iniciada");
+
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		} else {
 			stopRecording();
+			Log.i("gravacao", "parada");
 		}
 	}
 
-	private void startRecording() {
+	private void startRecording() throws Exception {
 		mRecorder = new MediaRecorder();
 		mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
 		mRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
 		mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
 		mRecorder.setOutputFile(mFileName);
-		try {
-			mRecorder.prepare();
-			mRecorder.start();
-		} catch (IOException e) {
-			Log.e(LOG_TAG, "prepare() failed");
-		}
 
-		
+		// try {
+		mRecorder.prepare();
+		mRecorder.start();
+		// } catch (IOException e) {
+		// Log.e(LOG_TAG, "prepare() failed");
+		// }
+
 	}
 
 	private void stopRecording() {
 		mRecorder.stop();
 		mRecorder.reset();
-		mRecorder.release();
-		mRecorder = null;
+		// mRecorder.release();
+		// mRecorder = null;
+
 	}
 
 	@Click(R.id.play_button)
 	public void onPlayClick() {
-		
+
 		onPlay(mStartPlaying);
 		if (mStartPlaying) {
-			
+
 			// setText("Stop playing");
 		} else {
 			// setText("Start playing");
 		}
 		mStartPlaying = !mStartPlaying;
 	}
+	
+	
+	//----------------------------------------
+	@Click(R.id.record_image)
+	public void onPlayRecordClick(){
+		
+		AudioPlayer audioPlayer = new AudioPlayer(mFileName);
+		
+		AudioDialog  audioDialog = new AudioDialog(this, audioPlayer );
+		audioDialog.show();
+		
+		
+	}
+	
+	//----------------------------------------
 
 	private void onPlay(boolean start) {
 		if (start) {
@@ -203,7 +233,7 @@ public class ResponseActivity extends Activity implements OnChronometerTickListe
 					postSender, discussionId);
 			if (file.exists()) {
 				sendPostAudio(sendPostResponse.getPostId());
-				file.delete(); // TODO: Verificar se essa lógica fica
+				/*file.delete(); // TODO: Verificar se essa lógica fica*/
 			}
 			toast();
 		} catch (HttpStatusCodeException e) {
@@ -230,30 +260,11 @@ public class ResponseActivity extends Activity implements OnChronometerTickListe
 	}
 
 	@Override
-	public void onChronometerTick(Chronometer arg0) {
-		
-		long endTime = System.currentTimeMillis();
-		String asText = "";
-		String Text1 = "";
-		String Text2 = "";
-		countUp = (endTime - startTime) / 1000;
-
-		if (countUp / 60 <= 9) {
-			Text1 = "0" + (countUp / 60);
-		} else {
-			Text1 += (countUp / 60);
-		}
-
-		if (countUp % 60 <= 9) {
-			Text2 = "0" + (countUp % 60);
-		} else {
-			Text2 += (countUp % 60);
-		}
-
-		asText = Text1 + ":" + Text2;
-
-		timeUp.setText(asText);
+	public void onRecordingDeleted() {
 		
 		
+		file.delete();
+		toaster.showToast("arquivo deletado");
 	}
+
 }

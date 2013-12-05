@@ -12,7 +12,7 @@ import com.googlecode.androidannotations.annotations.rest.Rest;
 		FormHttpMessageConverter.class, ByteArrayHttpMessageConverter.class })
 public interface SolarClientPostFileSender {
 
-	@Post("posts/{postId}/post_files.json?auth_token={token}")
+	@Post("posts/{postId}/post_files?auth_token={token}")
 	Object sendPostaudioFile(MultiValueMap postAudioFile, Integer postId,
 			String token);
 
