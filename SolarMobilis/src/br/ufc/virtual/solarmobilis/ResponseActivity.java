@@ -11,13 +11,17 @@ import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.SystemClock;
 import android.util.Log;
+import android.view.View;
+import android.widget.Chronometer;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 import br.ufc.virtual.solarmobilis.audio.AudioPlayer;
 import br.ufc.virtual.solarmobilis.model.DiscussionPost;
 import br.ufc.virtual.solarmobilis.model.SendPostResponse;
+import br.ufc.virtual.solarmobilis.util.Toaster;
 import br.ufc.virtual.solarmobilis.webservice.SolarManager;
 
 import com.googlecode.androidannotations.annotations.Background;
@@ -53,6 +57,9 @@ public class ResponseActivity extends Activity {
 	@Extra("discussionId")
 	Integer discussionId;
 
+	@ViewById(R.id.recording_chronometer)
+	Chronometer chronometer;
+
 	private ProgressDialog dialog;
 
 	AudioPlayer player = new AudioPlayer();
@@ -64,11 +71,13 @@ public class ResponseActivity extends Activity {
 	boolean mStartPlaying = true;
 	boolean mStartRecording = true;
 	File file;
+	private Toaster toaster = new Toaster();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		recorderConfig();
+		// chronometer = System.currentTimeMillis();
 	}
 
 	void recorderConfig() {
@@ -98,40 +107,56 @@ public class ResponseActivity extends Activity {
 		onRecord(mStartRecording);
 		if (mStartRecording) {
 			// setText("Stop recording");
+			recordButton.setImageResource(R.drawable.gravador_gravando);
+			chronometer.setVisibility(View.VISIBLE);
+			chronometer.setBase(SystemClock.elapsedRealtime());
+			chronometer.start();
 		} else {
 			// setText("Start recording");
+			recordButton.setImageResource(R.drawable.gravador_parado);
+			chronometer.setVisibility(View.GONE);
+			chronometer.stop();
 		}
 		mStartRecording = !mStartRecording;
 	}
 
 	void onRecord(boolean start) {
 		if (start) {
-			startRecording();
+			try {
+				startRecording();
+				Log.i("gravacao", "iniciada");
+
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		} else {
 			stopRecording();
+			Log.i("gravacao", "parada");
 		}
 	}
 
-	private void startRecording() {
+	private void startRecording() throws Exception {
 		mRecorder = new MediaRecorder();
 		mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
 		mRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
 		mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
 		mRecorder.setOutputFile(mFileName);
-		try {
-			mRecorder.prepare();
-		} catch (IOException e) {
-			Log.e(LOG_TAG, "prepare() failed");
-		}
-
+		// try {
+		mRecorder.prepare();
 		mRecorder.start();
+		// } catch (IOException e) {
+		// Log.e(LOG_TAG, "prepare() failed");
+		// }
+
 	}
 
 	private void stopRecording() {
 		mRecorder.stop();
 		mRecorder.reset();
-		mRecorder.release();
-		mRecorder = null;
+		// mRecorder.release();
+		// mRecorder = null;
+
 	}
 
 	@Click(R.id.play_button)
