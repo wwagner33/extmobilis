@@ -2,7 +2,6 @@ package br.ufc.virtual.solarmobilis;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.springframework.web.client.HttpStatusCodeException;
@@ -175,52 +174,42 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 		dialog = ProgressDialog.show(this, dialogWait, dialogMessage, true);
 	}
 
-
-
-	
 	// @UiThread
 	void setFooter() {
 
-		if(!footerFuturePostsState){
-			
+		if (!footerFuturePostsState) {
+
 			listVieWDiscussionPosts.addFooterView(footerRefresh, null, true);
 			footerFuturePostsState = true;
-			
+
 		}
-		
+
 		Log.i("Dentro do setFooter", String.valueOf(unloadedFuturePostsCount));
-      /*
-		if (unloadedFuturePostsCount > 0) {
-			((TextView) footerFuturePosts
-					.findViewById(R.id.load_available_posts))
-					.setText(unloadedFuturePostsCount
-							+ " "
-							+ getApplicationContext().getResources().getString(
-									R.string.not_loaded_posts_count));
+		/*
+		 * if (unloadedFuturePostsCount > 0) { ((TextView) footerFuturePosts
+		 * .findViewById(R.id.load_available_posts))
+		 * .setText(unloadedFuturePostsCount + " " +
+		 * getApplicationContext().getResources().getString(
+		 * R.string.not_loaded_posts_count));
+		 * 
+		 * ((ImageView) footerFuturePosts.findViewById(R.id.blue_line))
+		 * .setVisibility(View.VISIBLE); footerUnloadedFuturePostsState = true;
+		 * listVieWDiscussionPosts .addFooterView(footerFuturePosts, null,
+		 * true);
+		 * 
+		 * } else {
+		 * 
+		 * if (footerUnloadedFuturePostsState == true && footerFuturePostsState
+		 * == false) {
+		 * listVieWDiscussionPosts.removeFooterView(footerFuturePosts);
+		 * listVieWDiscussionPosts .addFooterView(footerRefresh, null, true);
+		 * footerUnloadedFuturePostsState = false; footerFuturePostsState =
+		 * true; } else if (footerUnloadedFuturePostsState == false &&
+		 * footerFuturePostsState == false) { listVieWDiscussionPosts
+		 * .addFooterView(footerRefresh, null, true); footerFuturePostsState =
+		 * true; } }
+		 */
 
-			((ImageView) footerFuturePosts.findViewById(R.id.blue_line))
-					.setVisibility(View.VISIBLE);
-			footerUnloadedFuturePostsState = true;
-			listVieWDiscussionPosts
-					.addFooterView(footerFuturePosts, null, true);
-
-		} else {
-
-			if (footerUnloadedFuturePostsState == true
-					&& footerFuturePostsState == false) {
-				listVieWDiscussionPosts.removeFooterView(footerFuturePosts);
-				listVieWDiscussionPosts
-						.addFooterView(footerRefresh, null, true);
-				footerUnloadedFuturePostsState = false;
-				footerFuturePostsState = true;
-			} else if (footerUnloadedFuturePostsState == false
-					&& footerFuturePostsState == false) {
-				listVieWDiscussionPosts
-						.addFooterView(footerRefresh, null, true);
-				footerFuturePostsState = true;
-			}
-		}*/
-         
 	}
 
 	@Click({ R.id.refresh_button })
@@ -246,7 +235,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 			}
 
 			newPosts = discussionPostList.getPosts();
-			Collections.reverse(newPosts);
+			//Collections.reverse(newPosts);
 			posts.addAll(posts.size(), newPosts);
 
 			for (int i = 0; i < posts.size(); i++) {
@@ -341,7 +330,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 					+ " "
 					+ discussionPostList.getPosts().get(i).getDateToString());
 		}
-		Collections.reverse(posts);
+		//Collections.reverse(posts);
 		adapter = new PostAdapter(this, R.layout.discussion_list_item,
 				R.id.user_nick, posts);
 
@@ -391,8 +380,8 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 			}
 
 			selectedPosition = position;
-			setActionBarSelected();
 			postSelected = true;
+			setActionBarSelected();
 
 			if (posts.get(selectedPosition).getAttachments().isEmpty()) {
 				Log.w("Anexo", "n�o preenchido");

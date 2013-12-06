@@ -62,14 +62,16 @@
     <string name="dialog_sending">Enviando</string>
     <string name="post_list_last">Última postagem da lista</string>
     <string name="post_list_first">Primeira postagem da lista</string>
-
     <string name="image_audio_description">Imagem que indica que um áudio está sendo exibido</string>
-   <string name="recording_date">Data da Gravação</string>
-   <string name="recording_progress_teste">00:00/00:15</string>
-     <string name="recording_duration">duração</string>
-     <string name="button_pause_blue_description">Imagem do botão de pause</string>
-     <string name="stop_button_description">Imagem do botão stop</string>
-     <string name="divider_line">Linha divisória</string>
-     <string name="delete">Deletar</string>
-     
+    <string name="recording_date">Data da Gravação</string>
+    <string name="recording_progress_teste">00:00/00:15</string>
+    <string name="recording_duration">duração</string>
+    <string name="button_pause_blue_description">Imagem do botão de pause</string>
+    <string name="stop_button_description">Imagem do botão stop</string>
+    <string name="divider_line">Linha divisória</string>
+    <string name="delete">Deletar</string>
+    <string name="empyt_field_response">O campo pode estar vázio</string>
+    <string name="record_on">Gravando</string>
+    <string name="record_off">Gravação concluida</string>
+
 </resources>

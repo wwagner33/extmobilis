@@ -64,7 +64,9 @@ public class PostPlayer implements DownloaderListener {
 		}
 
 		for (int i = 0; i < post.getAttachments().size(); i++) {
-			if (post.getAttachments().get(i).getType().equals("video/mp4")) {
+			if (post.getAttachments().get(i).getType().equals("video/mp4")
+					|| post.getAttachments().get(i).getType()
+							.equals("application/octet-stream")) {
 
 				String anexo = solarManager.getUrlAttachment(post
 						.getAttachments().get(i).getLink());
@@ -168,7 +170,6 @@ public class PostPlayer implements DownloaderListener {
 	}
 
 	public boolean isPlaying() {
-
 
 		if (audioPlayer != null) {
 

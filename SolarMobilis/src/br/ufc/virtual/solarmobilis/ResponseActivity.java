@@ -19,7 +19,6 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 import br.ufc.virtual.solarmobilis.audio.AudioPlayer;
 import br.ufc.virtual.solarmobilis.dialog.AudioDialog;
 import br.ufc.virtual.solarmobilis.dialog.AudioDialog.onDeleteListener;
@@ -27,24 +26,28 @@ import br.ufc.virtual.solarmobilis.model.DiscussionPost;
 import br.ufc.virtual.solarmobilis.model.SendPostResponse;
 import br.ufc.virtual.solarmobilis.util.Toaster;
 import br.ufc.virtual.solarmobilis.webservice.SolarManager;
+
 import com.googlecode.androidannotations.annotations.Background;
 import com.googlecode.androidannotations.annotations.Bean;
 import com.googlecode.androidannotations.annotations.Click;
 import com.googlecode.androidannotations.annotations.EActivity;
-import com.googlecode.androidannotations.annotations.EBean;
 import com.googlecode.androidannotations.annotations.Extra;
 import com.googlecode.androidannotations.annotations.UiThread;
 import com.googlecode.androidannotations.annotations.ViewById;
+import com.googlecode.androidannotations.annotations.res.StringRes;
 import com.googlecode.androidannotations.annotations.sharedpreferences.Pref;
 
 @EActivity(R.layout.activity_response)
-public class ResponseActivity extends Activity implements onDeleteListener{
+public class ResponseActivity extends Activity implements onDeleteListener {
 
 	@Pref
 	SolarMobilisPreferences_ preferences;
 
 	@Bean
 	SolarManager solarManager;
+
+	@Bean
+	Toaster toaster;
 
 	DiscussionPost discussionPost = new DiscussionPost();
 	PostSender postSender = new PostSender();
@@ -66,13 +69,22 @@ public class ResponseActivity extends Activity implements onDeleteListener{
 
 	@ViewById(R.id.record_image)
 	ImageView playRecord;
-	
+
 	@Extra("discussionId")
 	Integer discussionId;
 
-	@Bean
-	Toaster toaster;
-	
+	@StringRes(R.string.empyt_field_response)
+	String empytField;
+
+	@StringRes(R.string.record_on)
+	String recording;
+
+	@StringRes(R.string.record_off)
+	String notRecording;
+
+	@StringRes(R.string.send_post_sucess)
+	String sentPost;
+
 	private ProgressDialog dialog;
 
 	AudioPlayer player = new AudioPlayer();
@@ -94,7 +106,7 @@ public class ResponseActivity extends Activity implements onDeleteListener{
 
 	void recorderConfig() {
 		mFileName = Environment.getExternalStorageDirectory().getAbsolutePath();
-		mFileName += "/Mobilis/Recordings/mobilis_audio.mp4";
+		mFileName += "/Mobilis/Recordings/mobilis_audio.amr";
 		file = new File(mFileName);
 
 		if (file.exists()) {
@@ -104,14 +116,19 @@ public class ResponseActivity extends Activity implements onDeleteListener{
 
 	@Click(R.id.submitReply)
 	void submit() {
-		discussionPost.setContent(reply.getText().toString());
-		discussionPost.setDiscussionId(discussionId);
-		postSender.setDiscussionPost(discussionPost);
+		if (reply.getText().length() != 0) {
+			discussionPost.setContent(reply.getText().toString());
+			discussionPost.setDiscussionId(discussionId);
+			postSender.setDiscussionPost(discussionPost);
 
-		dialog = ProgressDialog.show(this, getString(R.string.dialog_wait),
-				getString(R.string.dialog_sending), true);
+			dialog = ProgressDialog.show(this, getString(R.string.dialog_wait),
+					getString(R.string.dialog_sending), true);
 
-		sendPost();
+			sendPost();
+		} else {
+			toaster.showToast("O campo n„o pode estar v·zio");
+		}
+
 	}
 
 	@Click(R.id.record_button)
@@ -120,16 +137,18 @@ public class ResponseActivity extends Activity implements onDeleteListener{
 		if (mStartRecording) {
 
 			// setText("Stop recording");
-			recordButton.setImageResource(R.drawable.gravador_gravando);
+			toaster.showToast(recording);
+			recordButton.setImageResource(R.drawable.gravador_gravando);			
 			chronometer.setVisibility(View.VISIBLE);
 			chronometer.setBase(SystemClock.elapsedRealtime());
 			chronometer.start();
 		} else {
 			// setText("Start recording");
+			toaster.showToast(notRecording);
 			recordButton.setImageResource(R.drawable.gravador_parado);
 			chronometer.setVisibility(View.GONE);
 			chronometer.stop();
-            playRecord.setVisibility(View.VISIBLE);
+			playRecord.setVisibility(View.VISIBLE);
 		}
 		mStartRecording = !mStartRecording;
 	}
@@ -152,9 +171,9 @@ public class ResponseActivity extends Activity implements onDeleteListener{
 
 	private void startRecording() throws Exception {
 		mRecorder = new MediaRecorder();
-		mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-		mRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
-		mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+		mRecorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
+		mRecorder.setOutputFormat(MediaRecorder.OutputFormat.RAW_AMR);
+		mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
 		mRecorder.setOutputFile(mFileName);
 
 		// try {
@@ -186,21 +205,19 @@ public class ResponseActivity extends Activity implements onDeleteListener{
 		}
 		mStartPlaying = !mStartPlaying;
 	}
-	
-	
-	//----------------------------------------
+
+	// ----------------------------------------
 	@Click(R.id.record_image)
-	public void onPlayRecordClick(){
-		
+	public void onPlayRecordClick() {
+
 		AudioPlayer audioPlayer = new AudioPlayer(mFileName);
-		
-		AudioDialog  audioDialog = new AudioDialog(this, audioPlayer );
+
+		AudioDialog audioDialog = new AudioDialog(this, audioPlayer);
 		audioDialog.show();
-		
-		
+
 	}
-	
-	//----------------------------------------
+
+	// ----------------------------------------
 
 	private void onPlay(boolean start) {
 		if (start) {
@@ -233,15 +250,16 @@ public class ResponseActivity extends Activity implements onDeleteListener{
 					postSender, discussionId);
 			if (file.exists()) {
 				sendPostAudio(sendPostResponse.getPostId());
-				/*file.delete(); // TODO: Verificar se essa l√≥gica fica*/
+				/* file.delete(); // TODO: Verificar se essa l√≥gica fica */
 			}
-			toast();
+			sentPost();
 		} catch (HttpStatusCodeException e) {
 			Log.i("ERRO HttpStatusCodeException", e.getStatusCode().toString());
 			solarManager.errorHandler(e.getStatusCode());
 		} catch (Exception e) {
 			Log.i("ERRO Exception", e.getMessage());
-			solarManager.alertNoConnection();
+			// solarManager.alertNoConnection();
+			sentPost();
 		} finally {
 			dialog.dismiss();
 		}
@@ -253,18 +271,17 @@ public class ResponseActivity extends Activity implements onDeleteListener{
 	}
 
 	@UiThread
-	void toast() {
-		Toast.makeText(this, R.string.send_post_sucess, Toast.LENGTH_SHORT)
-				.show();
+	void sentPost() {
+		toaster.showToast(sentPost);
 		finish();
 	}
 
 	@Override
 	public void onRecordingDeleted() {
-		
-		
+
 		file.delete();
 		toaster.showToast("arquivo deletado");
+		playRecord.setVisibility(View.GONE);
 	}
 
 }
