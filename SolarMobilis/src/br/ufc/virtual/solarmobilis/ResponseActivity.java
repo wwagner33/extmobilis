@@ -74,7 +74,13 @@ public class ResponseActivity extends Activity implements onDeleteListener {
 	Integer discussionId;
 
 	@StringRes(R.string.empyt_field_response)
-	String empytField;
+	String empytFieldResponse;
+
+	@StringRes(R.string.audio_attachment)
+	String audioAttachment;
+
+	@StringRes(R.string.audio_deleted)
+	String audioDeleted;
 
 	@StringRes(R.string.record_on)
 	String recording;
@@ -116,6 +122,10 @@ public class ResponseActivity extends Activity implements onDeleteListener {
 
 	@Click(R.id.submitReply)
 	void submit() {
+		if ((file.exists()) && (reply.getText().length() == 0)) {
+			reply.setText(audioAttachment);
+		}
+
 		if (reply.getText().length() != 0) {
 			discussionPost.setContent(reply.getText().toString());
 			discussionPost.setDiscussionId(discussionId);
@@ -126,9 +136,8 @@ public class ResponseActivity extends Activity implements onDeleteListener {
 
 			sendPost();
 		} else {
-			toaster.showToast("O campo n�o pode estar v�zio");
+			toaster.showToast(empytFieldResponse);
 		}
-
 	}
 
 	@Click(R.id.record_button)
@@ -182,7 +191,6 @@ public class ResponseActivity extends Activity implements onDeleteListener {
 		// } catch (IOException e) {
 		// Log.e(LOG_TAG, "prepare() failed");
 		// }
-
 	}
 
 	private void stopRecording() {
@@ -190,14 +198,12 @@ public class ResponseActivity extends Activity implements onDeleteListener {
 		mRecorder.reset();
 		// mRecorder.release();
 		// mRecorder = null;
-
 	}
 
 	@Click(R.id.play_button)
 	public void onPlayClick() {
 		onPlay(mStartPlaying);
 		if (mStartPlaying) {
-
 			// setText("Stop playing");
 		} else {
 			// setText("Start playing");
@@ -212,7 +218,6 @@ public class ResponseActivity extends Activity implements onDeleteListener {
 
 		AudioDialog audioDialog = new AudioDialog(this, audioPlayer);
 		audioDialog.show();
-
 	}
 
 	private void onPlay(boolean start) {
@@ -275,7 +280,7 @@ public class ResponseActivity extends Activity implements onDeleteListener {
 	@Override
 	public void onRecordingDeleted() {
 		file.delete();
-		toaster.showToast("arquivo deletado");
+		toaster.showToast(audioDeleted);
 		playRecord.setVisibility(View.GONE);
 	}
 

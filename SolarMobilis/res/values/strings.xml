@@ -17,7 +17,7 @@
     <string name="config">Configurações</string>
     <string name="ALERT_WAIT">Aguarde</string>
     <string name="ALERT_RESPONSE">Recebendo Resposta</string>
-    <string name="EMPTY_FIELD">Nenhum campo pode estar vázio</string>
+    <string name="EMPTY_FIELD">Nenhum campo pode estar vazio</string>
     <string name="ERROR_AUTHENTICATION">Usuário ou senha inválidos</string>
     <string name="ERROR_CONECTION">Erro de conexão</string>
     <string name="ERROR_TIMEOUT">Tempo limite de conexão atingido</string>
@@ -70,8 +70,10 @@
     <string name="stop_button_description">Imagem do botão stop</string>
     <string name="divider_line">Linha divisória</string>
     <string name="delete">Deletar</string>
-    <string name="empyt_field_response">O campo pode estar vázio</string>
+    <string name="empyt_field_response">Escreva uma mensagem</string>
     <string name="record_on">Gravando</string>
     <string name="record_off">Gravação concluida</string>
+    <string name="audio_attachment">[Áudio anexo]</string>
+    <string name="audio_deleted">Arquivo deletado</string>
 
 </resources>
