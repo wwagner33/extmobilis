@@ -106,7 +106,7 @@ public class ResponseActivity extends Activity implements onDeleteListener {
 
 	void recorderConfig() {
 		mFileName = Environment.getExternalStorageDirectory().getAbsolutePath();
-		mFileName += "/Mobilis/Recordings/mobilis_audio.amr";
+		mFileName += "/Mobilis/Recordings/mobilis_audio.mp4";
 		file = new File(mFileName);
 
 		if (file.exists()) {
@@ -126,7 +126,7 @@ public class ResponseActivity extends Activity implements onDeleteListener {
 
 			sendPost();
 		} else {
-			toaster.showToast("O campo não pode estar vázio");
+			toaster.showToast("O campo nï¿½o pode estar vï¿½zio");
 		}
 
 	}
@@ -138,7 +138,7 @@ public class ResponseActivity extends Activity implements onDeleteListener {
 
 			// setText("Stop recording");
 			toaster.showToast(recording);
-			recordButton.setImageResource(R.drawable.gravador_gravando);			
+			recordButton.setImageResource(R.drawable.gravador_gravando);
 			chronometer.setVisibility(View.VISIBLE);
 			chronometer.setBase(SystemClock.elapsedRealtime());
 			chronometer.start();
@@ -171,9 +171,9 @@ public class ResponseActivity extends Activity implements onDeleteListener {
 
 	private void startRecording() throws Exception {
 		mRecorder = new MediaRecorder();
-		mRecorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
-		mRecorder.setOutputFormat(MediaRecorder.OutputFormat.RAW_AMR);
-		mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+		mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+		mRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+		mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
 		mRecorder.setOutputFile(mFileName);
 
 		// try {
@@ -195,7 +195,6 @@ public class ResponseActivity extends Activity implements onDeleteListener {
 
 	@Click(R.id.play_button)
 	public void onPlayClick() {
-
 		onPlay(mStartPlaying);
 		if (mStartPlaying) {
 
@@ -206,7 +205,6 @@ public class ResponseActivity extends Activity implements onDeleteListener {
 		mStartPlaying = !mStartPlaying;
 	}
 
-	// ----------------------------------------
 	@Click(R.id.record_image)
 	public void onPlayRecordClick() {
 
@@ -216,8 +214,6 @@ public class ResponseActivity extends Activity implements onDeleteListener {
 		audioDialog.show();
 
 	}
-
-	// ----------------------------------------
 
 	private void onPlay(boolean start) {
 		if (start) {
@@ -278,7 +274,6 @@ public class ResponseActivity extends Activity implements onDeleteListener {
 
 	@Override
 	public void onRecordingDeleted() {
-
 		file.delete();
 		toaster.showToast("arquivo deletado");
 		playRecord.setVisibility(View.GONE);

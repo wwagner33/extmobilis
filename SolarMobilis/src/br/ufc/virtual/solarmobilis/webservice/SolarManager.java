@@ -90,7 +90,7 @@ public class SolarManager {
 				+ "/photo?auth_token=" + preferences.token().get());
 	}
 
-	public String getUrlAttachment(String link) {
+	public String getAttachmentUrl(String link) {
 		return ("http://apolo11teste.virtual.ufc.br" + link + "?auth_token=" + preferences
 				.token().get());
 	}

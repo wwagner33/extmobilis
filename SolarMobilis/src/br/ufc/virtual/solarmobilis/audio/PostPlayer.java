@@ -55,6 +55,7 @@ public class PostPlayer implements DownloaderListener {
 				+ Html.fromHtml(post.getContent()).toString();
 
 		blockenizer = new TextBlockenizer(textToBreak);
+
 		for (String block = blockenizer.getFirst(); block != ""; block = blockenizer
 				.getNext()) {
 
@@ -68,15 +69,12 @@ public class PostPlayer implements DownloaderListener {
 					|| post.getAttachments().get(i).getType()
 							.equals("application/octet-stream")) {
 
-				String anexo = solarManager.getUrlAttachment(post
+				String anexo = solarManager.getAttachmentUrl(post
 						.getAttachments().get(i).getLink());
-				Log.i("link para download",
-						solarManager.getUrlAttachment(post.getAttachments()
-								.get(i).getLink()));
+				Log.i("link para download", anexo);
 
 				fileDescriptors.add("");
 				audioDownloader.saveFile(anexo, (fileDescriptors.size() - 1));
-
 			}
 		}
 
@@ -90,11 +88,8 @@ public class PostPlayer implements DownloaderListener {
 		fileDescriptors.set(i, name);
 
 		if (i == 0) {
-
 			try {
-
 				playAudio(i);
-
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -118,7 +113,6 @@ public class PostPlayer implements DownloaderListener {
 							stoped = true;
 							deleteAudioData();
 							postPlayerListener.onCompletion();
-
 						} else if (fileDescriptors.get(i + 1) != null) {
 							Log.i("Tocar", "Proximo bloco");
 
@@ -128,11 +122,9 @@ public class PostPlayer implements DownloaderListener {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}
-
 						} else {
 							Log.i("bloco", "bloco n�o baixado");
 						}
-
 					}
 				});
 	}
@@ -142,7 +134,6 @@ public class PostPlayer implements DownloaderListener {
 			audioPlayer.play();
 
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		paused = false;
@@ -170,13 +161,10 @@ public class PostPlayer implements DownloaderListener {
 	}
 
 	public boolean isPlaying() {
-
 		if (audioPlayer != null) {
-
 			return audioPlayer.isPlaying();
 		}
 		return false;
-
 	}
 
 	public void setPostPlayerListener(PostPlayerListener postPlayerListener) {
@@ -194,6 +182,5 @@ public class PostPlayer implements DownloaderListener {
 			}
 			Log.i("Arquivos", "dados apagados apagados");
 		}
-
 	}
 }
