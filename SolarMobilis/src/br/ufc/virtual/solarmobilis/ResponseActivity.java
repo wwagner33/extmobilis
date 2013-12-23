@@ -267,8 +267,10 @@ public class ResponseActivity extends Activity implements onDeleteListener {
 	}
 
 	private void sendPostAudio(Integer postId) {
-		Object object = solarManager.sendPostAudio(file, postId);
-		object.toString();
+		// Object object = solarManager.sendPostAudio(file, postId);
+		// object.toString();
+
+		solarManager.sendAudioPost(file, postId);
 	}
 
 	@UiThread

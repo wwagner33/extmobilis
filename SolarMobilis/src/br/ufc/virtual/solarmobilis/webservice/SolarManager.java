@@ -24,6 +24,9 @@ import br.ufc.virtual.solarmobilis.model.GroupList;
 import br.ufc.virtual.solarmobilis.model.SendPostResponse;
 import br.ufc.virtual.solarmobilis.model.User;
 import br.ufc.virtual.solarmobilis.model.UserMessage;
+import br.ufc.virtual.solarmobilis.webservice.mobilis.Connection;
+import br.ufc.virtual.solarmobilis.webservice.mobilis.ConnectionCallback;
+import br.ufc.virtual.solarmobilis.webservice.mobilis.Constants;
 
 import com.googlecode.androidannotations.annotations.AfterInject;
 import com.googlecode.androidannotations.annotations.EBean;
@@ -33,7 +36,7 @@ import com.googlecode.androidannotations.annotations.rest.RestService;
 import com.googlecode.androidannotations.annotations.sharedpreferences.Pref;
 
 @EBean
-public class SolarManager {
+public class SolarManager implements ConnectionCallback {
 
 	@RootContext
 	Activity rootActivity;
@@ -46,6 +49,8 @@ public class SolarManager {
 
 	@Pref
 	SolarMobilisPreferences_ preferences;
+
+	private Connection connection;
 
 	@AfterInject
 	public void config() {
@@ -83,6 +88,19 @@ public class SolarManager {
 		parts.add("post_file", new FileSystemResource(postAudioFile));
 		return solarClientPostFileSender.sendPostaudioFile(parts, postId,
 				preferences.token().get());
+	}
+
+	public void sendAudioPost(File postAudioFile, Integer postId) {
+		connection = new Connection(this);
+		connection.postToServer(Constants.CONNECTION_POST_AUDIO,
+				Constants.generateAudioResponseURL(postId), postAudioFile,
+				preferences.token().get());
+	}
+	
+	@Override
+	public void resultFromConnection(int connectionId, String result,
+			int statusCode) {
+		// TODO Auto-generated method stub
 	}
 
 	public String getUserImageUrl(int userId) {
