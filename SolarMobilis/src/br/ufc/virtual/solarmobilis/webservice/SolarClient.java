@@ -15,7 +15,7 @@ import com.googlecode.androidannotations.annotations.rest.Get;
 import com.googlecode.androidannotations.annotations.rest.Post;
 import com.googlecode.androidannotations.annotations.rest.Rest;
 
-@Rest(rootUrl = "http://apolo11teste.virtual.ufc.br/", converters = { GsonHttpMessageConverter.class })
+@Rest(converters = { GsonHttpMessageConverter.class })
 public interface SolarClient {
 
 	@Post("sessions")
@@ -38,5 +38,7 @@ public interface SolarClient {
 			String token);
 
 	RestTemplate getRestTemplate();
+
+	void setRootUrl(String rootUrl);
 
 }

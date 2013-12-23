@@ -37,6 +37,7 @@ import com.googlecode.androidannotations.annotations.sharedpreferences.Pref;
 
 @EBean
 public class SolarManager implements ConnectionCallback {
+	public static final String SERVER_ROOT_URL = "http://apolo11teste.virtual.ufc.br/";
 
 	@RootContext
 	Activity rootActivity;
@@ -55,6 +56,8 @@ public class SolarManager implements ConnectionCallback {
 	@AfterInject
 	public void config() {
 		setTimeout();
+		solarClient.setRootUrl(SERVER_ROOT_URL);
+		solarClientPostFileSender.setRootUrl(SERVER_ROOT_URL);
 	}
 
 	public Object doLogin(User user) {
@@ -92,11 +95,13 @@ public class SolarManager implements ConnectionCallback {
 
 	public void sendAudioPost(File postAudioFile, Integer postId) {
 		connection = new Connection(this);
+		
+		String url = SERVER_ROOT_URL + "posts/" + postId + "/post_files?auth_token=" + preferences.token().get();
 		connection.postToServer(Constants.CONNECTION_POST_AUDIO,
-				Constants.generateAudioResponseURL(postId), postAudioFile,
+				url, postAudioFile,
 				preferences.token().get());
 	}
-	
+
 	@Override
 	public void resultFromConnection(int connectionId, String result,
 			int statusCode) {
@@ -104,13 +109,13 @@ public class SolarManager implements ConnectionCallback {
 	}
 
 	public String getUserImageUrl(int userId) {
-		return ("http://apolo11teste.virtual.ufc.br/users/" + userId
-				+ "/photo?auth_token=" + preferences.token().get());
+		return (SERVER_ROOT_URL + "/users/" + userId + "/photo?auth_token=" + preferences
+				.token().get());
 	}
 
 	public String getAttachmentUrl(String link) {
-		return ("http://apolo11teste.virtual.ufc.br" + link + "?auth_token=" + preferences
-				.token().get());
+		return (SERVER_ROOT_URL + link + "?auth_token=" + preferences.token()
+				.get());
 	}
 
 	private void setTimeout() {

@@ -37,7 +37,6 @@ public class Connection {
 		connection.connectionType = Constants.TYPE_CONNECTION_POST;
 		connection.connectionId = connectionId;
 		connection.url = url;
-		connection.jsonString = jsonString;
 
 		connection.execute();
 		watcher.execute(connection);
@@ -51,16 +50,14 @@ public class Connection {
 		connection.connectionType = Constants.TYPE_CONNECTION_POST;
 		connection.connectionId = connectionId;
 		connection.url = url;
-		connection.token = token;
 		connection.file = audioFile;
 
 		connection.execute();
 		watcher.execute(connection);
 	}
 
-	private Object[] executeAudioPost(String URL, File audioFile,
-			HttpPost post, String token) throws IllegalStateException,
-			IOException {
+	private Object[] executeAudioPost(String URL, File audioFile)
+			throws IllegalStateException, IOException {
 
 		Object resultSet[] = new Object[2];
 
@@ -74,16 +71,12 @@ public class Connection {
 
 		StringBuilder builder = new StringBuilder();
 
-		post = new HttpPost(Constants.URL_SERVER + URL + "?auth_token=" + token);
+		HttpPost post = new HttpPost(URL);
 
 		MultipartEntity entity = new MultipartEntity();
 		File file = audioFile;
-		// File file = new File(Environment.getExternalStorageDirectory()
-		// .getAbsolutePath() + "/Mobilis/Recordings/" +
-		// Constants.RECORDING_FULLNAME);
 
-		entity.addPart("post_file", new FileBody(file,
-				Constants.RECORDING_MIME_TYPE, "UTF-8"));
+		entity.addPart("post_file", new FileBody(file, "audio/aac", "UTF-8"));
 
 		post.setEntity(entity);
 
@@ -136,14 +129,11 @@ public class Connection {
 
 	private class ExecuteConnection extends AsyncTask<Void, Void, Object[]> {
 		public int connectionId;
-		public HttpGet get = null;
-		public HttpPost post = null;
 		public int connectionType;
 		public String url = null;
-		public String token = null;
 		public File file = null;
-		public String jsonString = null;
 		public int statusCode = 0;
+		public HttpPost post = null;
 
 		@Override
 		protected Object[] doInBackground(Void... params) {
@@ -153,7 +143,7 @@ public class Connection {
 				if (connectionType == Constants.TYPE_CONNECTION_POST) {
 
 					if (connectionId == Constants.CONNECTION_POST_AUDIO) {
-						return executeAudioPost(url, file, post, token);
+						return executeAudioPost(url, file);
 
 					}
 				}
@@ -161,8 +151,6 @@ public class Connection {
 				return null;
 			} catch (IOException e) {
 				return null;
-				// } catch (ParseException e) {
-				// return null;
 			} catch (Exception e) {
 				e.printStackTrace();
 				return null;

@@ -8,8 +8,8 @@ import org.springframework.web.client.RestTemplate;
 import com.googlecode.androidannotations.annotations.rest.Post;
 import com.googlecode.androidannotations.annotations.rest.Rest;
 
-@Rest(rootUrl = "http://apolo11teste.virtual.ufc.br/", converters = {
-		FormHttpMessageConverter.class, ByteArrayHttpMessageConverter.class })
+@Rest(converters = { FormHttpMessageConverter.class,
+		ByteArrayHttpMessageConverter.class })
 public interface SolarClientPostFileSender {
 
 	@Post("posts/{postId}/post_files?auth_token={token}")
@@ -17,5 +17,6 @@ public interface SolarClientPostFileSender {
 			String token);
 
 	RestTemplate getRestTemplate();
+	void setRootUrl(String rootUrl);
 
 }
