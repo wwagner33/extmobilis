@@ -11,7 +11,10 @@ import android.text.Html;
 import android.util.Log;
 import br.ufc.virtual.solarmobilis.DiscussionsPostsActivity;
 import br.ufc.virtual.solarmobilis.model.DiscussionPost;
+import br.ufc.virtual.solarmobilis.model.DiscussionPostAttachment;
+import br.ufc.virtual.solarmobilis.util.HttpDownloader;
 import br.ufc.virtual.solarmobilis.util.TextBlockenizer;
+import br.ufc.virtual.solarmobilis.util.Toaster;
 import br.ufc.virtual.solarmobilis.webservice.BingAudioDownloader;
 import br.ufc.virtual.solarmobilis.webservice.DownloaderListener;
 import br.ufc.virtual.solarmobilis.webservice.PostPlayerListener;
@@ -56,38 +59,49 @@ public class PostPlayer implements DownloaderListener {
 
 		blockenizer = new TextBlockenizer(textToBreak);
 
-		for (String block = blockenizer.getFirst(); block != ""; block = blockenizer
-				.getNext()) {
+		List<DiscussionPostAttachment> audioAttachments = new ArrayList<DiscussionPostAttachment>();
 
-			fileDescriptors.add("");
-			audioDownloader.saveAudio(block,
-					blockenizer.getCurrentBlockPosition() - 1);
+		for (DiscussionPostAttachment discussionPostAttachment : post
+				.getAttachments()) {
+			if (discussionPostAttachment.getType().equals(
+					"audio/aac; charset=UTF-8")) {
+				audioAttachments.add(discussionPostAttachment);
+			}
 		}
 
-		for (int i = 0; i < post.getAttachments().size(); i++) {
-			if (post.getAttachments().get(i).getType().equals("video/mp4")
-					|| post.getAttachments().get(i).getType()
-							.equals("application/octet-stream")) {
+		// Pre define o tamanho do array pra que sempre procure tocar um próximo
+		// se existir
+		for (int i = 0; i < blockenizer.size() + audioAttachments.size(); i++) {
+			fileDescriptors.add("");
+		}
 
-				String anexo = solarManager.getAttachmentUrl(post
-						.getAttachments().get(i).getLink());
-				Log.i("link para download", anexo);
+		int currentAudioAttrachmentPosition = blockenizer.size();
 
-				fileDescriptors.add("");
-				audioDownloader.saveFile(anexo, (fileDescriptors.size() - 1));
-			}
+		for (DiscussionPostAttachment audioAttachment : audioAttachments) {
+			String anexo = solarManager.getAttachmentUrl(audioAttachment
+					.getLink());
+
+			Log.i("link para download", anexo);
+			audioDownloader
+					.saveFile(anexo, (currentAudioAttrachmentPosition++));
+		}
+
+		for (String block = blockenizer.getFirst(); block != ""; block = blockenizer
+				.getNext()) {
+			audioDownloader.saveAudio(block,
+					blockenizer.getCurrentBlockPosition() - 1);
 		}
 
 		Log.i("arquivos", "baixados e criado");
 	}
 
 	@Override
-	public void onDowloadFinish(String name, final int i) {
+	public void onDownload(String name, final int i) {
 		Log.i("ondownloadfinish", name + " " + String.valueOf(i));
 
 		fileDescriptors.set(i, name);
 
-		if (i == 0) {
+		if (i == 0) { // blocoEsperado
 			try {
 				playAudio(i);
 			} catch (Exception e) {
@@ -119,11 +133,11 @@ public class PostPlayer implements DownloaderListener {
 							try {
 								playAudio(i + 1);
 							} catch (Exception e) {
-								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}
 						} else {
-							Log.i("bloco", "bloco n�o baixado");
+							Log.i("bloco", "bloco não baixado"); 
+							// blocoEsperado =
 						}
 					}
 				});

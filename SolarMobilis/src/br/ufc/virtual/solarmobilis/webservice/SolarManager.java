@@ -105,16 +105,16 @@ public class SolarManager implements ConnectionCallback {
 	@Override
 	public void resultFromConnection(int connectionId, String result,
 			int statusCode) {
-		// TODO Auto-generated method stub
 	}
 
 	public String getUserImageUrl(int userId) {
-		return (SERVER_ROOT_URL + "/users/" + userId + "/photo?auth_token=" + preferences
+		return (SERVER_ROOT_URL + "users/" + userId + "/photo?auth_token=" + preferences
 				.token().get());
 	}
 
 	public String getAttachmentUrl(String link) {
-		return (SERVER_ROOT_URL + link + "?auth_token=" + preferences.token()
+		String root = (String) SERVER_ROOT_URL.subSequence(0, SERVER_ROOT_URL.length()-1);
+		return (root + link + "?auth_token=" + preferences.token()
 				.get());
 	}
 
