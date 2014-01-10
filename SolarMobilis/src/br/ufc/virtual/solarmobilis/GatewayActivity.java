@@ -2,17 +2,15 @@ package br.ufc.virtual.solarmobilis;
 
 import java.io.File;
 
+import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.sharedpreferences.Pref;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 
-import com.googlecode.androidannotations.annotations.EActivity;
-import com.googlecode.androidannotations.annotations.NoTitle;
-import com.googlecode.androidannotations.annotations.sharedpreferences.Pref;
-
-@NoTitle
 @EActivity
 public class GatewayActivity extends Activity {
 

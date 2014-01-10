@@ -1,12 +1,11 @@
 package br.ufc.virtual.solarmobilis.webservice;
 
+import org.androidannotations.annotations.rest.Post;
+import org.androidannotations.annotations.rest.Rest;
 import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-
-import com.googlecode.androidannotations.annotations.rest.Post;
-import com.googlecode.androidannotations.annotations.rest.Rest;
 
 @Rest(converters = { FormHttpMessageConverter.class,
 		ByteArrayHttpMessageConverter.class })

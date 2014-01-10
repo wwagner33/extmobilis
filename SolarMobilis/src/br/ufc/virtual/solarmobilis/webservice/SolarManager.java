@@ -2,6 +2,12 @@ package br.ufc.virtual.solarmobilis.webservice;
 
 import java.io.File;
 
+import org.androidannotations.annotations.AfterInject;
+import org.androidannotations.annotations.EBean;
+import org.androidannotations.annotations.RootContext;
+import org.androidannotations.annotations.UiThread;
+import org.androidannotations.annotations.rest.RestService;
+import org.androidannotations.annotations.sharedpreferences.Pref;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpRequestFactory;
@@ -27,13 +33,6 @@ import br.ufc.virtual.solarmobilis.model.UserMessage;
 import br.ufc.virtual.solarmobilis.webservice.mobilis.Connection;
 import br.ufc.virtual.solarmobilis.webservice.mobilis.ConnectionCallback;
 import br.ufc.virtual.solarmobilis.webservice.mobilis.Constants;
-
-import com.googlecode.androidannotations.annotations.AfterInject;
-import com.googlecode.androidannotations.annotations.EBean;
-import com.googlecode.androidannotations.annotations.RootContext;
-import com.googlecode.androidannotations.annotations.UiThread;
-import com.googlecode.androidannotations.annotations.rest.RestService;
-import com.googlecode.androidannotations.annotations.sharedpreferences.Pref;
 
 @EBean
 public class SolarManager implements ConnectionCallback {

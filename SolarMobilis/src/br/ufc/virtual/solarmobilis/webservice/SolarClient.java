@@ -1,5 +1,8 @@
 package br.ufc.virtual.solarmobilis.webservice;
 
+import org.androidannotations.annotations.rest.Get;
+import org.androidannotations.annotations.rest.Post;
+import org.androidannotations.annotations.rest.Rest;
 import org.springframework.http.converter.json.GsonHttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
@@ -10,10 +13,6 @@ import br.ufc.virtual.solarmobilis.model.DiscussionPostList;
 import br.ufc.virtual.solarmobilis.model.GroupList;
 import br.ufc.virtual.solarmobilis.model.SendPostResponse;
 import br.ufc.virtual.solarmobilis.model.UserMessage;
-
-import com.googlecode.androidannotations.annotations.rest.Get;
-import com.googlecode.androidannotations.annotations.rest.Post;
-import com.googlecode.androidannotations.annotations.rest.Rest;
 
 @Rest(converters = { GsonHttpMessageConverter.class })
 public interface SolarClient {

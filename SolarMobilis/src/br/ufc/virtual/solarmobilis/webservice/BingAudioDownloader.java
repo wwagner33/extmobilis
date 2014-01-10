@@ -1,9 +1,9 @@
 package br.ufc.virtual.solarmobilis.webservice;
 
-import br.ufc.virtual.solarmobilis.util.BingURLCreator;
+import org.androidannotations.annotations.Background;
+import org.androidannotations.annotations.EBean;
 
-import com.googlecode.androidannotations.annotations.Background;
-import com.googlecode.androidannotations.annotations.EBean;
+import br.ufc.virtual.solarmobilis.util.BingURLCreator;
 
 @EBean
 public class BingAudioDownloader extends AudioDownloader {

@@ -5,6 +5,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.androidannotations.annotations.Background;
+import org.androidannotations.annotations.Bean;
+import org.androidannotations.annotations.EBean;
+
 import android.media.MediaPlayer;
 import android.os.Environment;
 import android.text.Html;
@@ -12,17 +16,11 @@ import android.util.Log;
 import br.ufc.virtual.solarmobilis.DiscussionsPostsActivity;
 import br.ufc.virtual.solarmobilis.model.DiscussionPost;
 import br.ufc.virtual.solarmobilis.model.DiscussionPostAttachment;
-import br.ufc.virtual.solarmobilis.util.HttpDownloader;
 import br.ufc.virtual.solarmobilis.util.TextBlockenizer;
-import br.ufc.virtual.solarmobilis.util.Toaster;
 import br.ufc.virtual.solarmobilis.webservice.BingAudioDownloader;
 import br.ufc.virtual.solarmobilis.webservice.DownloaderListener;
 import br.ufc.virtual.solarmobilis.webservice.PostPlayerListener;
 import br.ufc.virtual.solarmobilis.webservice.SolarManager;
-
-import com.googlecode.androidannotations.annotations.Background;
-import com.googlecode.androidannotations.annotations.Bean;
-import com.googlecode.androidannotations.annotations.EBean;
 
 @EBean
 public class PostPlayer implements DownloaderListener {

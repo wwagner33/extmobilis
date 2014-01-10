@@ -1,10 +1,10 @@
 package br.ufc.virtual.solarmobilis.util;
 
+import org.androidannotations.annotations.EBean;
+import org.androidannotations.annotations.RootContext;
+
 import android.app.Activity;
 import android.widget.Toast;
-
-import com.googlecode.androidannotations.annotations.EBean;
-import com.googlecode.androidannotations.annotations.RootContext;
 
 @EBean
 public class Toaster {
