@@ -1,18 +1,17 @@
 package br.ufc.virtual.solarmobilis.webservice;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import br.ufc.virtual.solarmobilis.util.HttpDownloader;
+import org.androidannotations.annotations.Background;
+import org.androidannotations.annotations.EBean;
 
 import android.os.Environment;
 import android.util.Log;
+import br.ufc.virtual.solarmobilis.util.HttpDownloader;
 
+@EBean
 public class AudioDownloader {
 
 	String stringUrl;
@@ -23,6 +22,7 @@ public class AudioDownloader {
 
 	private DownloaderListener downloaderListener;
 
+	// @Background
 	// public void saveFile(String stringUrl, int i) {
 	// try {
 	//
@@ -55,12 +55,13 @@ public class AudioDownloader {
 	// e.printStackTrace();
 	// }
 	// }
+
+	@Background
 	public void saveFile(String stringUrl, int i) {
-		HttpDownloader.initStrictMode();
+		// HttpDownloader.initStrictMode();
 		HttpDownloader httpDownloader = new HttpDownloader();
-		httpDownloader.downFile(stringUrl, "Mobilis/TTS/", i
-				+ ".wav");
-		
+		httpDownloader.downFile(stringUrl, "Mobilis/TTS/", i + ".wav");
+
 		File audioFile = new File(audioFilePath + i + ".wav");
 		downloaderListener.onDownload(audioFile.getAbsolutePath(), i);
 	}
