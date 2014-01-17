@@ -88,13 +88,14 @@ public class HttpDownloader {
 		url = new URL(urlStr);
 		HttpURLConnection urlConn = (HttpURLConnection) url.openConnection();
 		InputStream inputStream = urlConn.getInputStream();
-		System.out
-				.println("inputStream.available = " + inputStream.available());
+		// System.out
+		// .println("inputStream.available = " + inputStream.available());
 		return inputStream;
 	}
 
 	public static void initStrictMode() {
-		System.out.println("Build.VERSION.SDK_INT = " + Build.VERSION.SDK_INT);
+		// System.out.println("Build.VERSION.SDK_INT = " +
+		// Build.VERSION.SDK_INT);
 		if (Build.VERSION.SDK_INT > 10) {
 			StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
 					.detectDiskReads().detectDiskWrites().detectNetwork() // pode

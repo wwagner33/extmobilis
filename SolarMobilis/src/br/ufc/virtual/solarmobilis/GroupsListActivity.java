@@ -84,7 +84,6 @@ public class GroupsListActivity extends SherlockFragmentActivity {
 		} finally {
 			dialog.dismiss();
 		}
-		Log.i("GROUPSLIST", response.getGroups().get(0).getCode());
 	}
 
 	@UiThread

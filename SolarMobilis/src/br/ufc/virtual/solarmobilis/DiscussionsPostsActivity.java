@@ -313,7 +313,8 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 			Log.i("ERRO Exception", e.getMessage());
 			solarManager.alertNoConnection();
 		} finally {
-			dialog.dismiss();
+			if (dialog != null)
+				dialog.dismiss();
 		}
 	}
 

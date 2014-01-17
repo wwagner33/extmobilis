@@ -40,16 +40,18 @@ public class PostPlayer implements DownloaderListener {
 			.getAbsolutePath() + "/Mobilis/TTS/");
 	public AudioPlayer audioPlayer = new AudioPlayer();
 
+	int downloadWaitingToPlayAudioBlockIndex = 0;
+
 	public PostPlayer() {
 		audioDownloader = new BingAudioDownloader();
 		audioDownloader.setListener(this);
-
 	}
 
 	@Background
 	public void play(DiscussionPost post) {
 		paused = false;
 		stoped = false;
+		downloadWaitingToPlayAudioBlockIndex = 0;
 		deleteAudioData();
 
 		String textToBreak = post.userNick + ", " + post.getDateToPost() + ", "
@@ -67,10 +69,12 @@ public class PostPlayer implements DownloaderListener {
 			}
 		}
 
-		// Pre define o tamanho do array pra que sempre procure tocar um próximo
-		// se existir
-		for (int i = 0; i < blockenizer.size() + audioAttachments.size(); i++) {
-			fileDescriptors.add("");
+		setFileDescriptorsSize(blockenizer.size() + audioAttachments.size());
+
+		for (String block = blockenizer.getFirst(); block != ""; block = blockenizer
+				.getNext()) {
+			audioDownloader.saveAudio(block,
+					blockenizer.getCurrentBlockPosition() - 1);
 		}
 
 		int currentAudioAttrachmentPosition = blockenizer.size();
@@ -83,25 +87,30 @@ public class PostPlayer implements DownloaderListener {
 			audioDownloader
 					.saveFile(anexo, (currentAudioAttrachmentPosition++));
 		}
+	}
 
-		for (String block = blockenizer.getFirst(); block != ""; block = blockenizer
-				.getNext()) {
-			audioDownloader.saveAudio(block,
-					blockenizer.getCurrentBlockPosition() - 1);
+	private void setFileDescriptorsSize(int filedescriptorsSize) {
+		for (int i = 0; i < filedescriptorsSize; i++) {
+			fileDescriptors.add("");
 		}
-
-		Log.i("arquivos", "baixados e criado");
 	}
 
 	@Override
-	public void onDownload(String name, final int i) {
-		Log.i("ondownloadfinish", name + " " + String.valueOf(i));
+	public void onDownload(String name, final int downloadedAudioBlockIndex) {
+		Log.i("ondownloadfinish",
+				name + " " + String.valueOf(downloadedAudioBlockIndex));
 
-		fileDescriptors.set(i, name);
+		if (downloadedAudioBlockIndex >= fileDescriptors.size()) {
+			final File audioFile = new File(name);
+			audioFile.delete();
+			return;
+		}
 
-		if (i == 0) { // blocoEsperado
+		fileDescriptors.set(downloadedAudioBlockIndex, name);
+
+		if (downloadedAudioBlockIndex == downloadWaitingToPlayAudioBlockIndex) {
 			try {
-				playAudio(i);
+				playAudio(downloadedAudioBlockIndex);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -109,33 +118,37 @@ public class PostPlayer implements DownloaderListener {
 
 	}
 
-	public void playAudio(final int i) throws IllegalArgumentException,
-			SecurityException, IllegalStateException, IOException {
+	public void playAudio(final int audioBlockIndex)
+			throws IllegalArgumentException, SecurityException,
+			IllegalStateException, IOException {
 
 		audioPlayer.reset();
-		audioPlayer.play(fileDescriptors.get(i),
+		audioPlayer.play(fileDescriptors.get(audioBlockIndex),
 				new MediaPlayer.OnCompletionListener() {
 
 					@Override
 					public void onCompletion(MediaPlayer mp) {
-
-						if (i == (fileDescriptors.size() - 1)) {
+						if (audioBlockIndex == (fileDescriptors.size() - 1)) {
 							Log.i("ultimo post", "Ultimo bloco tocado");
 							// stop();
 							stoped = true;
 							deleteAudioData();
 							postPlayerListener.onCompletion();
-						} else if (fileDescriptors.get(i + 1) != null) {
-							Log.i("Tocar", "Proximo bloco");
+						} else if (fileDescriptors.get(audioBlockIndex + 1)
+								.equals("")) {
+							Log.i("Bloco", "Bloco não disponível "
+									+ (audioBlockIndex + 1));
+							downloadWaitingToPlayAudioBlockIndex = audioBlockIndex + 1;
 
+						} else if (fileDescriptors.get(audioBlockIndex + 1) != null) {
+							Log.i("Tocar", "Proximo bloco");
 							try {
-								playAudio(i + 1);
+								playAudio(audioBlockIndex + 1);
 							} catch (Exception e) {
 								e.printStackTrace();
 							}
 						} else {
-							Log.i("bloco", "bloco não baixado"); 
-							// blocoEsperado =
+							downloadWaitingToPlayAudioBlockIndex = audioBlockIndex;
 						}
 					}
 				});
