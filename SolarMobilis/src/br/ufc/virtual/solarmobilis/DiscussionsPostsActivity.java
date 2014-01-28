@@ -103,6 +103,8 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 	@StringRes(R.string.post_list_first)
 	String firstPostMessage;
 
+	@StringRes(R.string.ERROR_CONECTION)
+	String conectinErrortMessage;
 	@Bean
 	Toaster toaster;
 
@@ -235,7 +237,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 			}
 
 			newPosts = discussionPostList.getPosts();
-			//Collections.reverse(newPosts);
+			// Collections.reverse(newPosts);
 			posts.addAll(posts.size(), newPosts);
 
 			for (int i = 0; i < posts.size(); i++) {
@@ -331,7 +333,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 					+ " "
 					+ discussionPostList.getPosts().get(i).getDateToString());
 		}
-		//Collections.reverse(posts);
+		// Collections.reverse(posts);
 		adapter = new PostAdapter(this, R.layout.discussion_list_item,
 				R.id.user_nick, posts);
 
@@ -463,12 +465,16 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 		if (selectedPosition == posts.size() - 1) {
 			toaster.showToast(lastPostMessage);
 			Log.i("Toast", lastPostMessage);
-		} else {
+		} else if (selectedPosition < posts.size()) {
 			togglePostMarked(selectedPosition + 1);
 			postPlayer.play(posts.get(selectedPosition + 1));
 			Log.i("#selected-position-atual", String.valueOf(selectedPosition));
 			setImagePlayer();
+		} else {
+			stop();
+			Log.e("PAROU AO TENTAR O NEXT E FALTAR LISTA","STOP()"); 
 		}
+
 	}
 
 	@Click(R.id.button_prev)
@@ -522,5 +528,12 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 	public void onCompletion() {
 		setImagePlayer();
 		next();
+	}
+
+	@Override
+	@UiThread
+	public void onPostPlayException(Exception exception) {
+		stop();
+		toaster.showToast(conectinErrortMessage);
 	}
 }

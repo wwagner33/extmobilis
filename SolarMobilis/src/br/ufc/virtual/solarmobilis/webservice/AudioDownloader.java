@@ -1,7 +1,9 @@
 package br.ufc.virtual.solarmobilis.webservice;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.androidannotations.annotations.Background;
@@ -24,11 +26,16 @@ public class AudioDownloader {
 
 	@Background
 	public void saveFile(String stringUrl, int i) {
-		HttpDownloader httpDownloader = new HttpDownloader();
-		httpDownloader.downFile(stringUrl, "Mobilis/TTS/", i + ".wav");
 
-		File audioFile = new File(audioFilePath + i + ".wav");
-		downloaderListener.onDownload(audioFile.getAbsolutePath(), i);
+		try {
+			HttpDownloader httpDownloader = new HttpDownloader();
+			httpDownloader.downFile(stringUrl, "Mobilis/TTS/", i + ".wav");
+			File audioFile = new File(audioFilePath + i + ".wav");
+			downloaderListener.onDownload(audioFile.getAbsolutePath(), i);
+		} catch (Exception e) {
+			downloaderListener.onDownloadException(e);
+		}
+
 	}
 
 	public void deleteFiles() {

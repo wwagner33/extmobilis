@@ -8,6 +8,7 @@ import java.util.List;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EBean;
+import org.androidannotations.annotations.UiThread;
 
 import android.media.MediaPlayer;
 import android.os.Environment;
@@ -118,6 +119,11 @@ public class PostPlayer implements DownloaderListener {
 
 	}
 
+	@Override
+	public void onDownloadException(Exception exception) {
+		postPlayerListener.onPostPlayException(exception);
+	}
+
 	public void playAudio(final int audioBlockIndex)
 			throws IllegalArgumentException, SecurityException,
 			IllegalStateException, IOException {
@@ -208,4 +214,5 @@ public class PostPlayer implements DownloaderListener {
 			Log.i("Arquivos", "dados apagados apagados");
 		}
 	}
+
 }

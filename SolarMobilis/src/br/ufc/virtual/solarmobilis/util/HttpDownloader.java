@@ -56,8 +56,10 @@ public class HttpDownloader {
 	 * @param path
 	 * @param fileName
 	 * @return
+	 * @throws Exception 
 	 */
-	public int downFile(String urlStr, String path, String fileName) {
+	public int downFile(String urlStr, String path, String fileName)
+			throws Exception {
 		InputStream inputStream = null;
 		try {
 			FileUtils fileUtils = new FileUtils();
@@ -71,12 +73,15 @@ public class HttpDownloader {
 			if (resultFile == null) {
 				return -1;
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
+		} catch (MalformedURLException malformedURLException) {
+			throw malformedURLException;
+		} catch (IOException ioException) {
+			throw ioException;			
+		} 
+		finally {
 			try {
 				inputStream.close();
-			} catch (Exception e) {
+			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}

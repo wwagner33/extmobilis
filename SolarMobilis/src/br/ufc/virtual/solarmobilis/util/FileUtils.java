@@ -55,9 +55,11 @@ public class FileUtils {
 
 	/**
 	 * Grava dados do InputStream no cartão SD
+	 * 
+	 * @throws Exception
 	 */
 	public File write2SDFromInput(String path, String fileName,
-			InputStream input) {
+			InputStream input) throws Exception {
 		File file = null;
 		OutputStream output = null;
 		try {
@@ -71,7 +73,7 @@ public class FileUtils {
 			}
 			output.flush();
 		} catch (Exception e) {
-			e.printStackTrace();
+			throw e;
 		} finally {
 			try {
 				output.close();
