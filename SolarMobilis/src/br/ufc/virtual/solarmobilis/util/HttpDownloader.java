@@ -56,7 +56,7 @@ public class HttpDownloader {
 	 * @param path
 	 * @param fileName
 	 * @return
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public int downFile(String urlStr, String path, String fileName)
 			throws Exception {
@@ -76,9 +76,8 @@ public class HttpDownloader {
 		} catch (MalformedURLException malformedURLException) {
 			throw malformedURLException;
 		} catch (IOException ioException) {
-			throw ioException;			
-		} 
-		finally {
+			throw ioException;
+		} finally {
 			try {
 				inputStream.close();
 			} catch (IOException e) {
