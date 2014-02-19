@@ -29,18 +29,6 @@ public class Connection {
 		this.callback = callback;
 	}
 
-	public void postToServer(int connectionId, String jsonString, String url) {
-		ExecuteConnection connection = new ExecuteConnection();
-		ConnectionWatcher watcher = new ConnectionWatcher();
-
-		connection.connectionType = Constants.TYPE_CONNECTION_POST;
-		connection.connectionId = connectionId;
-		connection.url = url;
-
-		connection.execute();
-		watcher.execute(connection);
-	}
-
 	public void postToServer(int connectionId, String url, File audioFile,
 			String token) {
 		ExecuteConnection connection = new ExecuteConnection();
@@ -147,35 +135,16 @@ public class Connection {
 					}
 				}
 			} catch (ClientProtocolException e) {
+				e.printStackTrace();
 				return null;
 			} catch (IOException e) {
+				e.printStackTrace();
 				return null;
 			} catch (Exception e) {
 				e.printStackTrace();
 				return null;
 			}
 			return null;
-		}
-
-		@Override
-		protected void onPostExecute(Object[] result) {
-
-			String content = null;
-
-			if (result != null) {
-				if (result[1] != null) {
-					if (statusCode != 699) {
-						statusCode = (Integer) result[1];
-					}
-				}
-				if (result[0] != null) {
-					content = (String) result[0];
-				}
-			}
-
-			Log.w("STATUS CODE", "" + statusCode);
-			callback.resultFromConnection(connectionId, content, statusCode);
-			super.onPostExecute(result);
 		}
 
 		@Override

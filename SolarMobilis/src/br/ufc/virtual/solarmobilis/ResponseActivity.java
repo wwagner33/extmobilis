@@ -257,12 +257,16 @@ public class ResponseActivity extends Activity implements onDeleteListener {
 			Log.i("ERRO HttpStatusCodeException", e.getStatusCode().toString());
 			solarManager.errorHandler(e.getStatusCode());
 		} catch (Exception e) {
-			Log.i("ERRO Exception", e.getMessage());
-			// solarManager.alertNoConnection();
-			sentPost();
+			solarManager.alertNoConnection();
 		} finally {
-			dialog.dismiss();
+			dialogDismiss();
 		}
+	}
+
+	@UiThread
+	protected void dialogDismiss() {
+		if (dialog != null)
+			dialog.dismiss();
 	}
 
 	private void sendPostAudio(Integer postId) {
