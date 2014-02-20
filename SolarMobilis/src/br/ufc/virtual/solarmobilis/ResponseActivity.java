@@ -121,6 +121,8 @@ public class ResponseActivity extends Activity implements onDeleteListener {
 
 	@Click(R.id.submitReply)
 	void submit() {
+		stopIfRecording();
+
 		if ((file.exists()) && (reply.getText().length() == 0)) {
 			reply.setText(audioAttachment);
 		}
@@ -136,6 +138,15 @@ public class ResponseActivity extends Activity implements onDeleteListener {
 			sendPost();
 		} else {
 			toaster.showToast(empytFieldResponse);
+		}
+	}
+
+	private void stopIfRecording() {
+		if (!mStartRecording) {
+			onRecord(mStartRecording);
+			recordButton.setImageResource(R.drawable.gravador_parado);
+			chronometer.setVisibility(View.GONE);
+			chronometer.stop();
 		}
 	}
 
