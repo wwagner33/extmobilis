@@ -19,7 +19,8 @@
         android:theme="@android:style/Theme.Holo" >
         <activity
             android:name="br.ufc.virtual.solarmobilis.GatewayActivity_"
-            android:label="@string/app_name" >
+            android:label="@string/app_name"
+            android:noHistory="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -30,6 +31,7 @@
             android:name="br.ufc.virtual.solarmobilis.LoginActivity_"
             android:configChanges="orientation|screenSize"
             android:label="@string/app_name"
+            android:noHistory="true"
             android:screenOrientation="portrait" >
         </activity>
         <activity
