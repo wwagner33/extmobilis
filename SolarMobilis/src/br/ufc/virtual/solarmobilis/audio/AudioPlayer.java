@@ -11,7 +11,6 @@ public class AudioPlayer {
 	private String filePath;
 	private MediaPlayer player = new MediaPlayer();
 
-	@Deprecated
 	public AudioPlayer(String filePath) {
 		this.filePath = filePath;
 	}
