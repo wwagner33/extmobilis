@@ -113,7 +113,7 @@ public class PostPlayer implements DownloaderListener {
 			try {
 				playAudio(downloadedAudioBlockIndex);
 			} catch (Exception e) {
-				e.printStackTrace();
+				postPlayerListener.onPostPlayException(e);
 			}
 		}
 
@@ -151,7 +151,7 @@ public class PostPlayer implements DownloaderListener {
 							try {
 								playAudio(audioBlockIndex + 1);
 							} catch (Exception e) {
-								e.printStackTrace();
+								postPlayerListener.onPostPlayException(e);
 							}
 						} else {
 							downloadWaitingToPlayAudioBlockIndex = audioBlockIndex;
