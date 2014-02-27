@@ -92,7 +92,7 @@ public class ResponseActivity extends Activity implements onDeleteListener {
 
 	private ProgressDialog dialog;
 
-	AudioPlayer player = new AudioPlayer();
+	/*AudioPlayer player = new AudioPlayer();*/
 	private MediaRecorder mRecorder = null;
 	private MediaPlayer mPlayer = null;
 	private static String mFileName = null;

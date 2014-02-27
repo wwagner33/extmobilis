@@ -108,12 +108,15 @@ public class PostPlayer implements DownloaderListener {
 		}
 
 		fileDescriptors.set(downloadedAudioBlockIndex, name);
+		Log.i("++++download", "+++++");
+		
 
 		if (downloadedAudioBlockIndex == downloadWaitingToPlayAudioBlockIndex) {
 			try {
 				playAudio(downloadedAudioBlockIndex);
 			} catch (Exception e) {
 				postPlayerListener.onPostPlayException(e);
+			  
 			}
 		}
 
@@ -122,12 +125,14 @@ public class PostPlayer implements DownloaderListener {
 	@Override
 	public void onDownloadException(Exception exception) {
 		postPlayerListener.onPostPlayException(exception);
+	      
 	}
 
 	public void playAudio(final int audioBlockIndex)
 			throws IllegalArgumentException, SecurityException,
 			IllegalStateException, IOException {
-
+           Log.i("++++++audio", "++++");
+		
 		audioPlayer.reset();
 		audioPlayer.play(fileDescriptors.get(audioBlockIndex),
 				new MediaPlayer.OnCompletionListener() {
@@ -145,13 +150,19 @@ public class PostPlayer implements DownloaderListener {
 							Log.i("Bloco", "Bloco não disponível "
 									+ (audioBlockIndex + 1));
 							downloadWaitingToPlayAudioBlockIndex = audioBlockIndex + 1;
-
+                             Log.i("+++++audio normal", "+++++");
+							      
 						} else if (fileDescriptors.get(audioBlockIndex + 1) != null) {
 							Log.i("Tocar", "Proximo bloco");
 							try {
 								playAudio(audioBlockIndex + 1);
+								Log.i("+++++audio normal", "normal");
 							} catch (Exception e) {
 								postPlayerListener.onPostPlayException(e);
+							    e.printStackTrace();
+							    
+							    Log.i("erro ", "aqui");
+							   // Log.i("causa da excess�o",e.getCause().toString());
 							}
 						} else {
 							downloadWaitingToPlayAudioBlockIndex = audioBlockIndex;

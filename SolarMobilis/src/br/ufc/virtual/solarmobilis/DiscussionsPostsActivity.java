@@ -105,6 +105,10 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 
 	@StringRes(R.string.ERROR_CONECTION)
 	String conectinErrortMessage;
+	
+	@StringRes(R.string.ERROR_WHILE_PLAYING_ATTACH)
+	String errorWhilePlayingAttach;
+	
 	@Bean
 	Toaster toaster;
 
@@ -534,6 +538,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 	@UiThread
 	public void onPostPlayException(Exception exception) {
 		stop();
-		toaster.showToast(conectinErrortMessage);
+		toaster.showToast(errorWhilePlayingAttach);
+	next();
 	}
 }

@@ -5,7 +5,7 @@ import java.net.URLEncoder;
 
 public class BingURLCreator {
 	private static final String BING_BASE_URI = "http://api.microsofttranslator.com/v2/Http.svc/Speak?appId={appId}&text=\"{text}\"";
-	private static final String BING_APP_ID = "APP_ID";
+	private static final String BING_APP_ID = "03CAF44417913E4B9D82BE6202DBFBD768B8C5E1";
 	private static final String LANGUAGE = "&language=pt-br";
 
 	public static String getURL(final String text) {
