@@ -228,7 +228,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 			if (discussionSize == 0) {
 				oldDateString = "20001010102410";
 			} else {
-				oldDateString = posts.get(posts.size() - 1).getDateToString();
+				oldDateString = posts.get(0/*posts.size() - 1*/).getDateToString();
 			}
 
 			discussionPostList = solarManager.getPosts(discussionId,
@@ -236,7 +236,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 			unloadedFuturePostsCount = discussionPostList.getAfter();
 
 			for (int i = 0; i < discussionPostList.getPosts().size(); i++) {
-				Log.i("#" + i, discussionPostList.getPosts().get(i)
+				Log.i("#" + i+" "+oldDateString, discussionPostList.getPosts().get(i)
 						.getContent());
 			}
 
@@ -245,7 +245,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 			posts.addAll(posts.size(), newPosts);
 
 			for (int i = 0; i < posts.size(); i++) {
-				Log.i("#" + i, posts.get(i).getContent());
+				Log.i("#" + i+" "+oldDateString, posts.get(i).getContent());
 			}
 
 		} catch (HttpStatusCodeException e) {
@@ -399,7 +399,9 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 						.toString());
 			}
 		}
-
+		
+	  listVieWDiscussionPosts.smoothScrollToPosition(position);
+        
 		Log.i("toglle-marked", String.valueOf(selectedPosition));
 	}
 

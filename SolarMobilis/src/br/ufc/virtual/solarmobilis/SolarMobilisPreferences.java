@@ -7,7 +7,9 @@ import org.androidannotations.annotations.sharedpreferences.SharedPref.Scope;
 public interface SolarMobilisPreferences {
 
 	String token();
-
+    //----
+	String authToken();
+	//---
 	int curriculumUnitSelected();
 
 	int groupSelected();

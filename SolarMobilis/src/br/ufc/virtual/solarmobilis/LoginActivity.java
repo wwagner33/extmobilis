@@ -33,7 +33,13 @@ public class LoginActivity extends Activity {
 	SolarMobilisPreferences_ preferences;
 
 	Object response_post;
+	// ----
+	Object response_post2;
+	// ---
 	public JSONObject jsonObject;
+	// ---
+	JSONObject jsonObject2;
+	// ---
 	public UserMessage userMessage = new UserMessage();
 	public User user = new User();
 	private ProgressDialog dialog;
@@ -74,6 +80,9 @@ public class LoginActivity extends Activity {
 	void getToken() {
 		try {
 			response_post = solarManager.doLogin(user);
+			// --
+			response_post2 = solarManager.doLogin2(user);
+			// --
 			saveToken();
 		} catch (HttpStatusCodeException e) {
 			Log.i("ERRO HttpStatusCodeException", e.getStatusCode().toString());
@@ -81,6 +90,10 @@ public class LoginActivity extends Activity {
 		} catch (Exception e) {
 			Log.i("ERRO Exception", e.getMessage());
 			solarManager.alertNoConnection();
+			Log.i("RESPOSTA ANTIGA", response_post.toString());
+			//---
+			Log.i("RESPOSTA NOVA", response_post2.toString());
+			//---
 		} finally {
 			dialog.dismiss();
 		}
@@ -92,6 +105,9 @@ public class LoginActivity extends Activity {
 
 		try {
 			jsonObject = new JSONObject(response_post.toString());
+			// ---
+			jsonObject2 = new JSONObject(response_post2.toString());
+			// ---
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
@@ -100,13 +116,20 @@ public class LoginActivity extends Activity {
 			preferences.token()
 					.put(jsonObject.getJSONObject("session").getString(
 							"auth_token"));
+			//---
+			preferences.authToken().put(jsonObject2.getString("access_token"));
+            //----
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
 
 		Log.i("Token_na_login", preferences.token().get().toString());
+		//---
+		Log.i("Token_na_login2", preferences.authToken().get().toString());
+		//-----
 
-		if (preferences.token().get().length() != 0) {
+		if (preferences.token().get().length() != 0 & preferences.authToken().get().length()!= 0) {
+			
 			Intent intent = new Intent(this, CurriculumUnitsListActivity_.class);
 
 			dialog.dismiss();

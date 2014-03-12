@@ -18,6 +18,7 @@ import org.springframework.util.MultiValueMap;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.util.Log;
 import android.widget.Toast;
 import br.ufc.virtual.solarmobilis.LoginActivity_;
 import br.ufc.virtual.solarmobilis.PostSender;
@@ -45,6 +46,9 @@ public class SolarManager implements ConnectionCallback {
 	SolarClient solarClient;
 
 	@RestService
+	SolarApiClient solarClient2; 
+	
+	@RestService
 	SolarClientPostFileSender solarClientPostFileSender;
 
 	@Pref
@@ -56,15 +60,25 @@ public class SolarManager implements ConnectionCallback {
 	public void config() {
 		setTimeout();
 		solarClient.setRootUrl(SERVER_ROOT_URL);
+		solarClient2.setRootUrl(SERVER_ROOT_URL);
 		solarClientPostFileSender.setRootUrl(SERVER_ROOT_URL);
 	}
 
 	public Object doLogin(User user) {
 		UserMessage userMessage = new UserMessage();
 		userMessage.setUser(user);
+		
 		return solarClient.doLogin(userMessage);
+		
 	}
-
+//----------------------
+	public Object doLogin2(User user) {
+		
+		return solarClient2.doLogin(user);
+		
+	}
+	
+	//----------------
 	public CurriculumUnitList getCurriculumUnits() {
 		return solarClient.getCurriculumUnits(preferences.token().get());
 	}
@@ -78,7 +92,7 @@ public class SolarManager implements ConnectionCallback {
 	}
 
 	public DiscussionPostList getPosts(int id, String date) {
-		return solarClient.getPosts(preferences.token().get(), id, date);
+		return solarClient.getPosts(preferences.authToken().get(), id, date);
 	}
 
 	public SendPostResponse sendPost(PostSender postSender, Integer id) {
@@ -147,7 +161,7 @@ public class SolarManager implements ConnectionCallback {
 		switch (code) {
 		case 401:
 			toast(R.string.ERROR_AUTHENTICATION);
-			if (preferences.token().get().length() != 0) {
+			if (preferences.token().get().length() != 0 || preferences.authToken().get().length() !=0) {
 				logout();
 			}
 			break;
@@ -174,6 +188,7 @@ public class SolarManager implements ConnectionCallback {
 
 	public void logout() {
 		preferences.token().put(null);
+		preferences.authToken().put(null);
 		Intent intent = new Intent(rootActivity, LoginActivity_.class);
 		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		rootActivity.startActivity(intent);
