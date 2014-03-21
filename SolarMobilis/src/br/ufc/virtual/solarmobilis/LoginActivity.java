@@ -18,6 +18,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.EditText;
 import android.widget.Toast;
+import br.ufc.virtual.solarmobilis.model.LoginResponse;
+import br.ufc.virtual.solarmobilis.model.LoginResponseApi;
 import br.ufc.virtual.solarmobilis.model.User;
 import br.ufc.virtual.solarmobilis.model.UserMessage;
 import br.ufc.virtual.solarmobilis.webservice.SolarManager;
@@ -32,13 +34,14 @@ public class LoginActivity extends Activity {
 	@Pref
 	SolarMobilisPreferences_ preferences;
 
-	Object response_post;
+	LoginResponse loginResponseApi;
 	// ----
-	Object response_post2;
+	//Object response_post2;
+	LoginResponseApi response_post2;
 	// ---
 	public JSONObject jsonObject;
 	// ---
-	JSONObject jsonObject2;
+	public JSONObject jsonObject2;
 	// ---
 	public UserMessage userMessage = new UserMessage();
 	public User user = new User();
@@ -79,9 +82,10 @@ public class LoginActivity extends Activity {
 	@Background
 	void getToken() {
 		try {
-			response_post = solarManager.doLogin(user);
+			loginResponseApi = solarManager.doLogin(user); 
 			// --
 			response_post2 = solarManager.doLogin2(user);
+			
 			// --
 			saveToken();
 		} catch (HttpStatusCodeException e) {
@@ -90,7 +94,7 @@ public class LoginActivity extends Activity {
 		} catch (Exception e) {
 			Log.i("ERRO Exception", e.getMessage());
 			solarManager.alertNoConnection();
-			Log.i("RESPOSTA ANTIGA", response_post.toString());
+			Log.i("RESPOSTA ANTIGA", loginResponseApi.toString());
 			//---
 			Log.i("RESPOSTA NOVA", response_post2.toString());
 			//---
@@ -101,27 +105,22 @@ public class LoginActivity extends Activity {
 	}
 
 	public void saveToken() {
-		Log.i("resposta", response_post.toString());
+		Log.i("resposta", loginResponseApi.toString());
 
-		try {
+		/*try {
 			jsonObject = new JSONObject(response_post.toString());
 			// ---
-			jsonObject2 = new JSONObject(response_post2.toString());
+			//jsonObject2 = new JSONObject(response_post2.toString());
 			// ---
 		} catch (JSONException e) {
 			e.printStackTrace();
-		}
+		}*/
 
-		try {
-			preferences.token()
-					.put(jsonObject.getJSONObject("session").getString(
-							"auth_token"));
-			//---
-			preferences.authToken().put(jsonObject2.getString("access_token"));
-            //----
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
+		preferences.token()
+				.put(loginResponseApi.getSession().getAuth_token());
+		//---
+		preferences.authToken().put(response_post2.getAccessToken());
+		//----
 
 		Log.i("Token_na_login", preferences.token().get().toString());
 		//---

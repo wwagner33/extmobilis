@@ -3,24 +3,24 @@ package br.ufc.virtual.solarmobilis.model;
 import java.util.List;
 
 public class DiscussionPostList {
-	public int before;
-	public int after;
+	public int newer;
+	public int older;
 	public List<DiscussionPost> posts;
 
-	public int getBefore() {
-		return before;
+	public int getNewer() {
+		return newer;
 	}
 
-	public void setBefore(int before) {
-		this.before = before;
+	public void setNewer(int newer) {
+		this.newer = newer;
 	}
 
-	public int getAfter() {
-		return after;
+	public int getOlder() {
+		return older;
 	}
 
-	public void setAfter(int after) {
-		this.after = after;
+	public void setOlder(int older) {
+		this.older = older;
 	}
 
 	public List<DiscussionPost> getPosts() {

@@ -228,12 +228,12 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 			if (discussionSize == 0) {
 				oldDateString = "20001010102410";
 			} else {
-				oldDateString = posts.get(0/*posts.size() - 1*/).getDateToString();
+				oldDateString = posts.get(0).getDateToString();
 			}
 
 			discussionPostList = solarManager.getPosts(discussionId,
 					oldDateString);
-			unloadedFuturePostsCount = discussionPostList.getAfter();
+			unloadedFuturePostsCount = discussionPostList.getOlder();
 
 			for (int i = 0; i < discussionPostList.getPosts().size(); i++) {
 				Log.i("#" + i+" "+oldDateString, discussionPostList.getPosts().get(i)
@@ -307,8 +307,8 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 						.getUserImageUrl(discussionPost.getUserId()));
 			}
 
-			unloadedFuturePostsCount = discussionPostList.getAfter();
-			Log.i("after", String.valueOf(discussionPostList.getAfter()));
+			unloadedFuturePostsCount = discussionPostList.getOlder();
+			Log.i("after", String.valueOf(discussionPostList.getOlder()));
 
 			updateList();
 			setFooter();

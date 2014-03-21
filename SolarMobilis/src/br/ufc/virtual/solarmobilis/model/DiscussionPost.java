@@ -6,12 +6,14 @@ import java.util.Date;
 import java.util.List;
 
 import android.graphics.Bitmap;
+import android.util.Log;
 
 import com.google.gson.annotations.SerializedName;
 
 public class DiscussionPost {
 
 	public Integer id;
+
 	@SerializedName("profile_id")
 	public Integer profileId;
 	@SerializedName("discussion_id")
@@ -22,8 +24,9 @@ public class DiscussionPost {
 	public String userNick;
 	public Integer level;
 	public String content;
-	@SerializedName("updated_at")
-	public String updatedAt;
+	@SerializedName("created_at")
+	public String createdAt;
+
 	public List<DiscussionPostAttachment> attachments;
 	@SerializedName("parent_id")
 	public Integer parentId;
@@ -46,7 +49,7 @@ public class DiscussionPost {
 		this.userNick = userNick;
 		this.level = level;
 		this.content = content;
-		this.updatedAt = updatedAt;
+		this.createdAt = updatedAt;
 		this.attachments = attachments;
 	}
 
@@ -108,46 +111,49 @@ public class DiscussionPost {
 	}
 
 	public String getUpdatedAt() {
-		return updatedAt;
+		return createdAt;
 	}
 
 	public void setUpdatedAt(String updatedAt) {
-		this.updatedAt = updatedAt;
+		this.createdAt = updatedAt;
 	}
 
-	/*public String getDateToString() {
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(
-				"yyyy-MM-dd'T'HH:mm:ss.SSS", java.util.Locale.getDefault());
-		String formattedDate = null;
+	/*
+	 * public String getDateToString() { SimpleDateFormat simpleDateFormat = new
+	 * SimpleDateFormat( "yyyy-MM-dd'T'HH:mm:ss.SSS",
+	 * java.util.Locale.getDefault()); String formattedDate = null;
+	 * 
+	 * try { Date convertedDate = simpleDateFormat.parse(updatedAt);
+	 * SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmssSSS",
+	 * java.util.Locale.getDefault()); formattedDate =
+	 * formatter.format(convertedDate); } catch (ParseException e) { // TODO
+	 * Auto-generated catch block e.printStackTrace(); } return formattedDate; }
+	 */
 
-		try {
-			Date convertedDate = simpleDateFormat.parse(updatedAt);
-			SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmssSSS",
-					java.util.Locale.getDefault());
-			formattedDate = formatter.format(convertedDate);
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return formattedDate;
-	}*/
-	
 	public String getDateToString() {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(
-                        "yyyy-MM-dd'T'HH:mm:ss"/*.SSS*/, java.util.Locale.getDefault());
-        String formattedDate = null;
 
-        try {
-                Date convertedDate = simpleDateFormat.parse(updatedAt);
-                SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss"/*.SSS"*/,
-                                java.util.Locale.getDefault());
-                formattedDate = formatter.format(convertedDate);
-        } catch (ParseException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-        }
-        return formattedDate;
-}
+		String formattedString = createdAt.substring(0, 25).replace("-", "").replace(":", "")
+				.replace(".", "").replace("T", "");
+
+		return formattedString;
+
+		/*
+		 * SimpleDateFormat simpleDateFormat = new SimpleDateFormat(
+		 * "yyyy-MM-dd'T'HH:mm:ss.SSS", java.util.Locale.getDefault()); String
+		 * formattedDate = null;
+		 * 
+		 * try { Log.i("DATA ERRADA", createdAt);
+		 * 
+		 * Date convertedDate =
+		 * simpleDateFormat.parse("2014-03-13T09:02:26.68374-03:00");
+		 * SimpleDateFormat formatter = new
+		 * SimpleDateFormat("yyyyMMddHHmmssSSS", java.util.Locale.getDefault());
+		 * formattedDate = formatter.format(convertedDate); } catch
+		 * (ParseException e) { // TODO Auto-generated catch block
+		 * e.printStackTrace(); }
+		 */
+
+	}
 
 	public String getDateToPost() {
 		SimpleDateFormat simpleFormat = new SimpleDateFormat(
@@ -156,7 +162,7 @@ public class DiscussionPost {
 		String formattedDate = null;
 
 		try {
-			Date date = simpleFormat.parse(updatedAt);
+			Date date = simpleFormat.parse(createdAt);
 			SimpleDateFormat postDate = new SimpleDateFormat(
 					"'Dia' dd 'de' MMMM", java.util.Locale.getDefault());
 			formattedDate = postDate.format(date);

@@ -28,6 +28,8 @@ import br.ufc.virtual.solarmobilis.model.CurriculumUnitList;
 import br.ufc.virtual.solarmobilis.model.DiscussionList;
 import br.ufc.virtual.solarmobilis.model.DiscussionPostList;
 import br.ufc.virtual.solarmobilis.model.GroupList;
+import br.ufc.virtual.solarmobilis.model.LoginResponse;
+import br.ufc.virtual.solarmobilis.model.LoginResponseApi;
 import br.ufc.virtual.solarmobilis.model.SendPostResponse;
 import br.ufc.virtual.solarmobilis.model.User;
 import br.ufc.virtual.solarmobilis.model.UserMessage;
@@ -46,7 +48,7 @@ public class SolarManager implements ConnectionCallback {
 	SolarClient solarClient;
 
 	@RestService
-	SolarApiClient solarClient2; 
+	SolarApiClient solarApiClient; 
 	
 	@RestService
 	SolarClientPostFileSender solarClientPostFileSender;
@@ -60,11 +62,11 @@ public class SolarManager implements ConnectionCallback {
 	public void config() {
 		setTimeout();
 		solarClient.setRootUrl(SERVER_ROOT_URL);
-		solarClient2.setRootUrl(SERVER_ROOT_URL);
+		solarApiClient.setRootUrl(SERVER_ROOT_URL);
 		solarClientPostFileSender.setRootUrl(SERVER_ROOT_URL);
 	}
 
-	public Object doLogin(User user) {
+	public LoginResponse doLogin(User user) {
 		UserMessage userMessage = new UserMessage();
 		userMessage.setUser(user);
 		
@@ -72,9 +74,9 @@ public class SolarManager implements ConnectionCallback {
 		
 	}
 //----------------------
-	public Object doLogin2(User user) {
+	public LoginResponseApi doLogin2(User user) {
 		
-		return solarClient2.doLogin(user);
+		return solarApiClient.doLogin(user);
 		
 	}
 	
@@ -92,7 +94,7 @@ public class SolarManager implements ConnectionCallback {
 	}
 
 	public DiscussionPostList getPosts(int id, String date) {
-		return solarClient.getPosts(preferences.authToken().get(), id, date);
+		return solarApiClient.getPosts(preferences.authToken().get(), id, date);
 	}
 
 	public SendPostResponse sendPost(PostSender postSender, Integer id) {

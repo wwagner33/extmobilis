@@ -11,6 +11,7 @@ import br.ufc.virtual.solarmobilis.model.CurriculumUnitList;
 import br.ufc.virtual.solarmobilis.model.DiscussionList;
 import br.ufc.virtual.solarmobilis.model.DiscussionPostList;
 import br.ufc.virtual.solarmobilis.model.GroupList;
+import br.ufc.virtual.solarmobilis.model.LoginResponse;
 import br.ufc.virtual.solarmobilis.model.SendPostResponse;
 import br.ufc.virtual.solarmobilis.model.UserMessage;
 
@@ -18,7 +19,7 @@ import br.ufc.virtual.solarmobilis.model.UserMessage;
 public interface SolarClient {
 
 	@Post("sessions")
-	Object doLogin(UserMessage user);
+	LoginResponse doLogin(UserMessage user);
 
 	@Get("curriculum_units/mobilis_list.json?auth_token={token}")
 	CurriculumUnitList getCurriculumUnits(String token);
