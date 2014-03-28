@@ -17,6 +17,7 @@ import android.util.Log;
 import br.ufc.virtual.solarmobilis.DiscussionsPostsActivity;
 import br.ufc.virtual.solarmobilis.model.DiscussionPost;
 import br.ufc.virtual.solarmobilis.model.DiscussionPostAttachment;
+import br.ufc.virtual.solarmobilis.model.DiscussionPostFile;
 import br.ufc.virtual.solarmobilis.util.TextBlockenizer;
 import br.ufc.virtual.solarmobilis.webservice.BingAudioDownloader;
 import br.ufc.virtual.solarmobilis.webservice.DownloaderListener;
@@ -60,17 +61,17 @@ public class PostPlayer implements DownloaderListener {
 
 		blockenizer = new TextBlockenizer(textToBreak);
 
-		List<DiscussionPostAttachment> audioAttachments = new ArrayList<DiscussionPostAttachment>();
+		List<DiscussionPostFile> AudioFiles = new ArrayList<DiscussionPostFile>();
 
-		for (DiscussionPostAttachment discussionPostAttachment : post
-				.getAttachments()) {
-			if (discussionPostAttachment.getType().equals(
+		for (DiscussionPostFile discussionPostFile : post
+				.getFiles()) {
+			if (discussionPostFile.getContentType().equals(
 					"audio/aac; charset=UTF-8")) {
-				audioAttachments.add(discussionPostAttachment);
+				AudioFiles.add(discussionPostFile);
 			}
 		}
 
-		setFileDescriptorsSize(blockenizer.size() + audioAttachments.size());
+		setFileDescriptorsSize(blockenizer.size() + AudioFiles.size());
 
 		for (String block = blockenizer.getFirst(); block != ""; block = blockenizer
 				.getNext()) {
@@ -80,9 +81,9 @@ public class PostPlayer implements DownloaderListener {
 
 		int currentAudioAttrachmentPosition = blockenizer.size();
 
-		for (DiscussionPostAttachment audioAttachment : audioAttachments) {
+		for (DiscussionPostFile audioAttachment : AudioFiles) {
 			String anexo = solarManager.getAttachmentUrl(audioAttachment
-					.getLink());
+					.getUrl());
 
 			Log.i("link para download", anexo);
 			audioDownloader

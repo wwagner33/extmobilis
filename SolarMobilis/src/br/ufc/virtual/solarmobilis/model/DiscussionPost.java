@@ -26,8 +26,10 @@ public class DiscussionPost {
 	public String content;
 	@SerializedName("created_at")
 	public String createdAt;
-
-	public List<DiscussionPostAttachment> attachments;
+    
+	
+	public List<DiscussionPostFile> files;
+	//public List<DiscussionPostAttachment> attachments;
 	@SerializedName("parent_id")
 	public Integer parentId;
 	public Bitmap userImage;
@@ -40,7 +42,7 @@ public class DiscussionPost {
 
 	public DiscussionPost(Integer id, Integer profileId, Integer discussionId,
 			Integer userId, String userNick, Integer level, String content,
-			String updatedAt, List<DiscussionPostAttachment> attachments) {
+			String updatedAt, List<DiscussionPostFile> files) {
 		super();
 		this.id = id;
 		this.profileId = profileId;
@@ -50,7 +52,7 @@ public class DiscussionPost {
 		this.level = level;
 		this.content = content;
 		this.createdAt = updatedAt;
-		this.attachments = attachments;
+		this.files = files;
 	}
 
 	public Integer getId() {
@@ -174,12 +176,12 @@ public class DiscussionPost {
 
 	}
 
-	public List<DiscussionPostAttachment> getAttachments() {
-		return attachments;
+	public List<DiscussionPostFile> getFiles() {
+		return files;
 	}
 
-	public void setAttachments(List<DiscussionPostAttachment> attachments) {
-		this.attachments = attachments;
+	public void setAttachments(List<DiscussionPostFile> files) {
+		this.files = files;
 	}
 
 	public Integer getParentId() {

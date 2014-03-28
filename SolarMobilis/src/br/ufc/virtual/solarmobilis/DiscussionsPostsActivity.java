@@ -390,12 +390,12 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 			postSelected = true;
 			setActionBarSelected();
 
-			if (posts.get(selectedPosition).getAttachments().isEmpty()) {
+			if (posts.get(selectedPosition).getFiles().isEmpty()) {
 				Log.w("Anexo", "n�o preenchido");
 
 			} else {
 				Log.w("Anexo", "preenchido");
-				Log.w("Anexo", posts.get(selectedPosition).getAttachments()
+				Log.w("Anexo", posts.get(selectedPosition).getFiles()
 						.toString());
 			}
 		}

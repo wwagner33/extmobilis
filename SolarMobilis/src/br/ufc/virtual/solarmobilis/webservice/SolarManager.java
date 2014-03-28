@@ -39,7 +39,7 @@ import br.ufc.virtual.solarmobilis.webservice.mobilis.Constants;
 
 @EBean
 public class SolarManager implements ConnectionCallback {
-	public static final String SERVER_ROOT_URL = "http://apolo11teste.virtual.ufc.br/";
+	public static final String SERVER_ROOT_URL = "http://10.0.10.6:3000/";
 
 	@RootContext
 	Activity rootActivity;
@@ -134,7 +134,7 @@ public class SolarManager implements ConnectionCallback {
 	}
 
 	private void setTimeout() {
-		setTimeout(10);
+		setTimeout(20);
 	}
 
 	private void setTimeout(int seconds) {
