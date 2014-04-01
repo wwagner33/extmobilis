@@ -137,6 +137,8 @@ public class DiscussionPost {
 		String formattedString = createdAt.substring(0, 25).replace("-", "").replace(":", "")
 				.replace(".", "").replace("T", "");
 
+		Log.i("# post sendo enviado", formattedString);
+		
 		return formattedString;
 
 		/*

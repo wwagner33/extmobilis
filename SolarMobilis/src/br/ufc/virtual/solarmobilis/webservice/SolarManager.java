@@ -39,7 +39,7 @@ import br.ufc.virtual.solarmobilis.webservice.mobilis.Constants;
 
 @EBean
 public class SolarManager implements ConnectionCallback {
-	public static final String SERVER_ROOT_URL = "http://10.0.10.6:3000/";
+	public static final String SERVER_ROOT_URL = "http://apolo11teste.virtual.ufc.br/";
 
 	@RootContext
 	Activity rootActivity;
@@ -48,8 +48,8 @@ public class SolarManager implements ConnectionCallback {
 	SolarClient solarClient;
 
 	@RestService
-	SolarApiClient solarApiClient; 
-	
+	SolarApiClient solarApiClient;
+
 	@RestService
 	SolarClientPostFileSender solarClientPostFileSender;
 
@@ -69,18 +69,19 @@ public class SolarManager implements ConnectionCallback {
 	public LoginResponse doLogin(User user) {
 		UserMessage userMessage = new UserMessage();
 		userMessage.setUser(user);
-		
+
 		return solarClient.doLogin(userMessage);
-		
+
 	}
-//----------------------
+
+	// ----------------------
 	public LoginResponseApi doLogin2(User user) {
-		
+
 		return solarApiClient.doLogin(user);
-		
+
 	}
-	
-	//----------------
+
+	// ----------------
 	public CurriculumUnitList getCurriculumUnits() {
 		return solarClient.getCurriculumUnits(preferences.token().get());
 	}
@@ -110,11 +111,11 @@ public class SolarManager implements ConnectionCallback {
 
 	public void sendAudioPost(File postAudioFile, Integer postId) {
 		connection = new Connection(this);
-		
-		String url = SERVER_ROOT_URL + "posts/" + postId + "/post_files?auth_token=" + preferences.token().get();
-		connection.postToServer(Constants.CONNECTION_POST_AUDIO,
-				url, postAudioFile,
-				preferences.token().get());
+
+		String url = SERVER_ROOT_URL + "posts/" + postId
+				+ "/post_files?auth_token=" + preferences.token().get();
+		connection.postToServer(Constants.CONNECTION_POST_AUDIO, url,
+				postAudioFile, preferences.token().get());
 	}
 
 	@Override
@@ -128,9 +129,13 @@ public class SolarManager implements ConnectionCallback {
 	}
 
 	public String getAttachmentUrl(String link) {
-		String root = (String) SERVER_ROOT_URL.subSequence(0, SERVER_ROOT_URL.length()-1);
-		return (root + link + "?auth_token=" + preferences.token()
-				.get());
+		String root = (String) SERVER_ROOT_URL.subSequence(0,
+				SERVER_ROOT_URL.length() - 1);
+		return (root + link + "?auth_token=" + preferences.token().get());
+	}
+
+	public String getFileUrl(String link) {
+		return (link + "?auth_token=" + preferences.token().get());
 	}
 
 	private void setTimeout() {
@@ -163,7 +168,8 @@ public class SolarManager implements ConnectionCallback {
 		switch (code) {
 		case 401:
 			toast(R.string.ERROR_AUTHENTICATION);
-			if (preferences.token().get().length() != 0 || preferences.authToken().get().length() !=0) {
+			if (preferences.token().get().length() != 0
+					|| preferences.authToken().get().length() != 0) {
 				logout();
 			}
 			break;

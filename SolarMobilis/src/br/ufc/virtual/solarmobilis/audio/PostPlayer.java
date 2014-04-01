@@ -82,8 +82,7 @@ public class PostPlayer implements DownloaderListener {
 		int currentAudioAttrachmentPosition = blockenizer.size();
 
 		for (DiscussionPostFile audioAttachment : AudioFiles) {
-			String anexo = solarManager.getAttachmentUrl(audioAttachment
-					.getUrl());
+			String anexo = solarManager.getFileUrl(audioAttachment.getUrl());
 
 			Log.i("link para download", anexo);
 			audioDownloader
