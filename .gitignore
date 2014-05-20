@@ -7,3 +7,4 @@ src/com/mobilis/controller/Mobilis.java
 *.log
 proguard-project.txt
 */sherlock-bar-library/.settings/*
+lint.xml
