@@ -61,7 +61,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 	@Extra("discussionId")
 	int discussionId;
 
-	@Extra("discussionName")
+	@Extra("discussionName")	
 	String discussionName;
 
 	@Extra("discussionLastPostDate")
@@ -225,12 +225,14 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 		try {
 
 			int discussionSize = posts.size();
-			if (discussionSize == 0) {
+			/*if (discussionSize == 0) {
 				oldDateString = "20001010102410";
 			} else {
 				oldDateString = posts.get(0).getDateToString();
-			}
+			}*/
 
+			oldDateString = "20001010102410";
+			
 			discussionPostList = solarManager.getPosts(discussionId,
 					oldDateString);
 			unloadedFuturePostsCount = discussionPostList.getOlder();
@@ -242,6 +244,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 
 			newPosts = discussionPostList.getPosts();
 			// Collections.reverse(newPosts);
+			posts.clear();
 			posts.addAll(posts.size(), newPosts);
 
 			for (int i = 0; i < posts.size(); i++) {
@@ -400,8 +403,10 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 			}
 		}
 		
-	  listVieWDiscussionPosts.smoothScrollToPosition(position);
-        
+	  //listVieWDiscussionPosts.setSelection(position);
+		//listVieWDiscussionPosts.smoothScrollToPosition(position);
+      Log.i("smoothScrollToPosition", String.valueOf(position));
+	  
 		Log.i("toglle-marked", String.valueOf(selectedPosition));
 	}
 
@@ -472,6 +477,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 			toaster.showToast(lastPostMessage);
 			Log.i("Toast", lastPostMessage);
 		} else if (selectedPosition < posts.size()) {
+			
 			togglePostMarked(selectedPosition + 1);
 			postPlayer.play(posts.get(selectedPosition + 1));
 			Log.i("#selected-position-atual", String.valueOf(selectedPosition));
@@ -487,12 +493,15 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 	void previous() {
 		Log.i("Teste bot�o", "botao previous");
 
+		
+		
 		if (selectedPosition == 0) {
 			toaster.showToast(firstPostMessage);
 			Log.i("Toast", firstPostMessage);
 		} else {
 			Log.i("#bfselected-position-atual",
 					String.valueOf(selectedPosition));
+			
 			togglePostMarked(selectedPosition - 1);
 			postPlayer.play(posts.get(selectedPosition - 1));
 			Log.i("#selected-position-atual", String.valueOf(selectedPosition));

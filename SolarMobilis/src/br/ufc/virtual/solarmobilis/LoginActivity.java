@@ -94,9 +94,9 @@ public class LoginActivity extends Activity {
 		} catch (Exception e) {
 			Log.i("ERRO Exception", e.getMessage());
 			solarManager.alertNoConnection();
-			Log.i("RESPOSTA ANTIGA", loginResponseApi.toString());
+			//Log.i("RESPOSTA ANTIGA", loginResponseApi.toString());
 			//---
-			Log.i("RESPOSTA NOVA", response_post2.toString());
+			//Log.i("RESPOSTA NOVA", response_post2.toString());
 			//---
 		} finally {
 			dialog.dismiss();
