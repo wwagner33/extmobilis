@@ -39,7 +39,7 @@ import br.ufc.virtual.solarmobilis.webservice.mobilis.Constants;
 
 @EBean
 public class SolarManager implements ConnectionCallback {
-	public static final String SERVER_ROOT_URL = "http://solar2.virtual.ufc.br/";  //"http://200.129.43.170/";
+	public static final String SERVER_ROOT_URL = /*"http://solar2.virtual.ufc.br/";*/   "http://200.129.43.170/";
 
 	@RootContext
 	Activity rootActivity;
@@ -94,12 +94,16 @@ public class SolarManager implements ConnectionCallback {
 		return solarClient.getDiscussions(preferences.token().get(), id);
 	}
 
-	public DiscussionPostList getPosts(int id, String date) {
-		return solarApiClient.getPosts(preferences.authToken().get(), id, date);
-	}
+	public DiscussionPostList getPosts(int id, String date, int groupId) {
+		
+		Log.i("PARAMETROS PASSADOS:", preferences.authToken().get() +"///"+ String.valueOf(id)+"///"+date+"///"+String.valueOf(groupId));
+		
+		return solarApiClient.getPosts(preferences.authToken().get(), id, date, groupId);
+	
+}
 
-	public SendPostResponse sendPost(PostSender postSender, Integer id) {
-		return solarClient.sendPost(postSender, id, preferences.token().get());
+	public SendPostResponse sendPost(PostSender postSender, Integer id, int groupId) {
+		return solarClient.sendPost(postSender, id, /*preferences.token().get()*/preferences.authToken().get(), groupId);
 	}
 
 	public Object sendPostAudio(File postAudioFile, Integer postId) {
@@ -139,7 +143,7 @@ public class SolarManager implements ConnectionCallback {
 	}
 
 	private void setTimeout() {
-		setTimeout(100);
+		setTimeout(20);
 	}
 
 	private void setTimeout(int seconds) {

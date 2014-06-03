@@ -24,8 +24,8 @@ public interface SolarApiClient {
 	LoginResponseApi doLogin(User user);
 
 	
-	@Get("api/v1/discussions/{id}/posts/new/?date={date}&access_token={token}")
-	DiscussionPostList getPosts(String token, int id, String date);
+	@Get("api/v1/discussions/{id}/posts/new/?date={date}&access_token={token}&group_id={groupId}")
+	DiscussionPostList getPosts(String token, int id, String date, int groupId);
 	
 	/*
 	@Get("curriculum_units/mobilis_list.json?auth_token={token}")

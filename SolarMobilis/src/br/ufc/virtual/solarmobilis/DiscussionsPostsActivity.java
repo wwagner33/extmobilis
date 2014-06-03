@@ -234,7 +234,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 			oldDateString = "20001010102410";
 			
 			discussionPostList = solarManager.getPosts(discussionId,
-					oldDateString);
+					oldDateString, preferences.groupSelected().get());
 			unloadedFuturePostsCount = discussionPostList.getOlder();
 
 			for (int i = 0; i < discussionPostList.getPosts().size(); i++) {
@@ -303,7 +303,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 
 		try {
 			discussionPostList = solarManager.getPosts(discussionId,
-					oldDateString);
+					oldDateString, preferences.groupSelected().get());
 			List<DiscussionPost> posts = discussionPostList.getPosts();
 			for (DiscussionPost discussionPost : posts) {
 				discussionPost.setUserImageURL(solarManager
@@ -403,7 +403,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 			}
 		}
 		
-	  //listVieWDiscussionPosts.setSelection(position);
+	  listVieWDiscussionPosts.setSelection(position);
 		//listVieWDiscussionPosts.smoothScrollToPosition(position);
       Log.i("smoothScrollToPosition", String.valueOf(position));
 	  
