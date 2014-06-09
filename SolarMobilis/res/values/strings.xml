@@ -10,14 +10,14 @@
     <string name="title_activity_gateway">GatewayActivity</string>
     <string name="title_activity_curriculum_units_list">Cursos</string>
     <string name="logo_description">Imagem logo do solar</string>
-    <string name="iuvi_footer">Instituto Universidade Virtual - 2013</string>
+    <string name="iuvi_footer">Instituto Universidade Virtual - 2014</string>
     <string name="logout">Logout</string>
     <string name="courses_title">Cursos disponiveis</string>
     <string name="refresh">Atualizar</string>
     <string name="config">Configurações</string>
     <string name="ALERT_WAIT">Aguarde</string>
     <string name="ALERT_RESPONSE">Recebendo Resposta</string>
-    <string name="EMPTY_FIELD">Nenhum campo pode estar vazio</string>
+    <string name="EMPTY_FIELD">Por favor, informe Usuário e Senha</string>
     <string name="ERROR_AUTHENTICATION">Usuário ou senha inválidos</string>
     <string name="ERROR_CONECTION">Erro de conexão</string>
     <string name="ERROR_WHILE_PLAYING_ATTACH">Erro ao tocar anexo</string>
