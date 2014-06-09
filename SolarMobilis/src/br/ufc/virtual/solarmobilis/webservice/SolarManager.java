@@ -112,16 +112,16 @@ public class SolarManager implements ConnectionCallback {
 		return solarClientPostFileSender.sendPostaudioFile(parts, postId,
 				preferences.token().get());
 	}
-
+//send audio post atual
 	public void sendAudioPost(File postAudioFile, Integer postId) {
 		connection = new Connection(this);
 
 		String url = SERVER_ROOT_URL + "posts/" + postId
-				+ "/post_files?auth_token=" + preferences.token().get();
+				+ "/post_files?auth_token=" + preferences.token().get()/*+"&group_id="+preferences.groupSelected().get()*/;
 		connection.postToServer(Constants.CONNECTION_POST_AUDIO, url,
 				postAudioFile, preferences.token().get());
 	}
-
+//send audio post atual 
 	@Override
 	public void resultFromConnection(int connectionId, String result,
 			int statusCode) {

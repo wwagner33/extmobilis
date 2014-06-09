@@ -259,6 +259,12 @@ public class ResponseActivity extends Activity implements onDeleteListener {
 		try {
 			SendPostResponse sendPostResponse = solarManager.sendPost(
 					postSender, discussionId, preferences.groupSelected().get());
+			
+		/*	Object obj = solarManager.sendPost(
+					postSender, discussionId, preferences.groupSelected().get());
+			
+			Log.i("@RESPOSTA",obj.toString() );*/
+			
 			if (file.exists()) {
 				sendPostAudio(sendPostResponse.getPostId());
 				/* file.delete(); // TODO: Verificar se essa lógica fica */
