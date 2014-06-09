@@ -4,11 +4,9 @@ import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
-import org.androidannotations.annotations.NoTitle;
 import org.androidannotations.annotations.ViewById;
+import org.androidannotations.annotations.WindowFeature;
 import org.androidannotations.annotations.sharedpreferences.Pref;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.springframework.web.client.HttpStatusCodeException;
 
 import android.app.Activity;
@@ -16,6 +14,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Window;
 import android.widget.EditText;
 import android.widget.Toast;
 import br.ufc.virtual.solarmobilis.model.LoginResponse;
@@ -24,7 +23,7 @@ import br.ufc.virtual.solarmobilis.model.User;
 import br.ufc.virtual.solarmobilis.model.UserMessage;
 import br.ufc.virtual.solarmobilis.webservice.SolarManager;
 
-@NoTitle
+@WindowFeature({ Window.FEATURE_NO_TITLE })
 @EActivity(R.layout.activity_login)
 public class LoginActivity extends Activity {
 
@@ -34,19 +33,12 @@ public class LoginActivity extends Activity {
 	@Pref
 	SolarMobilisPreferences_ preferences;
 
-	LoginResponse loginResponseApi;
-	// ----
-	//Object response_post2;
-	LoginResponseApi response_post2;
-	// ---
-	public JSONObject jsonObject;
-	// ---
-	public JSONObject jsonObject2;
-	// ---
+	LoginResponse loginResponse;
+	LoginResponseApi loginResponseAPI;
+
 	public UserMessage userMessage = new UserMessage();
 	public User user = new User();
 	private ProgressDialog dialog;
-	SolarManager solarmanager;
 
 	@ViewById(R.id.editTextUser)
 	EditText fieldLogin;
@@ -61,8 +53,8 @@ public class LoginActivity extends Activity {
 
 	@Click(R.id.submit)
 	void submit() {
-		if (!(fieldLogin.getText().toString().trim().length() == 0 || fieldPassword
-				.getText().toString().trim().length() == 0)) {
+		if (!(fieldLogin.getText().toString().trim().isEmpty() || fieldPassword
+				.getText().toString().trim().isEmpty())) {
 
 			user.setLogin(fieldLogin.getText().toString().trim());
 			user.setPassword(fieldPassword.getText().toString().trim());
@@ -70,7 +62,6 @@ public class LoginActivity extends Activity {
 
 			dialog = ProgressDialog.show(this, getString(R.string.dialog_wait),
 					getString(R.string.dialog_message), true);
-
 			getToken();
 
 		} else {
@@ -81,58 +72,28 @@ public class LoginActivity extends Activity {
 
 	@Background
 	void getToken() {
+
 		try {
-			loginResponseApi = solarManager.doLogin(user); 
-			// --
-			response_post2 = solarManager.doLogin2(user);
-			
-			// --
+			loginResponse = solarManager.doLogin(user);
+			loginResponseAPI = solarManager.doApiLogin(user);
 			saveToken();
 		} catch (HttpStatusCodeException e) {
 			Log.i("ERRO HttpStatusCodeException", e.getStatusCode().toString());
 			solarManager.errorHandler(e.getStatusCode());
 		} catch (Exception e) {
-			Log.i("ERRO Exception", e.getMessage());
 			solarManager.alertNoConnection();
-			Log.i("RESPOSTA ANTIGA", loginResponseApi.toString());
-			//---
-			Log.i("RESPOSTA NOVA", response_post2.toString());
-			//---
 		} finally {
 			dialog.dismiss();
 		}
-		Log.i("MENSSAGEM", "PODE SIM");
 	}
 
 	public void saveToken() {
-		Log.i("resposta", loginResponseApi.toString());
+		preferences.token().put(loginResponse.getSession().getAuth_token());
+		preferences.authToken().put(loginResponseAPI.getAccessToken());
 
-		/*try {
-			jsonObject = new JSONObject(response_post.toString());
-			// ---
-			//jsonObject2 = new JSONObject(response_post2.toString());
-			// ---
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}*/
-
-		preferences.token()
-				.put(loginResponseApi.getSession().getAuth_token());
-		//---
-		preferences.authToken().put(response_post2.getAccessToken());
-		//----
-
-		Log.i("Token_na_login", preferences.token().get().toString());
-		//---
-		Log.i("Token_na_login2", preferences.authToken().get().toString());
-		//-----
-
-		if (preferences.token().get().length() != 0 & preferences.authToken().get().length()!= 0) {
-			
+		if (preferences.token().get().length() != 0
+				& preferences.authToken().get().length() != 0) {
 			Intent intent = new Intent(this, CurriculumUnitsListActivity_.class);
-
-			dialog.dismiss();
-
 			startActivity(intent);
 			finish();
 		}

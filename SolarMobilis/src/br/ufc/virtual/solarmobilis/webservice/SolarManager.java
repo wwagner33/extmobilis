@@ -18,7 +18,6 @@ import org.springframework.util.MultiValueMap;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.util.Log;
 import android.widget.Toast;
 import br.ufc.virtual.solarmobilis.LoginActivity_;
 import br.ufc.virtual.solarmobilis.PostSender;
@@ -39,7 +38,7 @@ import br.ufc.virtual.solarmobilis.webservice.mobilis.Constants;
 
 @EBean
 public class SolarManager implements ConnectionCallback {
-	public static final String SERVER_ROOT_URL = "http://apolo11teste.virtual.ufc.br/";
+	public static final String SERVER_ROOT_URL = "http://200.129.43.170/";
 
 	@RootContext
 	Activity rootActivity;
@@ -71,17 +70,12 @@ public class SolarManager implements ConnectionCallback {
 		userMessage.setUser(user);
 
 		return solarClient.doLogin(userMessage);
-
 	}
 
-	// ----------------------
-	public LoginResponseApi doLogin2(User user) {
-
+	public LoginResponseApi doApiLogin(User user) {
 		return solarApiClient.doLogin(user);
-
 	}
 
-	// ----------------
 	public CurriculumUnitList getCurriculumUnits() {
 		return solarClient.getCurriculumUnits(preferences.token().get());
 	}
@@ -213,7 +207,7 @@ public class SolarManager implements ConnectionCallback {
 	}
 
 	public void toast(int resourceMessageID) {
-		Toast.makeText(rootActivity, resourceMessageID, Toast.LENGTH_SHORT)
+		Toast.makeText(rootActivity, resourceMessageID, Toast.LENGTH_LONG)
 				.show();
 	}
 
