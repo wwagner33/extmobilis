@@ -92,7 +92,7 @@ public class ResponseActivity extends Activity implements onDeleteListener {
 
 	private ProgressDialog dialog;
 
-	/*AudioPlayer player = new AudioPlayer();*/
+	/* AudioPlayer player = new AudioPlayer(); */
 	private MediaRecorder mRecorder = null;
 	private MediaPlayer mPlayer = null;
 	private static String mFileName = null;
@@ -257,17 +257,14 @@ public class ResponseActivity extends Activity implements onDeleteListener {
 	@Background
 	void sendPost() {
 		try {
-			SendPostResponse sendPostResponse = solarManager.sendPost(
-					postSender, discussionId, preferences.groupSelected().get());
-			
-		/*	Object obj = solarManager.sendPost(
-					postSender, discussionId, preferences.groupSelected().get());
-			
-			Log.i("@RESPOSTA",obj.toString() );*/
-			
+			SendPostResponse sendPostResponse = solarManager
+					.sendPost(postSender, discussionId, preferences
+							.groupSelected().get());
+
 			if (file.exists()) {
-				sendPostAudio(sendPostResponse.getPostId());
+				sendPostAudio(sendPostResponse.getId());
 				/* file.delete(); // TODO: Verificar se essa lógica fica */
+
 			}
 			sentPost();
 		} catch (HttpStatusCodeException e) {

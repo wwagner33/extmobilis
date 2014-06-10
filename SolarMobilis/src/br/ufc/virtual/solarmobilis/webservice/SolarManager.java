@@ -39,9 +39,9 @@ import br.ufc.virtual.solarmobilis.webservice.mobilis.Constants;
 
 @EBean
 public class SolarManager implements ConnectionCallback {
-	// public static final String SERVER_ROOT_URL =
-	// "http://solar2.virtual.ufc.br/";
-	public static final String SERVER_ROOT_URL = "http://200.129.43.170/";
+	public static final String SERVER_ROOT_URL = /*
+												 * "http://solar2.virtual.ufc.br/";
+												 */"http://200.129.43.170/";
 
 	@RootContext
 	Activity rootActivity;
@@ -73,12 +73,17 @@ public class SolarManager implements ConnectionCallback {
 		userMessage.setUser(user);
 
 		return solarClient.doLogin(userMessage);
+
 	}
 
+	// ----------------------
 	public LoginResponseApi doApiLogin(User user) {
+
 		return solarApiClient.doLogin(user);
+
 	}
 
+	// ----------------
 	public CurriculumUnitList getCurriculumUnits() {
 		return solarClient.getCurriculumUnits(preferences.token().get());
 	}
@@ -108,22 +113,26 @@ public class SolarManager implements ConnectionCallback {
 				preferences.authToken().get(), groupId);
 	}
 
+	// send audio post não utilizado
 	public Object sendPostAudio(File postAudioFile, Integer postId) {
 		MultiValueMap<String, Object> parts = new LinkedMultiValueMap<String, Object>();
 		parts.add("post_file", new FileSystemResource(postAudioFile));
 		return solarClientPostFileSender.sendPostaudioFile(parts, postId,
 				preferences.token().get());
 	}
-//send audio post atual
+
+	// send audio post não utilizado
+	// send audio post atual
 	public void sendAudioPost(File postAudioFile, Integer postId) {
 		connection = new Connection(this);
 
 		String url = SERVER_ROOT_URL + "posts/" + postId
-				+ "/post_files?auth_token=" + preferences.token().get()/*+"&group_id="+preferences.groupSelected().get()*/;
+				+ "/post_files?auth_token=" + preferences.token().get();
 		connection.postToServer(Constants.CONNECTION_POST_AUDIO, url,
 				postAudioFile, preferences.token().get());
 	}
-//send audio post atual 
+
+	// send audio post atual
 	@Override
 	public void resultFromConnection(int connectionId, String result,
 			int statusCode) {
@@ -219,7 +228,7 @@ public class SolarManager implements ConnectionCallback {
 	}
 
 	public void toast(int resourceMessageID) {
-		Toast.makeText(rootActivity, resourceMessageID, Toast.LENGTH_LONG)
+		Toast.makeText(rootActivity, resourceMessageID, Toast.LENGTH_SHORT)
 				.show();
 	}
 
