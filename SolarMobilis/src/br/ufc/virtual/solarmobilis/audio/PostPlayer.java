@@ -8,7 +8,6 @@ import java.util.List;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EBean;
-import org.androidannotations.annotations.UiThread;
 
 import android.media.MediaPlayer;
 import android.os.Environment;
@@ -16,7 +15,6 @@ import android.text.Html;
 import android.util.Log;
 import br.ufc.virtual.solarmobilis.DiscussionsPostsActivity;
 import br.ufc.virtual.solarmobilis.model.DiscussionPost;
-import br.ufc.virtual.solarmobilis.model.DiscussionPostAttachment;
 import br.ufc.virtual.solarmobilis.model.DiscussionPostFile;
 import br.ufc.virtual.solarmobilis.util.TextBlockenizer;
 import br.ufc.virtual.solarmobilis.webservice.BingAudioDownloader;
@@ -63,8 +61,7 @@ public class PostPlayer implements DownloaderListener {
 
 		List<DiscussionPostFile> AudioFiles = new ArrayList<DiscussionPostFile>();
 
-		for (DiscussionPostFile discussionPostFile : post
-				.getFiles()) {
+		for (DiscussionPostFile discussionPostFile : post.getFiles()) {
 			if (discussionPostFile.getContentType().equals(
 					"audio/aac; charset=UTF-8")) {
 				AudioFiles.add(discussionPostFile);
@@ -109,14 +106,13 @@ public class PostPlayer implements DownloaderListener {
 
 		fileDescriptors.set(downloadedAudioBlockIndex, name);
 		Log.i("++++download", "+++++");
-		
 
 		if (downloadedAudioBlockIndex == downloadWaitingToPlayAudioBlockIndex) {
 			try {
 				playAudio(downloadedAudioBlockIndex);
 			} catch (Exception e) {
 				postPlayerListener.onPostPlayException(e);
-			  
+
 			}
 		}
 
@@ -125,14 +121,13 @@ public class PostPlayer implements DownloaderListener {
 	@Override
 	public void onDownloadException(Exception exception) {
 		postPlayerListener.onPostPlayException(exception);
-	      
 	}
 
 	public void playAudio(final int audioBlockIndex)
 			throws IllegalArgumentException, SecurityException,
 			IllegalStateException, IOException {
-           Log.i("++++++audio", "++++");
-		
+		Log.i("++++++audio", "++++");
+
 		audioPlayer.reset();
 		audioPlayer.play(fileDescriptors.get(audioBlockIndex),
 				new MediaPlayer.OnCompletionListener() {
@@ -150,8 +145,8 @@ public class PostPlayer implements DownloaderListener {
 							Log.i("Bloco", "Bloco não disponível "
 									+ (audioBlockIndex + 1));
 							downloadWaitingToPlayAudioBlockIndex = audioBlockIndex + 1;
-                             Log.i("+++++audio normal", "+++++");
-							      
+							Log.i("+++++audio normal", "+++++");
+
 						} else if (fileDescriptors.get(audioBlockIndex + 1) != null) {
 							Log.i("Tocar", "Proximo bloco");
 							try {
@@ -159,10 +154,10 @@ public class PostPlayer implements DownloaderListener {
 								Log.i("+++++audio normal", "normal");
 							} catch (Exception e) {
 								postPlayerListener.onPostPlayException(e);
-							    e.printStackTrace();
-							    
-							    Log.i("erro ", "aqui");
-							   // Log.i("causa da excess�o",e.getCause().toString());
+								e.printStackTrace();
+
+								Log.i("erro ", "aqui");
+								// Log.i("causa da excess�o",e.getCause().toString());
 							}
 						} else {
 							downloadWaitingToPlayAudioBlockIndex = audioBlockIndex;

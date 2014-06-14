@@ -30,13 +30,6 @@ public interface SolarClient {
 	@Get("groups/{id}/discussions/mobilis_list.json?auth_token={token}")
 	DiscussionList getDiscussions(String token, int id);
 
-	@Get("discussions/{id}/posts/news/{date}.json?mobilis=true&auth_token={token}")
-	DiscussionPostList getPosts(String token, int id, String date);
-
-	@Post("api/v1/discussions/{discussionId}/posts?access_token={token}&group_id={groupId}")
-	SendPostResponse sendPost(PostSender postSender, Integer discussionId,
-			String token, int groupId);
-
 	RestTemplate getRestTemplate();
 
 	void setRootUrl(String rootUrl);
