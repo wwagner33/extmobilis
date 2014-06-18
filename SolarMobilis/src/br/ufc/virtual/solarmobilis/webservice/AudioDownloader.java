@@ -1,9 +1,7 @@
 package br.ufc.virtual.solarmobilis.webservice;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.androidannotations.annotations.Background;
@@ -34,7 +32,6 @@ public class AudioDownloader {
 			downloaderListener.onDownload(audioFile.getAbsolutePath(), i);
 		} catch (Exception e) {
 			downloaderListener.onDownloadException(e);
-		
 		}
 
 	}

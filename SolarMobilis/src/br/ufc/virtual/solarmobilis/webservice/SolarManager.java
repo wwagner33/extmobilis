@@ -18,7 +18,6 @@ import org.springframework.util.MultiValueMap;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.util.Log;
 import android.widget.Toast;
 import br.ufc.virtual.solarmobilis.LoginActivity_;
 import br.ufc.virtual.solarmobilis.PostSender;

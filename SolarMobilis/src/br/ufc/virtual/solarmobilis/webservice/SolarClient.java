@@ -6,13 +6,10 @@ import org.androidannotations.annotations.rest.Rest;
 import org.springframework.http.converter.json.GsonHttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
-import br.ufc.virtual.solarmobilis.PostSender;
 import br.ufc.virtual.solarmobilis.model.CurriculumUnitList;
 import br.ufc.virtual.solarmobilis.model.DiscussionList;
-import br.ufc.virtual.solarmobilis.model.DiscussionPostList;
 import br.ufc.virtual.solarmobilis.model.GroupList;
 import br.ufc.virtual.solarmobilis.model.LoginResponse;
-import br.ufc.virtual.solarmobilis.model.SendPostResponse;
 import br.ufc.virtual.solarmobilis.model.UserMessage;
 
 @Rest(converters = { GsonHttpMessageConverter.class })

@@ -1,6 +1,5 @@
 package br.ufc.virtual.solarmobilis.model;
 
-import com.google.gson.annotations.SerializedName;
 
 public class SendPostResponse {
 	public Integer result;
