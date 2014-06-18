@@ -61,7 +61,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 	@Extra("discussionId")
 	int discussionId;
 
-	@Extra("discussionName")	
+	@Extra("discussionName")
 	String discussionName;
 
 	@Extra("discussionLastPostDate")
@@ -105,10 +105,10 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 
 	@StringRes(R.string.ERROR_CONECTION)
 	String conectinErrortMessage;
-	
+
 	@StringRes(R.string.ERROR_WHILE_PLAYING_ATTACH)
 	String errorWhilePlayingAttach;
-	
+
 	@Bean
 	Toaster toaster;
 
@@ -225,21 +225,20 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 		try {
 
 			int discussionSize = posts.size();
-			/*if (discussionSize == 0) {
-				oldDateString = "20001010102410";
-			} else {
-				oldDateString = posts.get(0).getDateToString();
-			}*/
+			/*
+			 * if (discussionSize == 0) { oldDateString = "20001010102410"; }
+			 * else { oldDateString = posts.get(0).getDateToString(); }
+			 */
 
 			oldDateString = "20001010102410";
-			
+
 			discussionPostList = solarManager.getPosts(discussionId,
 					oldDateString, preferences.groupSelected().get());
 			unloadedFuturePostsCount = discussionPostList.getOlder();
 
 			for (int i = 0; i < discussionPostList.getPosts().size(); i++) {
-				Log.i("#" + i+" "+oldDateString, discussionPostList.getPosts().get(i)
-						.getContent());
+				Log.i("#" + i + " " + oldDateString, discussionPostList
+						.getPosts().get(i).getContent());
 			}
 
 			newPosts = discussionPostList.getPosts();
@@ -248,7 +247,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 			posts.addAll(posts.size(), newPosts);
 
 			for (int i = 0; i < posts.size(); i++) {
-				Log.i("#" + i+" "+oldDateString, posts.get(i).getContent());
+				Log.i("#" + i + " " + oldDateString, posts.get(i).getContent());
 			}
 
 		} catch (HttpStatusCodeException e) {
@@ -402,11 +401,11 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 						.toString());
 			}
 		}
-		
-	  listVieWDiscussionPosts.setSelection(position);
-		//listVieWDiscussionPosts.smoothScrollToPosition(position);
-      Log.i("smoothScrollToPosition", String.valueOf(position));
-	  
+
+		listVieWDiscussionPosts.setSelection(position);
+		// listVieWDiscussionPosts.smoothScrollToPosition(position);
+		Log.i("smoothScrollToPosition", String.valueOf(position));
+
 		Log.i("toglle-marked", String.valueOf(selectedPosition));
 	}
 
@@ -477,14 +476,14 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 			toaster.showToast(lastPostMessage);
 			Log.i("Toast", lastPostMessage);
 		} else if (selectedPosition < posts.size()) {
-			
+
 			togglePostMarked(selectedPosition + 1);
 			postPlayer.play(posts.get(selectedPosition + 1));
 			Log.i("#selected-position-atual", String.valueOf(selectedPosition));
 			setImagePlayer();
 		} else {
 			stop();
-			Log.e("PAROU AO TENTAR O NEXT E FALTAR LISTA","STOP()"); 
+			Log.e("PAROU AO TENTAR O NEXT E FALTAR LISTA", "STOP()");
 		}
 
 	}
@@ -493,15 +492,13 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 	void previous() {
 		Log.i("Teste bot�o", "botao previous");
 
-		
-		
 		if (selectedPosition == 0) {
 			toaster.showToast(firstPostMessage);
 			Log.i("Toast", firstPostMessage);
 		} else {
 			Log.i("#bfselected-position-atual",
 					String.valueOf(selectedPosition));
-			
+
 			togglePostMarked(selectedPosition - 1);
 			postPlayer.play(posts.get(selectedPosition - 1));
 			Log.i("#selected-position-atual", String.valueOf(selectedPosition));
@@ -550,6 +547,6 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 	public void onPostPlayException(Exception exception) {
 		stop();
 		toaster.showToast(errorWhilePlayingAttach);
-	next();
+		next();
 	}
 }

@@ -139,7 +139,7 @@ public class SolarManager implements ConnectionCallback {
 	}
 
 	public String getFileUrl(String link) {
-		return (link + "?auth_token=" + preferences.token().get());
+		return (link + "?access_token=" + preferences.authToken().get());
 	}
 
 	private void setTimeout() {
