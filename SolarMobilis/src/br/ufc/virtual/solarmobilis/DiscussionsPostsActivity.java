@@ -109,6 +109,9 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 	@StringRes(R.string.ERROR_WHILE_PLAYING_ATTACH)
 	String errorWhilePlayingAttach;
 
+	@StringRes(R.string.ERROR_AUDIO_DOWNLOAD)
+	String audioDownloadError;
+
 	@Bean
 	Toaster toaster;
 
@@ -548,5 +551,11 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 		stop();
 		toaster.showToast(errorWhilePlayingAttach);
 		next();
+	}
+
+	@Override
+	@UiThread
+	public void onPostPlayDownloadException(Exception exception) {
+		toaster.showToast(audioDownloadError);
 	}
 }

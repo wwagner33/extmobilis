@@ -21,6 +21,7 @@
     <string name="ERROR_AUTHENTICATION">Usuário ou senha inválidos</string>
     <string name="ERROR_CONECTION">Erro de conexão</string>
     <string name="ERROR_WHILE_PLAYING_ATTACH">Erro ao tocar anexo</string>
+    <string name="ERROR_AUDIO_DOWNLOAD">Erro ao acessar áudio</string>
     <string name="ERROR_TIMEOUT">Tempo limite de conexão atingido</string>
     <string name="ERROR_UNKNOWN">Erro desconhecido</string>
     <string name="ERROR_SERVER">Ocorreu um erro no servidor</string>

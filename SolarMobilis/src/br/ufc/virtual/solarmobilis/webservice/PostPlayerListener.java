@@ -4,4 +4,6 @@ public interface PostPlayerListener {
 	public void onCompletion();
 
 	public void onPostPlayException(Exception exception);
+
+	public void onPostPlayDownloadException(Exception exception);
 }

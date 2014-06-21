@@ -2,6 +2,7 @@ package br.ufc.virtual.solarmobilis.audio;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,6 +42,7 @@ public class PostPlayer implements DownloaderListener {
 	public AudioPlayer audioPlayer = new AudioPlayer();
 
 	int downloadWaitingToPlayAudioBlockIndex = 0;
+	int downloadExceptionAudioBlockIndex = -1;
 
 	public PostPlayer() {
 		audioDownloader = new BingAudioDownloader();
@@ -112,56 +114,83 @@ public class PostPlayer implements DownloaderListener {
 				playAudio(downloadedAudioBlockIndex);
 			} catch (Exception e) {
 				postPlayerListener.onPostPlayException(e);
-
 			}
 		}
-
 	}
 
 	@Override
-	public void onDownloadException(Exception exception) {
-		postPlayerListener.onPostPlayException(exception);
+	public void onDownloadException(Exception exception, int fileIndex) {
+		downloadExceptionAudioBlockIndex = fileIndex;
+		postPlayerListener.onPostPlayDownloadException(exception);
 	}
 
 	public void playAudio(final int audioBlockIndex)
 			throws IllegalArgumentException, SecurityException,
 			IllegalStateException, IOException {
-		Log.i("++++++audio", "++++");
 
 		audioPlayer.reset();
 		audioPlayer.play(fileDescriptors.get(audioBlockIndex),
 				new MediaPlayer.OnCompletionListener() {
+					int completedAdudioIndex = audioBlockIndex;
 
 					@Override
 					public void onCompletion(MediaPlayer mp) {
-						if (audioBlockIndex == (fileDescriptors.size() - 1)) {
-							Log.i("ultimo post", "Ultimo bloco tocado");
-							// stop();
-							stoped = true;
-							deleteAudioData();
-							postPlayerListener.onCompletion();
-						} else if (fileDescriptors.get(audioBlockIndex + 1)
-								.equals("")) {
-							Log.i("Bloco", "Bloco não disponível "
-									+ (audioBlockIndex + 1));
-							downloadWaitingToPlayAudioBlockIndex = audioBlockIndex + 1;
-							Log.i("+++++audio normal", "+++++");
-
-						} else if (fileDescriptors.get(audioBlockIndex + 1) != null) {
-							Log.i("Tocar", "Proximo bloco");
-							try {
-								playAudio(audioBlockIndex + 1);
-								Log.i("+++++audio normal", "normal");
-							} catch (Exception e) {
-								postPlayerListener.onPostPlayException(e);
-								e.printStackTrace();
-
-								Log.i("erro ", "aqui");
-								// Log.i("causa da excess�o",e.getCause().toString());
-							}
+						if (isLastAudio()) {
+							postPlayCompleted();
+						} else if (isNextAudioNotAvailable()) {
+							if (isNextAudioDownloadException())
+								ignoreAudio();
+							else
+								setAudioIndexToWait();
+						} else if (isNextAudioAvailable()) {
+							playAvailableAudio();
 						} else {
-							downloadWaitingToPlayAudioBlockIndex = audioBlockIndex;
+							downloadWaitingToPlayAudioBlockIndex = completedAdudioIndex;
 						}
+					}
+
+					private void ignoreAudio() {
+						completedAdudioIndex++;
+						onCompletion(mp);
+					}
+
+					private boolean isNextAudioDownloadException() {
+						return (completedAdudioIndex + 1) == downloadExceptionAudioBlockIndex;
+					}
+
+					private void playAvailableAudio() {
+						Log.i("Tocar", "Proximo bloco");
+						try {
+							playAudio(completedAdudioIndex + 1);
+						} catch (Exception e) {
+							postPlayerListener.onPostPlayException(e);
+							e.printStackTrace();
+						}
+					}
+
+					private boolean isNextAudioAvailable() {
+						return fileDescriptors.get(completedAdudioIndex + 1) != null;
+					}
+
+					private void setAudioIndexToWait() {
+						downloadWaitingToPlayAudioBlockIndex = completedAdudioIndex + 1;
+					}
+
+					private boolean isNextAudioNotAvailable() {
+						Log.i("Bloco", "Bloco não disponível "
+								+ (completedAdudioIndex + 1));
+						return fileDescriptors.get(completedAdudioIndex + 1)
+								.equals("");
+					}
+
+					private void postPlayCompleted() {
+						stoped = true;
+						deleteAudioData();
+						postPlayerListener.onCompletion();
+					}
+
+					private boolean isLastAudio() {
+						return completedAdudioIndex == (fileDescriptors.size() - 1);
 					}
 				});
 	}

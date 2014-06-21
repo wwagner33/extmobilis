@@ -31,7 +31,7 @@ public class AudioDownloader {
 			File audioFile = new File(audioFilePath + i + ".wav");
 			downloaderListener.onDownload(audioFile.getAbsolutePath(), i);
 		} catch (Exception e) {
-			downloaderListener.onDownloadException(e);
+			downloaderListener.onDownloadException(e, i);
 		}
 
 	}

@@ -9,20 +9,16 @@ import br.ufc.virtual.solarmobilis.util.BingURLCreator;
 public class BingAudioDownloader extends AudioDownloader {
 
 	public BingAudioDownloader() {
-
 	}
 
 	@Background
 	public void saveAudio(String text, int i) {
-
 		try {
 			stringUrl = BingURLCreator.getURL(text);
 			saveFile(stringUrl, i);
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 	}
 
 }
