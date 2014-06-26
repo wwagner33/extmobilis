@@ -6,7 +6,6 @@ import org.androidannotations.annotations.rest.Rest;
 import org.springframework.http.converter.json.GsonHttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
-import br.ufc.virtual.solarmobilis.model.CurriculumUnitList;
 import br.ufc.virtual.solarmobilis.model.DiscussionList;
 import br.ufc.virtual.solarmobilis.model.GroupList;
 import br.ufc.virtual.solarmobilis.model.LoginResponse;
@@ -17,9 +16,6 @@ public interface SolarClient {
 
 	@Post("sessions")
 	LoginResponse doLogin(UserMessage user);
-
-	@Get("curriculum_units/mobilis_list.json?auth_token={token}")
-	CurriculumUnitList getCurriculumUnits(String token);
 
 	@Get("curriculum_units/{id}/groups/mobilis_list.json?auth_token={token}")
 	GroupList getGroups(String token, int id);

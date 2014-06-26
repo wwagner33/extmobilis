@@ -1,6 +1,7 @@
 package br.ufc.virtual.solarmobilis;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
@@ -19,7 +20,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import br.ufc.virtual.solarmobilis.model.CurriculumUnitList;
+import br.ufc.virtual.solarmobilis.model.CurriculumUnit;
 import br.ufc.virtual.solarmobilis.webservice.SolarManager;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
@@ -34,7 +35,7 @@ public class CurriculumUnitsListActivity extends SherlockFragmentActivity {
 	@Bean
 	SolarManager solarManager;
 
-	CurriculumUnitList response;
+	List<CurriculumUnit> curriculumUnits;
 
 	@ViewById
 	ListView listViewCurriculumUnits;
@@ -69,7 +70,7 @@ public class CurriculumUnitsListActivity extends SherlockFragmentActivity {
 	@Background
 	void getCurriculumUnits() {
 		try {
-			response = solarManager.getCurriculumUnits();
+			curriculumUnits = solarManager.getCurriculumUnits();
 			updateList();
 		} catch (HttpStatusCodeException e) {
 			Log.i("ERRO HttpStatusCodeException", e.getStatusCode().toString());
@@ -84,8 +85,8 @@ public class CurriculumUnitsListActivity extends SherlockFragmentActivity {
 
 	@UiThread
 	void updateList() {
-		for (int i = 0; i < response.getCurriculumuUnits().size(); i++) {
-			courses.add(response.getCurriculumuUnits().get(i).getName());
+		for (int i = 0; i < curriculumUnits.size(); i++) {
+			courses.add(curriculumUnits.get(i).getName());
 		}
 
 		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
@@ -96,7 +97,7 @@ public class CurriculumUnitsListActivity extends SherlockFragmentActivity {
 	@ItemClick
 	void listViewCurriculumUnits(int position) {
 		preferences.curriculumUnitSelected().put(
-				response.getCurriculumuUnits().get(position).getid());
+				curriculumUnits.get(position).getid());
 
 		Intent intent = new Intent(this, GroupsListActivity_.class);
 		startActivity(intent);

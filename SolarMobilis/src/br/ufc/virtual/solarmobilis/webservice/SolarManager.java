@@ -1,6 +1,7 @@
 package br.ufc.virtual.solarmobilis.webservice;
 
 import java.io.File;
+import java.util.List;
 
 import org.androidannotations.annotations.AfterInject;
 import org.androidannotations.annotations.EBean;
@@ -23,7 +24,7 @@ import br.ufc.virtual.solarmobilis.LoginActivity_;
 import br.ufc.virtual.solarmobilis.PostSender;
 import br.ufc.virtual.solarmobilis.R;
 import br.ufc.virtual.solarmobilis.SolarMobilisPreferences_;
-import br.ufc.virtual.solarmobilis.model.CurriculumUnitList;
+import br.ufc.virtual.solarmobilis.model.CurriculumUnit;
 import br.ufc.virtual.solarmobilis.model.DiscussionList;
 import br.ufc.virtual.solarmobilis.model.DiscussionPostList;
 import br.ufc.virtual.solarmobilis.model.GroupList;
@@ -72,15 +73,14 @@ public class SolarManager implements ConnectionCallback {
 		userMessage.setUser(user);
 
 		return solarClient.doLogin(userMessage);
-
 	}
 
 	public LoginResponseApi doApiLogin(User user) {
 		return solarApiClient.doLogin(user);
 	}
 
-	public CurriculumUnitList getCurriculumUnits() {
-		return solarClient.getCurriculumUnits(preferences.token().get());
+	public List<CurriculumUnit> getCurriculumUnits() {
+		return solarApiClient.getCurriculumUnits(preferences.authToken().get());
 	}
 
 	public GroupList getGroups(int id) {
