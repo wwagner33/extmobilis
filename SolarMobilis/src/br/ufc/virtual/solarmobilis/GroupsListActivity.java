@@ -1,6 +1,7 @@
 package br.ufc.virtual.solarmobilis;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
@@ -19,7 +20,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import br.ufc.virtual.solarmobilis.model.GroupList;
+import br.ufc.virtual.solarmobilis.model.Group;
 import br.ufc.virtual.solarmobilis.webservice.SolarManager;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
@@ -34,7 +35,7 @@ public class GroupsListActivity extends SherlockFragmentActivity {
 	@Bean
 	SolarManager solarManager;
 
-	GroupList response;
+	List<Group> groupList;
 
 	@ViewById
 	ListView listViewGroups;
@@ -72,7 +73,7 @@ public class GroupsListActivity extends SherlockFragmentActivity {
 		Log.i("TOKEN TURMAS", preferences.token().get().toString());
 
 		try {
-			response = solarManager.getGroups(preferences
+			groupList = solarManager.getGroups(preferences
 					.curriculumUnitSelected().get());
 			updateList();
 		} catch (HttpStatusCodeException e) {
@@ -88,8 +89,8 @@ public class GroupsListActivity extends SherlockFragmentActivity {
 
 	@UiThread
 	void updateList() {
-		for (int i = 0; i < response.getGroups().size(); i++) {
-			groups.add(response.getGroups().get(i).getCode());
+		for (int i = 0; i < groupList.size(); i++) {
+			groups.add(groupList.get(i).getCode());
 		}
 
 		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
@@ -99,14 +100,12 @@ public class GroupsListActivity extends SherlockFragmentActivity {
 
 	@ItemClick
 	void listViewGroups(int position) {
-		preferences.groupSelected().put(
-				response.getGroups().get(position).getId());
+		preferences.groupSelected().put(groupList.get(position).getId());
 
 		Intent intent = new Intent(this, DiscussionListActivity_.class);
 		// intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
 		// Intent.FLAG_ACTIVITY_CLEAR_TOP);
-		
-		
+
 		startActivity(intent);
 	}
 

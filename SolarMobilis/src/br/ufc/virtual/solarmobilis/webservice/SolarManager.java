@@ -27,7 +27,7 @@ import br.ufc.virtual.solarmobilis.SolarMobilisPreferences_;
 import br.ufc.virtual.solarmobilis.model.CurriculumUnit;
 import br.ufc.virtual.solarmobilis.model.DiscussionList;
 import br.ufc.virtual.solarmobilis.model.DiscussionPostList;
-import br.ufc.virtual.solarmobilis.model.GroupList;
+import br.ufc.virtual.solarmobilis.model.Group;
 import br.ufc.virtual.solarmobilis.model.LoginResponse;
 import br.ufc.virtual.solarmobilis.model.LoginResponseApi;
 import br.ufc.virtual.solarmobilis.model.SendPostResponse;
@@ -83,8 +83,8 @@ public class SolarManager implements ConnectionCallback {
 		return solarApiClient.getCurriculumUnits(preferences.authToken().get());
 	}
 
-	public GroupList getGroups(int id) {
-		return solarClient.getGroups(preferences.token().get(), id);
+	public List<Group> getGroups(int id) {
+		return solarApiClient.getGroups(preferences.authToken().get(), id);
 	}
 
 	public DiscussionList getDiscussions(int id) {
