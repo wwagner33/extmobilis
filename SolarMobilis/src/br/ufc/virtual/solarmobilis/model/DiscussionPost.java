@@ -26,10 +26,9 @@ public class DiscussionPost {
 	public String content;
 	@SerializedName("created_at")
 	public String createdAt;
-    
-	
+
 	public List<DiscussionPostFile> files;
-	//public List<DiscussionPostAttachment> attachments;
+	// public List<DiscussionPostAttachment> attachments;
 	@SerializedName("parent_id")
 	public Integer parentId;
 	public Bitmap userImage;
@@ -134,11 +133,11 @@ public class DiscussionPost {
 
 	public String getDateToString() {
 
-		String formattedString = createdAt.substring(0, 25).replace("-", "").replace(":", "")
-				.replace(".", "").replace("T", "");
+		String formattedString = createdAt.substring(0, 25).replace("-", "")
+				.replace(":", "").replace(".", "").replace("T", "");
 
 		Log.i("# post sendo enviado", formattedString);
-		
+
 		return formattedString;
 
 		/*
@@ -168,7 +167,7 @@ public class DiscussionPost {
 		try {
 			Date date = simpleFormat.parse(createdAt);
 			SimpleDateFormat postDate = new SimpleDateFormat(
-					"'Dia' dd 'de' MMMM", java.util.Locale.getDefault());
+					"'Dia' d 'de' MMMM", java.util.Locale.getDefault());
 			formattedDate = postDate.format(date);
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block

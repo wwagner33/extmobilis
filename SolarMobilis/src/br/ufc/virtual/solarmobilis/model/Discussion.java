@@ -24,7 +24,6 @@ public class Discussion {
 	private String status;
 
 	public Discussion() {
-
 	}
 
 	public Discussion(int allocationTagId, String description, String endDate,
@@ -59,18 +58,24 @@ public class Discussion {
 	}
 
 	public String getEndDate() {
+		return parseDate(endDate);
+	}
+
+	private String parseDate(final String stringDate) {
+
+		String parsedDate = "";
 		SimpleDateFormat simpleFormat = new SimpleDateFormat(
-				"yyyy-MM-dd HH:mm:ss", java.util.Locale.getDefault());
-		String formatedDate = "";
+				"yyyy-MM-dd'T'HH:mm:ss", java.util.Locale.getDefault());
 		try {
-			Date date = simpleFormat.parse(endDate);
+			Date date = simpleFormat.parse(stringDate);
 			SimpleDateFormat startDateFormat = new SimpleDateFormat(
 					"dd/MM/yyyy", java.util.Locale.getDefault());
-			formatedDate = startDateFormat.format(date);
+			parsedDate = startDateFormat.format(date);
 		} catch (ParseException e) {
+			parsedDate = "00/00/0000";
 			e.printStackTrace();
 		}
-		return formatedDate;
+		return parsedDate;
 	}
 
 	public void setEndDate(String endDate) {
@@ -110,18 +115,7 @@ public class Discussion {
 	}
 
 	public String getStartDate() {
-		String formatedDate = "";
-		SimpleDateFormat simpleFormat = new SimpleDateFormat(
-				"yyyy-MM-dd HH:mm:ss", java.util.Locale.getDefault());
-		try {
-			Date date = simpleFormat.parse(startDate);
-			SimpleDateFormat startDateFormat = new SimpleDateFormat(
-					"dd/MM/yyyy", java.util.Locale.getDefault());
-			formatedDate = startDateFormat.format(date);
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
-		return formatedDate;
+		return parseDate(startDate);
 	}
 
 	public void setStartDate(String startDate) {
