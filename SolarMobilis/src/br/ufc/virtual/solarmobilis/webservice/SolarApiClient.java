@@ -10,6 +10,7 @@ import org.springframework.web.client.RestTemplate;
 
 import br.ufc.virtual.solarmobilis.PostSender;
 import br.ufc.virtual.solarmobilis.model.CurriculumUnit;
+import br.ufc.virtual.solarmobilis.model.Discussion;
 import br.ufc.virtual.solarmobilis.model.DiscussionPostList;
 import br.ufc.virtual.solarmobilis.model.Group;
 import br.ufc.virtual.solarmobilis.model.LoginResponseApi;
@@ -27,6 +28,9 @@ public interface SolarApiClient {
 
 	@Get("api/v1/curriculum_units/{id}/groups?access_token={token}")
 	List<Group> getGroups(String token, int id);
+
+	@Get("api/v1/groups/{id}/discussions?access_token={token}")
+	List<Discussion> getDiscussions(String token, int id);
 
 	@Get("api/v1/discussions/{id}/posts/new/?date={date}&access_token={token}&group_id={groupId}")
 	DiscussionPostList getPosts(String token, int id, String date, int groupId);

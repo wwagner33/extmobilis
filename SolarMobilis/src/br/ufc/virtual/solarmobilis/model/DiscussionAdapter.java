@@ -18,18 +18,18 @@ public class DiscussionAdapter extends ArrayAdapter<String> {
 
 	Context context;
 	int layoutResourceId;
-	ArrayList<String> objects;
-	DiscussionList response;
+	ArrayList<String> discussions;
+	List<Discussion> discussionList;
 
 	public DiscussionAdapter(Context context, int resource,
-			int textViewResourceId, List<String> objects,
-			DiscussionList response) {
-		super(context, resource, textViewResourceId, objects);
+			int textViewResourceId, List<String> discussions,
+			List<Discussion> discussionList) {
+		super(context, resource, textViewResourceId, discussions);
 
 		this.context = context;
 		this.layoutResourceId = resource;
-		this.objects = (ArrayList<String>) objects;
-		this.response = response;
+		this.discussions = (ArrayList<String>) discussions;
+		this.discussionList = discussionList;
 	}
 
 	@Override
@@ -51,8 +51,7 @@ public class DiscussionAdapter extends ArrayAdapter<String> {
 			item.leftbar = (LinearLayout) row.findViewById(R.id.left_bar);
 
 			// area de tratamento
-			if (!(response.getDiscussions().get(position).getStatus()
-					.equals("1"))) {
+			if (!(discussionList.get(position).getStatus().equals("1"))) {
 
 				item.leftbar.setBackgroundColor(context.getResources()
 						.getColor(R.color.very_dark_gray));
@@ -75,7 +74,7 @@ public class DiscussionAdapter extends ArrayAdapter<String> {
 
 		}
 
-		item.textView.setText(objects.get(position));
+		item.textView.setText(discussions.get(position));
 
 		return row;/* super.getView(position, convertView, parent); */
 	}

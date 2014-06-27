@@ -1,6 +1,7 @@
 package br.ufc.virtual.solarmobilis;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
@@ -18,6 +19,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ListView;
+import br.ufc.virtual.solarmobilis.model.Discussion;
 import br.ufc.virtual.solarmobilis.model.DiscussionAdapter;
 import br.ufc.virtual.solarmobilis.model.DiscussionList;
 import br.ufc.virtual.solarmobilis.webservice.SolarManager;
@@ -32,6 +34,8 @@ public class DiscussionListActivity extends SherlockFragmentActivity {
 
 	@Bean
 	SolarManager solarManager;
+
+	List<Discussion> discussionList;
 
 	DiscussionList response;
 
@@ -67,8 +71,8 @@ public class DiscussionListActivity extends SherlockFragmentActivity {
 	@Background
 	void getDiscussions() {
 		try {
-			response = solarManager.getDiscussions(preferences.groupSelected()
-					.get());
+			discussionList = solarManager.getDiscussions(preferences
+					.groupSelected().get());
 			updateList();
 		} catch (HttpStatusCodeException e) {
 			Log.i("ERRO HttpStatusCodeException", e.getStatusCode().toString());
@@ -79,18 +83,18 @@ public class DiscussionListActivity extends SherlockFragmentActivity {
 		} finally {
 			dialog.dismiss();
 		}
-		// Log.i("DISCUSSIONLIST", response.getDiscussions().get(0).getName());
+		// Log.i("DISCUSSIONLIST", discussionList.get(0).getName());
 	}
 
 	@UiThread
 	void updateList() {
-		for (int i = 0; i < response.getDiscussions().size(); i++) {
-			discussions.add(response.getDiscussions().get(i).getName());
+		for (int i = 0; i < discussionList.size(); i++) {
+			discussions.add(discussionList.get(i).getName());
 		}
 
 		DiscussionAdapter adapter = new DiscussionAdapter(this,
 				R.layout.discussion_list, R.id.topic_name, discussions,
-				response);
+				discussionList);
 		listViewDiscussions.setAdapter(adapter);
 	}
 
@@ -100,16 +104,14 @@ public class DiscussionListActivity extends SherlockFragmentActivity {
 		Intent intent = new Intent(this, DiscussionsPostsActivity_.class);
 		// intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
 		// Intent.FLAG_ACTIVITY_CLEAR_TOP);
-		intent.putExtra("discussionId", response.getDiscussions().get(position)
-				.getId());
-		intent.putExtra("discussionName",
-				response.getDiscussions().get(position).getName());
-		intent.putExtra("discussionLastPostDate", response.getDiscussions()
-				.get(position).getLastPostDate());
-		intent.putExtra("startDate", response.getDiscussions().get(position)
+		intent.putExtra("discussionId", discussionList.get(position).getId());
+		intent.putExtra("discussionName", discussionList.get(position)
+				.getName());
+		intent.putExtra("discussionLastPostDate", discussionList.get(position)
+				.getLastPostDate());
+		intent.putExtra("startDate", discussionList.get(position)
 				.getStartDate());
-		intent.putExtra("endDate", response.getDiscussions().get(position)
-				.getEndDate());
+		intent.putExtra("endDate", discussionList.get(position).getEndDate());
 		startActivity(intent);
 
 	}
