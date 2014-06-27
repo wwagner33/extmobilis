@@ -348,6 +348,13 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 
 		listVieWDiscussionPosts.setAdapter(adapter);
 
+		if (postSelected) {
+
+			posts.get(selectedPosition).setMarked(true);
+			adapter.notifyDataSetChanged();
+
+		}
+
 	}
 
 	@UiThread
@@ -357,6 +364,14 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 				R.id.user_nick, posts);
 
 		listVieWDiscussionPosts.setAdapter(adapter);
+
+		if (postSelected) {
+
+			posts.get(selectedPosition).setMarked(true);
+			adapter.notifyDataSetChanged();
+
+		}
+
 	}
 
 	@ItemClick
