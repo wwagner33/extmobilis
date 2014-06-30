@@ -13,7 +13,7 @@ import br.ufc.virtual.solarmobilis.model.CurriculumUnit;
 import br.ufc.virtual.solarmobilis.model.Discussion;
 import br.ufc.virtual.solarmobilis.model.DiscussionPostList;
 import br.ufc.virtual.solarmobilis.model.Group;
-import br.ufc.virtual.solarmobilis.model.LoginResponseApi;
+import br.ufc.virtual.solarmobilis.model.LoginResponse;
 import br.ufc.virtual.solarmobilis.model.SendPostResponse;
 import br.ufc.virtual.solarmobilis.model.User;
 
@@ -21,7 +21,7 @@ import br.ufc.virtual.solarmobilis.model.User;
 public interface SolarApiClient {
 
 	@Post("oauth/token")
-	LoginResponseApi doLogin(User user);
+	LoginResponse doLogin(User user);
 
 	@Get("api/v1/curriculum_units?access_token={token}")
 	List<CurriculumUnit> getCurriculumUnits(String token);

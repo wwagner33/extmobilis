@@ -23,13 +23,12 @@ public class GatewayActivity extends Activity {
 
 		createFolder();
 
-		if (preferences.token().get().length() == 0) {
+		if (preferences.authToken().get().length() == 0) {
 			Intent intent = new Intent(this, LoginActivity_.class);
 			startActivity(intent);
 			finish();
 		} else {
 			Intent intent = new Intent(this, CurriculumUnitsListActivity_.class);
-			Log.i("Estado", "Preenchido - Curso");
 			startActivity(intent);
 			finish();
 		}
@@ -45,7 +44,6 @@ public class GatewayActivity extends Activity {
 		if (!file.exists() || !fileRec.exists()) {
 			file.mkdirs();
 			fileRec.mkdirs();
-			Log.i("Pasta", "criada");
 		}
 	}
 

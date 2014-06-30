@@ -29,10 +29,8 @@ import br.ufc.virtual.solarmobilis.model.Discussion;
 import br.ufc.virtual.solarmobilis.model.DiscussionPostList;
 import br.ufc.virtual.solarmobilis.model.Group;
 import br.ufc.virtual.solarmobilis.model.LoginResponse;
-import br.ufc.virtual.solarmobilis.model.LoginResponseApi;
 import br.ufc.virtual.solarmobilis.model.SendPostResponse;
 import br.ufc.virtual.solarmobilis.model.User;
-import br.ufc.virtual.solarmobilis.model.UserMessage;
 import br.ufc.virtual.solarmobilis.webservice.mobilis.Connection;
 import br.ufc.virtual.solarmobilis.webservice.mobilis.ConnectionCallback;
 import br.ufc.virtual.solarmobilis.webservice.mobilis.Constants;
@@ -45,9 +43,6 @@ public class SolarManager implements ConnectionCallback {
 
 	@RootContext
 	Activity rootActivity;
-
-	@RestService
-	SolarClient solarClient;
 
 	@RestService
 	SolarApiClient solarApiClient;
@@ -63,19 +58,11 @@ public class SolarManager implements ConnectionCallback {
 	@AfterInject
 	public void config() {
 		setTimeout();
-		solarClient.setRootUrl(SERVER_ROOT_URL);
 		solarApiClient.setRootUrl(SERVER_ROOT_URL);
 		solarClientPostFileSender.setRootUrl(SERVER_ROOT_URL);
 	}
 
 	public LoginResponse doLogin(User user) {
-		UserMessage userMessage = new UserMessage();
-		userMessage.setUser(user);
-
-		return solarClient.doLogin(userMessage);
-	}
-
-	public LoginResponseApi doApiLogin(User user) {
 		return solarApiClient.doLogin(user);
 	}
 
@@ -131,12 +118,6 @@ public class SolarManager implements ConnectionCallback {
 				.token().get());
 	}
 
-	public String getAttachmentUrl(String link) {
-		String root = (String) SERVER_ROOT_URL.subSequence(0,
-				SERVER_ROOT_URL.length() - 1);
-		return (root + link + "?auth_token=" + preferences.token().get());
-	}
-
 	public String getFileUrl(String link) {
 		return (link + "?access_token=" + preferences.authToken().get());
 	}
@@ -148,8 +129,8 @@ public class SolarManager implements ConnectionCallback {
 	private void setTimeout(int seconds) {
 
 		int mil = 1000;
-		ClientHttpRequestFactory requestFactory = solarClient.getRestTemplate()
-				.getRequestFactory();
+		ClientHttpRequestFactory requestFactory = solarApiClient
+				.getRestTemplate().getRequestFactory();
 		if (requestFactory instanceof SimpleClientHttpRequestFactory) {
 			((SimpleClientHttpRequestFactory) requestFactory)
 					.setConnectTimeout(seconds * mil);
@@ -171,8 +152,7 @@ public class SolarManager implements ConnectionCallback {
 		switch (code) {
 		case 401:
 			toast(R.string.ERROR_AUTHENTICATION);
-			if (preferences.token().get().length() != 0
-					|| preferences.authToken().get().length() != 0) {
+			if (preferences.authToken().get().length() != 0) {
 				logout();
 			}
 			break;
@@ -198,7 +178,6 @@ public class SolarManager implements ConnectionCallback {
 	}
 
 	public void logout() {
-		preferences.token().put(null);
 		preferences.authToken().put(null);
 		Intent intent = new Intent(rootActivity, LoginActivity_.class);
 		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -209,10 +188,6 @@ public class SolarManager implements ConnectionCallback {
 	@UiThread
 	public void alertNoConnection() {
 		toast(R.string.ERROR_NO_CONECTION);
-	}
-
-	public SolarClient getsolarClient() {
-		return solarClient;
 	}
 
 	public void toast(int resourceMessageID) {

@@ -69,9 +69,6 @@ public class GroupsListActivity extends SherlockFragmentActivity {
 
 	@Background
 	void getGroups() {
-
-		Log.i("TOKEN TURMAS", preferences.token().get().toString());
-
 		try {
 			groupList = solarManager.getGroups(preferences
 					.curriculumUnitSelected().get());

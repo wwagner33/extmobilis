@@ -18,7 +18,6 @@ import android.view.Window;
 import android.widget.EditText;
 import android.widget.Toast;
 import br.ufc.virtual.solarmobilis.model.LoginResponse;
-import br.ufc.virtual.solarmobilis.model.LoginResponseApi;
 import br.ufc.virtual.solarmobilis.model.User;
 import br.ufc.virtual.solarmobilis.model.UserMessage;
 import br.ufc.virtual.solarmobilis.webservice.SolarManager;
@@ -34,7 +33,6 @@ public class LoginActivity extends Activity {
 	SolarMobilisPreferences_ preferences;
 
 	LoginResponse loginResponse;
-	LoginResponseApi loginResponseAPI;
 
 	public UserMessage userMessage = new UserMessage();
 	public User user = new User();
@@ -75,7 +73,6 @@ public class LoginActivity extends Activity {
 
 		try {
 			loginResponse = solarManager.doLogin(user);
-			loginResponseAPI = solarManager.doApiLogin(user);
 			saveToken();
 		} catch (HttpStatusCodeException e) {
 			Log.i("ERRO HttpStatusCodeException", e.getStatusCode().toString());
@@ -88,11 +85,9 @@ public class LoginActivity extends Activity {
 	}
 
 	public void saveToken() {
-		preferences.token().put(loginResponse.getSession().getAuth_token());
-		preferences.authToken().put(loginResponseAPI.getAccessToken());
+		preferences.authToken().put(loginResponse.getAccessToken());
 
-		if (preferences.token().get().length() != 0
-				& preferences.authToken().get().length() != 0) {
+		if (preferences.authToken().get().length() != 0) {
 			Intent intent = new Intent(this, CurriculumUnitsListActivity_.class);
 			startActivity(intent);
 			finish();
