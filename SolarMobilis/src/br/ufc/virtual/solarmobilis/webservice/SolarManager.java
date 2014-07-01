@@ -91,20 +91,21 @@ public class SolarManager implements ConnectionCallback {
 
 	// send audio post n�o utilizado
 	public Object sendPostAudio(File postAudioFile, Integer postId) {
-		MultiValueMap<String, Object> parts = new LinkedMultiValueMap<String, Object>();
-		parts.add("post_file", new FileSystemResource(postAudioFile));
-		return solarClientPostFileSender.sendPostaudioFile(parts, postId,
-				preferences.token().get());
+//		MultiValueMap<String, Object> parts = new LinkedMultiValueMap<String, Object>();
+//		parts.add("post_file", new FileSystemResource(postAudioFile));
+//		return solarClientPostFileSender.sendPostaudioFile(parts, postId,
+//				preferences.token().get());
+		return new Object();
 	}
 
 	// send audio post atual
 	public void sendAudioPost(File postAudioFile, Integer postId) {
 		connection = new Connection(this);
 
-		String url = SERVER_ROOT_URL + "posts/" + postId
-				+ "/post_files?auth_token=" + preferences.token().get();
-		connection.postToServer(Constants.CONNECTION_POST_AUDIO, url,
-				postAudioFile, preferences.token().get());
+//		String url = SERVER_ROOT_URL + "posts/" + postId
+//				+ "/post_files?auth_token=" + preferences.token().get();
+//		connection.postToServer(Constants.CONNECTION_POST_AUDIO, url,
+//				postAudioFile, preferences.token().get());
 	}
 
 	// send audio post atual
@@ -114,8 +115,8 @@ public class SolarManager implements ConnectionCallback {
 	}
 
 	public String getUserImageUrl(int userId) {
-		return (SERVER_ROOT_URL + "users/" + userId + "/photo?auth_token=" + preferences
-				.token().get());
+		return (SERVER_ROOT_URL + "api/v1/users/" + userId + "/photo/style=small?access_token=" + preferences
+				.authToken().get());
 	}
 
 	public String getFileUrl(String link) {
