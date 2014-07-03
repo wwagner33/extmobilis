@@ -1,10 +1,13 @@
 package br.ufc.virtual.solarmobilis.model;
 
+import java.util.List;
+
 public class CurriculumUnit {
 
 	private String name;
 	private int id;
 	private String code;
+	private List<Group> groups;
 
 	public CurriculumUnit() {
 	}
@@ -37,6 +40,14 @@ public class CurriculumUnit {
 
 	public void setCode(String code) {
 		this.code = code;
+	}
+
+	public List<Group> getGroups() {
+		return groups;
+	}
+
+	public void setGroups(List<Group> groups) {
+		this.groups = groups;
 	}
 
 }

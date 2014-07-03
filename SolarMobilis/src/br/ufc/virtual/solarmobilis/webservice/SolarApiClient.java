@@ -26,6 +26,9 @@ public interface SolarApiClient {
 	@Get("api/v1/curriculum_units?access_token={token}")
 	List<CurriculumUnit> getCurriculumUnits(String token);
 
+	@Get("api/v1/curriculum_units/groups?access_token={token}")
+	List<CurriculumUnit> getCurriculumUnitsAndGroups(String token);
+
 	@Get("api/v1/curriculum_units/{id}/groups?access_token={token}")
 	List<Group> getGroups(String token, int id);
 

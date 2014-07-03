@@ -63,7 +63,7 @@ public class Connection {
 		MultipartEntity entity = new MultipartEntity();
 		File file = audioFile;
 
-		entity.addPart("post_file", new FileBody(file, "audio/aac", "UTF-8"));
+		entity.addPart("file", new FileBody(file, "audio/aac", "UTF-8"));
 
 		post.setEntity(entity);
 

@@ -1,6 +1,7 @@
 package br.ufc.virtual.solarmobilis.webservice;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.androidannotations.annotations.AfterInject;
@@ -19,6 +20,7 @@ import org.springframework.util.MultiValueMap;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.util.Log;
 import android.widget.Toast;
 import br.ufc.virtual.solarmobilis.LoginActivity_;
 import br.ufc.virtual.solarmobilis.PostSender;
@@ -71,7 +73,14 @@ public class SolarManager implements ConnectionCallback {
 	}
 
 	public List<Group> getGroups(int id) {
-		return solarApiClient.getGroups(preferences.authToken().get(), id);
+		//return solarApiClient.getGroups(preferences.authToken().get(), id);
+		List<CurriculumUnit> curriculumUnits = solarApiClient.getCurriculumUnitsAndGroups(preferences
+				.authToken().get());
+		for (CurriculumUnit curriculumUnit : curriculumUnits) {
+			if (curriculumUnit.getid() == id)
+				return curriculumUnit.getGroups();
+		}
+		return new ArrayList<Group>();
 	}
 
 	public List<Discussion> getDiscussions(int id) {
@@ -91,21 +100,23 @@ public class SolarManager implements ConnectionCallback {
 
 	// send audio post n�o utilizado
 	public Object sendPostAudio(File postAudioFile, Integer postId) {
-//		MultiValueMap<String, Object> parts = new LinkedMultiValueMap<String, Object>();
-//		parts.add("post_file", new FileSystemResource(postAudioFile));
-//		return solarClientPostFileSender.sendPostaudioFile(parts, postId,
-//				preferences.token().get());
-		return new Object();
+		MultiValueMap<String, Object> parts = new LinkedMultiValueMap<String, Object>();
+		parts.add("file", new FileSystemResource(postAudioFile));
+		return solarClientPostFileSender.sendPostaudioFile(parts, postId,
+				preferences.authToken().get());
 	}
 
 	// send audio post atual
 	public void sendAudioPost(File postAudioFile, Integer postId) {
 		connection = new Connection(this);
 
-//		String url = SERVER_ROOT_URL + "posts/" + postId
-//				+ "/post_files?auth_token=" + preferences.token().get();
-//		connection.postToServer(Constants.CONNECTION_POST_AUDIO, url,
-//				postAudioFile, preferences.token().get());
+		String url = SERVER_ROOT_URL + "api/v1/posts/" + postId
+				+ "/files?access_token=" + preferences.authToken().get();
+
+		Log.i("AOSDFFFFFFFFFFO", url);
+
+		connection.postToServer(Constants.CONNECTION_POST_AUDIO, url,
+				postAudioFile, preferences.authToken().get());
 	}
 
 	// send audio post atual
@@ -115,8 +126,9 @@ public class SolarManager implements ConnectionCallback {
 	}
 
 	public String getUserImageUrl(int userId) {
-		return (SERVER_ROOT_URL + "api/v1/users/" + userId + "/photo/style=small?access_token=" + preferences
-				.authToken().get());
+		return (SERVER_ROOT_URL + "api/v1/users/" + userId
+				+ "/photo/style=small?access_token=" + preferences.authToken()
+				.get());
 	}
 
 	public String getFileUrl(String link) {
@@ -124,7 +136,7 @@ public class SolarManager implements ConnectionCallback {
 	}
 
 	private void setTimeout() {
-		setTimeout(20);
+		setTimeout(50);
 	}
 
 	private void setTimeout(int seconds) {
