@@ -73,14 +73,7 @@ public class SolarManager implements ConnectionCallback {
 	}
 
 	public List<Group> getGroups(int id) {
-		//return solarApiClient.getGroups(preferences.authToken().get(), id);
-		List<CurriculumUnit> curriculumUnits = solarApiClient.getCurriculumUnitsAndGroups(preferences
-				.authToken().get());
-		for (CurriculumUnit curriculumUnit : curriculumUnits) {
-			if (curriculumUnit.getid() == id)
-				return curriculumUnit.getGroups();
-		}
-		return new ArrayList<Group>();
+		return solarApiClient.getGroups(preferences.authToken().get(), id);
 	}
 
 	public List<Discussion> getDiscussions(int id) {
@@ -127,7 +120,7 @@ public class SolarManager implements ConnectionCallback {
 
 	public String getUserImageUrl(int userId) {
 		return (SERVER_ROOT_URL + "api/v1/users/" + userId
-				+ "/photo/style=small?access_token=" + preferences.authToken()
+				+ "/photo?style=small&access_token=" + preferences.authToken()
 				.get());
 	}
 
@@ -136,7 +129,7 @@ public class SolarManager implements ConnectionCallback {
 	}
 
 	private void setTimeout() {
-		setTimeout(50);
+		setTimeout(35);
 	}
 
 	private void setTimeout(int seconds) {
