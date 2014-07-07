@@ -353,10 +353,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 		listVieWDiscussionPosts.setAdapter(adapter);
 
 		if (postSelected) {
-
-			posts.get(selectedPosition).setMarked(true);
-			adapter.notifyDataSetChanged();
-
+			setMarketPost(selectedPosition, true);
 		}
 
 	}
@@ -370,10 +367,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 		listVieWDiscussionPosts.setAdapter(adapter);
 
 		if (postSelected) {
-
-			posts.get(selectedPosition).setMarked(true);
-			adapter.notifyDataSetChanged();
-
+			setMarketPost(selectedPosition, true);
 		}
 
 	}
@@ -390,24 +384,18 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 	public void togglePostMarked(int position) {
 
 		if (selectedPosition == position) {
-
-			posts.get(position).setMarked(false);
-			adapter.notifyDataSetChanged();
+			setMarketPost(position, false);
 
 			postSelected = false;
 			setActionBarNotSelected();
 			removePlayControls();
 			stop();
 			selectedPosition = -1;
-
 		} else {
-
-			posts.get(position).setMarked(true);
-			adapter.notifyDataSetChanged();
+			setMarketPost(position, true);
 
 			if (selectedPosition != -1) {
-				posts.get(selectedPosition).setMarked(false);
-				adapter.notifyDataSetChanged();
+				setMarketPost(selectedPosition, false);
 			}
 
 			selectedPosition = position;
@@ -541,14 +529,23 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 			super.onBackPressed();
 
 		} else {
-			posts.get(selectedPosition).setMarked(false);
-			adapter.notifyDataSetChanged();
+			setMarketPost(selectedPosition, false);
 			selectedPosition = -1;
 			postSelected = false;
 			setActionBarNotSelected();
 			invalidateOptionsMenu();
 			removePlayControls();
 			stop();
+		}
+	}
+
+	private void setMarketPost(final int position, final boolean isMarked) {
+		if ((position >= 0) && (position < posts.size())) {
+			posts.get(position).setMarked(isMarked);
+			adapter.notifyDataSetChanged();
+		} else {
+			selectedPosition = -1;
+			postSelected = false;
 		}
 	}
 
