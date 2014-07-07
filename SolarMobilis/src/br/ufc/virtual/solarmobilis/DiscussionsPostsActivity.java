@@ -235,6 +235,8 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 
 			oldDateString = "20001010102410";
 
+			posts.clear();
+
 			discussionPostList = solarManager.getPosts(discussionId,
 					oldDateString, preferences.groupSelected().get());
 			unloadedFuturePostsCount = discussionPostList.getOlder();
@@ -244,10 +246,12 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 						.getPosts().get(i).getContent());
 			}
 
-			newPosts = discussionPostList.getPosts();
-			// Collections.reverse(newPosts);
-			posts.clear();
-			posts.addAll(posts.size(), newPosts);
+			posts = discussionPostList.getPosts();
+
+			for (DiscussionPost discussionPost : posts) {
+				discussionPost.setUserImageURL(solarManager
+						.getUserImageUrl(discussionPost.getUserId()));
+			}
 
 			for (int i = 0; i < posts.size(); i++) {
 				Log.i("#" + i + " " + oldDateString, posts.get(i).getContent());
@@ -348,6 +352,13 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 
 		listVieWDiscussionPosts.setAdapter(adapter);
 
+		if (postSelected) {
+
+			posts.get(selectedPosition).setMarked(true);
+			adapter.notifyDataSetChanged();
+
+		}
+
 	}
 
 	@UiThread
@@ -357,6 +368,14 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 				R.id.user_nick, posts);
 
 		listVieWDiscussionPosts.setAdapter(adapter);
+
+		if (postSelected) {
+
+			posts.get(selectedPosition).setMarked(true);
+			adapter.notifyDataSetChanged();
+
+		}
+
 	}
 
 	@ItemClick
