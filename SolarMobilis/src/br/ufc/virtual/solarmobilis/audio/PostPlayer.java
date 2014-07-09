@@ -2,7 +2,6 @@ package br.ufc.virtual.solarmobilis.audio;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.List;
 

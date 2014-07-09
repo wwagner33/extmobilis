@@ -21,7 +21,6 @@ import android.util.Log;
 import android.widget.ListView;
 import br.ufc.virtual.solarmobilis.model.Discussion;
 import br.ufc.virtual.solarmobilis.model.DiscussionAdapter;
-import br.ufc.virtual.solarmobilis.model.DiscussionList;
 import br.ufc.virtual.solarmobilis.webservice.SolarManager;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
@@ -36,8 +35,6 @@ public class DiscussionListActivity extends SherlockFragmentActivity {
 	SolarManager solarManager;
 
 	List<Discussion> discussionList;
-
-	DiscussionList response;
 
 	@ViewById
 	ListView listViewDiscussions;

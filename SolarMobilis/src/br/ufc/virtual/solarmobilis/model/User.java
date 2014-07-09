@@ -2,7 +2,8 @@ package br.ufc.virtual.solarmobilis.model;
 
 public class User {
 
-	private String grant_type = "password";
+	@SuppressWarnings("unused")
+	private final String grant_type = "password";
 	private String password = null;
 	private String login = null;
 
