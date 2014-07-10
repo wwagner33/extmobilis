@@ -1,7 +1,6 @@
 package br.ufc.virtual.solarmobilis.webservice;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.androidannotations.annotations.AfterInject;
@@ -20,7 +19,6 @@ import org.springframework.util.MultiValueMap;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.util.Log;
 import android.widget.Toast;
 import br.ufc.virtual.solarmobilis.LoginActivity_;
 import br.ufc.virtual.solarmobilis.PostSender;
@@ -105,8 +103,6 @@ public class SolarManager implements ConnectionCallback {
 
 		String url = SERVER_ROOT_URL + "api/v1/posts/" + postId
 				+ "/files?access_token=" + preferences.authToken().get();
-
-		Log.i("AOSDFFFFFFFFFFO", url);
 
 		connection.postToServer(Constants.CONNECTION_POST_AUDIO, url,
 				postAudioFile, preferences.authToken().get());

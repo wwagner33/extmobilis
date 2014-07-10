@@ -19,7 +19,6 @@ import android.widget.EditText;
 import android.widget.Toast;
 import br.ufc.virtual.solarmobilis.model.LoginResponse;
 import br.ufc.virtual.solarmobilis.model.User;
-import br.ufc.virtual.solarmobilis.model.UserMessage;
 import br.ufc.virtual.solarmobilis.webservice.SolarManager;
 
 @WindowFeature({ Window.FEATURE_NO_TITLE })
@@ -34,7 +33,6 @@ public class LoginActivity extends Activity {
 
 	LoginResponse loginResponse;
 
-	public UserMessage userMessage = new UserMessage();
 	public User user = new User();
 	private ProgressDialog dialog;
 
@@ -56,7 +54,6 @@ public class LoginActivity extends Activity {
 
 			user.setLogin(fieldLogin.getText().toString().trim());
 			user.setPassword(fieldPassword.getText().toString().trim());
-			userMessage.setUser(user);
 
 			dialog = ProgressDialog.show(this, getString(R.string.dialog_wait),
 					getString(R.string.dialog_message), true);

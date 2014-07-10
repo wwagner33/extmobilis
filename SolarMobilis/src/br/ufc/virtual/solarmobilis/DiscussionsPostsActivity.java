@@ -227,11 +227,13 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 		makeDialog();
 		try {
 
-			int discussionSize = posts.size();
-			/*
-			 * if (discussionSize == 0) { oldDateString = "20001010102410"; }
-			 * else { oldDateString = posts.get(0).getDateToString(); }
-			 */
+			// int discussionSize = posts.size();
+			//
+			// if (discussionSize == 0) {
+			// oldDateString = "20001010102410";
+			// } else {
+			// oldDateString = posts.get(0).getDateToString();
+			// }
 
 			oldDateString = "20001010102410";
 
