@@ -144,7 +144,6 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_discussions_posts);
-		makeDialog();
 		actionBar = getSupportActionBar();
 		LayoutInflater inflater = getLayoutInflater();
 		footerFuturePosts = inflater.inflate(
@@ -308,6 +307,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 	void getPosts() {
 
 		try {
+			makeDialog();
 			discussionPostList = solarManager.getPosts(discussionId,
 					oldDateString, preferences.groupSelected().get());
 			List<DiscussionPost> posts = discussionPostList.getPosts();
