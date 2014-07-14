@@ -34,12 +34,10 @@ public class DiscussionListActivity extends SherlockFragmentActivity {
 	@Bean
 	SolarManager solarManager;
 
-	List<Discussion> discussionList;
-
 	@ViewById
 	ListView listViewDiscussions;
 
-	ArrayList<String> discussions = new ArrayList<String>();
+	List<Discussion> discussions = new ArrayList<Discussion>();
 	private ProgressDialog dialog;
 
 	@Override
@@ -68,7 +66,7 @@ public class DiscussionListActivity extends SherlockFragmentActivity {
 	@Background
 	void getDiscussions() {
 		try {
-			discussionList = solarManager.getDiscussions(preferences
+			discussions = solarManager.getDiscussions(preferences
 					.groupSelected().get());
 			updateList();
 		} catch (HttpStatusCodeException e) {
@@ -80,18 +78,12 @@ public class DiscussionListActivity extends SherlockFragmentActivity {
 		} finally {
 			dialog.dismiss();
 		}
-		// Log.i("DISCUSSIONLIST", discussionList.get(0).getName());
 	}
 
 	@UiThread
 	void updateList() {
-		for (int i = 0; i < discussionList.size(); i++) {
-			discussions.add(discussionList.get(i).getName());
-		}
-
 		DiscussionAdapter adapter = new DiscussionAdapter(this,
-				R.layout.discussion_list, R.id.topic_name, discussions,
-				discussionList);
+				R.layout.discussion_list, R.id.topic_name, discussions);
 		listViewDiscussions.setAdapter(adapter);
 	}
 
@@ -101,15 +93,12 @@ public class DiscussionListActivity extends SherlockFragmentActivity {
 		Intent intent = new Intent(this, DiscussionsPostsActivity_.class);
 		// intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
 		// Intent.FLAG_ACTIVITY_CLEAR_TOP);
-		intent.putExtra("discussionId", discussionList.get(position).getId());
-		intent.putExtra("discussionName", discussionList.get(position)
-				.getName());
-		intent.putExtra("discussionLastPostDate", discussionList.get(position)
+		intent.putExtra("discussionId", discussions.get(position).getId());
+		intent.putExtra("discussionName", discussions.get(position).getName());
+		intent.putExtra("discussionLastPostDate", discussions.get(position)
 				.getLastPostDate());
-		intent.putExtra("startDate", discussionList.get(position)
-				.getStartDate());
-		intent.putExtra("endDate", discussionList.get(position).getEndDate());
+		intent.putExtra("startDate", discussions.get(position).getStartDate());
+		intent.putExtra("endDate", discussions.get(position).getEndDate());
 		startActivity(intent);
-
 	}
 }

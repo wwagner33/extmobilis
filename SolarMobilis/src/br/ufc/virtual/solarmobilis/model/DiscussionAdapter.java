@@ -14,75 +14,54 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import br.ufc.virtual.solarmobilis.R;
 
-public class DiscussionAdapter extends ArrayAdapter<String> {
+public class DiscussionAdapter extends ArrayAdapter<Discussion> {
 
 	Context context;
 	int layoutResourceId;
-	ArrayList<String> discussions;
-	List<Discussion> discussionList;
+	List<Discussion> discussions;
 
 	public DiscussionAdapter(Context context, int resource,
-			int textViewResourceId, List<String> discussions,
-			List<Discussion> discussionList) {
+			int textViewResourceId, List<Discussion> discussions) {
 		super(context, resource, textViewResourceId, discussions);
-
 		this.context = context;
 		this.layoutResourceId = resource;
-		this.discussions = (ArrayList<String>) discussions;
-		this.discussionList = discussionList;
+		this.discussions = discussions;
 	}
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-
 		View row = convertView;
-
 		Item item = null;
 
 		if (row == null) {
-
 			LayoutInflater inflater = ((Activity) context).getLayoutInflater();
-
 			row = inflater.inflate(layoutResourceId, parent, false);
 
 			item = new Item();
-
 			item.textView = (TextView) row.findViewById(R.id.topic_name);
-			item.leftbar = (LinearLayout) row.findViewById(R.id.left_bar);
+			item.leftBar = (LinearLayout) row.findViewById(R.id.left_bar);
 
-			// area de tratamento
-			if (!(discussionList.get(position).getStatus().equals("1"))) {
-
-				item.leftbar.setBackgroundColor(context.getResources()
+			if (!("1".equals(discussions.get(position).getStatus()))) {
+				item.leftBar.setBackgroundColor(context.getResources()
 						.getColor(R.color.very_dark_gray));
-
 				item.textView.setTextColor(context.getResources().getColor(
 						R.color.very_dark_gray));
-
 			} else {
-
-				item.leftbar.setBackgroundColor(Color.YELLOW);
-
+				item.leftBar.setBackgroundColor(Color.YELLOW);
 			}
 
-			// area de tratamento
 			row.setTag(item);
-
 		} else {
-
 			item = (Item) row.getTag();
-
 		}
 
-		item.textView.setText(discussions.get(position));
+		item.textView.setText(discussions.get(position).getName());
 
-		return row;/* super.getView(position, convertView, parent); */
+		return row;
 	}
 
 	class Item {
-
 		TextView textView;
-		LinearLayout leftbar;
+		LinearLayout leftBar;
 	}
-
 }
