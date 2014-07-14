@@ -21,6 +21,7 @@ import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import br.ufc.virtual.solarmobilis.model.CurriculumUnit;
+import br.ufc.virtual.solarmobilis.model.CurriculumUnitsAdapter;
 import br.ufc.virtual.solarmobilis.webservice.SolarManager;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
@@ -89,7 +90,7 @@ public class CurriculumUnitsListActivity extends SherlockFragmentActivity {
 			courses.add(curriculumUnits.get(i).getName());
 		}
 
-		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+		CurriculumUnitsAdapter adapter = new CurriculumUnitsAdapter(this,
 				R.layout.item_list, R.id.item, courses);
 		listViewCurriculumUnits.setAdapter(adapter);
 	}
