@@ -1,30 +1,25 @@
 package br.ufc.virtual.solarmobilis.model;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import br.ufc.virtual.solarmobilis.R;
-import br.ufc.virtual.solarmobilis.model.DiscussionAdapter.Item;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.LinearLayout;
 import android.widget.TextView;
+import br.ufc.virtual.solarmobilis.R;
 
-public class CurriculumUnitsAdapter extends ArrayAdapter<String> {
+public class CurriculumUnitsAdapter extends ArrayAdapter<CurriculumUnit> {
 
 	Context context;
 	int resource;
 	int layoutResourceId;
-	ArrayList<String> curriculumUnits;
+	List<CurriculumUnit> curriculumUnits;
 
 	public CurriculumUnitsAdapter(Context context, int resource,
-			int layoutResourceId, ArrayList<String> curriculumUnits) {
+			int layoutResourceId, List<CurriculumUnit> curriculumUnits) {
 		super(context, resource, layoutResourceId, curriculumUnits);
 		this.context = context;
 		this.resource = resource;
@@ -61,7 +56,7 @@ public class CurriculumUnitsAdapter extends ArrayAdapter<String> {
 
 		// item.textView.setText(discussions.get(position));
 
-		item.textView.setText(curriculumUnits.get(position));
+		item.textView.setText(curriculumUnits.get(position).getName());
 		return row;
 
 	}

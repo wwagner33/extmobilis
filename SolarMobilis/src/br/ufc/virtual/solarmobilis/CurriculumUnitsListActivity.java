@@ -40,8 +40,6 @@ public class CurriculumUnitsListActivity extends SherlockFragmentActivity {
 
 	@ViewById
 	ListView listViewCurriculumUnits;
-
-	ArrayList<String> courses = new ArrayList<String>();
 	private ProgressDialog dialog;
 
 	@Override
@@ -64,7 +62,6 @@ public class CurriculumUnitsListActivity extends SherlockFragmentActivity {
 	void refresh() {
 		dialog = ProgressDialog.show(this, getString(R.string.dialog_wait),
 				getString(R.string.dialog_message), true);
-		courses.clear();
 		getCurriculumUnits();
 	}
 
@@ -86,12 +83,8 @@ public class CurriculumUnitsListActivity extends SherlockFragmentActivity {
 
 	@UiThread
 	void updateList() {
-		for (int i = 0; i < curriculumUnits.size(); i++) {
-			courses.add(curriculumUnits.get(i).getName());
-		}
-
 		CurriculumUnitsAdapter adapter = new CurriculumUnitsAdapter(this,
-				R.layout.item_list, R.id.item, courses);
+				R.layout.item_list, R.id.item, curriculumUnits);
 		listViewCurriculumUnits.setAdapter(adapter);
 	}
 
