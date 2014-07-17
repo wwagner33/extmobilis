@@ -144,7 +144,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_discussions_posts);
-		makeDialog();
+
 		actionBar = getSupportActionBar();
 		LayoutInflater inflater = getLayoutInflater();
 		footerFuturePosts = inflater.inflate(
@@ -190,7 +190,6 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 
 			listVieWDiscussionPosts.addFooterView(footerRefresh, null, true);
 			footerFuturePostsState = true;
-
 		}
 
 		Log.i("Dentro do setFooter", String.valueOf(unloadedFuturePostsCount));
@@ -224,9 +223,9 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 	@Click({ R.id.refresh_button })
 	@Background
 	void refreshPostsList() {
-		makeDialog();
-		try {
 
+		try {
+			makeDialog();
 			// int discussionSize = posts.size();
 			//
 			// if (discussionSize == 0) {
@@ -262,6 +261,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 		} catch (HttpStatusCodeException e) {
 			Log.i("ERRO HttpClientErrorException", e.getStatusCode().toString());
 			solarManager.errorHandler(e.getStatusCode());
+			onBackPressed();
 		} catch (Exception e) {
 			Log.i("ERRO ResourceAccessException", e.getMessage());
 			solarManager.alertNoConnection();
@@ -310,6 +310,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 	void getPosts() {
 
 		try {
+			makeDialog();
 			discussionPostList = solarManager.getPosts(discussionId,
 					oldDateString, preferences.groupSelected().get());
 			List<DiscussionPost> posts = discussionPostList.getPosts();
@@ -326,6 +327,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 		} catch (HttpStatusCodeException e) {
 			Log.i("ERRO HttpStatusCodeException", e.getStatusCode().toString());
 			solarManager.errorHandler(e.getStatusCode());
+			onBackPressed();
 		} catch (Exception e) {
 			Log.i("ERRO Exception", e.getMessage());
 			solarManager.alertNoConnection();
@@ -337,7 +339,6 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 
 	@UiThread
 	void updateList() {
-		dialog.dismiss();
 		forumTitle.setText(discussionName);
 		forumRange.setText(startDate + " - " + endDate);
 
@@ -357,12 +358,10 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 		if (postSelected) {
 			setMarketPost(selectedPosition, true);
 		}
-
 	}
 
 	@UiThread
 	void reUpdateList() {
-		dialog.dismiss();
 		adapter = new PostAdapter(this, R.layout.discussion_list_item,
 				R.id.user_nick, posts);
 
@@ -371,7 +370,6 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 		if (postSelected) {
 			setMarketPost(selectedPosition, true);
 		}
-
 	}
 
 	@ItemClick
@@ -417,7 +415,6 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 		listVieWDiscussionPosts.setSelection(position);
 		// listVieWDiscussionPosts.smoothScrollToPosition(position);
 		Log.i("smoothScrollToPosition", String.valueOf(position));
-
 		Log.i("toglle-marked", String.valueOf(selectedPosition));
 	}
 
@@ -467,7 +464,6 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 
 	@UiThread
 	void setImagePlayer() {
-
 		Log.i("setImagePlayer teste",
 				"IsPaused : " + String.valueOf(postPlayer.isPaused()));
 		Log.i("setImagePlayer teste",
@@ -477,7 +473,6 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 		} else {
 			play.setImageResource(R.drawable.playback_pause);
 		}
-
 	}
 
 	@Click(R.id.button_next)
@@ -497,7 +492,6 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 			stop();
 			Log.e("PAROU AO TENTAR O NEXT E FALTAR LISTA", "STOP()");
 		}
-
 	}
 
 	@Click(R.id.button_prev)
@@ -510,7 +504,6 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 		} else {
 			Log.i("#bfselected-position-atual",
 					String.valueOf(selectedPosition));
-
 			togglePostMarked(selectedPosition - 1);
 			postPlayer.play(posts.get(selectedPosition - 1));
 			Log.i("#selected-position-atual", String.valueOf(selectedPosition));
@@ -526,10 +519,10 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 	}
 
 	@Override
+	@UiThread
 	public void onBackPressed() {
 		if (!postSelected) {
 			super.onBackPressed();
-
 		} else {
 			setMarketPost(selectedPosition, false);
 			selectedPosition = -1;
