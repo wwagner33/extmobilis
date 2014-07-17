@@ -1,6 +1,5 @@
 package br.ufc.virtual.solarmobilis;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.androidannotations.annotations.Background;
@@ -18,11 +17,10 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import br.ufc.virtual.solarmobilis.model.CurriculumUnit;
-import br.ufc.virtual.solarmobilis.model.CurriculumUnitsAdapter;
 import br.ufc.virtual.solarmobilis.webservice.SolarManager;
+import br.virtual.solarmobilis.view.CurriculumUnitAdapter;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 
@@ -35,6 +33,9 @@ public class CurriculumUnitsListActivity extends SherlockFragmentActivity {
 
 	@Bean
 	SolarManager solarManager;
+
+	@Bean
+	CurriculumUnitAdapter curriculumUnitAdapter;
 
 	List<CurriculumUnit> curriculumUnits;
 
@@ -83,9 +84,14 @@ public class CurriculumUnitsListActivity extends SherlockFragmentActivity {
 
 	@UiThread
 	void updateList() {
-		CurriculumUnitsAdapter adapter = new CurriculumUnitsAdapter(this,
-				R.layout.item_list, R.id.item, curriculumUnits);
-		listViewCurriculumUnits.setAdapter(adapter);
+		curriculumUnitAdapter.setCurriculumUnits(curriculumUnits);
+		bindAdapter();
+	}
+
+	void bindAdapter() {
+
+		listViewCurriculumUnits.setAdapter(curriculumUnitAdapter);
+
 	}
 
 	@ItemClick
