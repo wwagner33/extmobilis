@@ -93,9 +93,7 @@ public class CurriculumUnitsListActivity extends SherlockFragmentActivity {
 	}
 
 	void bindAdapter() {
-
 		listViewCurriculumUnits.setAdapter(curriculumUnitGroupsAdapter);
-
 	}
 
 	private OnChildClickListener onChildClickListener = new OnChildClickListener() {

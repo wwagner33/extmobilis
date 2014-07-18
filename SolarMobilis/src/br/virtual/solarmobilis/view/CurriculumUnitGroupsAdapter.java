@@ -33,46 +33,38 @@ public class CurriculumUnitGroupsAdapter extends BaseExpandableListAdapter {
 
 	@Override
 	public int getGroupCount() {
-		// TODO Auto-generated method stub
 		return curriculumUnits.size();
 	}
 
 	@Override
 	public int getChildrenCount(int groupPosition) {
-		// TODO Auto-generated method stub
 		return curriculumUnits.get(groupPosition).getGroups().size();
 	}
 
 	@Override
 	public Object getGroup(int groupPosition) {
-		// TODO Auto-generated method stub
-
 		return curriculumUnits.get(groupPosition);
 	}
 
 	@Override
 	public Object getChild(int groupPosition, int childPosition) {
-		// TODO Auto-generated method stub
 		return curriculumUnits.get(groupPosition).getGroups()
 				.get(childPosition);
 	}
 
 	@Override
 	public long getGroupId(int groupPosition) {
-		// TODO Auto-generated method stub
 		return curriculumUnits.get(groupPosition).getid();
 	}
 
 	@Override
 	public long getChildId(int groupPosition, int childPosition) {
-		// TODO Auto-generated method stub
 		return curriculumUnits.get(groupPosition).getGroups()
 				.get(childPosition).getId();
 	}
 
 	@Override
 	public boolean hasStableIds() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
@@ -119,7 +111,6 @@ public class CurriculumUnitGroupsAdapter extends BaseExpandableListAdapter {
 
 	@Override
 	public boolean isChildSelectable(int groupPosition, int childPosition) {
-		// TODO Auto-generated method stub
 		return true;
 	}
 
