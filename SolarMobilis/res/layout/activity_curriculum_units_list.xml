@@ -28,7 +28,7 @@
         android:background="@color/yellow_hightlight"
         android:orientation="vertical" />
 
-    <ListView
+    <ExpandableListView
         android:id="@+id/listViewCurriculumUnits"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"

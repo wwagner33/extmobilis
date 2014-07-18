@@ -17,10 +17,12 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.ListView;
+import android.view.View;
+import android.widget.ExpandableListView;
+import android.widget.ExpandableListView.OnChildClickListener;
 import br.ufc.virtual.solarmobilis.model.CurriculumUnit;
 import br.ufc.virtual.solarmobilis.webservice.SolarManager;
-import br.virtual.solarmobilis.view.CurriculumUnitAdapter;
+import br.virtual.solarmobilis.view.CurriculumUnitGroupsAdapter;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 
@@ -35,18 +37,20 @@ public class CurriculumUnitsListActivity extends SherlockFragmentActivity {
 	SolarManager solarManager;
 
 	@Bean
-	CurriculumUnitAdapter curriculumUnitAdapter;
+	CurriculumUnitGroupsAdapter curriculumUnitGroupsAdapter;
 
 	List<CurriculumUnit> curriculumUnits;
 
 	@ViewById
-	ListView listViewCurriculumUnits;
+	ExpandableListView listViewCurriculumUnits;
 	private ProgressDialog dialog;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_curriculum_units_list);
+
+		listViewCurriculumUnits.setOnChildClickListener(onChildClickListener);
 
 		dialog = ProgressDialog.show(this, getString(R.string.dialog_wait),
 				getString(R.string.dialog_message), true);
@@ -84,22 +88,33 @@ public class CurriculumUnitsListActivity extends SherlockFragmentActivity {
 
 	@UiThread
 	void updateList() {
-		curriculumUnitAdapter.setCurriculumUnits(curriculumUnits);
+		curriculumUnitGroupsAdapter.setCurriculumUnits(curriculumUnits);
 		bindAdapter();
 	}
 
 	void bindAdapter() {
 
-		listViewCurriculumUnits.setAdapter(curriculumUnitAdapter);
+		listViewCurriculumUnits.setAdapter(curriculumUnitGroupsAdapter);
 
 	}
 
-	@ItemClick
-	void listViewCurriculumUnits(int position) {
-		preferences.curriculumUnitSelected().put(
-				curriculumUnits.get(position).getid());
+	private OnChildClickListener onChildClickListener = new OnChildClickListener() {
 
-		Intent intent = new Intent(this, GroupsListActivity_.class);
-		startActivity(intent);
-	}
+		@Override
+		public boolean onChildClick(ExpandableListView parent, View v,
+				int groupPosition, int childPosition, long id) {
+
+			preferences.groupSelected().put(
+					curriculumUnits.get(groupPosition).getGroups()
+							.get(childPosition).getId());
+
+			Intent intent = new Intent(CurriculumUnitsListActivity.this,
+					DiscussionListActivity_.class);
+
+			startActivity(intent);
+
+			return false;
+		}
+	};
+
 }

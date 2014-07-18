@@ -24,14 +24,13 @@ public class CurriculumUnitGroupsAdapter extends BaseExpandableListAdapter {
 
 	@RootContext
 	Context context;
-	
+
 	public void setCurriculumUnits(List<CurriculumUnit> curriculumUnits) {
 
 		this.curriculumUnits = curriculumUnits;
 
 	}
-	
-	
+
 	@Override
 	public int getGroupCount() {
 		// TODO Auto-generated method stub
@@ -41,20 +40,21 @@ public class CurriculumUnitGroupsAdapter extends BaseExpandableListAdapter {
 	@Override
 	public int getChildrenCount(int groupPosition) {
 		// TODO Auto-generated method stub
-		return 0;
+		return curriculumUnits.get(groupPosition).getGroups().size();
 	}
 
 	@Override
 	public Object getGroup(int groupPosition) {
 		// TODO Auto-generated method stub
-		
+
 		return curriculumUnits.get(groupPosition);
 	}
 
 	@Override
 	public Object getChild(int groupPosition, int childPosition) {
 		// TODO Auto-generated method stub
-		return null;
+		return curriculumUnits.get(groupPosition).getGroups()
+				.get(childPosition);
 	}
 
 	@Override
@@ -66,7 +66,8 @@ public class CurriculumUnitGroupsAdapter extends BaseExpandableListAdapter {
 	@Override
 	public long getChildId(int groupPosition, int childPosition) {
 		// TODO Auto-generated method stub
-		return 0;
+		return curriculumUnits.get(groupPosition).getGroups()
+				.get(childPosition).getId();
 	}
 
 	@Override
@@ -78,7 +79,7 @@ public class CurriculumUnitGroupsAdapter extends BaseExpandableListAdapter {
 	@Override
 	public View getGroupView(int groupPosition, boolean isExpanded,
 			View convertView, ViewGroup parent) {
-		
+
 		CurriculumUnitItemView curriculumUnitItemView;
 
 		if (convertView == null) {
@@ -98,18 +99,28 @@ public class CurriculumUnitGroupsAdapter extends BaseExpandableListAdapter {
 	@Override
 	public View getChildView(int groupPosition, int childPosition,
 			boolean isLastChild, View convertView, ViewGroup parent) {
-		// TODO Auto-generated method stub
-		return null;
+
+		GroupItemView groupItemView;
+
+		if (convertView == null) {
+
+			groupItemView = GroupItemView_.build(context);
+
+		} else {
+
+			groupItemView = (GroupItemView) convertView;
+
+		}
+
+		groupItemView.bind(curriculumUnits.get(groupPosition).getGroups()
+				.get(childPosition));
+		return groupItemView;
 	}
 
 	@Override
 	public boolean isChildSelectable(int groupPosition, int childPosition) {
 		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
-	
-	
-	
-	
 
 }
