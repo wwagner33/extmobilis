@@ -69,7 +69,7 @@ public class CurriculumUnitsListActivity extends SherlockFragmentActivity {
 	@Background
 	void getCurriculumUnits() {
 		try {
-			curriculumUnits = solarManager.getCurriculumUnits();
+			curriculumUnits = solarManager.getCurriculumUnitGroups();
 			updateList();
 		} catch (HttpStatusCodeException e) {
 			Log.i("ERRO HttpStatusCodeException", e.getStatusCode().toString());

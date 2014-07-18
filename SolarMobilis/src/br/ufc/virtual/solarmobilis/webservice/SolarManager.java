@@ -70,6 +70,10 @@ public class SolarManager implements ConnectionCallback {
 		return solarApiClient.getCurriculumUnits(preferences.authToken().get());
 	}
 
+	public List<CurriculumUnit> getCurriculumUnitGroups() {
+		return solarApiClient.getCurriculumUnitsAndGroups(preferences.authToken().get());
+	}
+	
 	public List<Group> getGroups(int id) {
 		return solarApiClient.getGroups(preferences.authToken().get(), id);
 	}
