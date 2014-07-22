@@ -13,6 +13,7 @@ import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.ExpandableListView;
 
 @EBean
 public class CurriculumUnitGroupsAdapter extends BaseExpandableListAdapter {
@@ -73,15 +74,13 @@ public class CurriculumUnitGroupsAdapter extends BaseExpandableListAdapter {
 			View convertView, ViewGroup parent) {
 
 		CurriculumUnitItemView curriculumUnitItemView;
+		ExpandableListView expandableListView = (ExpandableListView) parent;
 
 		if (convertView == null) {
-
 			curriculumUnitItemView = CurriculumUnitItemView_.build(context);
-
+			expandableListView.expandGroup(groupPosition);
 		} else {
-
 			curriculumUnitItemView = (CurriculumUnitItemView) convertView;
-
 		}
 
 		curriculumUnitItemView.bind(curriculumUnits.get(groupPosition));

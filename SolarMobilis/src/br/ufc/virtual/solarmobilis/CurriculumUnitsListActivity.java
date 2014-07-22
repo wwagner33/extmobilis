@@ -56,7 +56,7 @@ public class CurriculumUnitsListActivity extends SherlockFragmentActivity {
 				getString(R.string.dialog_message), true);
 
 		getCurriculumUnits();
-	}
+}
 
 	@OptionsItem(R.id.menu_logout)
 	void logout() {
