@@ -83,7 +83,7 @@ public class DiscussionListActivity extends SherlockFragmentActivity {
 	@UiThread
 	void updateList() {
 		DiscussionAdapter adapter = new DiscussionAdapter(this,
-				R.layout.discussion_list, R.id.topic_name, discussions);
+				R.layout.discussion_list_item, R.id.topic_name, discussions);
 		listViewDiscussions.setAdapter(adapter);
 	}
 
