@@ -1,6 +1,5 @@
 package br.virtual.solarmobilis.view;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
