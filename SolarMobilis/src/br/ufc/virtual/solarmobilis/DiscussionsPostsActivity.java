@@ -350,7 +350,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 					+ discussionPostList.getPosts().get(i).getDateToString());
 		}
 		// Collections.reverse(posts);
-		adapter = new PostAdapter(this, R.layout.discussion_list_item,
+		adapter = new PostAdapter(this, R.layout.discussion_post_list_item,
 				R.id.user_nick, posts);
 
 		listVieWDiscussionPosts.setAdapter(adapter);
@@ -362,7 +362,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 
 	@UiThread
 	void reUpdateList() {
-		adapter = new PostAdapter(this, R.layout.discussion_list_item,
+		adapter = new PostAdapter(this, R.layout.discussion_post_list_item,
 				R.id.user_nick, posts);
 
 		listVieWDiscussionPosts.setAdapter(adapter);

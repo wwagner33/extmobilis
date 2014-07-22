@@ -20,8 +20,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.ListView;
 import br.ufc.virtual.solarmobilis.model.Discussion;
-import br.ufc.virtual.solarmobilis.model.DiscussionAdapter;
 import br.ufc.virtual.solarmobilis.webservice.SolarManager;
+import br.virtual.solarmobilis.view.DiscussionAdapter;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 
@@ -83,7 +83,7 @@ public class DiscussionListActivity extends SherlockFragmentActivity {
 	@UiThread
 	void updateList() {
 		DiscussionAdapter adapter = new DiscussionAdapter(this,
-				R.layout.discussion_list, R.id.topic_name, discussions);
+				R.layout.discussion_list_item, R.id.topic_name, discussions);
 		listViewDiscussions.setAdapter(adapter);
 	}
 
