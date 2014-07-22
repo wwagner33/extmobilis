@@ -1,4 +1,4 @@
-package br.ufc.virtual.solarmobilis.model;
+package br.virtual.solarmobilis.view;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +13,7 @@ import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import br.ufc.virtual.solarmobilis.R;
+import br.ufc.virtual.solarmobilis.model.Discussion;
 
 public class DiscussionAdapter extends ArrayAdapter<Discussion> {
 

@@ -20,8 +20,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.ListView;
 import br.ufc.virtual.solarmobilis.model.Discussion;
-import br.ufc.virtual.solarmobilis.model.DiscussionAdapter;
 import br.ufc.virtual.solarmobilis.webservice.SolarManager;
+import br.virtual.solarmobilis.view.DiscussionAdapter;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 
