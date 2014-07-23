@@ -14,7 +14,6 @@ public class CurriculumUnitItemView extends RelativeLayout {
 
 	@ViewById(R.id.item)
 	TextView name;
-
 	public CurriculumUnitItemView(Context context) {
 
 		super(context);
