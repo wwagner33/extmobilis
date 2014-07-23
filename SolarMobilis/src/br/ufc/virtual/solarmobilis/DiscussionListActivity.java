@@ -39,6 +39,9 @@ public class DiscussionListActivity extends SherlockFragmentActivity {
 
 	List<Discussion> discussions = new ArrayList<Discussion>();
 	private ProgressDialog dialog;
+	
+	@Bean
+	DiscussionAdapter discussionAdapter;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -82,9 +85,8 @@ public class DiscussionListActivity extends SherlockFragmentActivity {
 
 	@UiThread
 	void updateList() {
-		DiscussionAdapter adapter = new DiscussionAdapter(this,
-				R.layout.discussion_list_item, R.id.topic_name, discussions);
-		listViewDiscussions.setAdapter(adapter);
+		discussionAdapter.setDiscussions(discussions);
+		listViewDiscussions.setAdapter(discussionAdapter);
 	}
 
 	@ItemClick

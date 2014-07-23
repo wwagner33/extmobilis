@@ -2,66 +2,53 @@ package br.virtual.solarmobilis.view;
 
 import java.util.List;
 
-import android.app.Activity;
+import org.androidannotations.annotations.EBean;
+import org.androidannotations.annotations.RootContext;
+
 import android.content.Context;
-import android.graphics.Color;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-import br.ufc.virtual.solarmobilis.R;
+import android.widget.BaseAdapter;
 import br.ufc.virtual.solarmobilis.model.Discussion;
 
-public class DiscussionAdapter extends ArrayAdapter<Discussion> {
+@EBean
+public class DiscussionAdapter extends BaseAdapter {
 
+	@RootContext
 	Context context;
-	int layoutResourceId;
+
 	List<Discussion> discussions;
 
-	public DiscussionAdapter(Context context, int resource,
-			int textViewResourceId, List<Discussion> discussions) {
-		super(context, resource, textViewResourceId, discussions);
-		this.context = context;
-		this.layoutResourceId = resource;
+	public void setDiscussions(List<Discussion> discussions) {
 		this.discussions = discussions;
 	}
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-		View row = convertView;
-		Item item = null;
-
-		if (row == null) {
-			LayoutInflater inflater = ((Activity) context).getLayoutInflater();
-			row = inflater.inflate(layoutResourceId, parent, false);
-
-			item = new Item();
-			item.textView = (TextView) row.findViewById(R.id.topic_name);
-			item.leftBar = (LinearLayout) row.findViewById(R.id.left_bar);
-
-			if (!("1".equals(discussions.get(position).getStatus()))) {
-				item.leftBar.setBackgroundColor(context.getResources()
-						.getColor(R.color.very_dark_gray));
-				item.textView.setTextColor(context.getResources().getColor(
-						R.color.very_dark_gray));
-			} else {
-				item.leftBar.setBackgroundColor(Color.YELLOW);
-			}
-
-			row.setTag(item);
+		DiscussionItemView discussionItemView;
+		if (convertView == null) {
+			discussionItemView = DiscussionItemView_.build(context);
 		} else {
-			item = (Item) row.getTag();
+			discussionItemView = (DiscussionItemView) convertView;
 		}
 
-		item.textView.setText(discussions.get(position).getName());
+		discussionItemView.bind(getItem(position));
 
-		return row;
+		return discussionItemView;
 	}
 
-	class Item {
-		TextView textView;
-		LinearLayout leftBar;
+	@Override
+	public int getCount() {
+		return discussions.size();
+	}
+
+	@Override
+	public Discussion getItem(int position) {
+		return discussions.get(position);
+	}
+
+	@Override
+	public long getItemId(int position) {
+		return position;
 	}
 }
