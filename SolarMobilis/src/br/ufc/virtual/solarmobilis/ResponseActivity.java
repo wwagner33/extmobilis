@@ -8,13 +8,13 @@ import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Extra;
+import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.res.StringRes;
 import org.androidannotations.annotations.sharedpreferences.Pref;
 import org.springframework.web.client.HttpStatusCodeException;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
@@ -36,8 +36,11 @@ import br.ufc.virtual.solarmobilis.model.SendPostResponse;
 import br.ufc.virtual.solarmobilis.util.Toaster;
 import br.ufc.virtual.solarmobilis.webservice.SolarManager;
 
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+
 @EActivity(R.layout.activity_response)
-public class ResponseActivity extends Activity implements onDeleteListener {
+public class ResponseActivity extends SherlockFragmentActivity implements
+		onDeleteListener {
 
 	@Pref
 	SolarMobilisPreferences_ preferences;
@@ -106,6 +109,7 @@ public class ResponseActivity extends Activity implements onDeleteListener {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		recorderConfig();
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		// chronometer = System.currentTimeMillis();
 	}
 
@@ -301,6 +305,11 @@ public class ResponseActivity extends Activity implements onDeleteListener {
 		file.delete();
 		toaster.showToast(audioDeleted);
 		playRecord.setVisibility(View.GONE);
+	}
+
+	@OptionsItem
+	void homeSelected() {
+		onBackPressed();
 	}
 
 }

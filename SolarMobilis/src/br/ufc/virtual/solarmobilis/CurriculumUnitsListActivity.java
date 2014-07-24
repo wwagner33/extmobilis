@@ -5,7 +5,6 @@ import java.util.List;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EActivity;
-import org.androidannotations.annotations.ItemClick;
 import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.UiThread;
@@ -56,7 +55,7 @@ public class CurriculumUnitsListActivity extends SherlockFragmentActivity {
 				getString(R.string.dialog_message), true);
 
 		getCurriculumUnits();
-}
+	}
 
 	@OptionsItem(R.id.menu_logout)
 	void logout() {
