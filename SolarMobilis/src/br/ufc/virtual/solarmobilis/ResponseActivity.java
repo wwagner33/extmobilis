@@ -288,10 +288,10 @@ public class ResponseActivity extends SherlockFragmentActivity implements
 	}
 
 	private void sendPostAudio(Integer postId) {
-		// Object object = solarManager.sendPostAudio(file, postId);
-		// object.toString();
+		Object object = solarManager.sendPostAudio(file, postId);
+		object.toString();
 
-		solarManager.sendAudioPost(file, postId);
+		// solarManager.sendAudioPost(file, postId);
 	}
 
 	@UiThread

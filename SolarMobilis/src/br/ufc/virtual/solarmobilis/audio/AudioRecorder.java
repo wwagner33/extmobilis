@@ -66,7 +66,7 @@ public class AudioRecorder {
 
 	public void stopRecording() {
 		recorder.stop();
-		Log.w("RECORDER", "STOP");
+		// Log.w("RECORDER", "STOP");
 		// recorder.release();
 		isReseted = true;
 		recordOnBackgroundThread.cancel(true);

@@ -49,6 +49,7 @@ public class SolarManager implements ConnectionCallback {
 
 	@RestService
 	SolarClientPostFileSender solarClientPostFileSender;
+//	SolarClientPostFileSender_ solarClientPostFileSender2;
 
 	@Pref
 	SolarMobilisPreferences_ preferences;
@@ -60,6 +61,9 @@ public class SolarManager implements ConnectionCallback {
 		setTimeout();
 		solarApiClient.setRootUrl(SERVER_ROOT_URL);
 		solarClientPostFileSender.setRootUrl(SERVER_ROOT_URL);
+//		solarClientPostFileSender.setHeader("Content-Type", "audio/aac");
+//		solarClientPostFileSender.setHeader("Accept", "audio/aac");
+		// solarClientPostFileSender.setHeader("Accept", "video/mp4");
 	}
 
 	public LoginResponse doLogin(User user) {
@@ -71,9 +75,10 @@ public class SolarManager implements ConnectionCallback {
 	}
 
 	public List<CurriculumUnit> getCurriculumUnitGroups() {
-		return solarApiClient.getCurriculumUnitsAndGroups(preferences.authToken().get());
+		return solarApiClient.getCurriculumUnitsAndGroups(preferences
+				.authToken().get());
 	}
-	
+
 	public List<Group> getGroups(int id) {
 		return solarApiClient.getGroups(preferences.authToken().get(), id);
 	}
@@ -95,10 +100,64 @@ public class SolarManager implements ConnectionCallback {
 
 	// send audio post n�o utilizado
 	public Object sendPostAudio(File postAudioFile, Integer postId) {
-		MultiValueMap<String, Object> parts = new LinkedMultiValueMap<String, Object>();
-		parts.add("file", new FileSystemResource(postAudioFile));
-		return solarClientPostFileSender.sendPostaudioFile(parts, postId,
+		// MultiValueMap<String, Object> parts = new LinkedMultiValueMap<String,
+		// Object>();
+		// parts.add("file", new FileSystemResource(postAudioFile));
+		// return solarClientPostFileSender.sendPostaudioFile(parts, postId,
+		// preferences.authToken().get());
+
+		// MultiValueMap values = new
+		// org.springframework.util.LinkedMultiValueMap<String, Object>();
+		Object a = null;
+		//
+		// File file = postAudioFile;
+		// InputStream in = null;
+		// try {
+		// // in = new InputStream(in, options)
+		// // in = new BufferedInputStream(new FileInputStream(file));
+		// in = new FileInputStream(file);
+		// values.put("file", in);
+		// a = solarClientPostFileSender.sendPostaudioFile(values, postId,
+		// preferences.authToken().get());
+		// } catch (FileNotFoundException e) {
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
+		// } catch (Exception e) {
+		// e.printStackTrace();
+		// } finally {
+		// if (in != null) {
+		// try {
+		// in.close();
+		// } catch (IOException e) {
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
+		// }
+		// }
+		// }
+
+		// try {
+		// FileInputStream fileInputStream = new FileInputStream(postAudioFile);
+		// values.put("file", fileInputStream);
+		// a = solarClientPostFileSender.sendPostaudioFile(values, postId,
+		// preferences.authToken().get());
+		// } catch (FileNotFoundException e) {
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
+		// } finally {
+		// // in.close();
+		// }
+
+		// final File dir = Environment.getExternalStorageDirectory();
+		File file = new File(postAudioFile.getAbsolutePath());
+		MultiValueMap<String, Object> mvMap = new LinkedMultiValueMap<String, Object>();
+		// mvMap.add("login[device_id]", "dwd");
+		mvMap.add("file", new FileSystemResource(file.getAbsoluteFile()));
+
+
+		a = solarClientPostFileSender.sendPostaudioFile(mvMap, postId,
 				preferences.authToken().get());
+
+		return a;
 	}
 
 	// send audio post atual
