@@ -59,9 +59,10 @@ public class SolarManager implements ConnectionCallback {
 	public void config() {
 		setTimeout();
 		solarApiClient.setRootUrl(SERVER_ROOT_URL);
-		solarApiClient.setHeader("Authorization", "Bearer "
-				+ preferences.authToken().get());
+		String authorization = "Bearer " + preferences.authToken().get();
+		solarApiClient.setHeader("Authorization", authorization);
 		solarClientPostFileSender.setRootUrl(SERVER_ROOT_URL);
+		solarClientPostFileSender.setHeader("Authorization", authorization);
 	}
 
 	public LoginResponse doLogin(User user) {
@@ -97,8 +98,7 @@ public class SolarManager implements ConnectionCallback {
 	public Object sendPostAudio(File postAudioFile, Integer postId) {
 		MultiValueMap<String, Object> parts = new LinkedMultiValueMap<String, Object>();
 		parts.add("file", new FileSystemResource(postAudioFile));
-		return solarClientPostFileSender.sendPostaudioFile(parts, postId,
-				preferences.authToken().get());
+		return solarClientPostFileSender.sendPostaudioFile(parts, postId);
 	}
 
 	// send audio post atual
