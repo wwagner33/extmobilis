@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:orientation="vertical"
+    android:orientation="vertical" 
     android:background="@android:color/white" >
 
     <RelativeLayout
@@ -38,6 +38,9 @@
         android:layout_marginRight="15dp"
         android:divider="@null"
         android:dividerHeight="4dp"
-        android:drawSelectorOnTop="false" />
+        android:drawSelectorOnTop="false"
+        android:groupIndicator="@drawable/course_list_selector"
+        android:indicatorLeft="250dp"
+        android:indicatorRight="270dp" />
 
 </RelativeLayout>
