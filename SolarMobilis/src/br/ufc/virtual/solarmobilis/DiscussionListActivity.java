@@ -39,7 +39,7 @@ public class DiscussionListActivity extends SherlockFragmentActivity {
 
 	List<Discussion> discussions = new ArrayList<Discussion>();
 	private ProgressDialog dialog;
-	
+
 	@Bean
 	DiscussionAdapter discussionAdapter;
 
@@ -47,6 +47,8 @@ public class DiscussionListActivity extends SherlockFragmentActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_discussion_list);
+
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 		dialog = ProgressDialog.show(this, getString(R.string.dialog_wait),
 				getString(R.string.dialog_message), true);
@@ -102,5 +104,10 @@ public class DiscussionListActivity extends SherlockFragmentActivity {
 		intent.putExtra("startDate", discussions.get(position).getStartDate());
 		intent.putExtra("endDate", discussions.get(position).getEndDate());
 		startActivity(intent);
+	}
+
+	@OptionsItem
+	void homeSelected() {
+		onBackPressed();
 	}
 }

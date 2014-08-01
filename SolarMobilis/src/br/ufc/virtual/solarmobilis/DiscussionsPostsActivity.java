@@ -146,6 +146,8 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 		setContentView(R.layout.activity_discussions_posts);
 
 		actionBar = getSupportActionBar();
+		actionBar.setDisplayHomeAsUpEnabled(true);
+		actionBar.setHomeButtonEnabled(true);
 		LayoutInflater inflater = getLayoutInflater();
 		footerFuturePosts = inflater.inflate(
 				R.layout.load_available_posts_item, listVieWDiscussionPosts,
@@ -419,11 +421,8 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 	}
 
 	void setActionBarSelected() {
-		actionBar.setHomeButtonEnabled(false);
-		actionBar.setDisplayShowHomeEnabled(false);
 		actionBar.setDisplayShowTitleEnabled(false);
 		actionBar.setDisplayUseLogoEnabled(false);
-		actionBar.setDisplayHomeAsUpEnabled(false);
 		actionBar.setDisplayShowCustomEnabled(true);
 		actionBar.setBackgroundDrawable(new ColorDrawable(getResources()
 				.getColor(R.color.action_bar_active)));
@@ -431,8 +430,6 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 	}
 
 	void setActionBarNotSelected() {
-		actionBar.setDisplayShowHomeEnabled(true);
-		actionBar.setDisplayShowTitleEnabled(true);
 		actionBar.setDisplayUseLogoEnabled(true);
 		actionBar.setDisplayShowCustomEnabled(true);
 		actionBar.setBackgroundDrawable(new ColorDrawable(getResources()
@@ -568,5 +565,10 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 	@UiThread
 	public void onPostPlayDownloadException(Exception exception) {
 		toaster.showToast(audioDownloadError);
+	}
+
+	@OptionsItem
+	void homeSelected() {
+		onBackPressed();
 	}
 }

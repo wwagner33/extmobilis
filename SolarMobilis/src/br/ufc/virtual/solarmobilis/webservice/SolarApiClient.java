@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.androidannotations.annotations.rest.Get;
 import org.androidannotations.annotations.rest.Post;
+import org.androidannotations.annotations.rest.RequiresHeader;
 import org.androidannotations.annotations.rest.Rest;
 import org.springframework.http.converter.json.GsonHttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
@@ -17,33 +18,38 @@ import br.ufc.virtual.solarmobilis.model.LoginResponse;
 import br.ufc.virtual.solarmobilis.model.SendPostResponse;
 import br.ufc.virtual.solarmobilis.model.User;
 
+@RequiresHeader("Authorization")
 @Rest(converters = { GsonHttpMessageConverter.class })
 public interface SolarApiClient {
 
 	@Post("oauth/token")
 	LoginResponse doLogin(User user);
 
-	@Get("api/v1/curriculum_units?access_token={token}")
-	List<CurriculumUnit> getCurriculumUnits(String token);
+	@Get("api/v1/curriculum_units")
+	List<CurriculumUnit> getCurriculumUnits();
 
-	@Get("api/v1/curriculum_units/groups?access_token={token}")
-	List<CurriculumUnit> getCurriculumUnitsAndGroups(String token);
+	@Get("api/v1/curriculum_units/groups")
+	List<CurriculumUnit> getCurriculumUnitsAndGroups();
 
-	@Get("api/v1/curriculum_units/{id}/groups?access_token={token}")
-	List<Group> getGroups(String token, int id);
+	@Get("api/v1/curriculum_units/{curriculumUnitId}/groups")
+	List<Group> getGroups(int curriculumUnitId);
 
-	@Get("api/v1/groups/{id}/discussions?access_token={token}")
-	List<Discussion> getDiscussions(String token, int id);
+	@Get("api/v1/groups/{groupId}/discussions")
+	List<Discussion> getDiscussions(int groupId);
 
-	@Get("api/v1/discussions/{id}/posts/new/?date={date}&access_token={token}&group_id={groupId}")
-	DiscussionPostList getPosts(String token, int id, String date, int groupId);
+	@Get("api/v1/discussions/{id}/posts/new/?date={date}&group_id={groupId}")
+	DiscussionPostList getPosts(int id, String date, int groupId);
 
-	@Post("api/v1/discussions/{discussionId}/posts?access_token={token}&group_id={groupId}")
+	@Post("api/v1/discussions/{discussionId}/posts?group_id={groupId}")
 	SendPostResponse sendPost(PostSender postSender, Integer discussionId,
-			String token, int groupId);
+			int groupId);
 
 	RestTemplate getRestTemplate();
 
 	void setRootUrl(String rootUrl);
+
+	void setHeader(String name, String value);
+
+	String getHeader(String name);
 
 }
