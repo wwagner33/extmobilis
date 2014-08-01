@@ -59,6 +59,8 @@ public class SolarManager implements ConnectionCallback {
 	public void config() {
 		setTimeout();
 		solarApiClient.setRootUrl(SERVER_ROOT_URL);
+		solarApiClient.setHeader("Authorization", "Bearer "
+				+ preferences.authToken().get());
 		solarClientPostFileSender.setRootUrl(SERVER_ROOT_URL);
 	}
 
@@ -67,30 +69,28 @@ public class SolarManager implements ConnectionCallback {
 	}
 
 	public List<CurriculumUnit> getCurriculumUnits() {
-		return solarApiClient.getCurriculumUnits(preferences.authToken().get());
+		return solarApiClient.getCurriculumUnits();
 	}
 
 	public List<CurriculumUnit> getCurriculumUnitGroups() {
-		return solarApiClient.getCurriculumUnitsAndGroups(preferences.authToken().get());
-	}
-	
-	public List<Group> getGroups(int id) {
-		return solarApiClient.getGroups(preferences.authToken().get(), id);
+		return solarApiClient.getCurriculumUnitsAndGroups();
 	}
 
-	public List<Discussion> getDiscussions(int id) {
-		return solarApiClient.getDiscussions(preferences.authToken().get(), id);
+	public List<Group> getGroups(int curriculumUnitId) {
+		return solarApiClient.getGroups(curriculumUnitId);
+	}
+
+	public List<Discussion> getDiscussions(int groupId) {
+		return solarApiClient.getDiscussions(groupId);
 	}
 
 	public DiscussionPostList getPosts(int id, String date, int groupId) {
-		return solarApiClient.getPosts(preferences.authToken().get(), id, date,
-				groupId);
+		return solarApiClient.getPosts(id, date, groupId);
 	}
 
 	public SendPostResponse sendPost(PostSender postSender, Integer id,
 			int groupId) {
-		return solarApiClient.sendPost(postSender, id, preferences.authToken()
-				.get(), groupId);
+		return solarApiClient.sendPost(postSender, id, groupId);
 	}
 
 	// send audio post n�o utilizado
