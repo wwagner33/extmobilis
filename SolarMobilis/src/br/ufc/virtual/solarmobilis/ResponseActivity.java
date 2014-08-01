@@ -19,7 +19,6 @@ import android.app.ProgressDialog;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.SystemClock;
 import android.util.Log;
 import android.view.View;
@@ -29,6 +28,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import br.ufc.virtual.solarmobilis.audio.AudioPlayer;
+import br.ufc.virtual.solarmobilis.audio.AudioRecorder;
 import br.ufc.virtual.solarmobilis.dialog.AudioDialog;
 import br.ufc.virtual.solarmobilis.dialog.AudioDialog.onDeleteListener;
 import br.ufc.virtual.solarmobilis.model.DiscussionPost;
@@ -114,8 +114,8 @@ public class ResponseActivity extends SherlockFragmentActivity implements
 	}
 
 	void recorderConfig() {
-		mFileName = Environment.getExternalStorageDirectory().getAbsolutePath();
-		mFileName += "/Mobilis/Recordings/mobilis_audio.mp4";
+		mFileName = AudioRecorder.RECORDING_FULL_FILE_PATH;
+
 		file = new File(mFileName);
 
 		if (file.exists()) {
@@ -288,10 +288,8 @@ public class ResponseActivity extends SherlockFragmentActivity implements
 	}
 
 	private void sendPostAudio(Integer postId) {
-		// Object object = solarManager.sendPostAudio(file, postId);
-		// object.toString();
-
-		solarManager.sendAudioPost(file, postId);
+		Object object = solarManager.sendPostAudio(file, postId);
+		object.toString();
 	}
 
 	@UiThread

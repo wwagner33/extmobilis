@@ -97,8 +97,19 @@ public class SolarManager implements ConnectionCallback {
 	// send audio post n�o utilizado
 	public Object sendPostAudio(File postAudioFile, Integer postId) {
 		MultiValueMap<String, Object> parts = new LinkedMultiValueMap<String, Object>();
-		parts.add("file", new FileSystemResource(postAudioFile));
+		parts.add("file", new FileSystemResource(postAudioFile.getAbsolutePath()));
 		return solarClientPostFileSender.sendPostaudioFile(parts, postId);
+
+		
+		// File file = new File(postAudioFile.getAbsolutePath());
+		//		MultiValueMap<String, Object> mvMap = new LinkedMultiValueMap<String, Object>();
+//		// mvMap.add("login[device_id]", "dwd");
+//		mvMap.add("file", new FileSystemResource(file.getAbsoluteFile()));
+//
+//		a = solarClientPostFileSender.sendPostaudioFile(mvMap, postId,
+//				preferences.authToken().get());
+//
+//		return a;
 	}
 
 	// send audio post atual

@@ -12,10 +12,11 @@ public class AudioRecorder {
 	private static final String PATH_RECORDINGS = Environment
 			.getExternalStorageDirectory().getAbsolutePath()
 			+ "/Mobilis/Recordings/";
-	public static final String RECORDING_FILENAME = "recording";
-	public static final String RECORDING_EXTENSION = ".mp4";
-	public static final String RECORDING_FULLNAME = RECORDING_FILENAME
+	public static final String RECORDING_FILE_NAME = "mobilis_audio";
+	public static final String RECORDING_EXTENSION = ".aac";
+	public static final String RECORDING_FULL_NAME = RECORDING_FILE_NAME
 			+ RECORDING_EXTENSION;
+	public static final String RECORDING_FULL_FILE_PATH = PATH_RECORDINGS + RECORDING_FULL_NAME;
 	public static final String RECORDING_MIME_TYPE = "audio/aac";
 
 	public static final int RECORDING_STARTED = 1;
@@ -56,7 +57,7 @@ public class AudioRecorder {
 			setRecordOnBackground();
 		}
 
-		audioFile = new File(path, RECORDING_FULLNAME);
+		audioFile = new File(path, RECORDING_FULL_NAME);
 		recorder.setOutputFile(audioFile.getAbsolutePath());
 
 		recorder.prepare();

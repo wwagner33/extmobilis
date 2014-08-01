@@ -63,8 +63,9 @@ public class PostPlayer implements DownloaderListener {
 		List<DiscussionPostFile> AudioFiles = new ArrayList<DiscussionPostFile>();
 
 		for (DiscussionPostFile discussionPostFile : post.getFiles()) {
-			if (discussionPostFile.getContentType().equals(
-					"audio/aac; charset=UTF-8")) {
+
+			if (discussionPostFile.getName().endsWith(
+					AudioRecorder.RECORDING_EXTENSION)) {
 				AudioFiles.add(discussionPostFile);
 			}
 		}
