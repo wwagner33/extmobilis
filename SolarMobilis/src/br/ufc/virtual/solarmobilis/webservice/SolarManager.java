@@ -21,7 +21,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.widget.Toast;
 import br.ufc.virtual.solarmobilis.LoginActivity_;
-import br.ufc.virtual.solarmobilis.PostSender;
 import br.ufc.virtual.solarmobilis.R;
 import br.ufc.virtual.solarmobilis.SolarMobilisPreferences_;
 import br.ufc.virtual.solarmobilis.model.CurriculumUnit;
@@ -29,14 +28,13 @@ import br.ufc.virtual.solarmobilis.model.Discussion;
 import br.ufc.virtual.solarmobilis.model.DiscussionPostList;
 import br.ufc.virtual.solarmobilis.model.Group;
 import br.ufc.virtual.solarmobilis.model.LoginResponse;
+import br.ufc.virtual.solarmobilis.model.PostSender;
+import br.ufc.virtual.solarmobilis.model.SendPostFileResponse;
 import br.ufc.virtual.solarmobilis.model.SendPostResponse;
 import br.ufc.virtual.solarmobilis.model.User;
-import br.ufc.virtual.solarmobilis.webservice.mobilis.Connection;
-import br.ufc.virtual.solarmobilis.webservice.mobilis.ConnectionCallback;
-import br.ufc.virtual.solarmobilis.webservice.mobilis.Constants;
 
 @EBean
-public class SolarManager implements ConnectionCallback {
+public class SolarManager {
 	// public static final String SERVER_ROOT_URL =
 	// "http://solar2.virtual.ufc.br/";
 	public static final String SERVER_ROOT_URL = "http://200.129.43.170/";
@@ -52,8 +50,6 @@ public class SolarManager implements ConnectionCallback {
 
 	@Pref
 	SolarMobilisPreferences_ preferences;
-
-	private Connection connection;
 
 	@AfterInject
 	public void config() {
@@ -94,39 +90,12 @@ public class SolarManager implements ConnectionCallback {
 		return solarApiClient.sendPost(postSender, id, groupId);
 	}
 
-	// send audio post n�o utilizado
-	public Object sendPostAudio(File postAudioFile, Integer postId) {
+	public void sendPostFile(File postAudioFile, Integer postId) {
 		MultiValueMap<String, Object> parts = new LinkedMultiValueMap<String, Object>();
-		parts.add("file", new FileSystemResource(postAudioFile.getAbsolutePath()));
-		return solarClientPostFileSender.sendPostaudioFile(parts, postId);
-
-		
-		// File file = new File(postAudioFile.getAbsolutePath());
-		//		MultiValueMap<String, Object> mvMap = new LinkedMultiValueMap<String, Object>();
-//		// mvMap.add("login[device_id]", "dwd");
-//		mvMap.add("file", new FileSystemResource(file.getAbsoluteFile()));
-//
-//		a = solarClientPostFileSender.sendPostaudioFile(mvMap, postId,
-//				preferences.authToken().get());
-//
-//		return a;
-	}
-
-	// send audio post atual
-	public void sendAudioPost(File postAudioFile, Integer postId) {
-		connection = new Connection(this);
-
-		String url = SERVER_ROOT_URL + "api/v1/posts/" + postId
-				+ "/files?access_token=" + preferences.authToken().get();
-
-		connection.postToServer(Constants.CONNECTION_POST_AUDIO, url,
-				postAudioFile, preferences.authToken().get());
-	}
-
-	// send audio post atual
-	@Override
-	public void resultFromConnection(int connectionId, String result,
-			int statusCode) {
+		parts.add("file",
+				new FileSystemResource(postAudioFile.getAbsolutePath()));
+		SendPostFileResponse ids = solarClientPostFileSender.sendPostFile(
+				parts, postId);
 	}
 
 	public String getUserImageUrl(int userId) {

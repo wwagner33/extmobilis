@@ -8,13 +8,15 @@ import org.springframework.http.converter.json.GsonHttpMessageConverter;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import br.ufc.virtual.solarmobilis.model.SendPostFileResponse;
+
 @RequiresHeader("Authorization")
 @Rest(converters = { FormHttpMessageConverter.class,
 		GsonHttpMessageConverter.class })
 public interface SolarClientPostFileSender {
 
 	@Post("api/v1/posts/{postId}/files")
-	Object sendPostaudioFile(MultiValueMap postAudioFile, Integer postId);
+	SendPostFileResponse sendPostFile(MultiValueMap file, Integer postId);
 
 	RestTemplate getRestTemplate();
 

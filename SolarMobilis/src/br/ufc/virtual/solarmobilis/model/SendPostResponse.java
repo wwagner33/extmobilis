@@ -1,6 +1,5 @@
 package br.ufc.virtual.solarmobilis.model;
 
-
 public class SendPostResponse {
 	public Integer result;
 

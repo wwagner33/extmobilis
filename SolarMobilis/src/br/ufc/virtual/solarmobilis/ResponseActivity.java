@@ -32,6 +32,7 @@ import br.ufc.virtual.solarmobilis.audio.AudioRecorder;
 import br.ufc.virtual.solarmobilis.dialog.AudioDialog;
 import br.ufc.virtual.solarmobilis.dialog.AudioDialog.onDeleteListener;
 import br.ufc.virtual.solarmobilis.model.DiscussionPost;
+import br.ufc.virtual.solarmobilis.model.PostSender;
 import br.ufc.virtual.solarmobilis.model.SendPostResponse;
 import br.ufc.virtual.solarmobilis.util.Toaster;
 import br.ufc.virtual.solarmobilis.webservice.SolarManager;
@@ -288,8 +289,7 @@ public class ResponseActivity extends SherlockFragmentActivity implements
 	}
 
 	private void sendPostAudio(Integer postId) {
-		Object object = solarManager.sendPostAudio(file, postId);
-		object.toString();
+		solarManager.sendPostFile(file, postId);
 	}
 
 	@UiThread

@@ -1,11 +1,9 @@
-package br.ufc.virtual.solarmobilis;
+package br.ufc.virtual.solarmobilis.model;
 
 import com.google.gson.annotations.SerializedName;
 
-import br.ufc.virtual.solarmobilis.model.DiscussionPost;
-
 public class PostSender {
-	
+
 	@SerializedName("discussion_post")
 	DiscussionPost discussionPost;
 
