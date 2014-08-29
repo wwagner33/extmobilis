@@ -33,10 +33,11 @@ import android.widget.TextView;
 import br.ufc.virtual.solarmobilis.audio.PostPlayer;
 import br.ufc.virtual.solarmobilis.model.DiscussionPost;
 import br.ufc.virtual.solarmobilis.model.DiscussionPostList;
-import br.ufc.virtual.solarmobilis.model.PostAdapter;
+
 import br.ufc.virtual.solarmobilis.util.Toaster;
 import br.ufc.virtual.solarmobilis.webservice.PostPlayerListener;
 import br.ufc.virtual.solarmobilis.webservice.SolarManager;
+import br.virtual.solarmobilis.view.PostAdapter;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
@@ -118,6 +119,9 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 	@Bean
 	PostPlayer postPlayer;
 
+	@Bean
+	PostAdapter postAdapter;
+
 	List<String> fileDescriptors = new ArrayList<String>();
 	MediaPlayer mp = new MediaPlayer();
 
@@ -171,6 +175,12 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 		});
 
 		postPlayer.setPostPlayerListener(this);
+
+		dialog = ProgressDialog.show(this, getString(R.string.dialog_wait),
+				getString(R.string.dialog_message), true);
+
+		getPosts();
+
 	}
 
 	@Override
@@ -224,53 +234,13 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 
 	@Click({ R.id.refresh_button })
 	@Background
+	@UiThread
 	void refreshPostsList() {
 
-		try {
-			makeDialog();
-			// int discussionSize = posts.size();
-			//
-			// if (discussionSize == 0) {
-			// oldDateString = "20001010102410";
-			// } else {
-			// oldDateString = posts.get(0).getDateToString();
-			// }
+		dialog = ProgressDialog.show(this, getString(R.string.dialog_wait),
+				getString(R.string.dialog_message), true);
 
-			oldDateString = "20001010102410";
-
-			posts.clear();
-
-			discussionPostList = solarManager.getPosts(discussionId,
-					oldDateString, preferences.groupSelected().get());
-			unloadedFuturePostsCount = discussionPostList.getOlder();
-
-			for (int i = 0; i < discussionPostList.getPosts().size(); i++) {
-				Log.i("#" + i + " " + oldDateString, discussionPostList
-						.getPosts().get(i).getContent());
-			}
-
-			posts = discussionPostList.getPosts();
-
-			for (DiscussionPost discussionPost : posts) {
-				discussionPost.setUserImageURL(solarManager
-						.getUserImageUrl(discussionPost.getUserId()));
-			}
-
-			for (int i = 0; i < posts.size(); i++) {
-				Log.i("#" + i + " " + oldDateString, posts.get(i).getContent());
-			}
-
-		} catch (HttpStatusCodeException e) {
-			Log.i("ERRO HttpClientErrorException", e.getStatusCode().toString());
-			solarManager.errorHandler(e.getStatusCode());
-			onBackPressed();
-		} catch (Exception e) {
-			Log.i("ERRO ResourceAccessException", e.getMessage());
-			solarManager.alertNoConnection();
-		} finally {
-			dialog.dismiss();
-		}
-		reUpdateList();
+		getPosts();
 		setFooter();
 	}
 
@@ -312,66 +282,47 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 	void getPosts() {
 
 		try {
-			makeDialog();
+
 			discussionPostList = solarManager.getPosts(discussionId,
 					oldDateString, preferences.groupSelected().get());
-			List<DiscussionPost> posts = discussionPostList.getPosts();
-			for (DiscussionPost discussionPost : posts) {
-				discussionPost.setUserImageURL(solarManager
-						.getUserImageUrl(discussionPost.getUserId()));
-			}
-
-			unloadedFuturePostsCount = discussionPostList.getOlder();
-			Log.i("after", String.valueOf(discussionPostList.getOlder()));
-
+			posts = discussionPostList.getPosts();
 			updateList();
-			setFooter();
 		} catch (HttpStatusCodeException e) {
 			Log.i("ERRO HttpStatusCodeException", e.getStatusCode().toString());
 			solarManager.errorHandler(e.getStatusCode());
-			onBackPressed();
 		} catch (Exception e) {
 			Log.i("ERRO Exception", e.getMessage());
 			solarManager.alertNoConnection();
 		} finally {
-			if (dialog != null)
+			if (dialog != null) {
 				dialog.dismiss();
+			}
 		}
+
+		for (DiscussionPost discussionPost : posts) {
+			discussionPost.setUserImageURL(solarManager
+					.getUserImageUrl(discussionPost.getUserId()));
+		}
+
+		setFooter();
 	}
 
 	@UiThread
 	void updateList() {
+
 		forumTitle.setText(discussionName);
 		forumRange.setText(startDate + " - " + endDate);
 
-		posts = discussionPostList.getPosts();
-		for (int i = 0; i < discussionPostList.getPosts().size(); i++) {
-
-			Log.i("#" + i, discussionPostList.getPosts().get(i).getUpdatedAt()
-					+ " "
-					+ discussionPostList.getPosts().get(i).getDateToString());
-		}
-		// Collections.reverse(posts);
-		adapter = new PostAdapter(this, R.layout.discussion_post_list_item,
-				R.id.user_nick, posts);
-
-		listVieWDiscussionPosts.setAdapter(adapter);
-
+		postAdapter.setPosts(posts);
+		bindAdapter();
 		if (postSelected) {
 			setMarketPost(selectedPosition, true);
 		}
 	}
 
-	@UiThread
-	void reUpdateList() {
-		adapter = new PostAdapter(this, R.layout.discussion_post_list_item,
-				R.id.user_nick, posts);
+	void bindAdapter() {
 
-		listVieWDiscussionPosts.setAdapter(adapter);
-
-		if (postSelected) {
-			setMarketPost(selectedPosition, true);
-		}
+		listVieWDiscussionPosts.setAdapter(postAdapter);
 	}
 
 	@ItemClick
@@ -414,7 +365,8 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 			}
 		}
 
-		listVieWDiscussionPosts.setSelection(position);
+		// listVieWDiscussionPosts.setSelection(position);
+		// listVieWDiscussionPosts.setItemChecked(position, true);
 		// listVieWDiscussionPosts.smoothScrollToPosition(position);
 		Log.i("smoothScrollToPosition", String.valueOf(position));
 		Log.i("toglle-marked", String.valueOf(selectedPosition));
@@ -534,7 +486,12 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 	private void setMarketPost(final int position, final boolean isMarked) {
 		if ((position >= 0) && (position < posts.size())) {
 			posts.get(position).setMarked(isMarked);
-			adapter.notifyDataSetChanged();
+			postAdapter.notifyDataSetChanged();
+			if (isMarked) {
+				listVieWDiscussionPosts.setSelection(position);
+			}
+			listVieWDiscussionPosts.setItemChecked(position, isMarked);
+
 		} else {
 			selectedPosition = -1;
 			postSelected = false;

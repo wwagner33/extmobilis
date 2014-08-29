@@ -43,7 +43,10 @@
         android:layout_marginRight="16dp"
         android:cacheColorHint="@android:color/white"
         android:divider="@color/list_divider"
-        android:dividerHeight="1dp" >
+        android:dividerHeight="1dp" 
+        android:choiceMode="singleChoice"
+        >
+      
     </ListView>
 
     <View

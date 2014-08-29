@@ -40,7 +40,7 @@
         android:dividerHeight="4dp"
         android:drawSelectorOnTop="false"
         android:groupIndicator="@drawable/course_list_selector"
-        android:indicatorLeft="250dp"
-        android:indicatorRight="270dp" />
+        android:indicatorLeft="250sp"
+        android:indicatorRight="270sp" />
 
 </RelativeLayout>
