@@ -115,7 +115,8 @@ public class ResponseActivity extends SherlockFragmentActivity implements
 	}
 
 	void recorderConfig() {
-		mFileName = AudioRecorder.RECORDING_FULL_FILE_PATH;
+		mFileName = getApplicationContext().getCacheDir()
+				+ "/Mobilis/Recordings/" + AudioRecorder.RECORDING_FULL_NAME;
 
 		file = new File(mFileName);
 

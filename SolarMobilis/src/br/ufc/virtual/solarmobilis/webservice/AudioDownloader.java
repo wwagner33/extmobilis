@@ -7,7 +7,6 @@ import java.net.URL;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EBean;
 
-import android.os.Environment;
 import android.util.Log;
 import br.ufc.virtual.solarmobilis.util.HttpDownloader;
 
@@ -17,8 +16,7 @@ public class AudioDownloader {
 	String stringUrl;
 	URL url;
 	HttpURLConnection urlConnection;
-	String audioFilePath = Environment.getExternalStorageDirectory()
-			.getAbsolutePath() + "/Mobilis/TTS/";
+	String audioFilePath;
 
 	private DownloaderListener downloaderListener;
 
@@ -26,14 +24,19 @@ public class AudioDownloader {
 	public void saveFile(String stringUrl, int i) {
 
 		try {
+			String fileName = i + ".wav";
+			String audioFileFullPath = audioFilePath + fileName;
 			HttpDownloader httpDownloader = new HttpDownloader();
-			httpDownloader.downFile(stringUrl, "Mobilis/TTS/", i + ".wav");
-			File audioFile = new File(audioFilePath + i + ".wav");
+			httpDownloader.downFile(stringUrl, audioFilePath, fileName);
+			File audioFile = new File(audioFileFullPath);
 			downloaderListener.onDownload(audioFile.getAbsolutePath(), i);
 		} catch (Exception e) {
 			downloaderListener.onDownloadException(e, i);
 		}
+	}
 
+	public void setAudioPathFile(String path) {
+		audioFilePath = path;
 	}
 
 	public void deleteFiles() {

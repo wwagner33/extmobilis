@@ -9,62 +9,66 @@ import java.io.OutputStream;
 import android.os.Environment;
 
 public class FileUtils {
-	private String SDPATH;
+	private String basePath;
 
-	public String getSDPATH() {
-		return SDPATH;
+	public String getBasePath() {
+		return basePath;
+	}
+
+	public void setBasePath(String basePath) {
+		this.basePath = basePath;
 	}
 
 	public FileUtils() {
-		SDPATH = Environment.getExternalStorageDirectory() + File.separator;
+		basePath = Environment.getExternalStorageDirectory() + File.separator;
 	}
 
 	/**
-	 * Cria um arquivo no cartão SD
+	 * Cria um arquivo
 	 * 
 	 * @param fileName
 	 * @return
 	 * @throws IOException
 	 */
-	public File createSDFile(String fileName) throws IOException {
-		File file = new File(SDPATH + fileName);
+	public File createFile(String fileName) throws IOException {
+		File file = new File(basePath + fileName);
 		file.createNewFile();
 		return file;
 	}
 
 	/**
-	 * Cria um diretório no cartão SD
+	 * Cria um diretório
 	 * 
 	 * @param dirName
 	 * @return
 	 * @throws IOException
 	 */
-	public File createSDDir(String dirName) throws IOException {
-		File dir = new File(SDPATH + dirName);
+	public File createDir(String dirName) throws IOException {
+		File dir = new File(basePath + dirName);
 		dir.mkdirs();
 		return dir;
 	}
 
 	/**
-	 * Verifica se existe um arquivo no cartão SD
+	 * Verifica se existe um arquivo
 	 */
 	public boolean isFileExist(String fileName) {
-		File file = new File(SDPATH + fileName);
+		File file = new File(basePath + fileName);
 		return file.exists();
 	}
 
 	/**
-	 * Grava dados do InputStream no cartão SD
+	 * Grava dados do InputStream
 	 * 
 	 * @throws Exception
 	 */
-	public File write2SDFromInput(String path, String fileName,
-			InputStream input) throws Exception {
+	public File writeFromInput(String path, String fileName, InputStream input)
+			throws Exception {
 		File file = null;
 		OutputStream output = null;
 		try {
-			createSDDir(path);
-			file = createSDFile(path + fileName);
+			createDir(path);
+			file = createFile(path + fileName);
 			output = new FileOutputStream(file);
 			byte[] buffer = new byte[4 * 1024];
 			int readsize = 0;

@@ -63,12 +63,13 @@ public class HttpDownloader {
 		InputStream inputStream = null;
 		try {
 			FileUtils fileUtils = new FileUtils();
-			if (fileUtils.isFileExist(path + fileName)) {
+			fileUtils.setBasePath(path);
+			if (fileUtils.isFileExist(fileName)) {
 				return 1;
 			}
 
 			inputStream = getInputStreamFromUrl(urlStr);
-			File resultFile = fileUtils.write2SDFromInput(path, fileName,
+			File resultFile = fileUtils.writeFromInput("", fileName,
 					inputStream);
 			if (resultFile == null) {
 				return -1;

@@ -8,7 +8,6 @@ import org.androidannotations.annotations.sharedpreferences.Pref;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Environment;
 
 @EActivity
 public class GatewayActivity extends Activity {
@@ -34,11 +33,11 @@ public class GatewayActivity extends Activity {
 	}
 
 	void createFolder() {
-		File file = new File(Environment.getExternalStorageDirectory()
-				.getAbsolutePath() + "/Mobilis/TTS/");
+		File file = new File(getApplicationContext().getCacheDir()
+				+ "/Mobilis/TTS/");
 
-		File fileRec = new File(Environment.getExternalStorageDirectory()
-				.getAbsolutePath() + "/Mobilis/Recordings/");
+		File fileRec = new File(getApplicationContext().getCacheDir()
+				+ "/Mobilis/Recordings/");
 
 		if (!file.exists() || !fileRec.exists()) {
 			file.mkdirs();

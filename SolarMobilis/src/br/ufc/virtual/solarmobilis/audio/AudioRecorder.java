@@ -16,7 +16,8 @@ public class AudioRecorder {
 	public static final String RECORDING_EXTENSION = ".aac";
 	public static final String RECORDING_FULL_NAME = RECORDING_FILE_NAME
 			+ RECORDING_EXTENSION;
-	public static final String RECORDING_FULL_FILE_PATH = PATH_RECORDINGS + RECORDING_FULL_NAME;
+	public static final String RECORDING_FULL_FILE_PATH = PATH_RECORDINGS
+			+ RECORDING_FULL_NAME;
 	public static final String RECORDING_MIME_TYPE = "audio/aac";
 
 	public static final int RECORDING_STARTED = 1;
@@ -32,10 +33,8 @@ public class AudioRecorder {
 	public boolean isReseted = false;
 
 	public AudioRecorder() {
-
 		recorder = new MediaRecorder();
 		setRecordOnBackground();
-
 	}
 
 	private void setRecordOnBackground() {
@@ -72,7 +71,6 @@ public class AudioRecorder {
 		isReseted = true;
 		recordOnBackgroundThread.cancel(true);
 		isRecording = false;
-
 	}
 
 	public void releaseRecording() {
@@ -88,10 +86,8 @@ public class AudioRecorder {
 	}
 
 	public class RecordOnBackground extends AsyncTask<Void, Void, Void> {
-
 		@Override
 		protected Void doInBackground(Void... params) {
-
 			recorder.start();
 			return null;
 		}

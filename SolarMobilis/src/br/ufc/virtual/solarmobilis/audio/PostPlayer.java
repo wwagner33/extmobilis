@@ -10,7 +10,6 @@ import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EBean;
 
 import android.media.MediaPlayer;
-import android.os.Environment;
 import android.text.Html;
 import android.util.Log;
 import br.ufc.virtual.solarmobilis.DiscussionsPostsActivity;
@@ -36,8 +35,7 @@ public class PostPlayer implements DownloaderListener {
 	public PostPlayerListener postPlayerListener;
 	public DiscussionsPostsActivity postsActivity;
 	public List<String> fileDescriptors = new ArrayList<String>();
-	public File file = new File(Environment.getExternalStorageDirectory()
-			.getAbsolutePath() + "/Mobilis/TTS/");
+	public File file;
 	public AudioPlayer audioPlayer = new AudioPlayer();
 
 	int downloadWaitingToPlayAudioBlockIndex = 0;
@@ -87,6 +85,12 @@ public class PostPlayer implements DownloaderListener {
 			audioDownloader
 					.saveFile(anexo, (currentAudioAttrachmentPosition++));
 		}
+	}
+
+	public void setDir(File file) {
+		this.file = file;
+		audioDownloader.setAudioPathFile(file.getAbsolutePath()
+				+ File.separator);
 	}
 
 	private void setFileDescriptorsSize(int filedescriptorsSize) {

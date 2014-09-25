@@ -22,7 +22,6 @@ import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,7 +32,6 @@ import android.widget.TextView;
 import br.ufc.virtual.solarmobilis.audio.PostPlayer;
 import br.ufc.virtual.solarmobilis.model.DiscussionPost;
 import br.ufc.virtual.solarmobilis.model.DiscussionPostList;
-
 import br.ufc.virtual.solarmobilis.util.Toaster;
 import br.ufc.virtual.solarmobilis.webservice.PostPlayerListener;
 import br.ufc.virtual.solarmobilis.webservice.SolarManager;
@@ -141,13 +139,14 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 
 	PostAdapter adapter;
 
-	File file = new File(Environment.getExternalStorageDirectory()
-			.getAbsolutePath() + "/Mobilis/TTS/");
+	File file;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_discussions_posts);
+
+		file = new File(getApplicationContext().getCacheDir() + "/Mobilis/TTS/");
 
 		actionBar = getSupportActionBar();
 		actionBar.setDisplayHomeAsUpEnabled(true);
@@ -174,7 +173,9 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 			}
 		});
 
+		postPlayer.setDir(file);
 		postPlayer.setPostPlayerListener(this);
+		
 
 		dialog = ProgressDialog.show(this, getString(R.string.dialog_wait),
 				getString(R.string.dialog_message), true);
