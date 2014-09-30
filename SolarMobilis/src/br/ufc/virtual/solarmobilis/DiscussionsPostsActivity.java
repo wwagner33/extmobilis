@@ -29,7 +29,9 @@ import android.view.View.OnClickListener;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 import br.ufc.virtual.solarmobilis.audio.PostPlayer;
+import br.ufc.virtual.solarmobilis.model.Discussion;
 import br.ufc.virtual.solarmobilis.model.DiscussionPost;
 import br.ufc.virtual.solarmobilis.model.DiscussionPostList;
 import br.ufc.virtual.solarmobilis.util.Toaster;
@@ -72,6 +74,9 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 	@Extra("endDate")
 	String endDate;
 
+	@Extra("status")
+	String status;
+
 	@ViewById(R.id.forum_title)
 	TextView forumTitle;
 
@@ -110,6 +115,9 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 
 	@StringRes(R.string.ERROR_AUDIO_DOWNLOAD)
 	String audioDownloadError;
+
+	@StringRes(R.string.closed_forum_menssage)
+	String closedForumMensage;
 
 	@Bean
 	Toaster toaster;
@@ -175,7 +183,6 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 
 		postPlayer.setDir(file);
 		postPlayer.setPostPlayerListener(this);
-		
 
 		dialog = ProgressDialog.show(this, getString(R.string.dialog_wait),
 				getString(R.string.dialog_message), true);
@@ -266,9 +273,21 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 
 	@OptionsItem(R.id.menu_response)
 	void response() {
-		Intent intent = new Intent(this, ResponseActivity_.class);
-		intent.putExtra("discussionId", discussionId);
-		startActivity(intent);
+
+		if (isDiscussionClosed()) {
+
+			toaster.showToast(closedForumMensage);
+
+		} else {
+			Intent intent = new Intent(this, ResponseActivity_.class);
+			intent.putExtra("discussionId", discussionId);
+			startActivity(intent);
+		}
+
+	}
+
+	private boolean isDiscussionClosed() {
+		return status.equals("2");
 	}
 
 	@OptionsItem(R.id.showPlayerControls)

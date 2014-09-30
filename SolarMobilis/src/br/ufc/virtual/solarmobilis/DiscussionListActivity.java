@@ -103,6 +103,7 @@ public class DiscussionListActivity extends SherlockFragmentActivity {
 				.getLastPostDate());
 		intent.putExtra("startDate", discussions.get(position).getStartDate());
 		intent.putExtra("endDate", discussions.get(position).getEndDate());
+		intent.putExtra("status", discussions.get(position).getStatus());
 		startActivity(intent);
 	}
 
