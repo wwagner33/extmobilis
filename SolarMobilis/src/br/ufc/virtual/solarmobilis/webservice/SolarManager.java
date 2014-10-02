@@ -29,7 +29,6 @@ import br.ufc.virtual.solarmobilis.model.DiscussionPostList;
 import br.ufc.virtual.solarmobilis.model.Group;
 import br.ufc.virtual.solarmobilis.model.LoginResponse;
 import br.ufc.virtual.solarmobilis.model.PostSender;
-import br.ufc.virtual.solarmobilis.model.SendPostFileResponse;
 import br.ufc.virtual.solarmobilis.model.SendPostResponse;
 import br.ufc.virtual.solarmobilis.model.User;
 
@@ -94,8 +93,7 @@ public class SolarManager {
 		MultiValueMap<String, Object> parts = new LinkedMultiValueMap<String, Object>();
 		parts.add("file",
 				new FileSystemResource(postAudioFile.getAbsolutePath()));
-		SendPostFileResponse ids = solarClientPostFileSender.sendPostFile(
-				parts, postId);
+		solarClientPostFileSender.sendPostFile(parts, postId);
 	}
 
 	public String getUserImageUrl(int userId) {

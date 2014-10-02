@@ -29,9 +29,7 @@ import android.view.View.OnClickListener;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 import br.ufc.virtual.solarmobilis.audio.PostPlayer;
-import br.ufc.virtual.solarmobilis.model.Discussion;
 import br.ufc.virtual.solarmobilis.model.DiscussionPost;
 import br.ufc.virtual.solarmobilis.model.DiscussionPostList;
 import br.ufc.virtual.solarmobilis.util.Toaster;
@@ -45,7 +43,7 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 
 @EActivity
-public class DiscussionsPostsActivity extends SherlockFragmentActivity
+public class DiscussionPostsActivity extends SherlockFragmentActivity
 		implements PostPlayerListener {
 
 	DiscussionPostList discussionPostList;
@@ -77,11 +75,11 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 	@Extra("status")
 	String status;
 
-	@ViewById(R.id.forum_title)
-	TextView forumTitle;
+	@ViewById(R.id.discussion_title)
+	TextView discussionTitle;
 
-	@ViewById(R.id.forum_range)
-	TextView forumRange;
+	@ViewById(R.id.discussion_range)
+	TextView discussionRange;
 
 	@ViewById(R.id.button_play)
 	ImageButton play;
@@ -116,8 +114,8 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 	@StringRes(R.string.ERROR_AUDIO_DOWNLOAD)
 	String audioDownloadError;
 
-	@StringRes(R.string.closed_forum_menssage)
-	String closedForumMensage;
+	@StringRes(R.string.closed_discussion_message)
+	String closedDiscussionMessage;
 
 	@Bean
 	Toaster toaster;
@@ -152,7 +150,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_discussions_posts);
+		setContentView(R.layout.activity_discussion_posts);
 
 		file = new File(getApplicationContext().getCacheDir() + "/Mobilis/TTS/");
 
@@ -276,7 +274,7 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 
 		if (isDiscussionClosed()) {
 
-			toaster.showToast(closedForumMensage);
+			toaster.showToast(closedDiscussionMessage);
 
 		} else {
 			Intent intent = new Intent(this, ResponseActivity_.class);
@@ -330,8 +328,8 @@ public class DiscussionsPostsActivity extends SherlockFragmentActivity
 	@UiThread
 	void updateList() {
 
-		forumTitle.setText(discussionName);
-		forumRange.setText(startDate + " - " + endDate);
+		discussionTitle.setText(discussionName);
+		discussionRange.setText(startDate + " - " + endDate);
 
 		postAdapter.setPosts(posts);
 		bindAdapter();

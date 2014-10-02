@@ -31,7 +31,6 @@
     <string name="groups_title">Turmas disponiveis</string>
     <string name="discussions_title">Fóruns disponiveis</string>
     <string name="title_activity_discussion_list">Fóruns</string>
-    <string name="hello_world">Hello world!</string>
     <string name="title_activity_discussions_posts">Postagens</string>
     <string name="play">Play</string>
     <string name="next">Next</string>
@@ -77,6 +76,6 @@
     <string name="record_off">Gravação concluida</string>
     <string name="audio_attachment">[Áudio anexo]</string>
     <string name="audio_deleted">Arquivo deletado</string>
-     <string name="closed_forum_menssage">O forum foi encerrado</string>
+    <string name="closed_discussion_message">O fórum foi encerrado.</string>
 
 </resources>

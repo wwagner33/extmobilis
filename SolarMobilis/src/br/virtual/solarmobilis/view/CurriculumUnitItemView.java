@@ -1,6 +1,5 @@
 package br.virtual.solarmobilis.view;
 
-import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EViewGroup;
 import org.androidannotations.annotations.ViewById;
 
@@ -15,16 +14,13 @@ public class CurriculumUnitItemView extends RelativeLayout {
 
 	@ViewById(R.id.item)
 	TextView name;
-    public CurriculumUnitItemView(Context context) {
 
+	public CurriculumUnitItemView(Context context) {
 		super(context);
-
 	}
 
 	public void bind(CurriculumUnit curriculumUnit) {
-
 		name.setText(curriculumUnit.getName());
-
 	}
 
 }

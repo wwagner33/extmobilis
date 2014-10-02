@@ -12,7 +12,7 @@ import org.androidannotations.annotations.EBean;
 import android.media.MediaPlayer;
 import android.text.Html;
 import android.util.Log;
-import br.ufc.virtual.solarmobilis.DiscussionsPostsActivity;
+import br.ufc.virtual.solarmobilis.DiscussionPostsActivity;
 import br.ufc.virtual.solarmobilis.model.DiscussionPost;
 import br.ufc.virtual.solarmobilis.model.DiscussionPostFile;
 import br.ufc.virtual.solarmobilis.util.TextBlockenizer;
@@ -33,7 +33,7 @@ public class PostPlayer implements DownloaderListener {
 	public MediaPlayer mp = new MediaPlayer();
 	public BingAudioDownloader audioDownloader;
 	public PostPlayerListener postPlayerListener;
-	public DiscussionsPostsActivity postsActivity;
+	public DiscussionPostsActivity postsActivity;
 	public List<String> fileDescriptors = new ArrayList<String>();
 	public File file;
 	public AudioPlayer audioPlayer = new AudioPlayer();

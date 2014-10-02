@@ -5,7 +5,6 @@ import org.androidannotations.annotations.EViewGroup;
 import org.androidannotations.annotations.ViewById;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import br.ufc.virtual.solarmobilis.R;
