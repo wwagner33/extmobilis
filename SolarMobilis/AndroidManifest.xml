@@ -56,7 +56,7 @@
             android:theme="@style/Theme.Mobilis" >
         </activity>
         <activity
-            android:name="br.ufc.virtual.solarmobilis.DiscussionsPostsActivity_"
+            android:name="br.ufc.virtual.solarmobilis.DiscussionPostsActivity_"
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_discussions_posts"
             android:screenOrientation="portrait"
