@@ -76,6 +76,6 @@
     <string name="record_off">Gravação concluida</string>
     <string name="audio_attachment">[Áudio anexo]</string>
     <string name="audio_deleted">Arquivo deletado</string>
-    <string name="closed_discussion_message">O fórum foi encerrado.</string>
+    <string name="closed_discussion_message">O fórum está encerrado</string>
 
 </resources>

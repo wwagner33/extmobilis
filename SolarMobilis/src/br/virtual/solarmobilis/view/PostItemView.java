@@ -31,7 +31,6 @@ public class PostItemView extends RelativeLayout {
 	ImageView UserImage;
 
 	public void bind(DiscussionPost post, Context context) {
-		//
 		userNick.setText(post.getUserNick());
 		postDate.setText(post.getDateToPost());
 		postContent.setText(Html.fromHtml(post.getContent()));

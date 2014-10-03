@@ -43,8 +43,8 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 
 @EActivity
-public class DiscussionPostsActivity extends SherlockFragmentActivity
-		implements PostPlayerListener {
+public class DiscussionPostsActivity extends SherlockFragmentActivity implements
+		PostPlayerListener {
 
 	DiscussionPostList discussionPostList;
 
@@ -158,13 +158,15 @@ public class DiscussionPostsActivity extends SherlockFragmentActivity
 		actionBar.setDisplayHomeAsUpEnabled(true);
 		actionBar.setHomeButtonEnabled(true);
 		LayoutInflater inflater = getLayoutInflater();
+
 		footerFuturePosts = inflater.inflate(
 				R.layout.load_available_posts_item, listVieWDiscussionPosts,
 				false);
+
 		footerRefresh = inflater.inflate(R.layout.refresh_discussion_list_item,
 				listVieWDiscussionPosts, false);
-		footerRefresh.setOnClickListener(new OnClickListener() {
 
+		footerRefresh.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				refreshPostsList();
