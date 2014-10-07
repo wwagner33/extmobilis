@@ -11,5 +11,7 @@ public interface SolarMobilisPreferences {
 	int curriculumUnitSelected();
 
 	int groupSelected();
-
+	
+	boolean remainLoggedIn();
+	
 }

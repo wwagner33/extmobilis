@@ -15,6 +15,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Window;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 import br.ufc.virtual.solarmobilis.model.LoginResponse;
@@ -41,7 +42,10 @@ public class LoginActivity extends Activity {
 
 	@ViewById(R.id.editTextPassword)
 	EditText fieldPassword;
-
+	
+	@ViewById
+	CheckBox remainLoggedIn;
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -83,7 +87,8 @@ public class LoginActivity extends Activity {
 
 	public void saveToken() {
 		preferences.authToken().put(loginResponse.getAccessToken());
-
+		preferences.remainLoggedIn().put(remainLoggedIn.isChecked());
+		
 		if (preferences.authToken().get().length() != 0) {
 			Intent intent = new Intent(this, CurriculumUnitsListActivity_.class);
 			startActivity(intent);

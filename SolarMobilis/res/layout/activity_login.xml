@@ -33,15 +33,6 @@
         <requestFocus />
     </EditText>
 
-    <Button
-        android:id="@+id/submit"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/editTextPassword"
-        android:layout_below="@+id/editTextPassword"
-        android:layout_marginTop="10dp"
-        android:text="@string/login" />
-
     <EditText
         android:id="@+id/editTextPassword"
         android:layout_width="match_parent"
@@ -62,5 +53,24 @@
         android:layout_marginBottom="15dp"
         android:text="@string/iuvi_footer"
         android:textColor="#ffffff" />
+    
+    <CheckBox
+        android:id="@+id/remainLoggedIn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/editTextPassword"
+        android:layout_below="@+id/editTextPassword"
+        android:layout_marginTop="14dp"
+        android:checked="true"
+        android:text="@string/remain_logged_in" />
+
+    <Button
+        android:id="@+id/submit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/remainLoggedIn"
+        android:layout_below="@+id/remainLoggedIn"
+        android:layout_marginTop="18dp"
+        android:text="@string/login" />
 
 </RelativeLayout>

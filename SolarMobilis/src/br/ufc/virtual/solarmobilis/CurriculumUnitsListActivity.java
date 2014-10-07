@@ -113,5 +113,13 @@ public class CurriculumUnitsListActivity extends SherlockFragmentActivity {
 			return false;
 		}
 	};
-
+	
+	@Override
+	protected void onDestroy(){
+		super.onDestroy();
+		if(preferences.remainLoggedIn().get() == false){
+			preferences.authToken().put(null);
+		}
+	}
+	
 }
