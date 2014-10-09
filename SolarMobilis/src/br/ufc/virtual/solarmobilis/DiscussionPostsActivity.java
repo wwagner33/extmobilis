@@ -184,11 +184,6 @@ public class DiscussionPostsActivity extends SherlockFragmentActivity implements
 		postPlayer.setDir(file);
 		postPlayer.setPostPlayerListener(this);
 
-		dialog = ProgressDialog.show(this, getString(R.string.dialog_wait),
-				getString(R.string.dialog_message), true);
-
-		getPosts();
-
 	}
 
 	@Override
@@ -245,9 +240,6 @@ public class DiscussionPostsActivity extends SherlockFragmentActivity implements
 	@UiThread
 	void refreshPostsList() {
 
-		dialog = ProgressDialog.show(this, getString(R.string.dialog_wait),
-				getString(R.string.dialog_message), true);
-
 		getPosts();
 		setFooter();
 	}
@@ -302,6 +294,8 @@ public class DiscussionPostsActivity extends SherlockFragmentActivity implements
 	void getPosts() {
 
 		try {
+
+			makeDialog();
 
 			discussionPostList = solarManager.getPosts(discussionId,
 					oldDateString, preferences.groupSelected().get());
