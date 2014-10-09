@@ -20,7 +20,11 @@ public class GatewayActivity extends Activity {
 		super.onCreate(savedInstanceState);
 
 		createFolder();
-
+		
+		if(preferences.remainLoggedIn().get() == false){
+			preferences.authToken().put(null);
+		}
+		
 		if (preferences.authToken().get().length() == 0) {
 			Intent intent = new Intent(this, LoginActivity_.class);
 			startActivity(intent);

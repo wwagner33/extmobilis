@@ -77,5 +77,6 @@
     <string name="audio_attachment">[Áudio anexo]</string>
     <string name="audio_deleted">Arquivo deletado</string>
     <string name="closed_discussion_message">O fórum está encerrado</string>
-
+	<string name="remain_logged_in">Continuar Conectado</string>
+    
 </resources>
