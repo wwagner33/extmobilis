@@ -34,9 +34,7 @@ import br.ufc.virtual.solarmobilis.model.User;
 
 @EBean
 public class SolarManager {
-	// public static final String SERVER_ROOT_URL =
-	// "http://solar2.virtual.ufc.br/";
-	public static final String SERVER_ROOT_URL = "http://solar.virtual.ufc.br/";
+	public static final String SERVER_ROOT_URL = "http://www.solar.virtual.ufc.br/";
 
 	@RootContext
 	Activity rootActivity;
