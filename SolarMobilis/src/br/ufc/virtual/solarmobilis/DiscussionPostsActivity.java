@@ -183,7 +183,6 @@ public class DiscussionPostsActivity extends SherlockFragmentActivity implements
 
 		postPlayer.setDir(file);
 		postPlayer.setPostPlayerListener(this);
-
 	}
 
 	@Override
@@ -200,46 +199,18 @@ public class DiscussionPostsActivity extends SherlockFragmentActivity implements
 
 	// @UiThread
 	void setFooter() {
-
 		if (!footerFuturePostsState) {
-
 			listVieWDiscussionPosts.addFooterView(footerRefresh, null, true);
 			footerFuturePostsState = true;
 		}
 
 		Log.i("Dentro do setFooter", String.valueOf(unloadedFuturePostsCount));
-		/*
-		 * if (unloadedFuturePostsCount > 0) { ((TextView) footerFuturePosts
-		 * .findViewById(R.id.load_available_posts))
-		 * .setText(unloadedFuturePostsCount + " " +
-		 * getApplicationContext().getResources().getString(
-		 * R.string.not_loaded_posts_count));
-		 * 
-		 * ((ImageView) footerFuturePosts.findViewById(R.id.blue_line))
-		 * .setVisibility(View.VISIBLE); footerUnloadedFuturePostsState = true;
-		 * listVieWDiscussionPosts .addFooterView(footerFuturePosts, null,
-		 * true);
-		 * 
-		 * } else {
-		 * 
-		 * if (footerUnloadedFuturePostsState == true && footerFuturePostsState
-		 * == false) {
-		 * listVieWDiscussionPosts.removeFooterView(footerFuturePosts);
-		 * listVieWDiscussionPosts .addFooterView(footerRefresh, null, true);
-		 * footerUnloadedFuturePostsState = false; footerFuturePostsState =
-		 * true; } else if (footerUnloadedFuturePostsState == false &&
-		 * footerFuturePostsState == false) { listVieWDiscussionPosts
-		 * .addFooterView(footerRefresh, null, true); footerFuturePostsState =
-		 * true; } }
-		 */
-
 	}
 
 	@Click({ R.id.refresh_button })
 	@Background
 	@UiThread
 	void refreshPostsList() {
-
 		getPosts();
 		setFooter();
 	}
@@ -255,7 +226,6 @@ public class DiscussionPostsActivity extends SherlockFragmentActivity implements
 		}
 
 		return true;
-
 	}
 
 	@OptionsItem(R.id.menu_logout)
@@ -265,7 +235,6 @@ public class DiscussionPostsActivity extends SherlockFragmentActivity implements
 
 	@OptionsItem(R.id.menu_response)
 	void response() {
-
 		if (isDiscussionClosed()) {
 
 			toaster.showToast(closedDiscussionMessage);
@@ -275,7 +244,6 @@ public class DiscussionPostsActivity extends SherlockFragmentActivity implements
 			intent.putExtra("discussionId", discussionId);
 			startActivity(intent);
 		}
-
 	}
 
 	private boolean isDiscussionClosed() {
@@ -292,7 +260,6 @@ public class DiscussionPostsActivity extends SherlockFragmentActivity implements
 
 	@Background
 	void getPosts() {
-
 		try {
 
 			makeDialog();
@@ -323,25 +290,22 @@ public class DiscussionPostsActivity extends SherlockFragmentActivity implements
 
 	@UiThread
 	void updateList() {
-
 		discussionTitle.setText(discussionName);
 		discussionRange.setText(startDate + " - " + endDate);
 
 		postAdapter.setPosts(posts);
 		bindAdapter();
 		if (postSelected) {
-			setMarketPost(selectedPosition, true);
+			setMarkedPost(selectedPosition, true);
 		}
 	}
 
 	void bindAdapter() {
-
 		listVieWDiscussionPosts.setAdapter(postAdapter);
 	}
 
 	@ItemClick
 	void listViewDiscussionsPosts(int position) {
-
 		Log.i("clicado (activity de posts)", "ENTROU NO LISTNER");
 		Log.i("clicado (activity de posts)", "clicado no " + position);
 		togglePostMarked(position);
@@ -349,9 +313,8 @@ public class DiscussionPostsActivity extends SherlockFragmentActivity implements
 
 	@UiThread
 	public void togglePostMarked(int position) {
-
 		if (selectedPosition == position) {
-			setMarketPost(position, false);
+			setMarkedPost(position, false);
 
 			postSelected = false;
 			setActionBarNotSelected();
@@ -359,11 +322,11 @@ public class DiscussionPostsActivity extends SherlockFragmentActivity implements
 			stop();
 			selectedPosition = -1;
 		} else {
-			setMarketPost(position, true);
-
 			if (selectedPosition != -1) {
-				setMarketPost(selectedPosition, false);
+				setMarkedPost(selectedPosition, false);
 			}
+
+			setMarkedPost(position, true);
 
 			selectedPosition = position;
 			postSelected = true;
@@ -371,19 +334,12 @@ public class DiscussionPostsActivity extends SherlockFragmentActivity implements
 
 			if (posts.get(selectedPosition).getFiles().isEmpty()) {
 				Log.w("Anexo", "n�o preenchido");
-
 			} else {
 				Log.w("Anexo", "preenchido");
 				Log.w("Anexo", posts.get(selectedPosition).getFiles()
 						.toString());
 			}
 		}
-
-		// listVieWDiscussionPosts.setSelection(position);
-		// listVieWDiscussionPosts.setItemChecked(position, true);
-		// listVieWDiscussionPosts.smoothScrollToPosition(position);
-		Log.i("smoothScrollToPosition", String.valueOf(position));
-		Log.i("toglle-marked", String.valueOf(selectedPosition));
 	}
 
 	void setActionBarSelected() {
@@ -405,7 +361,6 @@ public class DiscussionPostsActivity extends SherlockFragmentActivity implements
 
 	@Click(R.id.button_play)
 	void play() {
-
 		if (postPlayer.isPlaying()) {
 			Log.i("estava tocando", "agora pausar");
 			postPlayer.pause();
@@ -487,7 +442,7 @@ public class DiscussionPostsActivity extends SherlockFragmentActivity implements
 		if (!postSelected) {
 			super.onBackPressed();
 		} else {
-			setMarketPost(selectedPosition, false);
+			setMarkedPost(selectedPosition, false);
 			selectedPosition = -1;
 			postSelected = false;
 			setActionBarNotSelected();
@@ -497,14 +452,14 @@ public class DiscussionPostsActivity extends SherlockFragmentActivity implements
 		}
 	}
 
-	private void setMarketPost(final int position, final boolean isMarked) {
+	private void setMarkedPost(final int position, final boolean isMarked) {
 		if ((position >= 0) && (position < posts.size())) {
 			posts.get(position).setMarked(isMarked);
 			postAdapter.notifyDataSetChanged();
-			if (isMarked) {
-				listVieWDiscussionPosts.setSelection(position);
-			}
+
 			listVieWDiscussionPosts.setItemChecked(position, isMarked);
+			listVieWDiscussionPosts.setSelection(listVieWDiscussionPosts
+					.getCheckedItemPosition());
 
 		} else {
 			selectedPosition = -1;

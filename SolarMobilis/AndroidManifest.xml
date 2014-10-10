@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="br.ufc.virtual.solarmobilis"
-    android:versionCode="3"
-    android:versionName="0.6" >
+    android:versionCode="5"
+    android:versionName="0.8" >
 
     <uses-sdk
         android:minSdkVersion="11"
-        android:targetSdkVersion="19" />
+        android:targetSdkVersion="20" />
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -66,13 +66,6 @@
             android:name="br.ufc.virtual.solarmobilis.ResponseActivity_"
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_response"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.Mobilis" >
-        </activity>
-         <activity
-            android:name="br.ufc.virtual.solarmobilis.DiscussionPostsActivity0_"
-            android:configChanges="orientation|screenSize"
-            android:label="@string/title_activity_discussions_posts"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Mobilis" >
         </activity>
