@@ -6,5 +6,11 @@
         android:icon="@drawable/action_playback"
         android:showAsAction="always"
         android:title="@string/action_playback"/>
+    
+    <item 
+        android:id="@+id/menu_post_response"
+        android:icon="@drawable/action_reply" 
+        android:showAsAction="always" 
+        android:title="@string/action_reply"/>
 
 </menu>

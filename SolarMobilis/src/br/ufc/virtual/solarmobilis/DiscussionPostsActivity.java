@@ -236,16 +236,29 @@ public class DiscussionPostsActivity extends SherlockFragmentActivity implements
 	@OptionsItem(R.id.menu_response)
 	void response() {
 		if (isDiscussionClosed()) {
-
 			toaster.showToast(closedDiscussionMessage);
-
-		} else {
+		}else {
 			Intent intent = new Intent(this, ResponseActivity_.class);
 			intent.putExtra("discussionId", discussionId);
+			if(postSelected){
+				if(posts.get(selectedPosition).getLevel() == 4){
+					toaster.showToast("Essa postagem não permite resposta direta!");
+					intent.putExtra("parentPostId", posts.get(selectedPosition).getParentId());
+				}else{
+					intent.putExtra("parentPostId", posts.get(selectedPosition).getId());
+				}
+			}else{
+				intent.putExtra("parentPostId", 0);
+			}
 			startActivity(intent);
 		}
 	}
-
+	
+	@OptionsItem(R.id.menu_post_response)
+	void responseMenssage() {
+		response();
+	}
+	
 	private boolean isDiscussionClosed() {
 		return status.equals("2");
 	}

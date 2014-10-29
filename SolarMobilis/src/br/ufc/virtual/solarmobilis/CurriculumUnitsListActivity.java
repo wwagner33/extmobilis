@@ -15,6 +15,7 @@ import org.springframework.web.client.HttpStatusCodeException;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.widget.ExpandableListView;
@@ -93,8 +94,29 @@ public class CurriculumUnitsListActivity extends SherlockFragmentActivity {
 
 	void bindAdapter() {
 		listViewCurriculumUnits.setAdapter(curriculumUnitGroupsAdapter);
+		setGroupIndicatorToRight();
 	}
-
+	
+	private void setGroupIndicatorToRight() {
+        /* Get the screen width */
+        DisplayMetrics dm = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(dm);
+        int width = dm.widthPixels;
+        if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN_MR2) {
+        	listViewCurriculumUnits.setIndicatorBounds(width-getDipsFromPixel(40), width-getDipsFromPixel(50));
+        } else {
+        	listViewCurriculumUnits.setIndicatorBoundsRelative(width-getDipsFromPixel(40), width-getDipsFromPixel(50));
+        }
+    }
+	
+    // Convert pixel to dip
+    public int getDipsFromPixel(float pixels) {
+        // Get the screen's density scale
+        final float scale = getResources().getDisplayMetrics().density;
+        // Convert the dps to pixels, based on density scale
+        return (int) (pixels * scale + 0.5f);
+    }
+	
 	private OnChildClickListener onChildClickListener = new OnChildClickListener() {
 
 		@Override
