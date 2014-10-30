@@ -9,7 +9,7 @@
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
     <color name="disabled">#EFEFEF</color>
-    <color name="yellow_hightlight">#FFFF00</color>
+    <color name="yellow_hightlight">#F9DB43</color>
     <color name="discussion_name">#FF122E92</color>
     <color name="list_divider">#000000</color>
     <color name="not_loaded_post_count">#FF666666</color>
