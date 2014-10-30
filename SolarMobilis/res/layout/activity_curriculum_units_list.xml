@@ -23,7 +23,7 @@
     <LinearLayout
         android:id="@+id/highlight_bar"
         android:layout_width="fill_parent"
-        android:layout_height="9dp"
+        android:layout_height="4dp"
         android:layout_alignParentBottom="true"
         android:background="@color/yellow_hightlight"
         android:orientation="vertical" />
