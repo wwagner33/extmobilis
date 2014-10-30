@@ -75,6 +75,9 @@ public class ResponseActivity extends SherlockFragmentActivity implements
 
 	@Extra("discussionId")
 	Integer discussionId;
+	
+	@Extra("parentPostId")
+	Integer parentPostId;
 
 	@StringRes(R.string.empyt_field_response)
 	String empytFieldResponse;
@@ -136,6 +139,9 @@ public class ResponseActivity extends SherlockFragmentActivity implements
 		if (reply.getText().length() != 0) {
 			discussionPost.setContent(reply.getText().toString());
 			discussionPost.setDiscussionId(discussionId);
+			if(parentPostId != 0){
+				discussionPost.setParentId(parentPostId);
+			}
 			postSender.setDiscussionPost(discussionPost);
 
 			dialog = ProgressDialog.show(this, getString(R.string.dialog_wait),
