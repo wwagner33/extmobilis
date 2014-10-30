@@ -15,35 +15,22 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
+        android:layout_marginBottom="10dp"
         android:text="@string/iuvi_footer"
-        android:textColor="#ffffff"
-        android:textSize="12sp" />
-
-    <ImageView
-        android:id="@+id/imageView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="-20dp"
-        android:contentDescription="@string/logo_description"
-        android:scaleType="fitXY"
-        android:scaleX="0.6"
-        android:scaleY="0.6"
-        android:src="@drawable/logo_solar" />
+        android:textColor="#ffffff" />
 
     <LinearLayout
         android:id="@+id/loginFormInputs"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/imageView1"
-        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
         android:orientation="vertical" >
 
         <EditText
             android:id="@+id/editTextUser"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
             android:ems="10"
             android:hint="@string/user" >
 
@@ -54,6 +41,7 @@
             android:id="@+id/editTextPassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
             android:ems="10"
             android:hint="@string/password"
             android:inputType="textPassword" />
@@ -62,6 +50,7 @@
             android:id="@+id/remainLoggedIn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp"
             android:checked="true"
             android:text="@string/remain_logged_in" />
 
@@ -70,6 +59,17 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/login" />
+
     </LinearLayout>
+
+    <ImageView
+        android:id="@+id/imageView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/loginFormInputs"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="70dp"
+        android:contentDescription="@string/logo_description"
+        android:src="@drawable/logo_solar" />
 
 </RelativeLayout>
