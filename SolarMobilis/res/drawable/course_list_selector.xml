@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item android:state_expanded="false"><bitmap android:gravity="center" android:src="@android:drawable/arrow_up_float" />
+    <item android:state_expanded="false"><bitmap android:gravity="center" android:src="@drawable/arrow_up" />
     </item>
-    <item android:state_expanded="true"><bitmap android:gravity="center" android:src="@android:drawable/arrow_down_float" />
+    <item android:state_expanded="true"><bitmap android:gravity="center" android:src="@drawable/arrow_down" />
     </item>
 
 </selector>
