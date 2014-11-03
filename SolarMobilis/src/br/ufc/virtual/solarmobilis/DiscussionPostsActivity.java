@@ -240,16 +240,16 @@ public class DiscussionPostsActivity extends SherlockFragmentActivity implements
 		}else {
 			Intent intent = new Intent(this, ResponseActivity_.class);
 			intent.putExtra("discussionId", discussionId);
+			int parentPostId = 0;
 			if(postSelected){
 				if(posts.get(selectedPosition).getLevel() == 4){
 					toaster.showToast("Essa postagem não permite resposta direta!");
-					intent.putExtra("parentPostId", posts.get(selectedPosition).getParentId());
+					parentPostId = posts.get(selectedPosition).getParentId();
 				}else{
-					intent.putExtra("parentPostId", posts.get(selectedPosition).getId());
+					parentPostId = posts.get(selectedPosition).getId();
 				}
-			}else{
-				intent.putExtra("parentPostId", 0);
 			}
+			intent.putExtra("parentPostId", parentPostId);
 			startActivity(intent);
 		}
 	}
