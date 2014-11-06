@@ -5,21 +5,6 @@
     android:orientation="vertical" 
     android:background="@android:color/white" >
 
-    <RelativeLayout
-        android:id="@+id/content"
-        android:layout_width="wrap_content"
-        android:layout_height="50dp"
-        android:layout_alignParentTop="true" >
-
-        <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="15dp"
-            android:text="@string/courses_title"
-            android:textStyle="bold" />
-    </RelativeLayout>
-
     <LinearLayout
         android:id="@+id/highlight_bar"
         android:layout_width="fill_parent"
@@ -33,7 +18,7 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:layout_above="@id/highlight_bar"
-        android:layout_below="@id/content"
+        android:layout_marginTop="15dp"
         android:layout_marginLeft="15dp"
         android:layout_marginRight="15dp"
         android:divider="@null"

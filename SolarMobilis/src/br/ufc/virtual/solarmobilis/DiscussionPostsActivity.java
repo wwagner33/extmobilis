@@ -75,12 +75,6 @@ public class DiscussionPostsActivity extends SherlockFragmentActivity implements
 	@Extra("status")
 	String status;
 
-	@ViewById(R.id.discussion_title)
-	TextView discussionTitle;
-
-	@ViewById(R.id.discussion_range)
-	TextView discussionRange;
-
 	@ViewById(R.id.button_play)
 	ImageButton play;
 
@@ -303,8 +297,8 @@ public class DiscussionPostsActivity extends SherlockFragmentActivity implements
 
 	@UiThread
 	void updateList() {
-		discussionTitle.setText(discussionName);
-		discussionRange.setText(startDate + " - " + endDate);
+		getActionBar().setTitle(discussionName);
+		getActionBar().setSubtitle(startDate + " - " + endDate);
 
 		postAdapter.setPosts(posts);
 		bindAdapter();

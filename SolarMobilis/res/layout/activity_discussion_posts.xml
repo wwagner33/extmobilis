@@ -8,44 +8,21 @@
         android:id="@+id/action_bar_footer"
         android:layout_width="match_parent"
         android:layout_height="1dp"
+        android:layout_marginBottom="15dp"
         android:background="@color/yellow_hightlight" />
-
-    <TextView
-        android:id="@+id/discussion_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textStyle="bold"
-        android:textAllCaps="true"
-        android:layout_below="@id/action_bar_footer"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginTop="8dp"
-        android:textColor="@color/text_white_color"
-        android:textSize="14sp" />
-
-    <TextView
-        android:id="@+id/discussion_range"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@id/discussion_title"
-        android:layout_below="@id/discussion_title"
-        android:layout_marginBottom="8dp"
-        android:textColor="@color/text_white_color"
-        android:textSize="14sp" />
 
     <ListView
         android:id="@+id/listViewDiscussionsPosts"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/footer"
-        android:layout_below="@+id/discussion_range"
+        android:layout_below="@id/action_bar_footer"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
         android:cacheColorHint="@android:color/white"
-        android:divider="@color/list_divider"
-        android:dividerHeight="1dp" 
         android:choiceMode="singleChoice"
-        >
+        android:divider="@color/list_divider"
+        android:dividerHeight="1dp" >
       
     </ListView>
 
