@@ -65,7 +65,7 @@ public class Discussion {
 
 		String parsedDate = "";
 		SimpleDateFormat simpleFormat = new SimpleDateFormat(
-				"yyyy-MM-dd'T'HH:mm:ss", java.util.Locale.getDefault());
+				"yyyy-MM-dd", java.util.Locale.getDefault());
 		try {
 			Date date = simpleFormat.parse(stringDate);
 			SimpleDateFormat startDateFormat = new SimpleDateFormat(
