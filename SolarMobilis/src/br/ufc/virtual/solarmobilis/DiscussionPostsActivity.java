@@ -359,6 +359,7 @@ public class DiscussionPostsActivity extends SherlockFragmentActivity implements
 	}
 
 	void setActionBarNotSelected() {
+		actionBar.setDisplayShowTitleEnabled(true);
 		actionBar.setDisplayUseLogoEnabled(true);
 		actionBar.setDisplayShowCustomEnabled(true);
 		actionBar.setBackgroundDrawable(new ColorDrawable(getResources()

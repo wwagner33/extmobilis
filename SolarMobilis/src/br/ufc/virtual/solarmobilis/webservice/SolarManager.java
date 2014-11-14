@@ -163,7 +163,7 @@ public class SolarManager {
 	public void logout() {
 		preferences.authToken().put(null);
 		Intent intent = new Intent(rootActivity, LoginActivity_.class);
-		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 		rootActivity.startActivity(intent);
 		rootActivity.finish();
 	}
