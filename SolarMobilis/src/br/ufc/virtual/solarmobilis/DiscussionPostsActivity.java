@@ -22,13 +22,16 @@ import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.TextView;
 import br.ufc.virtual.solarmobilis.audio.PostPlayer;
 import br.ufc.virtual.solarmobilis.model.DiscussionPost;
 import br.ufc.virtual.solarmobilis.model.DiscussionPostList;
@@ -37,13 +40,8 @@ import br.ufc.virtual.solarmobilis.webservice.PostPlayerListener;
 import br.ufc.virtual.solarmobilis.webservice.SolarManager;
 import br.virtual.solarmobilis.view.PostAdapter;
 
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-
 @EActivity
-public class DiscussionPostsActivity extends SherlockFragmentActivity implements
+public class DiscussionPostsActivity extends ActionBarActivity implements
 		PostPlayerListener {
 
 	DiscussionPostList discussionPostList;
@@ -212,7 +210,7 @@ public class DiscussionPostsActivity extends SherlockFragmentActivity implements
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		menu.clear();
-		MenuInflater inflater = getSupportMenuInflater();
+		MenuInflater inflater = getMenuInflater();
 		if (!postSelected) {
 			inflater.inflate(R.menu.options_menu_action, menu);
 		} else {
@@ -482,6 +480,7 @@ public class DiscussionPostsActivity extends SherlockFragmentActivity implements
 		stop.setVisibility(View.GONE);
 	}
 
+	@Override
 	public void onCompletion() {
 		setImagePlayer();
 		next();
@@ -501,7 +500,7 @@ public class DiscussionPostsActivity extends SherlockFragmentActivity implements
 		toaster.showToast(audioDownloadError);
 	}
 
-	@OptionsItem
+	@OptionsItem(android.R.id.home)
 	void homeSelected() {
 		onBackPressed();
 	}

@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+<menu xmlns:android="http://schemas.android.com/apk/res/android" 
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
         android:id="@id/menu_logout"
-        android:showAsAction="never"
+        app:showAsAction="never"
         android:title="@string/logout"/>
     
     <item 
         android:id="@+id/menu_response"
-        android:showAsAction="always"
+        app:showAsAction="always"
         android:icon="@drawable/action_reply_discussion"
         android:title="@string/reply"/>
 

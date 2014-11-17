@@ -17,17 +17,16 @@ import org.springframework.web.client.HttpStatusCodeException;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.widget.ListView;
 import br.ufc.virtual.solarmobilis.model.Discussion;
 import br.ufc.virtual.solarmobilis.webservice.SolarManager;
 import br.virtual.solarmobilis.view.DiscussionAdapter;
 
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-
 @OptionsMenu(R.menu.options_menu)
 @EActivity
-public class DiscussionListActivity extends SherlockFragmentActivity {
+public class DiscussionListActivity extends ActionBarActivity {
 	@Pref
 	SolarMobilisPreferences_ preferences;
 
@@ -107,7 +106,7 @@ public class DiscussionListActivity extends SherlockFragmentActivity {
 		startActivity(intent);
 	}
 
-	@OptionsItem
+	@OptionsItem(android.R.id.home)
 	void homeSelected() {
 		onBackPressed();
 	}

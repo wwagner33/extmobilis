@@ -20,6 +20,7 @@ import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Chronometer;
@@ -37,10 +38,9 @@ import br.ufc.virtual.solarmobilis.model.SendPostResponse;
 import br.ufc.virtual.solarmobilis.util.Toaster;
 import br.ufc.virtual.solarmobilis.webservice.SolarManager;
 
-import com.actionbarsherlock.app.SherlockFragmentActivity;
 
 @EActivity(R.layout.activity_response)
-public class ResponseActivity extends SherlockFragmentActivity implements
+public class ResponseActivity extends ActionBarActivity implements
 		onDeleteListener {
 
 	@Pref
@@ -312,7 +312,7 @@ public class ResponseActivity extends SherlockFragmentActivity implements
 		playRecord.setVisibility(View.GONE);
 	}
 
-	@OptionsItem
+	@OptionsItem(android.R.id.home)
 	void homeSelected() {
 		onBackPressed();
 	}

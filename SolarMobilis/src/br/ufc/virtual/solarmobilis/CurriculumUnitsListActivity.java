@@ -15,6 +15,7 @@ import org.springframework.web.client.HttpStatusCodeException;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
@@ -24,11 +25,10 @@ import br.ufc.virtual.solarmobilis.model.CurriculumUnit;
 import br.ufc.virtual.solarmobilis.webservice.SolarManager;
 import br.virtual.solarmobilis.view.CurriculumUnitGroupsAdapter;
 
-import com.actionbarsherlock.app.SherlockFragmentActivity;
 
 @OptionsMenu(R.menu.options_menu)
 @EActivity
-public class CurriculumUnitsListActivity extends SherlockFragmentActivity {
+public class CurriculumUnitsListActivity extends ActionBarActivity{
 
 	@Pref
 	SolarMobilisPreferences_ preferences;
