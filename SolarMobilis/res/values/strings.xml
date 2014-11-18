@@ -78,5 +78,6 @@
     <string name="audio_deleted">Arquivo deletado</string>
     <string name="closed_discussion_message">O fórum está encerrado</string>
     <string name="remain_logged_in">Continuar conectado</string>
+    <string name="not_allow_direct_response">Essa postagem não permite resposta direta!</string>
 
 </resources>

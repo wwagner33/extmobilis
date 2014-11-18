@@ -108,6 +108,9 @@ public class DiscussionPostsActivity extends ActionBarActivity implements
 
 	@StringRes(R.string.closed_discussion_message)
 	String closedDiscussionMessage;
+	
+	@StringRes(R.string.not_allow_direct_response)
+	String notAllowDirectResponse;
 
 	@Bean
 	Toaster toaster;
@@ -235,7 +238,7 @@ public class DiscussionPostsActivity extends ActionBarActivity implements
 			int parentPostId = 0;
 			if(postSelected){
 				if(posts.get(selectedPosition).getLevel() == 4){
-					toaster.showToast("Essa postagem não permite resposta direta!");
+					toaster.showToast( notAllowDirectResponse);
 					parentPostId = posts.get(selectedPosition).getParentId();
 				}else{
 					parentPostId = posts.get(selectedPosition).getId();
