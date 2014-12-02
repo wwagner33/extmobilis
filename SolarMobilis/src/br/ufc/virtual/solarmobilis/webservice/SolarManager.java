@@ -25,12 +25,14 @@ import br.ufc.virtual.solarmobilis.R;
 import br.ufc.virtual.solarmobilis.SolarMobilisPreferences_;
 import br.ufc.virtual.solarmobilis.model.CurriculumUnit;
 import br.ufc.virtual.solarmobilis.model.Discussion;
+import br.ufc.virtual.solarmobilis.model.DiscussionPost;
 import br.ufc.virtual.solarmobilis.model.DiscussionPostList;
 import br.ufc.virtual.solarmobilis.model.Group;
 import br.ufc.virtual.solarmobilis.model.LoginResponse;
 import br.ufc.virtual.solarmobilis.model.PostSender;
 import br.ufc.virtual.solarmobilis.model.SendPostResponse;
 import br.ufc.virtual.solarmobilis.model.User;
+import br.ufc.virtual.solarmobilis.model.UserData;
 
 @EBean
 public class SolarManager {
@@ -62,6 +64,10 @@ public class SolarManager {
 	public LoginResponse doLogin(User user) {
 		return solarApiClient.doLogin(user);
 	}
+	
+	public UserData getUserData() {
+		return solarApiClient.getUserData();
+	}
 
 	public List<CurriculumUnit> getCurriculumUnits() {
 		return solarApiClient.getCurriculumUnits();
@@ -87,7 +93,11 @@ public class SolarManager {
 			int groupId) {
 		return solarApiClient.sendPost(postSender, id, groupId);
 	}
-
+	
+	public DiscussionPost deletePost(Integer id) {
+		return solarApiClient.deletePost(id);
+	}
+	
 	public void sendPostFile(File postAudioFile, Integer postId) {
 		MultiValueMap<String, Object> parts = new LinkedMultiValueMap<String, Object>();
 		parts.add("file",

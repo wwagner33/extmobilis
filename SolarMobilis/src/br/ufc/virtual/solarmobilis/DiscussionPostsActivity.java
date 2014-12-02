@@ -111,7 +111,10 @@ public class DiscussionPostsActivity extends ActionBarActivity implements
 	
 	@StringRes(R.string.not_allow_direct_response)
 	String notAllowDirectResponse;
-
+	
+	@StringRes(R.string.post_delete)
+	String postDelete;
+	
 	@Bean
 	Toaster toaster;
 
@@ -137,7 +140,8 @@ public class DiscussionPostsActivity extends ActionBarActivity implements
 	private String oldDateString = "20001010102410";
 	private ActionBar actionBar;
 	private boolean postSelected = false;
-
+	private boolean canDelete = true;
+	
 	PostAdapter adapter;
 
 	File file;
@@ -218,6 +222,8 @@ public class DiscussionPostsActivity extends ActionBarActivity implements
 			inflater.inflate(R.menu.options_menu_action, menu);
 		} else {
 			inflater.inflate(R.menu.action_bar_selected, menu);
+			menu.findItem(R.id.menu_post_delete).setEnabled(canDelete);
+			menu.findItem(R.id.menu_post_delete).setVisible(canDelete);
 		}
 
 		return true;
@@ -252,6 +258,67 @@ public class DiscussionPostsActivity extends ActionBarActivity implements
 	@OptionsItem(R.id.menu_post_response)
 	void responseMenssage() {
 		response();
+	}
+	
+	@OptionsItem(R.id.menu_post_delete)
+	void deleteMenssage() {
+		getPosts();
+		checkParentId();
+		deletePost();
+		toaster.showToast(postDelete);
+		onBackPressed();
+	}
+	
+	@Background
+	void deletePost() {
+		try{
+			solarManager.deletePost(posts.get(selectedPosition).getId());
+		}catch (HttpStatusCodeException e) {
+			Log.i("ERRO HttpStatusCodeException", e.getStatusCode().toString());
+			solarManager.errorHandler(e.getStatusCode());
+		} catch (Exception e) {
+			solarManager.alertNoConnection();
+		} finally {
+			dialogDismiss();
+		}
+		getPosts();
+	}
+	
+	@Background
+	void checkParentId(){
+		int position = selectedPosition - 1;
+		int postId = posts.get(selectedPosition).getId();
+		int parentId = 0;
+		canDelete = true;
+		if(preferences.userId().get() == posts.get(selectedPosition).userId){
+			if(posts.get(selectedPosition).getLevel() == 4){
+				canDelete = true;
+			}else{
+				while(canDelete && position >= 0){
+					if(posts.get(position).getLevel() == 1){
+						Log.i("teste", "não tem parent");
+					}else{
+						parentId = posts.get(position).getParentId();
+					}
+					if(postId == parentId){
+						canDelete = false;
+						Log.i("teste", "encontrou");
+					}else{
+						canDelete = true;
+					}
+					position --;
+					Log.i("teste", ""+position);
+				}
+			}
+		}else{
+			canDelete = false;
+		}
+	}
+	
+	@UiThread
+	protected void dialogDismiss() {
+		if (dialog != null)
+			dialog.dismiss();
 	}
 	
 	private boolean isDiscussionClosed() {
@@ -338,6 +405,7 @@ public class DiscussionPostsActivity extends ActionBarActivity implements
 
 			selectedPosition = position;
 			postSelected = true;
+			checkParentId();
 			setActionBarSelected();
 
 			if (posts.get(selectedPosition).getFiles().isEmpty()) {

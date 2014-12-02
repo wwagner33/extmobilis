@@ -12,8 +12,10 @@ import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.sharedpreferences.Pref;
 import org.springframework.web.client.HttpStatusCodeException;
 
+import android.annotation.TargetApi;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.DisplayMetrics;
@@ -22,10 +24,12 @@ import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnChildClickListener;
 import br.ufc.virtual.solarmobilis.model.CurriculumUnit;
+import br.ufc.virtual.solarmobilis.model.UserData;
 import br.ufc.virtual.solarmobilis.webservice.SolarManager;
 import br.virtual.solarmobilis.view.CurriculumUnitGroupsAdapter;
 
 
+@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 @OptionsMenu(R.menu.options_menu)
 @EActivity
 public class CurriculumUnitsListActivity extends ActionBarActivity{
@@ -40,7 +44,9 @@ public class CurriculumUnitsListActivity extends ActionBarActivity{
 	CurriculumUnitGroupsAdapter curriculumUnitGroupsAdapter;
 
 	List<CurriculumUnit> curriculumUnits;
-
+	
+	UserData userData = new UserData();
+	
 	@ViewById
 	ExpandableListView listViewCurriculumUnits;
 	private ProgressDialog dialog;
@@ -56,6 +62,7 @@ public class CurriculumUnitsListActivity extends ActionBarActivity{
 				getString(R.string.dialog_message), true);
 
 		getCurriculumUnits();
+		getUser();
 	}
 
 	@OptionsItem(R.id.menu_logout)
@@ -69,7 +76,21 @@ public class CurriculumUnitsListActivity extends ActionBarActivity{
 				getString(R.string.dialog_message), true);
 		getCurriculumUnits();
 	}
-
+	
+	@Background
+	void getUser() {
+		try {
+			userData = solarManager.getUserData();
+		} catch (HttpStatusCodeException e) {
+			Log.i("ERRO HttpStatusCodeException", e.getStatusCode().toString());
+			solarManager.errorHandler(e.getStatusCode());
+		} catch (Exception e) {
+			solarManager.alertNoConnection();
+		} finally {
+			dialog.dismiss();
+		}
+	}
+	
 	@Background
 	void getCurriculumUnits() {
 		try {
@@ -126,7 +147,7 @@ public class CurriculumUnitsListActivity extends ActionBarActivity{
 			preferences.groupSelected().put(
 					curriculumUnits.get(groupPosition).getGroups()
 							.get(childPosition).getId());
-
+			preferences.userId().put(userData.getId());
 			Intent intent = new Intent(CurriculumUnitsListActivity.this,
 					DiscussionListActivity_.class);
 

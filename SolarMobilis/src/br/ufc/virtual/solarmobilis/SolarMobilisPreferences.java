@@ -14,4 +14,6 @@ public interface SolarMobilisPreferences {
 	
 	boolean remainLoggedIn();
 	
+	int userId();
+	
 }
