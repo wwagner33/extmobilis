@@ -269,10 +269,16 @@ public class DiscussionPostsActivity extends ActionBarActivity implements
 		onBackPressed();
 	}
 	
+	@UiThread
+	void updatePost(){
+		getPosts();
+	}
+	
 	@Background
 	void deletePost() {
 		try{
 			solarManager.deletePost(posts.get(selectedPosition).getId());
+			updatePost();
 		}catch (HttpStatusCodeException e) {
 			Log.i("ERRO HttpStatusCodeException", e.getStatusCode().toString());
 			solarManager.errorHandler(e.getStatusCode());
@@ -281,7 +287,6 @@ public class DiscussionPostsActivity extends ActionBarActivity implements
 		} finally {
 			dialogDismiss();
 		}
-		getPosts();
 	}
 	
 	@Background
