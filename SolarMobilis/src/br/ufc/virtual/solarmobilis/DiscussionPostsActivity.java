@@ -262,8 +262,6 @@ public class DiscussionPostsActivity extends ActionBarActivity implements
 	
 	@OptionsItem(R.id.menu_post_delete)
 	void deleteMenssage() {
-		getPosts();
-		checkParentId();
 		deletePost();
 		toaster.showToast(postDelete);
 		onBackPressed();
@@ -277,8 +275,14 @@ public class DiscussionPostsActivity extends ActionBarActivity implements
 	@Background
 	void deletePost() {
 		try{
-			solarManager.deletePost(posts.get(selectedPosition).getId());
-			updatePost();
+			DiscussionPost dp = null;
+            dp = solarManager.deletePost(posts.get(selectedPosition).getId());
+            int i = 0;
+            while ((dp == null) && i < 10) {
+                wait(100);
+                i++;
+            }
+            updatePost();
 		}catch (HttpStatusCodeException e) {
 			Log.i("ERRO HttpStatusCodeException", e.getStatusCode().toString());
 			solarManager.errorHandler(e.getStatusCode());
