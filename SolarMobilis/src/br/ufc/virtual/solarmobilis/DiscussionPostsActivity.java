@@ -108,13 +108,13 @@ public class DiscussionPostsActivity extends ActionBarActivity implements
 
 	@StringRes(R.string.closed_discussion_message)
 	String closedDiscussionMessage;
-	
+
 	@StringRes(R.string.not_allow_direct_response)
 	String notAllowDirectResponse;
-	
+
 	@StringRes(R.string.post_delete)
 	String postDelete;
-	
+
 	@Bean
 	Toaster toaster;
 
@@ -141,7 +141,7 @@ public class DiscussionPostsActivity extends ActionBarActivity implements
 	private ActionBar actionBar;
 	private boolean postSelected = false;
 	private boolean canDelete = true;
-	
+
 	PostAdapter adapter;
 
 	File file;
@@ -196,7 +196,7 @@ public class DiscussionPostsActivity extends ActionBarActivity implements
 		dialog = ProgressDialog.show(this, dialogWait, dialogMessage, true);
 	}
 
-	// @UiThread
+	@UiThread
 	void setFooter() {
 		if (!footerFuturePostsState) {
 			listVieWDiscussionPosts.addFooterView(footerRefresh, null, true);
@@ -238,15 +238,15 @@ public class DiscussionPostsActivity extends ActionBarActivity implements
 	void response() {
 		if (isDiscussionClosed()) {
 			toaster.showToast(closedDiscussionMessage);
-		}else {
+		} else {
 			Intent intent = new Intent(this, ResponseActivity_.class);
 			intent.putExtra("discussionId", discussionId);
 			int parentPostId = 0;
-			if(postSelected){
-				if(posts.get(selectedPosition).getLevel() == 4){
-					toaster.showToast( notAllowDirectResponse);
+			if (postSelected) {
+				if (posts.get(selectedPosition).getLevel() == 4) {
+					toaster.showToast(notAllowDirectResponse);
 					parentPostId = posts.get(selectedPosition).getParentId();
-				}else{
+				} else {
 					parentPostId = posts.get(selectedPosition).getId();
 				}
 			}
@@ -254,36 +254,36 @@ public class DiscussionPostsActivity extends ActionBarActivity implements
 			startActivity(intent);
 		}
 	}
-	
+
 	@OptionsItem(R.id.menu_post_response)
-	void responseMenssage() {
+	void responseMessage() {
 		response();
 	}
-	
+
 	@OptionsItem(R.id.menu_post_delete)
 	void deleteMenssage() {
 		deletePost();
 		toaster.showToast(postDelete);
 		onBackPressed();
 	}
-	
+
 	@UiThread
-	void updatePost(){
+	void updatePost() {
 		getPosts();
 	}
-	
+
 	@Background
 	void deletePost() {
-		try{
+		try {
 			DiscussionPost dp = null;
-            dp = solarManager.deletePost(posts.get(selectedPosition).getId());
-            int i = 0;
-            while ((dp == null) && i < 10) {
-                wait(100);
-                i++;
-            }
-            updatePost();
-		}catch (HttpStatusCodeException e) {
+			dp = solarManager.deletePost(posts.get(selectedPosition).getId());
+			int i = 0;
+			while ((dp == null) && i < 10) {
+				wait(100);
+				i++;
+			}
+			updatePost();
+		} catch (HttpStatusCodeException e) {
 			Log.i("ERRO HttpStatusCodeException", e.getStatusCode().toString());
 			solarManager.errorHandler(e.getStatusCode());
 		} catch (Exception e) {
@@ -292,44 +292,44 @@ public class DiscussionPostsActivity extends ActionBarActivity implements
 			dialogDismiss();
 		}
 	}
-	
+
 	@Background
-	void checkParentId(){
+	void checkParentId() {
 		int position = selectedPosition - 1;
 		int postId = posts.get(selectedPosition).getId();
 		int parentId = 0;
 		canDelete = true;
-		if(preferences.userId().get() == posts.get(selectedPosition).userId){
-			if(posts.get(selectedPosition).getLevel() == 4){
+		if (preferences.userId().get() == posts.get(selectedPosition).userId) {
+			if (posts.get(selectedPosition).getLevel() == 4) {
 				canDelete = true;
-			}else{
-				while(canDelete && position >= 0){
-					if(posts.get(position).getLevel() == 1){
+			} else {
+				while (canDelete && position >= 0) {
+					if (posts.get(position).getLevel() == 1) {
 						Log.i("teste", "não tem parent");
-					}else{
+					} else {
 						parentId = posts.get(position).getParentId();
 					}
-					if(postId == parentId){
+					if (postId == parentId) {
 						canDelete = false;
 						Log.i("teste", "encontrou");
-					}else{
+					} else {
 						canDelete = true;
 					}
-					position --;
-					Log.i("teste", ""+position);
+					position--;
+					Log.i("teste", "" + position);
 				}
 			}
-		}else{
+		} else {
 			canDelete = false;
 		}
 	}
-	
+
 	@UiThread
 	protected void dialogDismiss() {
 		if (dialog != null)
 			dialog.dismiss();
 	}
-	
+
 	private boolean isDiscussionClosed() {
 		return status.equals("2");
 	}
@@ -481,7 +481,7 @@ public class DiscussionPostsActivity extends ActionBarActivity implements
 
 	@Click(R.id.button_next)
 	void next() {
-		Log.i("Teste bot�o", "botao next");
+		Log.i("Teste botao", "botao next");
 
 		if (selectedPosition == posts.size() - 1) {
 			toaster.showToast(lastPostMessage);
