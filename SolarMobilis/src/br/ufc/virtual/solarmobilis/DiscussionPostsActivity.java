@@ -261,7 +261,7 @@ public class DiscussionPostsActivity extends ActionBarActivity implements
 	}
 
 	@OptionsItem(R.id.menu_post_delete)
-	void deleteMenssage() {
+	void deleteMessage() {
 		deletePost();
 		toaster.showToast(postDelete);
 		onBackPressed();
@@ -418,7 +418,7 @@ public class DiscussionPostsActivity extends ActionBarActivity implements
 			setActionBarSelected();
 
 			if (posts.get(selectedPosition).getFiles().isEmpty()) {
-				Log.w("Anexo", "n�o preenchido");
+				Log.w("Anexo", "nao preenchido");
 			} else {
 				Log.w("Anexo", "preenchido");
 				Log.w("Anexo", posts.get(selectedPosition).getFiles()
@@ -500,7 +500,7 @@ public class DiscussionPostsActivity extends ActionBarActivity implements
 
 	@Click(R.id.button_prev)
 	void previous() {
-		Log.i("Teste bot�o", "botao previous");
+		Log.i("Teste botao", "botao previous");
 
 		if (selectedPosition == 0) {
 			toaster.showToast(firstPostMessage);
